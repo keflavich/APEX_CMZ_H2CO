@@ -115,10 +115,10 @@ for i in xrange(8): # adjust to observing needs...
     print ' '; print 'Loop #:',i+1,'starting...'; print ' '
     tp()
     repeat(1) # adjust to observing needs...
-    otf(xlen=480, ylen=480, xstep=9, ystep=9, time=1.0, direction='x',
+    otf(xlen=480, ylen=480, xstep=18, ystep=9, time=0.5, direction='x',
         zigzag=1, angle=58.6, size_unit='arcsec', angle_unit='deg', system='eq',
         on2cal=14, epoch=2000.0)
-    otf(xlen=480, ylen=480, xstep=9, ystep=9, time=1.0, direction='y',
+    otf(xlen=480, ylen=480, xstep=9, ystep=18, time=0.5, direction='y',
         zigzag=1, angle=58.6, size_unit='arcsec', angle_unit='deg', system='eq',
         on2cal=14, epoch=2000.0)
 tp()
