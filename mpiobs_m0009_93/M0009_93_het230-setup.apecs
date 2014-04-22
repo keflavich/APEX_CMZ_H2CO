@@ -1,0 +1,41 @@
+# MPIFR, 10 April 2014
+################################################################
+## Setup for HET230 (APEX1, i.e. first band of SHFI)
+## To use with M0000_00-target.apecs
+################################################################
+#
+# NB: if Mxxxx_yy is your account in the database
+# (http://www.apex-telescope.org/apexdb/),
+# then your project id is M-0yy.F-xxxx-year with 
+# 'year' the current year
+
+# Your project id
+project_id('M-093.F-0009-2014')
+
+# Your source catalog(s)
+sourcecats('M0009_93.cat')
+# The syntax for several source catalogs is:
+# sourcecats(['M0000_00.cat','M0000_00-2.cat'])
+
+# Your line catalog
+linecats('M0009_93.lin')
+
+# Load special commands for SHFI observations
+exec_apecs_script('shfi_commands') 
+execfile('/homes/software/apecs/start_het230.apecs')
+
+# Frontend/backend setup for HET230
+setup_shfi(fename='het230',linename='shfi219ghz',sideband='',mode='spec')
+#
+# sidebands: 'LSB', 'USB', or ''. If left empty, the sideband 
+#            specified in the line catalog will be used
+# mode: 'spec' for spectroscopy, 'cont' for continuum
+# Information about the bandwidth and spectral resolution can be found in
+# Tables 3.4, 3.5, and 3.6 of the APECS user manual version 2.7.
+
+# Heterodyne setup
+use_ref('on')
+continuous_data('off')
+skip_hardware_setup('off')
+
+################################################################
