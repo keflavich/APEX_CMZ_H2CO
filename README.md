@@ -11,3 +11,6 @@ demonstrating this (it will automatically download the necessary data).  One
 can also demonstrate that these are relatively emission-free using the [Bell
 Labs 7m 12CO 1-0 data](http://files.figshare.com/1216354/GC_12CO_LVcube.fits),
 with apologies for the FITS header.
+
+The off position map rendered in low quality:
+![Imgur](http://i.imgur.com/UzE4Rgp.png)
