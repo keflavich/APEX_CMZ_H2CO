@@ -54,14 +54,13 @@ source('Map_115',cats='all')
 # source('Map_004', cats='all')
 # source('Map_003', cats='all')
           
-############################################################
-###   Switching mode (total power OR wobbler OR frequency 
-### switching). Remove the parts you don't need! 
-############################################################
 
-#####################
-# TOTAL POWER MODE
-tp()
+setup_shfi(fename='het230',linename='shfi219ghz',sideband='',mode='spec')
+go()
+print ' '
+dummy = raw_input('\033[32;1mTune receiver if required - and press RETURN when ready!\033[0m ')
+print ' '
+
 use_ref('on')
 # reference position defined by an offset from the source:
 # [AG] Absolute references selected to avoid 12CO emission from Dame et al. 2001
@@ -77,39 +76,13 @@ reference(x="17:43:53.890",x="-28:07:04.68", time=0.0, on2off=1, unit='hdms', mo
 reference(x="17:48:11.934",x="-29:44:41.83", time=0.0, on2off=1, unit='hdms', mode='abs',
           system='EQ', epoch=2000.0)
 
-#####################
-# WOBBLER MODE (+- amplitude arcsec)
-# amplitude max: about 120 arcsec, depending on the wobbling
-# rate.
-#wob(amplitude=100.0, rate=1.5, mode='sym', blank=-1)
-
-# OR for continuum observations:
-#wob(amplitude=100.0, rate=1.0, mode='sym', blank=-1)
-
-#####################
-# FREQUENCY SWITCHING MODE
-# before using this mode, read the report on tests performed 
-# with FLASH in February 2010!
-#fsw(rate=1, blank=-1)
-
-############################################################
-###   Offsets from catalog position (if required)
-############################################################
-
-# No offset required [AG]
-# offset(0.0,0.0,unit='arcsec',system='EQ')
-
-############################################################
-###   Calibrations, repetitions, loops
-###   Remove the parts you don't need!
-############################################################
 
 #####################
 # OTF MAP
 # Section written by Adam Ginsburg [AG]
 # calibrate('cold') # REMOVED because of on2cal [AG]
 # tp() scans added to match ESO obs [AG]
-# Integration time dropped from 1.0 to 0.5 per Axels' recommendation [AG]
+# Integration time dropped from 1.0 to 0.5 per Axel's recommendation [AG]
 # Each scan requires 480 / 18 = 26.666 seconds
 # Calibrations should be performed every 10 minutes, so on2cal=15
 # (every 6.666 minutes, plus overheads) should be fine

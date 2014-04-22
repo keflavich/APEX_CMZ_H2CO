@@ -11,15 +11,7 @@ linecats('e-093.c-0144a-2014.lin')
 
 # Setup for APEX-1 (frontend, backend, lines)
 # Uncomment the setup for the line to observe, or enter manually!
-# setup_shfi(fename='het230',linename='p-H2CO_303-202',sideband='',mode='spec',cats='user')
-# setup_shfi(fename='het230',linename='p-H2CO_322-221',sideband='',mode='spec',cats='user')
-# setup_shfi(fename='het230',linename='p-H2CO_321-220',sideband='',mode='spec',cats='user')
-# setup_shfi(fename='het230',linename='SiO_J=5-4',sideband='',mode='spec',cats='user')
-# setup_shfi(fename='het230',linename='SO_6_5-5-4',sideband='',mode='spec',cats='user')
-# setup_shfi(fename='het230',linename='CH3CN_12-11',sideband='',mode='spec',cats='user')
-# setup_shfi(fename='het230',linename='CH3CN_12-11_0',sideband='',mode='spec',cats='user')
-# setup_shfi(fename='het230',linename='C18O',sideband='',mode='spec',cats='user')
-# setup_shfi(fename='het230',linename='13CO',sideband='',mode='spec',cats='user')
+
 
 # User source catalog
 sourcecats(['e-093.c-0144a-2014.cat'])
