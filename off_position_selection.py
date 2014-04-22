@@ -9,4 +9,5 @@ F.show_grayscale()
 F.recenter(0,0,width=5,height=3) # center on the inner 5x3 degrees
 F.show_regions('target_fields_8x8.reg')
 F.show_regions('off_positions_selectedfromDame2001.reg')
+F.save('Dame2001_APEXCMZ_offpositions.png')
 F.save('Dame2001_APEXCMZ_offpositions.pdf')

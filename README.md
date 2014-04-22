@@ -12,5 +12,9 @@ can also demonstrate that these are relatively emission-free using the [Bell
 Labs 7m 12CO 1-0 data](http://files.figshare.com/1216354/GC_12CO_LVcube.fits),
 with apologies for the FITS header.
 
-The off position map rendered in low quality:
-![Imgur](http://i.imgur.com/UzE4Rgp.png)
+The off position map, with two additional points identified by Jens Kauffmann
+and Walker Lu:
+![Imgur](http://i.imgur.com/Oh1HI1v.png)
+
+Note that Jens' point reportedly showed some signal around SiO, while Walker's
+did not.
