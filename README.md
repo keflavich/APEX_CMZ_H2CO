@@ -18,3 +18,7 @@ identified by Jens Kauffmann and Walker Lu:
 
 Note that Jens' point reportedly showed some signal around SiO, while Walker's
 did not.
+
+Here are the target regions colored by their association with the selected off
+position:
+![Imgur](http://i.imgur.com/LzAC4KJ.png)

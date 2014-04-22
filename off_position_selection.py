@@ -11,3 +11,8 @@ F.show_regions('target_fields_8x8.reg')
 F.show_regions('off_positions_selectedfromDame2001.reg')
 F.save('Dame2001_APEXCMZ_offpositions.png')
 F.save('Dame2001_APEXCMZ_offpositions.pdf')
+
+F.hide_layer('region_set_1')
+F.hide_layer('region_set_1_txt')
+F.show_regions('target_fields_8x8_coloredbyoffposition.reg')
+F.save('Dame2001_APEXCMZ_offpositions_coloredbyoff.png')
