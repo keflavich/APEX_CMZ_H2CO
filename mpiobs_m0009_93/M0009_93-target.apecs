@@ -110,14 +110,17 @@ reference(x="17:48:11.934",x="-29:44:41.83", time=0.0, on2off=1, unit='hdms', mo
 # calibrate('cold') # REMOVED because of on2cal [AG]
 # tp() scans added to match ESO obs [AG]
 # Integration time dropped from 1.0 to 0.5 per Axels' recommendation [AG]
+# Each scan requires 480 / 18 = 26.666 seconds
+# Calibrations should be performed every 10 minutes, so on2cal=15
+# (every 6.666 minutes, plus overheads) should be fine
 tp()
 repeat(1)
-otf(xlen=480, ylen=480, xstep=9, ystep=9, time=0.5, direction='x',
+otf(xlen=480, ylen=480, xstep=18, ystep=9, time=0.5, direction='x',
     zigzag=1, angle=58.6, size_unit='arcsec', angle_unit='deg', system='eq',
-    on2cal=14, epoch=2000.0)
-otf(xlen=480, ylen=480, xstep=9, ystep=9, time=0.5, direction='y',
+    on2cal=15, epoch=2000.0)
+otf(xlen=480, ylen=480, xstep=9, ystep=18, time=0.5, direction='y',
     zigzag=1, angle=58.6, size_unit='arcsec', angle_unit='deg', system='eq',
-    on2cal=14, epoch=2000.0)
+    on2cal=15, epoch=2000.0)
 tp()
 # If the otf scan lasts longer than typically 10 minutes, then you can
 # insert calibrations with the parameter on2cal. No calibration will be
