@@ -158,7 +158,9 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
     ra,dec = zip(*[(h['RA']+h['RAoff']/np.cos(h['DEC']/180.*np.pi),
                     h['DEC']+h['DECoff']) for h in headers])
     print "Determining Galactic coordinates"
-    gal = coordinates.ICRS(np.array(ra)*u.deg,np.array(dec)*u.deg).galactic
+    gal = coordinates.SkyCoord(np.array(ra)*u.deg,
+                               np.array(dec)*u.deg,
+                               frame='icrs').galactic
     #gal.l.wrap_angle = 180*u.deg
     galOK = ((gal.l.wrap_at(180*u.deg).deg > -2) &
              (gal.l.wrap_at(180*u.deg).deg < 2) &
@@ -585,10 +587,11 @@ def build_cube_ao(window, freq=False, mergefile=None,
         all_hdrs[dataset] = hdrs
         all_gal[dataset] = gal
 
-    all_gal_vect = coordinates.Galactic(np.hstack([all_gal[g].l.to(u.radian).value
+    all_gal_vect = coordinates.SkyCoord(np.hstack([all_gal[g].l.to(u.radian).value
                                                    for g in all_gal]) * u.radian,
                                         np.hstack([all_gal[g].b.to(u.radian).value
-                                                   for g in all_gal]) * u.radian)
+                                                   for g in all_gal]) * u.radian,
+                                        frame='galactic')
     all_gal_vect.l.wrap_angle = 180*u.deg
 
     if not mergefile:
@@ -676,10 +679,11 @@ def build_cube_2013(mergefile=None,
                                                skip_data=True)
             all_gal[dataset] = gal
 
-        all_gal_vect = coordinates.Galactic(np.hstack([all_gal[g].l.to(u.radian).value
+        all_gal_vect = coordinates.SkyCoord(np.hstack([all_gal[g].l.to(u.radian).value
                                                        for g in all_gal]) * u.radian,
                                             np.hstack([all_gal[g].b.to(u.radian).value
-                                                       for g in all_gal]) * u.radian)
+                                                       for g in all_gal]) * u.radian,
+                                            frame='galactic')
         all_gal_vect.l.wrap_angle = 180*u.deg
 
         make_blanks_freq(all_gal_vect, hdrs[0], cubefilename, clobber=True)
@@ -1460,10 +1464,11 @@ def build_cube_2014(sourcename,
                                                skip_data=True)
             all_gal[dataset] = gal
 
-        all_gal_vect = coordinates.Galactic(np.hstack([all_gal[g].l.to(u.radian).value
+        all_gal_vect = coordinates.SkyCoord(np.hstack([all_gal[g].l.to(u.radian).value
                                                        for g in all_gal]) * u.radian,
                                             np.hstack([all_gal[g].b.to(u.radian).value
-                                                       for g in all_gal]) * u.radian)
+                                                       for g in all_gal]) * u.radian,
+                                            frame='galactic')
         all_gal_vect.l.wrap_angle = 180*u.deg
 
         log.info("Making blanks for "+cubefilename)
