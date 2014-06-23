@@ -6,6 +6,7 @@ from astropy import wcs
 from astropy import coordinates
 from astropy import units as u
 from astropy import constants
+from astropy.utils.console import ProgressBar
 from astropy.convolution import convolve, Gaussian1DKernel
 from sdpy import makecube
 from astropy.io import fits
@@ -231,22 +232,35 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
 
 def process_data(data, gal, hdrs, dataset, scanblsub=True,
                  subspectralmeans=True, verbose=False, noisefactor=1.5,
+                 linemask=False, automask=2,
                  **kwargs):
+
+    timeaxis = 0
+    freqaxis = 1
+
+    log.info("Processing {0}".format(dataset))
+
     if subspectralmeans:
-        data -= data.mean(axis=1)[:,None]
+        data -= data.mean(axis=freqaxis)[:,None]
 
     if scanblsub:
         scans = identify_scans_fromcoords(gal)
         freq = hdr_to_freq(hdrs[0])
-        mask = make_line_mask(freq)
-        dsub = subtract_scan_linear_fit(data, scans, mask_pixels=mask,
-                                        verbose=verbose, automask=2,
-                                        smooth_all=True)
+        if linemask:
+            mask = make_line_mask(freq)
+        else:
+            mask = None
+        dsub,mask_pix = subtract_scan_linear_fit(data, scans, mask_pixels=mask,
+                                                 verbose=verbose,
+                                                 automask=automask,
+                                                 smooth_all=True,
+                                                 return_mask=True)
+        mask = mask_pix.max(axis=timeaxis).astype('bool')
     else:
         freq = None
         mask = None
 
-    noise = np.std(data,axis=1)
+    noise = np.std(data,axis=freqaxis)
     freq_step = np.array([h['FRES'] for h in hdrs])
     exptime = np.array([h['EXPOSURE'] for h in hdrs])
     tsys = np.array([h['TSYS'] for h in hdrs])
@@ -267,21 +281,25 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
     diagplot(data, tsys, noise, dataset+"_preflag", freq=freq, mask=mask, **kwargs)
 
     data = data[True-bad]
+    obsids = obsids[True-bad]
+    tsys = tsys[True-bad]
+    noise = noise[True-bad]
+
     if scanblsub:
-        data_diagplot(data, dataset+"_presub", **kwargs)
-        for xscan in np.unique(obsids):
+        data_diagplot(data, dataset+"_presub",
+                      **kwargs)
+        for ii,xscan in enumerate(np.unique(obsids)):
             match = obsids == xscan
-            data_diagplot(data, dataset+"_presub_obs%i" % xscan, **kwargs)
+            # maybe mask=mask_pix.max(axis=timeaxis), ?
+            #mask=mask_pix[ii], 
+            data_diagplot(data[match], dataset+"_presub_obs%i" % xscan,
+                          **kwargs)
     gal = gal[True-bad]
     hdrs = [h for h,b in zip(hdrs,bad) if not b]
-    print "Flagged out %i bad values (%0.1f%%)." % (bad.sum(),bad.sum()/float(bad.size))
+    log.info("Flagged out %i bad values (%0.1f%%)." % (bad.sum(),bad.sum()/float(bad.size)))
 
     if scanblsub:
         data = dsub[True-bad]
-
-    tsys = tsys[True-bad]
-    noise = noise[True-bad]
-    obsids = obsids[True-bad]
 
     diagplot(data, tsys, noise, dataset, freq=freq, mask=mask, **kwargs)
     for xscan in np.unique(obsids):
@@ -301,11 +319,12 @@ def hdr_to_velo(h):
     veloarr = (np.arange(h['NCHAN'])+1-h['RCHAN']) * h['VRES'] + h['VOFF']
     return veloarr
 
-def add_apex_data(data,hdrs,gal, cubefilename, noisecut=np.inf, retfreq=False,
-                  excludefitrange=None, varweight=False, debug=False):
+def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
+                  retfreq=False, excludefitrange=None, varweight=False,
+                  debug=False):
 
 
-    print "Data shape: ",data.shape
+    log.info("Data shape: {}".format(data.shape))
     if data.ndim != 2:
         raise ValueError('Data shape is NOT ok.')
     if data.shape[0] != len(hdrs):
@@ -358,12 +377,12 @@ def add_apex_data(data,hdrs,gal, cubefilename, noisecut=np.inf, retfreq=False,
 
 def make_blanks(gal, header, cubefilename, clobber=True):
 
-    lrange = gal.l.wrap_at(180*u.deg).deg.min()+15/3600.,gal.l.wrap_at(180*u.deg).deg.max()+15/3600.
+    lrange = (gal.l.wrap_at(180*u.deg).deg.min()+15/3600.,
+              gal.l.wrap_at(180*u.deg).deg.max()+15/3600.)
     brange = gal.b.deg.min()+15/3600.,gal.b.deg.max()+15/3600.
-    print "Map extent: %0.2f < l < %0.2f,  %0.2f < b < %0.2f" % (lrange[0],
-                                                                 lrange[1],
-                                                                 brange[0],
-                                                                 brange[1])
+    log.info("Map extent automatically determined: "
+             "%0.2f < l < %0.2f,  %0.2f < b < %0.2f" % (lrange[0], lrange[1],
+                                                        brange[0], brange[1]))
 
     pixsize = 7.2*u.arcsec
     naxis1 = (lrange[1]-lrange[0])/(pixsize.to(u.deg).value)
@@ -373,7 +392,7 @@ def make_blanks(gal, header, cubefilename, clobber=True):
 
     makecube.generate_header(np.mean(lrange), np.mean(brange), naxis1=naxis1,
                              naxis2=naxis2, naxis3=4096, coordsys='galactic',
-                             ctype3='VELO-LSR',
+                             ctype3='VRAD',
                              bmaj=bmaj.to(u.deg).value,
                              bmin=bmaj.to(u.deg).value,
                              pixsize=pixsize.to(u.arcsec).value,
@@ -523,7 +542,11 @@ def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png', newfig
         freq = np.arange(data.shape[1])
     pl.plot(freq, data.mean(axis=0))
     if mask is not None:
-        pl.plot(freq[mask], data.mean(axis=0)[mask])
+        # Avoid the incorrect appearance of interpolation by masking out
+        # intermediate values
+        d_to_plot = data.mean(axis=0)
+        d_to_plot[mask] = np.nan
+        pl.plot(freq, d_to_plot)
     pl.xlabel("Frequency")
     pl.ylabel("Mean Counts")
     pl.savefig(os.path.join(diagplotdir, dataset+"_masked."+ext),bbox_inches='tight')
@@ -565,7 +588,7 @@ def build_cube_ao(window, freq=False, mergefile=None,
                                          rchanrange=None,
                                          #rchanrange=rcr,
                                          tsysrange=[100,250])
-        print "Selected %i spectra from %s" % (len(hdrs), dataset)
+        log.info("Selected %i spectra from %s" % (len(hdrs), dataset))
 
         #This flagging is more appropriately done in the process_data step
         # # noise_cut = 4 determined by looking at a plot of noise vs time; 0.7%
@@ -604,6 +627,8 @@ def build_cube_ao(window, freq=False, mergefile=None,
         excludefitrange=None
     else:
         excludefitrange = [700,1300] # FIX THIS when velos are fixed
+
+    log.info("Data has been collected and flagged, now adding to cube.")
 
     for dataset in all_data:
         data = all_data[dataset]
@@ -1543,9 +1568,6 @@ def build_cube_2014(sourcename,
     log.info("Done with "+cubefilename)
 
 
-def fft_flag(dfft, minfreq, minlevel):
-    pass
-
 def identify_scans_fromcoords(gal):
     # identify where the *derivative* changes signs
     # each np.diff shifts 1 to the left
@@ -1555,7 +1577,9 @@ def identify_scans_fromcoords(gal):
 
 def subtract_scan_linear_fit(data, scans, mask_pixels=None,
                              verbose=False, smoothing_width=10,
-                             automask=False, smooth_all=False):
+                             automask=False, smooth_all=False,
+                             smoothing_kernel_size_scale=40,
+                             nsigma_ignore=1.0, return_mask=False):
     """
     Use linear algebra to fit a time-baseline to each scan to remove spectral
     baseline drifts.
@@ -1584,35 +1608,59 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
         slightly smoothed first if automask > 1.
     verbose : bool
         Print out simple stats about the fits
+    smoothing_kernel_size_scale : int
+        The size multiplier of the smoothing kernel used for interpolation in
+        the frequency domain; smoothing_kernel_size_scale * smoothing_width
+        defines the number of pixels to use when interpolating
+    nsigma_ignore : float
+        The number of standard deviations above which the mean spectrum ought
+        to be before it is ignored
+    return_mask : bool
+        Return an array of the mask used for each scan
     """
     
     #dmeans = data[:,percentile*data.shape[1]:(1-percentile)*data.shape[1]].mean(axis=1)
 
     dsub = data*0
 
+    timeaxis = 0
+    freqaxis = 1
+
+    # Kernel must be ODD
+    kernel_size = smoothing_kernel_size_scale * smoothing_width
+    if kernel_size % 2 == 0:
+        kernel_size += 1
+
+    if return_mask and automask > 0:
+        masklist = []
+
     for ii,jj in zip([0]+scans.tolist(),
-                     scans.tolist()+[data.shape[0]]):
+                     scans.tolist()+[data.shape[timeaxis]]):
         x = np.arange(jj-ii)
 
         if automask:
-            means = data[ii:jj,:].mean(axis=0)
+            mean_spectrum = data[ii:jj,:].mean(axis=timeaxis)
             if automask > 1:
-                means = convolve(means, Gaussian1DKernel(stddev=automask))
-            mask_pixels = means < means.mean() + means.std()
+                mean_spectrum = convolve(mean_spectrum,
+                                         Gaussian1DKernel(stddev=automask))
+            mask_pixels = (mean_spectrum < (mean_spectrum.mean() +
+                                            nsigma_ignore*mean_spectrum.std()))
             if verbose:
                 nflag = (~mask_pixels).sum()
                 log.info("Masked {0} pixels in scan {1}-{2} ({3}%)".format(nflag,
                                                                            ii, jj,
                                                                            nflag/float(mask_pixels.size),
                                                                            )
-                           )
+                          )
 
         if mask_pixels is None:
             y = data[ii:jj,:]
         else:
             # mask_pixels is an include mask
-            inds = np.arange(data.shape[1])[mask_pixels]
+            inds = np.arange(data.shape[freqaxis])[mask_pixels]
             y = data[ii:jj,mask_pixels]
+            if return_mask:
+                masklist.append(mask_pixels)
 
         # X is a vector of the X-values and a constant (1)
         # Becomes set of equations y = m x + b  ||  y = X mb
@@ -1622,15 +1670,15 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
         if mask_pixels is not None:
             # Mask out the bad values, interpolate using a wide gaussian that
             # ignores nans
-            m = np.zeros(data.shape[1]) + np.nan
+            m = np.zeros(data.shape[freqaxis]) + np.nan
             m[inds] = mb[0,:]
             m = convolve(m, Gaussian1DKernel(stddev=smoothing_width,
-                                             x_size=401))
+                                             x_size=kernel_size))
 
-            b = np.zeros(data.shape[1]) + np.nan
+            b = np.zeros(data.shape[freqaxis]) + np.nan
             b[inds] = mb[1,:]
             b = convolve(b, Gaussian1DKernel(stddev=smoothing_width,
-                                             x_size=401))
+                                             x_size=kernel_size))
 
             # restore initial sampling unless we want smooth
             if not smooth_all:
@@ -1642,8 +1690,11 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
         dsub[ii:jj,:] = data[ii:jj,:] - np.inner(X,mb.T)
 
     log.info("Fit {0} scans with mean slopes {1} and offset {2}".format(len(scans)+1,
-                                                                                        mb.mean(axis=1)[0],
-                mb.mean(axis=1)[1]))
+                                                                        mb.mean(axis=1)[0],
+                                                                        mb.mean(axis=1)[1]))
+
+    if return_mask:
+        return dsub, np.array(masklist)
 
     return dsub
 
