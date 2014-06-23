@@ -158,7 +158,7 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
     ra,dec = zip(*[(h['RA']+h['RAoff']/np.cos(h['DEC']/180.*np.pi),
                     h['DEC']+h['DECoff']) for h in headers])
     print "Determining Galactic coordinates"
-    gal = coordinates.ICRS(np.array(ra),np.array(dec),unit=(u.deg,u.deg)).galactic
+    gal = coordinates.ICRS(np.array(ra)*u.deg,np.array(dec)*u.deg).galactic
     #gal.l.wrap_angle = 180*u.deg
     galOK = ((gal.l.wrap_at(180*u.deg).deg > -2) &
              (gal.l.wrap_at(180*u.deg).deg < 2) &
@@ -520,7 +520,7 @@ def build_cube_ao(lines, freq=False, mergefile=None,
     all_data,all_hdrs,all_gal = {},{},{}
     for dataset in datasets:
 
-        apex_filename=datapath+dataset+"_merge.apex"
+        apex_filename = os.path.join(datapath,dataset+"_merge.apex")
 
         spectra,headers,indices = load_apex_cube(apex_filename)
         data,hdrs,gal = select_apex_data(spectra, headers, indices,
