@@ -228,7 +228,8 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
     return data,hdrs,gal
 
 def process_data(data, gal, hdrs, dataset, scanblsub=True,
-                 subspectralmeans=True, verbose=False, noisefactor=1.5):
+                 subspectralmeans=True, verbose=False, noisefactor=1.5,
+                 **kwargs):
     if subspectralmeans:
         data -= data.mean(axis=1)[:,None]
 
@@ -260,12 +261,15 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
 
     obsids = np.array([h['XSCAN'] for h in hdrs])
 
+    # pre-flagging diagnostic
+    diagplot(data, tsys, noise, dataset+"_preflag", freq=freq, mask=mask, **kwargs)
+
     data = data[True-bad]
     if scanblsub:
-        data_diagplot(data, dataset+"_presub")
+        data_diagplot(data, dataset+"_presub", **kwargs)
         for xscan in np.unique(obsids):
             match = obsids == xscan
-            data_diagplot(data, dataset+"_presub_obs%i" % xscan)
+            data_diagplot(data, dataset+"_presub_obs%i" % xscan, **kwargs)
     gal = gal[True-bad]
     hdrs = [h for h,b in zip(hdrs,bad) if not b]
     print "Flagged out %i bad values (%0.1f%%)." % (bad.sum(),bad.sum()/float(bad.size))
@@ -277,11 +281,11 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
     noise = noise[True-bad]
     obsids = obsids[True-bad]
 
-    diagplot(data, tsys, noise, dataset, freq=freq, mask=mask)
+    diagplot(data, tsys, noise, dataset, freq=freq, mask=mask, **kwargs)
     for xscan in np.unique(obsids):
         match = obsids == xscan
         diagplot(data[match], tsys[match], noise[match],
-                 dataset+"_obs%i" % xscan, freq=freq, mask=mask, )
+                 dataset+"_obs%i" % xscan, freq=freq, mask=mask, **kwargs)
 
     return data,gal,hdrs
 
@@ -453,10 +457,13 @@ def make_blanks_merge(cubefilename, lowhigh='low', clobber=True,
 
     makecube.make_blank_images(cubefilename, clobber=clobber)
 
-def data_diagplot(data, dataset, ext='png'):
+def data_diagplot(data, dataset, ext='png', newfig=False):
     log.info("Doing diagnostics in "+dataset)
-    pl.figure(1)
-    pl.clf()
+    if newfig:
+        pl.figure()
+    else:
+        pl.figure(1)
+        pl.clf()
     if (np.isnan(data)).all():
         print "ALL data is NaN in ", dataset
         import ipdb; ipdb.set_trace()
@@ -468,11 +475,33 @@ def data_diagplot(data, dataset, ext='png'):
         print ex
     return axis
 
-def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png'):
+def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png', newfig=False):
+    """
+    Generate a set of diagnostic plots
 
-    data_diagplot(data, dataset, ext=ext)
-    pl.figure(2)
-    pl.clf()
+    Parameters
+    ----------
+    data : `numpy.ndarray`
+        A 2D data set, with scans along the y-axis and frequency along the
+        x-axis
+    tsys : `numpy.ndarray`
+        A 1D data set giving TSYS at each time
+    noise : `numpy.ndarray`
+        The measured noise in each scan
+    freq : `numpy.ndarray` or None
+        The frequencies to plot along the X-axis
+    mask : `numpy.ndarray`
+        A boolean mask array with True = good values to be plotted
+    ext : str
+        The image extension to use when saving
+    """
+
+    data_diagplot(data, dataset, ext=ext, newfig=newfig)
+    if newfig:
+        pl.figure()
+    else:
+        pl.figure(2)
+        pl.clf()
     pl.subplot(2,1,1)
     pl.plot(tsys,np.arange(tsys.size),alpha=0.5)
     pl.xlabel("TSYS")
@@ -483,8 +512,11 @@ def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png'):
     pl.ylabel("Noise")
     pl.savefig(os.path.join(diagplotdir, dataset+"_tsys."+ext),bbox_inches='tight')
 
-    pl.figure(3)
-    pl.clf()
+    if newfig:
+        pl.figure()
+    else:
+        pl.figure(3)
+        pl.clf()
     if freq is None:
         freq = np.arange(data.shape[1])
     pl.plot(freq, data.mean(axis=0))
@@ -494,28 +526,30 @@ def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png'):
     pl.ylabel("Mean Counts")
     pl.savefig(os.path.join(diagplotdir, dataset+"_masked."+ext),bbox_inches='tight')
 
-def build_cube_ao(lines, freq=False, mergefile=None,
+def build_cube_ao(window, freq=False, mergefile=None,
                   datapath=aorawpath,
                   outpath=aopath,
                   datasets=['O-085.F-9311A-2010','E-085.B-0964A-2010'],
                   scanblsub=True,
                   verbose=False,
-                  debug=False):
+                  debug=False,
+                  **kwargs):
     """
-    Attempt to determine CORRECT velocities:
-        The Brick peak is at pixel 244
+    TODO: comment!
+
+    kwargs are passed to process_data
     """
-    if lines not in ('low','high'):
+    if window not in ('low','high'):
         raise ValueError()
     if mergefile:
-        cubefilename=os.path.join(outpath,'APEX_H2CO_merge_%s' % lines)
+        cubefilename=os.path.join(outpath,'APEX_H2CO_merge_%s' % window)
     elif freq:
-        cubefilename=os.path.join(outpath,'APEX_H2CO_Ao_Freq_%s' % lines)
+        cubefilename=os.path.join(outpath,'APEX_H2CO_Ao_Freq_%s' % window)
     else:
-        cubefilename=os.path.join(outpath,'APEX_H2CO_Ao_%s' % lines)
+        cubefilename=os.path.join(outpath,'APEX_H2CO_Ao_%s' % window)
 
-    #rcr = [-1000,0] if lines == 'low' else [0,5000]
-    xtel = 'AP-H201-F101' if lines == 'high' else 'AP-H201-F102'
+    #rcr = [-1000,0] if window == 'low' else [0,5000]
+    xtel = 'AP-H201-F101' if window == 'high' else 'AP-H201-F102'
 
     all_data,all_hdrs,all_gal = {},{},{}
     for dataset in datasets:
@@ -531,20 +565,21 @@ def build_cube_ao(lines, freq=False, mergefile=None,
                                          tsysrange=[100,250])
         print "Selected %i spectra from %s" % (len(hdrs), dataset)
 
-        # noise_cut = 4 determined by looking at a plot of noise vs time; 0.7%
-        # of data is above 4
-        # Extreme noise appears independent of TSYS!
-        # 4% of data >0.75, but it's pretty bad
-        noise = np.std(data,axis=1)
-        freq_step = np.array([h['FRES'] for h in hdrs])
-        exptime = np.array([h['EXPOSURE'] for h in hdrs])
-        tsys = np.array([h['TSYS'] for h in hdrs])
-        theoretical_rms = 2.0**0.5*tsys/(np.abs(freq_step*1.0e6)*exptime)**0.5
-        bad = noise > theoretical_rms
-        data = data[True-bad]
-        gal = gal[True-bad]
-        hdrs = [h for h,b in zip(hdrs,bad) if not b]
-        print "Flagged out %i bad values (%0.1f%%)." % (bad.sum(),bad.sum()/float(bad.size))
+        #This flagging is more appropriately done in the process_data step
+        # # noise_cut = 4 determined by looking at a plot of noise vs time; 0.7%
+        # # of data is above 4
+        # # Extreme noise appears independent of TSYS!
+        # # 4% of data >0.75, but it's pretty bad
+        # noise = np.std(data,axis=1)
+        # freq_step = np.array([h['FRES'] for h in hdrs])
+        # exptime = np.array([h['EXPOSURE'] for h in hdrs])
+        # tsys = np.array([h['TSYS'] for h in hdrs])
+        # theoretical_rms = 2.0**0.5*tsys/(np.abs(freq_step*1.0e6)*exptime)**0.5
+        # bad = noise > theoretical_rms
+        # data = data[True-bad]
+        # gal = gal[True-bad]
+        # hdrs = [h for h,b in zip(hdrs,bad) if not b]
+        # print "Flagged out %i bad values (%0.1f%%)." % (bad.sum(),bad.sum()/float(bad.size))
 
         all_data[dataset] = data
         all_hdrs[dataset] = hdrs
@@ -573,7 +608,8 @@ def build_cube_ao(lines, freq=False, mergefile=None,
         gal  = all_gal[dataset]
 
         data, gal, hdrs = process_data(data, gal, hdrs, dataset+"_"+xtel,
-                                       scanblsub=scanblsub, verbose=verbose)
+                                       scanblsub=scanblsub, verbose=verbose,
+                                       **kwargs)
 
         add_apex_data(data, hdrs, gal, cubefilename,
                       excludefitrange=excludefitrange,
@@ -611,7 +647,7 @@ def build_cube_2013(mergefile=None,
                               'M-091.F-0019-2013-2013-06-12',
                               'M-091.F-0019-2013-2013-06-13'],
                     scanblsub=True,
-                    verbose=True):
+                    verbose=True, **kwargs):
     if mergefile:
         cubefilename=os.path.join(outpath,mergefile)
     else:
@@ -674,7 +710,8 @@ def build_cube_2013(mergefile=None,
                                            skip_data=False)
         
         data, gal, hdrs = process_data(data, gal, hdrs, dataset+"_"+xtel,
-                                       scanblsub=scanblsub, verbose=verbose)
+                                       scanblsub=scanblsub, verbose=verbose,
+                                       **kwargs)
 
         add_apex_data(data, hdrs, gal, cubefilename, retfreq=True,
                       varweight=True,)
@@ -700,7 +737,7 @@ def build_cube_2013(mergefile=None,
 def make_high_mergecube(datasets_2014=datasets_2014):
     mergefile2 = 'APEX_H2CO_merge_high'
     make_blanks_merge(os.path.join(mergepath,mergefile2), lowhigh='high')
-    build_cube_ao(lines='high', mergefile=True, freq=True, outpath=mergepath)
+    build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath)
     build_cube_2013(mergefile=mergefile2,
                     outpath=mergepath,
                     lowhigh='high',
@@ -720,7 +757,7 @@ def make_high_mergecube(datasets_2014=datasets_2014):
 def make_low_mergecube(datasets_2014=datasets_2014):
     mergefile1 = 'APEX_H2CO_merge_low'
     make_blanks_merge(os.path.join(mergepath,mergefile1), lowhigh='low')
-    build_cube_ao(lines='low', mergefile=True, freq=True, outpath=mergepath)
+    build_cube_ao(window='low', mergefile=True, freq=True, outpath=mergepath)
     build_cube_2013(mergefile=mergefile1,
                     outpath=mergepath,
                     lowhigh='low',
@@ -1380,7 +1417,8 @@ def build_cube_2014(sourcename,
                     outpath='/Users/adam/work/h2co/apex/april2014/',
                     datasets=None,
                     scanblsub=False,
-                    verbose=True
+                    verbose=True,
+                    **kwargs
                     ):
     """
     Wrapper.  Because each field has its own name in 2014, this will need to be
@@ -1465,7 +1503,8 @@ def build_cube_2014(sourcename,
 
         data, gal, hdrs = process_data(data, gal, hdrs, os.path.join(outpath,
                                                                      dataset)+"_"+xtel,
-                                       scanblsub=scanblsub, verbose=verbose)
+                                       scanblsub=scanblsub, verbose=verbose,
+                                       **kwargs)
 
         log.info("".join(("Adding data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
 
