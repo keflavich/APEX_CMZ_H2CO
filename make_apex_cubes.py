@@ -129,6 +129,9 @@ def load_2013_dataset_for_debugging(lowhigh='low', downsample_factor=8,
 
     return spectra,headers,indices, data,hdrs,gal
 
+def get_sourcenames(headers):
+    return list(set([h['SOURC'].strip() for h in headers]))
+
 def load_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
                    skip_data=False, DEBUG=False, downsample_factor=None):
     spectra,headers,indices = read_class.read_class(apex_filename, start=1024,
@@ -153,20 +156,25 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
                      shapeselect=None, tsysrange=None, rchanrange=None,
                      xscan=None,
                      xtel=None,
-                     skip_data=False):
+                     skip_data=False,
+                     galactic_coordinate_range=[[-2,2],[-2,2]]):
 
-    print "Determining RA/Dec"
+    log.info("Determining RA/Dec")
     ra,dec = zip(*[(h['RA']+h['RAoff']/np.cos(h['DEC']/180.*np.pi),
                     h['DEC']+h['DECoff']) for h in headers])
-    print "Determining Galactic coordinates"
+    log.info("Determining Galactic coordinates")
     gal = coordinates.SkyCoord(np.array(ra)*u.deg,
                                np.array(dec)*u.deg,
                                frame='icrs').galactic
     #gal.l.wrap_angle = 180*u.deg
-    galOK = ((gal.l.wrap_at(180*u.deg).deg > -2) &
-             (gal.l.wrap_at(180*u.deg).deg < 2) &
-             (gal.b.deg > -2) &
-             (gal.b.deg < 2))
+    if galactic_coordinate_range is not None:
+        (lmin,lmax),(bmin,bmax) = galactic_coordinate_range
+        galOK = ((gal.l.wrap_at(180*u.deg).deg > lmin) &
+                 (gal.l.wrap_at(180*u.deg).deg < lmax) &
+                 (gal.b.deg > bmin) &
+                 (gal.b.deg < bmax))
+    else:
+        galOK = True
 
     
     if isinstance(sourcename, (list,tuple)):
@@ -203,7 +211,7 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
     mostOK = galOK & sourceOK & tsysOK & rchanOK & xtelOK & xscanOK
 
     if not skip_data:
-        print "Shaping data"
+        log.info("Shaping data")
         data1 = np.array(spectra)
         shapes = np.array([d.shape for d in data1])
         if shapeselect is not None:
@@ -550,6 +558,114 @@ def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png', newfig
     pl.xlabel("Frequency")
     pl.ylabel("Mean Counts")
     pl.savefig(os.path.join(diagplotdir, dataset+"_masked."+ext),bbox_inches='tight')
+
+def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
+                       outpath='./', datasets=[], scanblsub=True,
+                       shapeselect=None,
+                       sourcename=None,
+                       tsysrange=[100,250],
+                       excludefitrange=None,
+                       downsample_factor=None,
+                       verbose=False, debug=False, **kwargs):
+    """
+    TODO: comment!
+
+    kwargs are passed to process_data
+
+    Parameters
+    ----------
+    window : 'low' or 'high'
+        Which of the two APEX SHFI windows to use
+    freq : bool
+        If True, the cube will be in frequency units and will fully cover the
+        observed spectral range.  If False, the cube will be in velocity units
+        centered on the observed rest frequency.  This is ignored if mergefile
+        is set
+    """
+    if window not in ('low','high'):
+        raise ValueError()
+    if mergefile:
+        cubefilename=os.path.join(outpath,"{0}_{1}".format(mergefile, window))
+    else:
+        # assume that we want a cube for EACH data set
+        cubefilename = None
+
+    #rcr = [-1000,0] if window == 'low' else [0,5000]
+    #xtel = 'AP-H201-F101' if window == 'high' else 'AP-H201-F102'
+    xtel = 'AP-H201-X202' if window=='low' else 'AP-H201-X201'
+
+    all_data,all_hdrs,all_gal = {},{},{}
+    for dataset in datasets:
+
+        apex_filename = os.path.join(datapath,dataset+".apex")
+
+        spectra,headers,indices = load_apex_cube(apex_filename)
+        data,hdrs,gal = select_apex_data(spectra, headers, indices,
+                                         sourcename=sourcename,
+                                         shapeselect=shapeselect, xtel=xtel,
+                                         rchanrange=None,
+                                         galactic_coordinate_range=None,
+                                         tsysrange=tsysrange)
+        log.info("Selected %i spectra from %s" % (len(hdrs), dataset))
+
+        all_data[dataset] = data
+        all_hdrs[dataset] = hdrs
+        all_gal[dataset] = gal
+
+    all_gal_vect = coordinates.SkyCoord(np.hstack([all_gal[g].l.to(u.radian).value
+                                                   for g in all_gal]) * u.radian,
+                                        np.hstack([all_gal[g].b.to(u.radian).value
+                                                   for g in all_gal]) * u.radian,
+                                        frame='galactic')
+    all_gal_vect.l.wrap_angle = 180*u.deg
+
+    log.info("Data has been collected and flagged, now adding to cube.")
+
+    for dataset in all_data:
+
+        if not mergefile:
+            cubefilename = os.path.join(outpath, "{0}_{1}_cube".format(dataset,window))
+            if freq:
+                make_blanks_freq(all_gal_vect, hdrs[0], cubefilename, clobber=True)
+            else:
+                make_blanks(all_gal_vect, hdrs[0], cubefilename, clobber=True)
+
+        data = all_data[dataset]
+        hdrs = all_hdrs[dataset]
+        gal  = all_gal[dataset]
+
+        data, gal, hdrs = process_data(data, gal, hdrs, dataset+"_"+xtel,
+                                       scanblsub=scanblsub, verbose=verbose,
+                                       **kwargs)
+
+        add_apex_data(data, hdrs, gal, cubefilename,
+                      excludefitrange=excludefitrange,
+                      retfreq=freq,
+                      varweight=True,
+                      debug=debug)
+
+    log.info("Completed cubemaking.  Now doing 'continuum subtraction'"
+             "or cube-based spectral baselining")
+    cube = fits.open(cubefilename+'.fits', memmap=False)
+    cont = fits.getdata(cubefilename+'_continuum.fits')
+    data = cube[0].data
+    cube[0].data = data - cont
+    cube.writeto(cubefilename+'_sub.fits', clobber=True)
+
+
+    # Downsample by some factor?
+    if downsample_factor:
+        log.info("Downsampling "+cubefilename)
+        avg = FITS_tools.downsample.downsample_axis(cube[0].data, downsample_factor, 0)
+        cube[0].data = avg
+        cube[0].header['CDELT3'] *= downsample_factor
+        scalefactor = 1./downsample_factor
+        crpix3 = (cube[0].header['CRPIX3']-1)*scalefactor+0.5+scalefactor/2.
+        cube[0].header['CRPIX3'] = crpix3
+        cube.writeto(cubefilename+'_downsampled.fits', clobber=True)
+
+    log.info("Done with "+cubefilename)
+
 
 def build_cube_ao(window, freq=False, mergefile=None,
                   datapath=aorawpath,
