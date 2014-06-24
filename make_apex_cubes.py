@@ -1935,7 +1935,7 @@ def PCA_clean(data,
                                                        data.shape[1]/(smoothing_scale/5))))
 
     sm_data = filters.gaussian_filter1d(data, smoothing_scale,
-                                        axis=1, mode='mirror')
+                                        axis=1, mode='mirror').real
 
     efuncarr,covmat,evals,evects = efuncs(sm_data[:,::smoothing_scale/5].T,
                                           return_others=True)
@@ -1955,7 +1955,7 @@ def PCA_clean(data,
     if freqaxis == 0 and timeaxis == 1:
         dsub = dsub.swapaxes(0,1)
 
-    return dsub
+    return dsub.real
 
 
 def demo_parameters_of_blsubbing(data, scans, mask):
