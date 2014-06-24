@@ -21,6 +21,9 @@ import pylab as pl
 import os
 from astropy import log
 import glob
+from scipy.ndimage import filters
+from scipy import signal,interpolate
+import image_tools
 
 datasets_2014 = {'E-093.C-0144A.2014JUN01/E-093.C-0144A-2014-2014-05-31': ('MAP_007',),
                  'E-093.C-0144A.2014MAY30/E-093.C-0144A-2014-2014-05-29': ('MAP_002','MAP_003','MAP_004'),
@@ -269,6 +272,8 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
                  subspectralmeans=True, verbose=False, noisefactor=1.5,
                  linemask=False, automask=2,
                  zero_edge_pixels=0,
+                 pca_clean=False,
+                 pcakwargs={},
                  **kwargs):
 
     timeaxis = 0
@@ -284,7 +289,19 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
     if subspectralmeans:
         data -= data.mean(axis=freqaxis)[:,None]
 
+    obsids = np.array([h['XSCAN'] for h in hdrs])
+
     if scanblsub:
+
+        data_diagplot(data, dataset+"_presub",
+                      **kwargs)
+        for ii,xscan in enumerate(np.unique(obsids)):
+            match = obsids == xscan
+            # maybe mask=mask_pix.max(axis=timeaxis), ?
+            #mask=mask_pix[ii], 
+            data_diagplot(data[match], dataset+"_presub_obs%i" % xscan,
+                          **kwargs)
+
         scans = identify_scans_fromcoords(gal)
         freq = hdr_to_freq(hdrs[0])
         if linemask:
@@ -300,10 +317,14 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
     else:
         freq = None
         mask = None
+        dsub = data
+
+    if pca_clean:
+        dsub = PCA_clean(dsub, **pcakwargs)
 
     # Standard Deviation can be fooled by obscene outliers
-    #noise = MAD(data,axis=freqaxis)
-    noise = np.std(data,axis=freqaxis)
+    #noise = MAD(dsub,axis=freqaxis)
+    noise = np.std(dsub,axis=freqaxis)
     freq_step = np.array([h['FRES'] for h in hdrs])
     exptime = np.array([h['EXPOSURE'] for h in hdrs])
     tsys = np.array([h['TSYS'] for h in hdrs])
@@ -318,43 +339,30 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
              (gal.b.deg<-0.001))
     bad[sgrb2] = False
 
-    obsids = np.array([h['XSCAN'] for h in hdrs])
-
     # pre-flagging diagnostic
-    diagplot(data, tsys, noise, dataset+"_preflag", freq=freq, mask=mask, **kwargs)
+    diagplot(dsub, tsys, noise, dataset+"_preflag", freq=freq, mask=mask,
+             **kwargs)
 
     if np.count_nonzero(bad) == bad.size:
         import ipdb; ipdb.set_trace()
         raise ValueError("All data will be flagged out; something is amiss.")
 
-    data = data[True-bad]
+    dsub = dsub[True-bad]
     obsids = obsids[True-bad]
     tsys = tsys[True-bad]
     noise = noise[True-bad]
 
-    if scanblsub:
-        data_diagplot(data, dataset+"_presub",
-                      **kwargs)
-        for ii,xscan in enumerate(np.unique(obsids)):
-            match = obsids == xscan
-            # maybe mask=mask_pix.max(axis=timeaxis), ?
-            #mask=mask_pix[ii], 
-            data_diagplot(data[match], dataset+"_presub_obs%i" % xscan,
-                          **kwargs)
     gal = gal[True-bad]
     hdrs = [h for h,b in zip(hdrs,bad) if not b]
     log.info("Flagged out %i bad values (%0.1f%%)." % (bad.sum(),bad.sum()/float(bad.size)))
 
-    if scanblsub:
-        data = dsub[True-bad]
-
-    diagplot(data, tsys, noise, dataset, freq=freq, mask=mask, **kwargs)
+    diagplot(dsub, tsys, noise, dataset, freq=freq, mask=mask, **kwargs)
     for xscan in np.unique(obsids):
         match = obsids == xscan
-        diagplot(data[match], tsys[match], noise[match],
+        diagplot(dsub[match], tsys[match], noise[match],
                  dataset+"_obs%i" % xscan, freq=freq, mask=mask, **kwargs)
 
-    return data,gal,hdrs
+    return dsub,gal,hdrs
 
 
 def hdr_to_freq(h):
@@ -523,7 +531,8 @@ def make_blanks_merge(cubefilename, lowhigh='low', clobber=True,
 
     makecube.make_blank_images(cubefilename, clobber=clobber)
 
-def data_diagplot(data, dataset, ext='png', newfig=False):
+def data_diagplot(data, dataset, ext='png', newfig=False,
+                  max_size=1024, freq=None):
     log.info("Doing diagnostics in "+dataset)
     if newfig:
         pl.figure()
@@ -533,7 +542,24 @@ def data_diagplot(data, dataset, ext='png', newfig=False):
     if (np.isnan(data)).all():
         print "ALL data is NaN in ", dataset
         import ipdb; ipdb.set_trace()
+
+    if np.any([d > max_size for d in data.shape]):
+        # downsample to *not less than* max_size
+        factors = [int(np.floor(d / max_size)) for d in data.shape]
+        data = image_tools.downsample(data, min(factors))
+
     axis = mpl_plot_templates.imdiagnostics(data)
+
+    if freq is not None:
+        axis.set_xticklabels(np.interp(axis.get_xticks(),
+                                       np.arange(freq.size),
+                                       freq))
+        axis.set_xlabel("Frequency")
+    else:
+        axis.set_xlabel("Channel #")
+    
+    axis.set_ylabel("Integration #")
+
     try:
         pl.savefig(os.path.join(diagplotdir, dataset+"_diagnostics."+ext),bbox_inches='tight')
     except Exception as ex:
@@ -541,7 +567,8 @@ def data_diagplot(data, dataset, ext='png', newfig=False):
         print ex
     return axis
 
-def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png', newfig=False):
+def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png',
+             newfig=False):
     """
     Generate a set of diagnostic plots
 
@@ -562,7 +589,6 @@ def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png', newfig
         The image extension to use when saving
     """
 
-    data_diagplot(data, dataset, ext=ext, newfig=newfig)
     if newfig:
         pl.figure()
     else:
@@ -596,6 +622,8 @@ def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png', newfig
     pl.ylabel("Mean Counts")
     pl.savefig(os.path.join(diagplotdir, dataset+"_masked."+ext),bbox_inches='tight')
 
+    data_diagplot(data, dataset, ext=ext, newfig=newfig, freq=freq)
+
 def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                        outpath='./', datasets=[], scanblsub=True,
                        shapeselect=None,
@@ -605,6 +633,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                        downsample_factor=None,
                        pixsize=7.2*u.arcsec,
                        kernel_fwhm=10/3600.,
+                       pca_clean=False,
                        verbose=False, debug=False, **kwargs):
     """
     TODO: comment!
@@ -677,7 +706,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
 
         data, gal, hdrs = process_data(data, gal, hdrs, dataset+"_"+xtel,
                                        scanblsub=scanblsub, verbose=verbose,
-                                       **kwargs)
+                                       pca_clean=pca_clean, **kwargs)
 
         add_apex_data(data, hdrs, gal, cubefilename,
                       excludefitrange=excludefitrange,
@@ -1855,6 +1884,72 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
         return dsub, np.array(masklist)
 
     return dsub
+
+def efuncs(arr, return_others=False):
+    """
+    Determine eigenfunctions of an array for use with
+    PCA cleaning
+    """
+    if hasattr(arr,'filled'):
+        arr = arr.filled(0)
+    covmat = np.dot(arr.T,arr)
+    evals,evects = np.linalg.eig(covmat)
+    efuncarr = np.dot(arr,evects)
+    if return_others:
+        return efuncarr,covmat,evals,evects
+    else:
+        return efuncarr
+
+def PCA_clean(data,
+              smoothing_scale=200.,
+              timeaxis=0,
+              freqaxis=1,
+              ncomponents=3,
+             ):
+    """
+    Remove N PCA components in the time direction
+
+    TODO: speed up by downsampling in TIME as well; we don't expect large
+    second-to-second variations
+    """
+
+    if freqaxis == 0 and timeaxis == 1:
+        data = data.swapaxes(0,1)
+    elif freqaxis != 1 or timeaxis != 0:
+        raise ValueError("Invalid axis specification.")
+
+    if np.any(np.isnan(data)):
+        warnings.warn("There were NaNs in the PCA-target data")
+        data = np.nan_to_num(data)
+
+    log.info(("PCA cleaning an image with size {0},"
+              " which will downsample to {1}").format(data.shape,
+                                                      (data.shape[0],
+                                                       data.shape[1]/(smoothing_scale/5))))
+
+    sm_data = filters.gaussian_filter1d(data, smoothing_scale,
+                                        axis=1, mode='mirror')
+
+    efuncarr,covmat,evals,evects = efuncs(sm_data[:,::smoothing_scale/5].T,
+                                          return_others=True)
+
+    # Zero-out the components we want to keep
+    efuncarr[:,ncomponents:] = 0
+
+    to_subtract = np.inner(efuncarr,evects).T
+
+    ifunc = interpolate.interp1d(np.arange(to_subtract.shape[1]),
+                                 to_subtract,
+                                 axis=1)
+    to_subtract = ifunc(np.linspace(0, to_subtract.shape[1]-1, data.shape[1]))
+
+    dsub = data - to_subtract
+
+    if freqaxis == 0 and timeaxis == 1:
+        dsub = dsub.swapaxes(0,1)
+
+    return dsub
+
 
 def demo_parameters_of_blsubbing(data, scans, mask):
     """
