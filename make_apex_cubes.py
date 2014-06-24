@@ -23,6 +23,7 @@ from astropy import log
 import glob
 from scipy.ndimage import filters
 from scipy import signal,interpolate
+import warnings
 import image_tools
 
 datasets_2014 = {'E-093.C-0144A.2014JUN01/E-093.C-0144A-2014-2014-05-31': ('MAP_007',),
@@ -320,7 +321,9 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
         dsub = data
 
     if pca_clean:
+        t0 = time.time()
         dsub = PCA_clean(dsub, **pcakwargs)
+        log.info("PCA cleaning took {0} seconds".format(time.time()-t0))
 
     # Standard Deviation can be fooled by obscene outliers
     #noise = MAD(dsub,axis=freqaxis)
@@ -1879,6 +1882,9 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
     log.info("Fit {0} scans with mean slopes {1} and offset {2}".format(len(scans)+1,
                                                                         mb.mean(axis=1)[0],
                                                                         mb.mean(axis=1)[1]))
+    if np.any(np.isnan(dsub)):
+        warnings.warn("There were NaNs left over from time-baseline subtraction.")
+        dsub[np.isnan(dsub)] = 0
 
     if return_mask:
         return dsub, np.array(masklist)
@@ -1920,6 +1926,7 @@ def PCA_clean(data,
 
     if np.any(np.isnan(data)):
         warnings.warn("There were NaNs in the PCA-target data")
+        import ipdb; ipdb.set_trace()
         data = np.nan_to_num(data)
 
     log.info(("PCA cleaning an image with size {0},"
