@@ -171,12 +171,13 @@ def load_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
     return spectra,headers,indices
 
 def add_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
-                  cubefilename='APEX_H2CO_Ao', clobber=True, **kwargs):
+                  cubefilename='APEX_H2CO_Ao', clobber=True,
+                  kernel_fwhm=10./3600., **kwargs):
     spectra,headers,indices = load_apex_cube(apex_filename)
 
     data, hdrs, gal = select_apex_data(spectra, headers, indices, **kwargs)
 
-    add_apex_data(data, hdrs, gal, cubefilename)
+    add_apex_data(data, hdrs, gal, cubefilename, kernel_fwhm=kernel_fwhm)
 
 def select_apex_data(spectra,headers,indices, sourcename=None,
                      shapeselect=None, tsysrange=None, rchanrange=None,
@@ -367,7 +368,7 @@ def hdr_to_velo(h):
 
 def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
                   retfreq=False, excludefitrange=None, varweight=False,
-                  debug=False):
+                  debug=False, kernel_fwhm=10./3600.):
 
 
     log.info("Data shape: {}".format(data.shape))
@@ -411,7 +412,7 @@ def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
                               velo_iterator=velo_iterator, debug=debug,
                               progressbar=True, coordsys='galactic',
                               velocity_offset=0.0, negative_mean_cut=None,
-                              add_with_kernel=True, kernel_fwhm=10./3600.,
+                              add_with_kernel=True, kernel_fwhm=kernel_fwhm,
                               fsw=False,
                               diagnostic_plot_name=None, chmod=False,
                               default_unit=u.GHz if retfreq else u.km/u.s,
@@ -603,6 +604,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                        excludefitrange=None,
                        downsample_factor=None,
                        pixsize=7.2*u.arcsec,
+                       kernel_fwhm=10/3600.,
                        verbose=False, debug=False, **kwargs):
     """
     TODO: comment!
@@ -681,6 +683,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                       excludefitrange=excludefitrange,
                       retfreq=freq,
                       varweight=True,
+                      kernel_fwhm=kernel_fwhm,
                       debug=debug)
 
     log.info("Completed cubemaking.  Now doing 'continuum subtraction'"
