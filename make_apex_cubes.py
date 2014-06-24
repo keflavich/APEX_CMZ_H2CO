@@ -68,6 +68,32 @@ aorawpath = '/Users/adam/work/h2co/apex/2010_reduced/2010_raw/'
 aopath = '/Users/adam/work/h2co/apex/2010_reduced/'
 diagplotdir = '/Users/adam/work/h2co/apex/diagnostic_plots/'
 
+def MAD(a, c=0.6745, axis=None):
+    """
+    Median Absolute Deviation along given axis of an array:
+
+    median(abs(a - median(a))) / c
+
+    c = 0.6745 is the constant to convert from MAD to std; it is used by
+    default
+
+    """
+
+    a = ma.masked_where(a!=a, a)
+    if a.ndim == 1:
+        d = ma.median(a)
+        m = ma.median(ma.fabs(a - d) / c)
+    else:
+        d = ma.median(a, axis=axis)
+        # I don't want the array to change so I have to copy it?
+        if axis > 0:
+            aswp = ma.swapaxes(a,0,axis)
+        else:
+            aswp = a
+        m = ma.median(ma.fabs(aswp - d) / c, axis=0)
+
+    return m
+
 def debug_and_load(test='test'):
 
     spectra,headers,indices,data,hdrs,gal = load_2013_dataset_for_debugging(skip_data=False, lowhigh='high')
@@ -241,12 +267,18 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
 def process_data(data, gal, hdrs, dataset, scanblsub=True,
                  subspectralmeans=True, verbose=False, noisefactor=1.5,
                  linemask=False, automask=2,
+                 zero_edge_pixels=0,
                  **kwargs):
 
     timeaxis = 0
     freqaxis = 1
 
     log.info("Processing {0}".format(dataset))
+
+    if zero_edge_pixels:
+        # Force the Nth first/last frequency pixels to zero
+        data[:,:zero_edge_pixels] = 0
+        data[:,-zero_edge_pixels:] = 0
 
     if subspectralmeans:
         data -= data.mean(axis=freqaxis)[:,None]
@@ -268,6 +300,8 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
         freq = None
         mask = None
 
+    # Standard Deviation can be fooled by obscene outliers
+    #noise = MAD(data,axis=freqaxis)
     noise = np.std(data,axis=freqaxis)
     freq_step = np.array([h['FRES'] for h in hdrs])
     exptime = np.array([h['EXPOSURE'] for h in hdrs])
@@ -287,6 +321,10 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
 
     # pre-flagging diagnostic
     diagplot(data, tsys, noise, dataset+"_preflag", freq=freq, mask=mask, **kwargs)
+
+    if np.count_nonzero(bad) == bad.size:
+        import ipdb; ipdb.set_trace()
+        raise ValueError("All data will be flagged out; something is amiss.")
 
     data = data[True-bad]
     obsids = obsids[True-bad]
@@ -383,7 +421,7 @@ def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
                               varweight=varweight,
                               continuum_prefix=None)
 
-def make_blanks(gal, header, cubefilename, clobber=True):
+def make_blanks(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
 
     lrange = (gal.l.wrap_at(180*u.deg).deg.min()+15/3600.,
               gal.l.wrap_at(180*u.deg).deg.max()+15/3600.)
@@ -392,7 +430,6 @@ def make_blanks(gal, header, cubefilename, clobber=True):
              "%0.2f < l < %0.2f,  %0.2f < b < %0.2f" % (lrange[0], lrange[1],
                                                         brange[0], brange[1]))
 
-    pixsize = 7.2*u.arcsec
     naxis1 = (lrange[1]-lrange[0])/(pixsize.to(u.deg).value)
     naxis2 = (brange[1]-brange[0])/(pixsize.to(u.deg).value)
     restfreq = (header['RESTF']*u.MHz)
@@ -415,7 +452,7 @@ def make_blanks(gal, header, cubefilename, clobber=True):
 
     makecube.make_blank_images(cubefilename, clobber=clobber)
 
-def make_blanks_freq(gal, header, cubefilename, clobber=True):
+def make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
     """ complete freq covg """
 
     lrange = gal.l.wrap_at(180*u.deg).deg.min()+15/3600.,gal.l.wrap_at(180*u.deg).deg.max()+15/3600.
@@ -425,7 +462,6 @@ def make_blanks_freq(gal, header, cubefilename, clobber=True):
                                                                  brange[0],
                                                                  brange[1])
 
-    pixsize = 7.2*u.arcsec
     naxis1 = int((lrange[1]-lrange[0])/(pixsize.to(u.deg).value)+10)
     naxis2 = int((brange[1]-brange[0])/(pixsize.to(u.deg).value)+10)
     restfreq = (header['RESTF']*u.MHz)
@@ -455,8 +491,8 @@ def make_blanks_freq(gal, header, cubefilename, clobber=True):
 
 
 def make_blanks_merge(cubefilename, lowhigh='low', clobber=True,
-                      width=1.0*u.GHz, lowest_freq=None):
-    pixsize = 7.2*u.arcsec
+                      width=1.0*u.GHz, lowest_freq=None, pixsize =
+                      7.2*u.arcsec):
     # total size is 2.3 x 0.4 degrees
     # 1150x
     # center is 0.55 -0.075
@@ -566,6 +602,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                        tsysrange=[100,250],
                        excludefitrange=None,
                        downsample_factor=None,
+                       pixsize=7.2*u.arcsec,
                        verbose=False, debug=False, **kwargs):
     """
     TODO: comment!
@@ -626,9 +663,11 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
         if not mergefile:
             cubefilename = os.path.join(outpath, "{0}_{1}_cube".format(dataset,window))
             if freq:
-                make_blanks_freq(all_gal_vect, hdrs[0], cubefilename, clobber=True)
+                make_blanks_freq(all_gal_vect, hdrs[0], cubefilename,
+                                 clobber=True, pixsize=pixsize)
             else:
-                make_blanks(all_gal_vect, hdrs[0], cubefilename, clobber=True)
+                make_blanks(all_gal_vect, hdrs[0], cubefilename, clobber=True,
+                            pixsize=pixsize)
 
         data = all_data[dataset]
         hdrs = all_hdrs[dataset]
