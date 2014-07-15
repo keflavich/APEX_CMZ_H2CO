@@ -273,6 +273,7 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
                  subspectralmeans=True, verbose=False, noisefactor=1.5,
                  linemask=False, automask=2,
                  zero_edge_pixels=0,
+                 subtract_time_average=False,
                  pca_clean=False,
                  pcakwargs={},
                  **kwargs):
@@ -292,6 +293,9 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
 
     obsids = np.array([h['XSCAN'] for h in hdrs])
 
+    # for plotting and masking, determine frequency array
+    freq = hdr_to_freq(hdrs[0])
+
     if scanblsub:
 
         data_diagplot(data, dataset+"_presub",
@@ -304,7 +308,6 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
                           **kwargs)
 
         scans = identify_scans_fromcoords(gal)
-        freq = hdr_to_freq(hdrs[0])
         if linemask:
             mask = make_line_mask(freq)
         else:
@@ -315,8 +318,17 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
                                                  smooth_all=True,
                                                  return_mask=True)
         mask = mask_pix.max(axis=timeaxis).astype('bool')
+    elif subtract_time_average:
+        # subtracting mean spectrum from all spectra
+        dsub = data - data.mean(axis=timeaxis)
+        mask = None
+    elif timewise_pca:
+        # Not obvious that this is ever useful
+        t0 = time.time()
+        dsub = PCA_clean(data.T, **pcakwargs)
+        log.info("PCA cleaning *in the time axis* took {0} seconds".format(time.time()-t0))
+        mask = None
     else:
-        freq = None
         mask = None
         dsub = data
 
@@ -548,7 +560,7 @@ def data_diagplot(data, dataset, ext='png', newfig=False,
 
     if np.any([d > max_size for d in data.shape]):
         # downsample to *not less than* max_size
-        factors = [int(np.floor(d / max_size)) for d in data.shape]
+        factors = [max([1,int(np.floor(d / max_size))]) for d in data.shape]
         data = image_tools.downsample(data, min(factors))
 
     axis = mpl_plot_templates.imdiagnostics(data)
@@ -748,6 +760,7 @@ def build_cube_ao(window, freq=False, mergefile=None,
                   scanblsub=True,
                   verbose=False,
                   debug=False,
+                  pca_clean=True,
                   **kwargs):
     """
     TODO: comment!
@@ -827,6 +840,7 @@ def build_cube_ao(window, freq=False, mergefile=None,
 
         data, gal, hdrs = process_data(data, gal, hdrs, dataset+"_"+xtel,
                                        scanblsub=scanblsub, verbose=verbose,
+                                       pca_clean=pca_clean,
                                        **kwargs)
 
         add_apex_data(data, hdrs, gal, cubefilename,
@@ -865,12 +879,16 @@ def build_cube_2013(mergefile=None,
                               'M-091.F-0019-2013-2013-06-12',
                               'M-091.F-0019-2013-2013-06-13'],
                     scanblsub=True,
+                    pca_clean=True,
+                    extra_suffix="",
                     verbose=True, **kwargs):
     if mergefile:
         cubefilename=os.path.join(outpath,mergefile)
     else:
         cubefilename=os.path.join(outpath,
                                   'APEX_H2CO_2013_%s' % lowhigh)
+    if extra_suffix:
+        cubefilename = cubefilename + extra_suffix
 
 
     xtel = 'AP-H201-X202' if lowhigh=='low' else 'AP-H201-X201'
@@ -930,6 +948,7 @@ def build_cube_2013(mergefile=None,
         
         data, gal, hdrs = process_data(data, gal, hdrs, dataset+"_"+xtel,
                                        scanblsub=scanblsub, verbose=verbose,
+                                       pca_clean=pca_clean,
                                        **kwargs)
 
         add_apex_data(data, hdrs, gal, cubefilename, retfreq=True,
@@ -1637,6 +1656,7 @@ def build_cube_2014(sourcename,
                     datasets=None,
                     scanblsub=False,
                     verbose=True,
+                    pca_clean=True,
                     **kwargs
                     ):
     """
@@ -1724,6 +1744,7 @@ def build_cube_2014(sourcename,
         data, gal, hdrs = process_data(data, gal, hdrs, os.path.join(outpath,
                                                                      dataset)+"_"+xtel,
                                        scanblsub=scanblsub, verbose=verbose,
+                                       pca_clean=pca_clean,
                                        **kwargs)
 
         log.info("".join(("Adding data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
@@ -1911,6 +1932,7 @@ def PCA_clean(data,
               timeaxis=0,
               freqaxis=1,
               ncomponents=3,
+              diagplotfilename=None,
              ):
     """
     Remove N PCA components in the time direction
@@ -1929,26 +1951,44 @@ def PCA_clean(data,
         import ipdb; ipdb.set_trace()
         data = np.nan_to_num(data)
 
-    log.info(("PCA cleaning an image with size {0},"
-              " which will downsample to {1}").format(data.shape,
-                                                      (data.shape[0],
-                                                       data.shape[1]/(smoothing_scale/5))))
+    if smoothing_scale:
+        log.info("PCA will remove {0} components".format(ncomponents))
+        log.info(("PCA cleaning an image with size {0},"
+                  " which will downsample to {1}").format(data.shape,
+                                                          (data.shape[0],
+                                                           data.shape[1]/(smoothing_scale/5))))
 
-    sm_data = filters.gaussian_filter1d(data, smoothing_scale,
-                                        axis=1, mode='mirror').real
+        sm_data = filters.gaussian_filter1d(data, smoothing_scale,
+                                            axis=1, mode='mirror').real
 
-    efuncarr,covmat,evals,evects = efuncs(sm_data[:,::smoothing_scale/5].T,
-                                          return_others=True)
+        efuncarr,covmat,evals,evects = efuncs(sm_data[:,::smoothing_scale/5].T,
+                                              return_others=True)
+    else:
+        log.info("PCA will remove {0} components".format(ncomponents))
+        log.info("PCA cleaning an image with size {0}".format(data.shape))
+        
+        efuncarr,covmat,evals,evects = efuncs(data.T,
+                                              return_others=True)
+
+    if diagplotfilename is not None:
+        fig = pl.figure(4)
+        fig.clf()
+        ax = fig.gca()
+        for ii in range(ncomponents):
+            ax.plot(efuncarr[:,ii], label=str(ii), linewidth=0.5, alpha=0.5)
+        ax.legend(loc='best')
+        fig.savefig(diagplotfilename)
 
     # Zero-out the components we want to keep
     efuncarr[:,ncomponents:] = 0
 
     to_subtract = np.inner(efuncarr,evects).T
 
-    ifunc = interpolate.interp1d(np.arange(to_subtract.shape[1]),
-                                 to_subtract,
-                                 axis=1)
-    to_subtract = ifunc(np.linspace(0, to_subtract.shape[1]-1, data.shape[1]))
+    if smoothing_scale:
+        ifunc = interpolate.interp1d(np.arange(to_subtract.shape[1]),
+                                     to_subtract,
+                                     axis=1)
+        to_subtract = ifunc(np.linspace(0, to_subtract.shape[1]-1, data.shape[1]))
 
     dsub = data - to_subtract
 
