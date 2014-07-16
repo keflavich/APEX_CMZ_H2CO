@@ -66,6 +66,7 @@ datasets_2014 = {'E-093.C-0144A.2014JUN01/E-093.C-0144A-2014-2014-05-31': ('MAP_
 
 june2013datapath = '/Users/adam/work/h2co/apex/june2013/raw/M-091.F-0019-2013/'
 june2013path = '/Users/adam/work/h2co/apex/june2013/'
+april2014path = '/Users/adam/work/h2co/apex/april2014/'
 h2copath = '/Users/adam/work/h2co/apex/h2co_cubes/'
 mergepath = '/Users/adam/work/h2co/apex/merged_datasets/'
 aorawpath = '/Users/adam/work/h2co/apex/2010_reduced/2010_raw/'
@@ -997,9 +998,11 @@ def build_cube_2013(mergefile=None,
 def make_high_mergecube(datasets_2014=datasets_2014):
     mergefile2 = 'APEX_H2CO_merge_high'
     make_blanks_merge(os.path.join(mergepath,mergefile2), lowhigh='high')
-    build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath)
+    build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath,
+                  datapath=aorawpath)
     build_cube_2013(mergefile=mergefile2,
                     outpath=mergepath,
+                    datapath=june2013datapath,
                     lowhigh='high',
                     scanblsub=True)
 
@@ -1010,6 +1013,7 @@ def make_high_mergecube(datasets_2014=datasets_2014):
         build_cube_2014(mapnames,
                         mergefile=mergefile2,
                         outpath=mergepath,
+                        datapath=april2014path,
                         lowhigh=lowhigh,
                         datasets=datasets_2014)
 
@@ -1673,8 +1677,8 @@ def build_cube_2014(sourcename,
                     mergefile=None,
                     lowhigh='low',
                     downsample_factor=8,
-                    datapath='/Users/adam/work/h2co/apex/april2014/',
-                    outpath='/Users/adam/work/h2co/apex/april2014/',
+                    datapath=april2014path,
+                    outpath=april2014path,
                     datasets=None,
                     scanblsub=False,
                     verbose=True,
