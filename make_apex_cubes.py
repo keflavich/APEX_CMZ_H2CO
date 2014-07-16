@@ -101,25 +101,33 @@ def MAD(a, c=0.6745, axis=None):
 def debug_and_load(test='test'):
 
     spectra,headers,indices,data,hdrs,gal = load_2013_dataset_for_debugging(skip_data=False, lowhigh='high')
-    make_blanks_freq(gal, hdrs[0], test, clobber=True)
 
+    make_blanks_freq(gal, hdrs[0], test, clobber=True)
     dmeansub,gal,hdrs = process_data(data, gal, hdrs, dataset=test,
                                      subspectralmeans=True, scanblsub=False)
     add_apex_data(dmeansub, hdrs, gal, test, retfreq=True, varweight=True,)
-    make_blanks_freq(gal, hdrs[0], test+"_blsub", clobber=True)
     dscube = cube_regrid.downsample_cube(fits.open(test+".fits")[0], factor=4)
     dscube.writeto(test+"_ds.fits",clobber=True)
 
+    make_blanks_freq(gal, hdrs[0], test+"_blsub", clobber=True)
     dspecsub,gal,hdrs = process_data(data, gal, hdrs, dataset=test+"_blsub",
                                      subspectralmeans=True, scanblsub=True)
     add_apex_data(dspecsub, hdrs, gal, test+"_blsub", retfreq=True, varweight=True,)
     dscube = cube_regrid.downsample_cube(fits.open(test+"_blsub.fits")[0], factor=4)
     dscube.writeto(test+"_blsub_ds.fits",clobber=True)
 
+    make_blanks_freq(gal, hdrs[0], test+"_pcasub", clobber=True)
+    dpcasub,gal,hdrs = process_data(data, gal, hdrs, dataset=test+"_pcasub",
+                                    subspectralmeans=True, scanblsub=True,
+                                    pca_clean=True, pcakwargs={})
+    add_apex_data(dpcasub, hdrs, gal, test+"_pcasub", retfreq=True, varweight=True,)
+    dscube = cube_regrid.downsample_cube(fits.open(test+"_pcasub.fits")[0], factor=4)
+    dscube.writeto(test+"_pcasub_ds.fits",clobber=True)
+
     freq = hdr_to_freq(hdrs[0])
     mask = make_line_mask(freq)
 
-    return spectra,headers,indices,data,hdrs,gal,dspecsub,dmeansub,freq,mask
+    return spectra,headers,indices,data,hdrs,gal,dspecsub,dmeansub,dpcasub,freq,mask
 
 def load_2013_dataset_for_debugging(lowhigh='low', downsample_factor=8,
                                     dataset='M-091.F-0019-2013-2013-06-11',
@@ -275,6 +283,7 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
                  zero_edge_pixels=0,
                  subtract_time_average=False,
                  pca_clean=False,
+                 timewise_pca=False,
                  pcakwargs={},
                  **kwargs):
 
@@ -296,9 +305,12 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
     # for plotting and masking, determine frequency array
     freq = hdr_to_freq(hdrs[0])
 
+    scans = identify_scans_fromcoords(gal)
+
     if scanblsub:
 
         data_diagplot(data, dataset+"_presub",
+                      scans=scans,
                       **kwargs)
         for ii,xscan in enumerate(np.unique(obsids)):
             match = obsids == xscan
@@ -307,7 +319,6 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
             data_diagplot(data[match], dataset+"_presub_obs%i" % xscan,
                           **kwargs)
 
-        scans = identify_scans_fromcoords(gal)
         if linemask:
             mask = make_line_mask(freq)
         else:
@@ -322,19 +333,16 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
         # subtracting mean spectrum from all spectra
         dsub = data - data.mean(axis=timeaxis)
         mask = None
-    elif timewise_pca:
-        # Not obvious that this is ever useful
-        t0 = time.time()
-        dsub = PCA_clean(data.T, **pcakwargs)
-        log.info("PCA cleaning *in the time axis* took {0} seconds".format(time.time()-t0))
-        mask = None
     else:
         mask = None
         dsub = data
 
     if pca_clean:
         t0 = time.time()
-        dsub = PCA_clean(dsub, **pcakwargs)
+        # DON'T remove the mean: that's dealt with in 'spectral baselining' in
+        # a more conservative fashion
+        dmean = dsub.mean(axis=0)
+        dsub = PCA_clean(dsub-dmean, **pcakwargs) + dmean
         log.info("PCA cleaning took {0} seconds".format(time.time()-t0))
 
     # Standard Deviation can be fooled by obscene outliers
@@ -547,13 +555,16 @@ def make_blanks_merge(cubefilename, lowhigh='low', clobber=True,
     makecube.make_blank_images(cubefilename, clobber=clobber)
 
 def data_diagplot(data, dataset, ext='png', newfig=False,
-                  max_size=1024, freq=None):
+                  max_size=1024, freq=None, scans=None,
+                  figure=None, axis=None):
     log.info("Doing diagnostics in "+dataset)
-    if newfig:
-        pl.figure()
+    if figure:
+        pass
+    elif newfig:
+        figure = pl.figure()
     else:
-        pl.figure(1)
-        pl.clf()
+        figure = pl.figure(1)
+        figure.clf()
     if (np.isnan(data)).all():
         print "ALL data is NaN in ", dataset
         import ipdb; ipdb.set_trace()
@@ -563,17 +574,28 @@ def data_diagplot(data, dataset, ext='png', newfig=False,
         factors = [max([1,int(np.floor(d / max_size))]) for d in data.shape]
         data = image_tools.downsample(data, min(factors))
 
-    axis = mpl_plot_templates.imdiagnostics(data)
+    if axis is None:
+        axis = figure.gca()
+
+    axis = mpl_plot_templates.imdiagnostics(data, axis=axis,
+                                            second_xaxis=freq)
 
     if freq is not None:
-        axis.set_xticklabels(np.interp(axis.get_xticks(),
-                                       np.arange(freq.size),
-                                       freq))
-        axis.set_xlabel("Frequency")
+        #axis.set_xticklabels(np.interp(axis.get_xticks(),
+        #                               np.arange(freq.size),
+        #                               freq))
+        axis.figure.axes[5].set_xlabel("Frequency")
     else:
         axis.set_xlabel("Channel #")
     
     axis.set_ylabel("Integration #")
+
+    if scans is not None:
+        xlim = axis.get_xlim()
+        ylim = axis.get_ylim()
+        axis.hlines(scans, xlim[0], xlim[1], color='k', linestyle='--',
+                    alpha=0.5)
+        axis.set_xlim(*xlim)
 
     try:
         pl.savefig(os.path.join(diagplotdir, dataset+"_diagnostics."+ext),bbox_inches='tight')
@@ -1858,10 +1880,10 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
                                             nsigma_ignore*mean_spectrum.std()))
             if verbose:
                 nflag = (~mask_pixels).sum()
-                log.info("Masked {0} pixels in scan {1}-{2} ({3}%)".format(nflag,
-                                                                           ii, jj,
-                                                                           nflag/float(mask_pixels.size),
-                                                                           )
+                log.info(("Masked {0} pixels"
+                          " in scan {1}-{2} "
+                          "({3}%)").format(nflag, ii, jj,
+                                           nflag/float(mask_pixels.size),)
                           )
 
         if mask_pixels is None:
@@ -1928,17 +1950,25 @@ def efuncs(arr, return_others=False):
         return efuncarr
 
 def PCA_clean(data,
-              smoothing_scale=200.,
+              smoothing_scale=25., # should be ~200 for SEDIGISM
               timeaxis=0,
               freqaxis=1,
               ncomponents=3,
               diagplotfilename=None,
+              scans=None,
+              maxntimes=5000,
              ):
     """
     Remove N PCA components in the time direction
 
     TODO: speed up by downsampling in TIME as well; we don't expect large
-    second-to-second variations
+    second-to-second variations REVISE: No, actually, there are sharp
+    jumps in time.
+
+    Maybe scan-by-scan pca is faster?
+
+    Smoothing scale is ~200 in total, which means 25 for pre-downsampled
+    CMZ data
     """
 
     if freqaxis == 0 and timeaxis == 1:
@@ -1951,8 +1981,52 @@ def PCA_clean(data,
         import ipdb; ipdb.set_trace()
         data = np.nan_to_num(data)
 
+    if maxntimes and scans is None:
+        ntimes = data.shape[1]
+        if ntimes > maxntimes:
+            nsplits = np.ceil(ntimes/maxntimes)
+            length = ntimes/nsplits
+            splits = np.arange(0, ntimes, length)
+            scans = splits
+
+    if scans is not None:
+        all_data = data
+        all_dsub = np.empty(data.shape)
+        for start,end in zip([0]+scans.tolist(),
+                             scans.tolist()+[data.shape[1]]):
+            dsub,efuncarr = PCA_subtract(data[start:end,:],
+                                         smoothing_scale=smoothing_scale,
+                                         ncomponents=ncomponents)
+            if start == 0:
+                efuncs = efuncarr[:,:ncomponents]
+            else:
+                efuncs += efuncarr[:,:ncomponents]
+            all_dsub[start:end,:] = dsub
+        dsub = all_dsub
+        efuncarr = efuncs / (len(scans)+1.) # Average removed efuncs
+    else:
+        dsub,efuncarr = PCA_subtract(data,
+                                     smoothing_scale=smoothing_scale,
+                                     ncomponents=ncomponents)
+
+
+    if diagplotfilename is not None:
+        fig = pl.figure(4)
+        fig.clf()
+        ax = fig.gca()
+        for ii in range(ncomponents):
+            ax.plot(efuncarr[:,ii], label=str(ii), linewidth=0.5, alpha=0.5)
+        ax.legend(loc='best')
+        fig.savefig(diagplotfilename)
+
+    if freqaxis == 0 and timeaxis == 1:
+        dsub = dsub.swapaxes(0,1)
+
+    return dsub.real
+
+def PCA_subtract(data, smoothing_scale=None, ncomponents=3):
+    log.info("PCA will remove {0} components".format(ncomponents))
     if smoothing_scale:
-        log.info("PCA will remove {0} components".format(ncomponents))
         log.info(("PCA cleaning an image with size {0},"
                   " which will downsample to {1}").format(data.shape,
                                                           (data.shape[0],
@@ -1964,20 +2038,10 @@ def PCA_clean(data,
         efuncarr,covmat,evals,evects = efuncs(sm_data[:,::smoothing_scale/5].T,
                                               return_others=True)
     else:
-        log.info("PCA will remove {0} components".format(ncomponents))
         log.info("PCA cleaning an image with size {0}".format(data.shape))
         
         efuncarr,covmat,evals,evects = efuncs(data.T,
                                               return_others=True)
-
-    if diagplotfilename is not None:
-        fig = pl.figure(4)
-        fig.clf()
-        ax = fig.gca()
-        for ii in range(ncomponents):
-            ax.plot(efuncarr[:,ii], label=str(ii), linewidth=0.5, alpha=0.5)
-        ax.legend(loc='best')
-        fig.savefig(diagplotfilename)
 
     # Zero-out the components we want to keep
     efuncarr[:,ncomponents:] = 0
@@ -1992,43 +2056,4 @@ def PCA_clean(data,
 
     dsub = data - to_subtract
 
-    if freqaxis == 0 and timeaxis == 1:
-        dsub = dsub.swapaxes(0,1)
-
-    return dsub.real
-
-
-def demo_parameters_of_blsubbing(data, scans, mask):
-    """
-    These figures are used to justify the choice of parameters in
-    subtract_scan_lienar_fit:
-        automask=2, smooth_all=True
-
-    spectra,headers,indices,data,hdrs,gal,dspecsub,dmeansub,freq,mask = debug_and_load()
-    """
-
-    data_diagplot(data, 'blsub_demo_raw')
-
-    dsub = subtract_scan_linear_fit(data, scans, verbose=True, automask=True,
-                                    smooth_all=True)
-    data_diagplot(dsub, 'blsub_demo_automask_smoothall')
-
-    dsub = subtract_scan_linear_fit(data, scans, verbose=True, automask=True,
-                                    smooth_all=False)
-    data_diagplot(dsub, 'blsub_demo_automask')
-
-    dsub = subtract_scan_linear_fit(data, scans, verbose=True, automask=2,
-                                    smooth_all=False)
-    data_diagplot(dsub, 'blsub_demo_automask_smooth2')
-
-    dsub = subtract_scan_linear_fit(data, scans, mask_pixels=mask,
-                                    verbose=True, automask=False,
-                                    smooth_all=False)
-    data_diagplot(dsub, 'blsub_demo_linemask')
-
-    dsub = subtract_scan_linear_fit(data, scans, verbose=True, automask=2,
-                                    smooth_all=True)
-    data_diagplot(dsub, 'blsub_demo_automask_smooth2_smoothall')
-
-#make_high_mergecube()
-#make_low_mergecube()
+    return dsub, efuncarr

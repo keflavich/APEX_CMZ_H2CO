@@ -70,19 +70,33 @@ low-order polynomial to the surroundings is somewhat impractical in the
 Galactic Center, where baseline ripples are on comparable scales to the
 extremely wide spectral lines.
 
+We perform a scan-by-scan baseline subtraction as follows: 
+\begin{enumerate}
+    \item Compute the mean spectrum across the scan
+    \item Identify pixels $>1-\sigma$ above the mean spectrum to be ignored
+        when baseline fitting (this is a simple `line masking' process)
+    \item Fit a line to each spectral channel across the scan
+    \item Smooth the fitted line parameters with a gaussian with with
+        $\sigma=10$ channels, interpolating into the line-masked regions
+    \item Subtract the fitted baselines
+\end{enumerate}
+
 We therefore adopted a principle component analysis (PCA) baseline removal
 approach in which the data were spectrally smoothed and downsampled by an
-additional factor of 200.  The resulting data were decomposed into
+additional factor of 25, for a characteristic frequency scale of 15 MHz.  The
+data had their means subtracted before PCA cleaning so that only time-variable
+baseline variation was removed.  The resulting data were decomposed into
 eigenspectra, of which the 3 most correlated components were then set to zero.
-These components visually match the baseline ripples rather well, and due to
-the extreme smoothing (160 \kms resolution), no line information is lost.  The
-selection of 3 components was determined empirically by examining the
-eigenspectra; a test removing the first 10 components showed no significant
-difference.
+These components visually match the baseline ripples, and due to the wide
+smoothing (20 \kms resolution), no line information is lost.  The selection of
+3 components was determined empirically by examining the eigenspectra; a test
+removing the first 10 components showed no significant difference in the
+cleaning but did show signs of extracting large-scale correlated signal.
 
 \Figure{figures/M-091.F-0019-2013-2013-06-08_PCA_high_diagnostic.png}
-{The first 3 eigenspectra from an observation taken on DATE.}
-{fig:eigenspectra}{1}{0}
+{The first 3 eigenspectra from an observation taken on June 8, 2013. \todo{This
+will be replaced with a higher-quality figure}}
+{fig:eigenspectra}{0.5}{0}
 
 
 \subsubsection{Mapmaking}
@@ -98,9 +112,9 @@ effectively smooths the output images from $FWHM\approx28\arcsec$ to
 $\approx30\arcsec$.  See \citet{Mangum2007a} for more detail on the on-the-fly
 mapping technique used here.
 
-To demonstrate the utility of the PCA subtraction approach described in Section
+\todo{To demonstrate the utility of the PCA subtraction approach described in Section
 \ref{sec:baseline}, we show maps of the \formaldehyde \threeohthree line before
-and after PCA subtraction.
+and after PCA subtraction.}
 
 The PPV cubes were created with units of brightness temperature.  
 
@@ -138,6 +152,8 @@ We created two independent ratio maps, \threeohthree/\threetwotwo and
 the same) can be used as a sanity check.
 
 \subsection{Computing Temperature}
+\todo{Unless there's a strong reason not to, I will use the same grid that
+Yiping used.}
 We use RADEX \citet{van-Der-Tak2007a} to create a model grid for the
 p-\formaldehyde lines over a sparse grid of density ($n=10^{4,5,6,7}$ \percc),
 a fixed assumed line gradient of 5 \kms / pc, a fixed column of \formaldehyde
@@ -154,7 +170,7 @@ temperature, which generally holds.  It also required us to \emph{a priori} sele
 a density from the grid; we selected $n=10^4$ \percc.  \todo{It is important to
 assess what systematic effect density may have: to this end, I propose to show
 temperature maps computed with (1) a $10\times$ higher density and (2) a
-10\times lower abundance.}.
+$10\times$ lower abundance.}.
 
 
 
