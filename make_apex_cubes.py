@@ -1167,7 +1167,10 @@ def do_momcube_masking_hi(prefix=h2copath+'APEX_H2CO_303_202'):
 def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
                     debug=False, smooth=False, vsmooth=False, naxis3=400, crval3=50):
     t0 = time.time()
-    log.info("Extracting subcube at {0} from {1} with smooth={2} and vsmooth={3}".format(linefreq, cubefilename, smooth, vsmooth))
+    log.info(("Extracting subcube at {0} from {1}"
+              " with smooth={2} and vsmooth={3}").format(linefreq,
+                                                         cubefilename, smooth,
+                                                         vsmooth))
     ffile = fits.open(cubefilename)
     # I don't know why this is necessary, but there were weird bugs showing up
     # if I did not add this (some parts of the cube defaulted to 3e-319)
@@ -1237,7 +1240,8 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
 
     newhdu.writeto(outfilename, clobber=True)
 
-    log.info("Completed cube extraction in {0} seconds.".format(time.time()-t0))
+    log.info("Completed cube extraction to {1} in {0} seconds.".format(time.time()-t0,
+                                                                       outfilename))
     
     return newhdu
 
@@ -1285,7 +1289,7 @@ def make_line_mask(freqarr, lines=bright_lines):
     return mask
 
 
-def do_extract_subcubes():
+def do_extract_subcubes(outdir=mergepath):
 
     for line,freq in all_lines.iteritems():
         log.info("Extracting {0}".format(line))
@@ -1316,7 +1320,7 @@ def do_everything():
     os.chdir(mergepath)
     os.system('./APEX_H2CO_merge_high_starlink_custom.sh')
     os.chdir('../')
-    do_extract_subcubes()
+    do_extract_subcubes(outdir=mergepath)
     compute_noise_high()
     compute_noise_high(mergepath+'APEX_H2CO_merge_high_smooth',[203,272])
     compute_noise_high(mergepath+'APEX_H2CO_merge_high_vsmoothds',[203,272])
