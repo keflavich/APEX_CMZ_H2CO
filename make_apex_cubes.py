@@ -371,7 +371,7 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
 
     # pre-flagging diagnostic
     diagplot(dsub, tsys, noise, dataset+"_preflag", freq=freq, mask=mask,
-             **kwargs)
+             scans=scans, **kwargs)
 
     if np.count_nonzero(bad) == bad.size:
         import ipdb; ipdb.set_trace()
@@ -386,7 +386,8 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
     hdrs = [h for h,b in zip(hdrs,bad) if not b]
     log.info("Flagged out %i bad values (%0.1f%%)." % (bad.sum(),bad.sum()/float(bad.size)))
 
-    diagplot(dsub, tsys, noise, dataset, freq=freq, mask=mask, **kwargs)
+    diagplot(dsub, tsys, noise, dataset, freq=freq, mask=mask, scans=scans,
+             **kwargs)
     for xscan in np.unique(obsids):
         match = obsids == xscan
         diagplot(dsub[match], tsys[match], noise[match],
@@ -612,7 +613,7 @@ def data_diagplot(data, dataset, ext='png', newfig=False,
     return axis
 
 def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png',
-             newfig=False):
+             newfig=False, **kwargs):
     """
     Generate a set of diagnostic plots
 
@@ -666,7 +667,7 @@ def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png',
     pl.ylabel("Mean Counts")
     pl.savefig(os.path.join(diagplotdir, dataset+"_masked."+ext),bbox_inches='tight')
 
-    data_diagplot(data, dataset, ext=ext, newfig=newfig, freq=freq)
+    data_diagplot(data, dataset, ext=ext, newfig=newfig, freq=freq, **kwargs)
 
 def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                        outpath='./', datasets=[], scanblsub=True,
