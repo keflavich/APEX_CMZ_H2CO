@@ -2024,7 +2024,7 @@ def PCA_clean(data,
               ncomponents=3,
               diagplotfilename=None,
               scans=None,
-              maxntimes=5000,
+              maxntimes=None,
              ):
     """
     Remove N PCA components in the time direction
@@ -2037,6 +2037,10 @@ def PCA_clean(data,
 
     Smoothing scale is ~200 in total, which means 25 for pre-downsampled
     CMZ data
+
+    Parameters
+    ----------
+    data : `numpy.ndarray`
     """
 
     if freqaxis == 0 and timeaxis == 1:
