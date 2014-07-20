@@ -1928,7 +1928,7 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
                 m[inds] = mb[0,:]
                 b[inds] = mb[1,:]
 
-            mb = np.array([m,b])
+            mb = np.array([m,b]/scratch/aginsbur/apex/raw/O-085.F-9311A-2010_merge.apex)
 
         dsub[ii:jj,:] = data[ii:jj,:] - np.inner(X,mb.T)
 
@@ -1981,12 +1981,23 @@ def efuncs(arr, neig=None, return_others=False, huge_limit=500):
     if arr.shape[1] > huge_limit and not neig:
         log.critical("Very large eigenvalue computation!"
                      " Danger stranger! Stranger danger!")
-        import idb; ipdb.set_trace()
-    covmat = np.dot(arr.T,arr)
+        import ipdb; ipdb.set_trace()
+    covmat = np.dot(arr.T.conj(),arr)
 
     # assert covariance matrix is Hermitian
     # (symmetric under transpose + conjugation)
-    assert (covmat.T.conj() == covmat).all()
+    if not assert (covmat.T.conj() == covmat).all():
+        diff = (covmat.T.conj() - covmat)
+        worst_diff_ind = np.argmax(np.abs(diff))
+        worst_diff = diff.flat[ind]/covmat.flat[ind]
+        log.warning("There are differences between the upper "
+                    "and lower triangular components of the "
+                    "covariance matrix; this is probably a "
+                    "floating point error and should not be terrible."
+                    "  The relative error is {wd}.".format(wd=worst_diff))
+        if np.abs(worst_diff) > 1e-4:
+            log.warning("Actually, that's a pretty large error.  "
+                        "You may be in trouble.")
     
     # Changed from np.linalg.eig to scipy.linalg.eigh
     # and numpy.linalg.eigh, which both return values in
@@ -2041,10 +2052,33 @@ def PCA_clean(data,
     Parameters
     ----------
     data : `numpy.ndarray`
-        2D data, with dimensions (times, frequencies)
+        2D data, with dimensions ``[times, frequencies]`` (or reversed if
+        ``timeaxis`` and ``freqaxis`` are appropriately specified)
     smoothing_scale : float
         The scale over which frequencies should be smoothed prior to performing
-        the PCA analysis
+        the PCA analysis.  This is the width of a gaussian.  The data will be
+        downsampled by a factor (1/5)*smoothing_scale
+    timeaxis : int
+    freqaxis : int
+        The axis #'s of the frequency and time data
+    ncomponents : int
+        The number of PCA components to remove.  3 is empirically decent, but
+        it's very important to test this #
+    diagplotfilename : None or str
+        A filename to save a diagnostic plot in.  The plot shows the first
+        ``ncomponents`` eigenfunctions.
+    scans : list
+        A list of scans.  If these are specified, the PCA analysis will be done
+        on a scan-by-scan basis, in which the most-correlated N components will
+        be identified in each scan.  This is not obviously the best thing to
+        do, but it can be useful.
+    maxntimes : int or None
+        If specified, the timestream will be chunked out into sections with
+        length < maxntimes before doing PCA computations.  In principle, this
+        can be used to overcome memory limitations, but it should be used with
+        caution as the locations of the splits are somewhat arbitrary and could
+        result in different principle component selections if the data aren't
+        well-behaved.
     """
 
     if freqaxis == 0 and timeaxis == 1:
@@ -2097,7 +2131,7 @@ def PCA_clean(data,
         fig.clf()
         ax = fig.gca()
         for ii in range(ncomponents):
-            ax.plot(efuncarr[:,ii], label=str(ii), linewidth=0.5, alpha=0.5)
+            ax.plot(efuncarr[:,ii], label=str(ii), linewidth=2, alpha=0.5)
         ax.legend(loc='best')
         fig.savefig(diagplotfilename)
 
@@ -2107,6 +2141,23 @@ def PCA_clean(data,
     return dsub.real
 
 def PCA_subtract(data, smoothing_scale=None, ncomponents=3):
+    """
+
+    Parameters
+    ----------
+    data : `numpy.ndarray`
+        2D data, with dimensions (times, frequencies)
+    smoothing_scale : float
+        The scale over which frequencies should be smoothed prior to performing
+        the PCA analysis.  This is the width of a gaussian.  The data will be
+        downsampled by a factor (1/5)*smoothing_scale
+
+    Returns
+    -------
+    dsub : `numpy.ndarray`
+        The data with ``ncomponents`` principle components removed
+    efuncarr :
+    """
     t0 = time.time()
     log.info("PCA will remove {0} components".format(ncomponents))
     if smoothing_scale:
