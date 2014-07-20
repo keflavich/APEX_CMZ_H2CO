@@ -15,6 +15,7 @@ from FITS_tools.load_header import get_cd
 from astropy.wcs import WCS
 import FITS_tools
 import scipy.ndimage
+import scipy.linalg
 import time
 import mpl_plot_templates
 import pylab as pl
@@ -1943,15 +1944,70 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
 
     return dsub
 
-def efuncs(arr, return_others=False):
+def efuncs(arr, neig=None, return_others=False, huge_limit=500):
     """
     Determine eigenfunctions of an array for use with
     PCA cleaning
+
+    Parameters
+    ----------
+    arr : `numpy.ndarray`
+        The array (2D)
+    neig : None or int
+        The number of eigenvalues to compute.  Smaller = faster!
+        None = All!
+    huge_limit : int
+        The limit above which an error will be raised (for large arrays, this
+        can take *forever*)
+    return_others : bool
+        Return the evals, evects, and covmat or just the efuncs?
+
+    Returns
+    -------
+    efuncarr : np.ndarray
+        The eigenfunctions
+
+    Optional Returns
+    ----------------
+    covmat : np.ndarray
+        Symmetric covariance matrix
+    evals : np.ndarray
+        1D array of eigenvalues
+    evects : np.ndarray
+        Eigenvectors
     """
     if hasattr(arr,'filled'):
         arr = arr.filled(0)
+    if arr.shape[1] > huge_limit and not neig:
+        log.critical("Very large eigenvalue computation!"
+                     " Danger stranger! Stranger danger!")
+        import idb; ipdb.set_trace()
     covmat = np.dot(arr.T,arr)
-    evals,evects = np.linalg.eig(covmat)
+
+    # assert covariance matrix is Hermitian
+    # (symmetric under transpose + conjugation)
+    assert (covmat.T.conj() == covmat).all()
+    
+    # Changed from np.linalg.eig to scipy.linalg.eigh
+    # and numpy.linalg.eigh, which both return values in
+    # the opposite order from np.linalg.eig
+    if neig:
+        sz = covmat.shape[1]
+        eva, eve = scipy.linalg.eigh(covmat,
+                                     eigvals=(sz-neig,sz-1))
+        # eigh returns values in opposit order from np.linalg.eig
+        # we also want a fully populated matrix so the size stays
+        # the same
+        evals = np.zeros(sz)
+        evals[:neig] = eva[::-1]
+        evects = np.zeros([sz,sz])
+        evects[:, :neig] = eve[:,::-1]
+
+    else:
+        evals,evects = np.linalg.eigh(covmat)
+        evals = evals[::-1]
+        evects = evects[:,::-1]
+
     efuncarr = np.dot(arr,evects)
     if return_others:
         return efuncarr,covmat,evals,evects
@@ -2052,17 +2108,22 @@ def PCA_subtract(data, smoothing_scale=None, ncomponents=3):
                                             axis=1, mode='mirror').real
 
         efuncarr,covmat,evals,evects = efuncs(sm_data[:,::smoothing_scale/5].T,
+                                              neig=ncomponents,
+                                              huge_limit=1000,
                                               return_others=True)
     else:
         log.info("PCA cleaning an image with size {0}".format(data.shape))
         
         efuncarr,covmat,evals,evects = efuncs(data.T,
+                                              neig=ncomponents,
+                                              huge_limit=1000,
                                               return_others=True)
 
     log.info("Completed PCA (eigenfunction/vector) computation"
              " in {0} seconds.".format(time.time()-t0))
 
     # Zero-out the components we want to keep
+    # (technically no longer necessary: this should be a null operation)
     efuncarr[:,ncomponents:] = 0
 
     to_subtract = np.inner(efuncarr,evects).T
