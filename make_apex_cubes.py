@@ -316,15 +316,14 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
 
     if scanblsub:
 
-        data_diagplot(data, dataset+"_presub",
-                      scans=scans,
+        data_diagplot(data, dataset+"_presub", scans=scans, freq=freq,
                       **kwargs)
         for ii,xscan in enumerate(np.unique(obsids)):
             match = obsids == xscan
             # maybe mask=mask_pix.max(axis=timeaxis), ?
             #mask=mask_pix[ii], 
             data_diagplot(data[match], dataset+"_presub_obs%i" % xscan,
-                          **kwargs)
+                          freq=freq, **kwargs)
 
         if linemask:
             mask = make_line_mask(freq)
