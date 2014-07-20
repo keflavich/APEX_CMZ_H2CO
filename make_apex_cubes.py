@@ -1998,15 +1998,18 @@ def efuncs(arr, neig=None, return_others=False, huge_limit=500):
         # eigh returns values in opposit order from np.linalg.eig
         # we also want a fully populated matrix so the size stays
         # the same
+        inds = np.argsort(eva)[::-1]
+
         evals = np.zeros(sz)
-        evals[:neig] = eva[::-1]
+        evals[:neig] = eva[inds]
         evects = np.zeros([sz,sz])
-        evects[:, :neig] = eve[:,::-1]
+        evects[:, :neig] = eve[:,inds]
 
     else:
         evals,evects = np.linalg.eigh(covmat)
-        evals = evals[::-1]
-        evects = evects[:,::-1]
+        inds = np.argsort(evals)[::-1]
+        evals = evals[inds]
+        evects = evects[:,inds]
 
     efuncarr = np.dot(arr,evects)
     if return_others:
