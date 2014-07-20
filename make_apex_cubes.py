@@ -298,8 +298,13 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
         data[:,:zero_edge_pixels] = 0
         data[:,-zero_edge_pixels:] = 0
 
+    # flag extremely bad pixels (don't know where these come from, scary!)
+    extremely_bad = (data > 1e10) | (data < -1e10)
+    # Set to zero rather than nan to avoid masking-related issues below
+    data[extremely_bad] = 0
+
     if subspectralmeans:
-        data -= data.mean(axis=freqaxis)[:,None]
+        data = data - data.mean(axis=freqaxis)[:,None]
 
     obsids = np.array([h['XSCAN'] for h in hdrs])
 
@@ -1680,7 +1685,7 @@ def build_cube_2014(sourcename,
                     datapath=april2014path,
                     outpath=april2014path,
                     datasets=None,
-                    scanblsub=False,
+                    scanblsub=True,
                     verbose=True,
                     pca_clean=True,
                     **kwargs
@@ -1986,18 +1991,22 @@ def PCA_clean(data,
         data = np.nan_to_num(data)
 
     if maxntimes and scans is None:
-        ntimes = data.shape[1]
+        ntimes = data.shape[0]
         if ntimes > maxntimes:
-            nsplits = np.ceil(ntimes/maxntimes)
+            nsplits = np.ceil(ntimes/float(maxntimes))
             length = ntimes/nsplits
-            splits = np.arange(0, ntimes, length)
-            scans = splits
+            # Split with equal length, but leave out the starting point
+            # and the end point since those are both added
+            splits = np.linspace(0, ntimes, nsplits+1)[1:-1]
+            scans = splits.astype('int')
 
     if scans is not None:
         all_data = data
         all_dsub = np.empty(data.shape)
         for start,end in zip([0]+scans.tolist(),
-                             scans.tolist()+[data.shape[1]]):
+                             scans.tolist()+[data.shape[0]]):
+            log.info("Computing PCA on an array with shape"
+                     " {0}".format(data[start:end,:].shape))
             dsub,efuncarr = PCA_subtract(data[start:end,:],
                                          smoothing_scale=smoothing_scale,
                                          ncomponents=ncomponents)
@@ -2009,6 +2018,8 @@ def PCA_clean(data,
         dsub = all_dsub
         efuncarr = efuncs / (len(scans)+1.) # Average removed efuncs
     else:
+        log.info("Computing PCA on an array with shape"
+                 " {0}".format(data.shape))
         dsub,efuncarr = PCA_subtract(data,
                                      smoothing_scale=smoothing_scale,
                                      ncomponents=ncomponents)
@@ -2029,6 +2040,7 @@ def PCA_clean(data,
     return dsub.real
 
 def PCA_subtract(data, smoothing_scale=None, ncomponents=3):
+    t0 = time.time()
     log.info("PCA will remove {0} components".format(ncomponents))
     if smoothing_scale:
         log.info(("PCA cleaning an image with size {0},"
@@ -2046,6 +2058,9 @@ def PCA_subtract(data, smoothing_scale=None, ncomponents=3):
         
         efuncarr,covmat,evals,evects = efuncs(data.T,
                                               return_others=True)
+
+    log.info("Completed PCA (eigenfunction/vector) computation"
+             " in {0} seconds.".format(time.time()-t0))
 
     # Zero-out the components we want to keep
     efuncarr[:,ncomponents:] = 0
