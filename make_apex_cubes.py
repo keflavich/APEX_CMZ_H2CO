@@ -2041,6 +2041,10 @@ def PCA_clean(data,
     Parameters
     ----------
     data : `numpy.ndarray`
+        2D data, with dimensions (times, frequencies)
+    smoothing_scale : float
+        The scale over which frequencies should be smoothed prior to performing
+        the PCA analysis
     """
 
     if freqaxis == 0 and timeaxis == 1:
