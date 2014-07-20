@@ -2035,7 +2035,7 @@ def PCA_clean(data,
               ncomponents=3,
               diagplotfilename=None,
               scans=None,
-              maxntimes=None,
+              maxntimes=5000,
              ):
     """
     Remove N PCA components in the time direction
