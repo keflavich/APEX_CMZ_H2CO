@@ -1989,7 +1989,7 @@ def efuncs(arr, neig=None, return_others=False, huge_limit=500):
     if not (covmat.T.conj() == covmat).all():
         diff = (covmat.T.conj() - covmat)
         worst_diff_ind = np.argmax(np.abs(diff))
-        worst_diff = diff.flat[ind]/covmat.flat[ind]
+        worst_diff = diff.flat[worst_diff_ind]/covmat.flat[worst_diff_ind]
         log.warning("There are differences between the upper "
                     "and lower triangular components of the "
                     "covariance matrix; this is probably a "
