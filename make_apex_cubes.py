@@ -1928,7 +1928,7 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
                 m[inds] = mb[0,:]
                 b[inds] = mb[1,:]
 
-            mb = np.array([m,b]/scratch/aginsbur/apex/raw/O-085.F-9311A-2010_merge.apex)
+            mb = np.array([m,b])
 
         dsub[ii:jj,:] = data[ii:jj,:] - np.inner(X,mb.T)
 
