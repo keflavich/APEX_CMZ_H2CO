@@ -1363,17 +1363,17 @@ def do_everything():
             baseline_cube(mergepath+'APEX_{0}_vsmooth.fits'.format(line),
                           maskfn=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
-    for fn in glob.glob(os.path.join(mergepath,'APEX_H2CO_32*fits')):
+    do_mask_ch3oh()
+
+    for fn in glob.glob(os.path.join(mergepath,'APEX_H2CO_3*fits')):
         try:
             os.symlink(fn,
                        os.path.join(h2copath,os.path.split(fn)[-1]))
+            log.info("Linked file {0} to {1}".format(fn, h2copath))
         except OSError:
             log.debug("Skipped file {0} because it exists".format(fn))
 
     do_temperature()
-
-def do_temperature():
-    temperaturemap(tm)
 
 def baseline_cube(cubefn, maskfn, order=5):
     from pyspeckit.cubes.cubes import baseline_cube
@@ -1398,7 +1398,7 @@ def do_everything_2013extrafreqs():
     #compute_noise_extras(lowhigh='high',pixrange=[0,4096])
 
 
-def doratio():
+def doratio(h2copath=h2copath):
     """ I swapped top and bottom because that's what the models were set up for... """
 
     top = fits.getdata(h2copath+'APEX_H2CO_303_202_smooth_mask_integ.fits')
@@ -1573,6 +1573,9 @@ class TemperatureMapper(object):
 if 'tm' not in locals():
     tm = TemperatureMapper(trange=[10,300],ntemp=100)
 
+def do_temperature():
+    temperaturemap(tm)
+
 def temperaturemap(ratio_to_tem, path=h2copath):
     doratio()
 
@@ -1611,36 +1614,36 @@ def temperaturemap(ratio_to_tem, path=h2copath):
                     rf[0].data = np.nansum(tmap*wt, axis=0)/np.nansum(wt, axis=0)
                     rf.writeto(pfx+'_wtdmeantemperature.fits', clobber=True)
 
-def mask_out_ch3oh(smooth='smooth'):
+def mask_out_ch3oh(smooth='smooth', dpath=mergepath):
     nu_ch3oh = all_lines['CH3OH_422_312']
     nu_h2co = all_lines['H2CO_322_221']
     v_ch3oh = ((nu_ch3oh - nu_h2co)/nu_h2co * constants.c).to(u.km/u.s).value
 
-    hdu = fits.open('APEX_H2CO_322_221_{0}.fits'.format(smooth))[0]
+    hdu = fits.open(dpath+'APEX_H2CO_322_221_{0}.fits'.format(smooth))[0]
     dv = hdu.header['CDELT3']
     shift = v_ch3oh / dv
     log.info("CH3OH Masking: dv: {0} shift: {1} ".format(dv,shift))
 
-    mask = fits.getdata('APEX_H2CO_303_202_{0}_mask.fits'.format(smooth)).astype('bool')
+    mask = fits.getdata(dpath+'APEX_H2CO_303_202_{0}_mask.fits'.format(smooth)).astype('bool')
     log.info("Mask shape: {0}".format(mask.shape))
     newmask = mask*False
     log.info("NewMask shape: {0}".format(newmask.shape))
     newmask[np.abs(shift):,:,:] = mask[:-np.abs(shift),:,:]
     log.info("NewMask number of masked pixels: {0}".format(newmask.sum()))
     hdu.data[newmask] = np.nan
-    hdu.writeto('APEX_H2CO_322_221_{0}_CH3OHchomped.fits'.format(smooth), clobber=True)
+    hdu.writeto(dpath+'APEX_H2CO_322_221_{0}_CH3OHchomped.fits'.format(smooth), clobber=True)
 
     hdu.data[True-mask] = np.nan
-    hdu.writeto('APEX_H2CO_322_221_{0}_CH3OHchomped_masked.fits'.format(smooth), clobber=True)
+    hdu.writeto(dpath+'APEX_H2CO_322_221_{0}_CH3OHchomped_masked.fits'.format(smooth), clobber=True)
 
-    integrate_mask('APEX_H2CO_322_221_{0}_CH3OHchomped'.format(smooth),
-                   mask='APEX_H2CO_303_202_{0}_mask.fits'.format(smooth))
+    integrate_mask(dpath+'APEX_H2CO_322_221_{0}_CH3OHchomped'.format(smooth),
+                   mask=dpath+'APEX_H2CO_303_202_{0}_mask.fits'.format(smooth))
 
-def do_mask_ch3oh():
+def do_mask_ch3oh(dpath=mergepath):
     # spatial smoothing = 2pix
-    mask_out_ch3oh('smooth')
+    mask_out_ch3oh('smooth', dpath=dpath)
     # spatial smoothing = 4pix
-    mask_out_ch3oh('vsmooth')
+    mask_out_ch3oh('vsmooth', dpath=dpath)
 
 def do_2014(datasets=datasets_2014):
     #datasets = ['E-093.C-0144A.2014APR02/E-093.C-0144A-2014-2014-04-01',
