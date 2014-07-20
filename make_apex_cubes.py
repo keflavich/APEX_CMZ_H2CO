@@ -1429,8 +1429,8 @@ def doratio(h2copath=h2copath):
         bottom = fits.getdata(h2copath+'APEX_H2CO_322_221_{0}_CH3OHchomped_masked.fits'.format(smooth))
         
         ratio = bottom/top
-        ratio[ratio<0.0] = np.nan
-        ratio[ratio>0.64] = np.nan
+        #ratio[ratio<0.0] = np.nan
+        #ratio[ratio>0.64] = np.nan
         
         f = fits.open(h2copath+'APEX_H2CO_303_202_{0}_mask.fits'.format(smooth))
         
@@ -1441,8 +1441,8 @@ def doratio(h2copath=h2copath):
         bottom = fits.getdata(h2copath+'APEX_H2CO_321_220_{0}.fits'.format(smooth))
         
         ratio = bottom/top
-        ratio[ratio<0.0] = np.nan
-        ratio[ratio>0.64] = np.nan
+        #ratio[ratio<0.0] = np.nan
+        #ratio[ratio>0.64] = np.nan
         
         f = fits.open(h2copath+'APEX_H2CO_303_202_{0}.fits'.format(smooth))
         
@@ -1596,9 +1596,9 @@ def temperaturemap(ratio_to_tem, path=h2copath):
                 rf.writeto(pfx+'_temperature.fits',clobber=True)
                 #mask = fits.getdata('APEX_H2CO_303_202_smooth_mask_integ.fits') > 0.018
                 if not suf:
-                    mask = fits.getdata('APEX_H2CO_322_221_{0}_mask_integ.fits'.format(smooth)) > 0.0025
+                    mask = fits.getdata(path+'APEX_H2CO_322_221_{0}_mask_integ.fits'.format(smooth)) > 0.0025
                 else:
-                    mask = fits.getdata('APEX_H2CO_303_202_{0}_mask.fits'.format(smooth)).astype('bool')
+                    mask = fits.getdata(path+'APEX_H2CO_303_202_{0}_mask.fits'.format(smooth)).astype('bool')
                 tmap[True-mask] = np.nan
                 rf[0].data = tmap
                 rf.writeto(pfx+'_temperature_masked.fits',clobber=True)
@@ -1609,7 +1609,7 @@ def temperaturemap(ratio_to_tem, path=h2copath):
                     rf[0].data = scipy.stats.nanmedian(tmap, axis=0)
                     rf.writeto(pfx+'_midtemperature.fits', clobber=True)
 
-                    wt = fits.getdata('APEX_H2CO_303_202_smooth.fits').astype('bool')
+                    wt = fits.getdata(path+'APEX_H2CO_303_202_smooth.fits').astype('bool')
                     wt[(True-mask) | (tmap==0) | (True-np.isfinite(tmap))] = 0
                     rf[0].data = np.nansum(tmap*wt, axis=0)/np.nansum(wt, axis=0)
                     rf.writeto(pfx+'_wtdmeantemperature.fits', clobber=True)
