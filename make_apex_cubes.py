@@ -496,10 +496,10 @@ def make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcs
 
     lrange = gal.l.wrap_at(180*u.deg).deg.min()+15/3600.,gal.l.wrap_at(180*u.deg).deg.max()+15/3600.
     brange = gal.b.deg.min()+15/3600.,gal.b.deg.max()+15/3600.
-    print "Map extent: %0.2f < l < %0.2f,  %0.2f < b < %0.2f" % (lrange[0],
-                                                                 lrange[1],
-                                                                 brange[0],
-                                                                 brange[1])
+    log.info("Map extent: %0.2f < l < %0.2f,  %0.2f < b < %0.2f" % (lrange[0],
+                                                                    lrange[1],
+                                                                    brange[0],
+                                                                    brange[1]))
 
     naxis1 = int((lrange[1]-lrange[0])/(pixsize.to(u.deg).value)+10)
     naxis2 = int((brange[1]-brange[0])/(pixsize.to(u.deg).value)+10)
@@ -573,7 +573,7 @@ def data_diagplot(data, dataset, ext='png', newfig=False,
         figure = pl.figure(1)
         figure.clf()
     if (np.isnan(data)).all():
-        print "ALL data is NaN in ", dataset
+        log.exception("ALL data is NaN in {0}".format(dataset))
         import ipdb; ipdb.set_trace()
 
     if np.any([d > max_size for d in data.shape]):
@@ -607,7 +607,7 @@ def data_diagplot(data, dataset, ext='png', newfig=False,
     try:
         pl.savefig(os.path.join(diagplotdir, dataset+"_diagnostics."+ext),bbox_inches='tight')
     except Exception as ex:
-        log.info(ex)
+        log.exception(ex)
         print ex
     return axis
 
@@ -1145,10 +1145,10 @@ def moment_mask_cube(prefix, noise=None, kernelsize=[2,2,2], grow=1,
         noise = fits.getdata(prefix+'_noise.fits')
 
     t0 = time.time()
-    print "Initiating cube smooth."
+    log.info("Initiating cube smooth of {0}.".format(prefix))
     smcube = cube_regrid.gsmooth_cube(cube, kernelsize, use_fft=False,
                                       kernelsize_mult=3)
-    print "Completed cube smooth in %i seconds" % (time.time()-t0)
+    log.info("Completed cube smooth in %i seconds" % (time.time()-t0))
     mask = smcube > noise*sigmacut
 
     mask_grow = scipy.ndimage.morphology.binary_dilation(mask, iterations=1)
@@ -1381,9 +1381,9 @@ def baseline_cube(cubefn, maskfn, order=5):
     cube = f[0].data
     mask = fits.getdata(maskfn).astype('bool')
     t0 = time.time()
-    print "Baselining cube {0}...".format(cubefn),
+    log.info("Baselining cube {0} with order {1}...".format(cubefn, order))
     bc = baseline_cube(cube, order, cubemask=mask)
-    print " done ({0} seconds)".format(time.time()-t0)
+    log.info("Baselining done ({0} seconds)".format(time.time()-t0))
     f[0].data = bc
     f.writeto(cubefn.replace(".fits","_bl.fits"), clobber=True)
 
@@ -1619,14 +1619,14 @@ def mask_out_ch3oh(smooth='smooth'):
     hdu = fits.open('APEX_H2CO_322_221_{0}.fits'.format(smooth))[0]
     dv = hdu.header['CDELT3']
     shift = v_ch3oh / dv
-    print "dv,shift: ",dv,shift
+    log.info("CH3OH Masking: dv: {0} shift: {1} ".format(dv,shift))
 
     mask = fits.getdata('APEX_H2CO_303_202_{0}_mask.fits'.format(smooth)).astype('bool')
-    print mask.shape
+    log.info("Mask shape: {0}".format(mask.shape))
     newmask = mask*False
-    print newmask.shape
+    log.info("NewMask shape: {0}".format(newmask.shape))
     newmask[np.abs(shift):,:,:] = mask[:-np.abs(shift),:,:]
-    print newmask.sum()
+    log.info("NewMask number of masked pixels: {0}".format(newmask.sum()))
     hdu.data[newmask] = np.nan
     hdu.writeto('APEX_H2CO_322_221_{0}_CH3OHchomped.fits'.format(smooth), clobber=True)
 
