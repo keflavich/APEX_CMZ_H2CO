@@ -119,7 +119,7 @@ def MAD(a, c=0.6745, axis=None):
 
 def debug_and_load(test='test'):
 
-    spectra,headers,indices,data,hdrs,gal = load_2013_dataset_for_debugging(skip_data=False, lowhigh='high')
+    spectra,headers,indices,data,hdrs,gal = load_dataset_for_debugging(skip_data=False, lowhigh='high')
 
     make_blanks_freq(gal, hdrs[0], test, clobber=True)
     dmeansub,gal,hdrs = process_data(data, gal, hdrs, dataset=test,
@@ -148,15 +148,18 @@ def debug_and_load(test='test'):
 
     return spectra,headers,indices,data,hdrs,gal,dspecsub,dmeansub,dpcasub,freq,mask
 
-def load_2013_dataset_for_debugging(lowhigh='low', downsample_factor=8,
-                                    dataset='M-091.F-0019-2013-2013-06-11',
-                                    datapath=june2013datapath,
-                                    xscan=37986,
-                                    skip_data=True):
+def load_dataset_for_debugging(lowhigh='low', downsample_factor=8,
+                               dataset='M-091.F-0019-2013-2013-06-11',
+                               datapath=june2013datapath,
+                               xscan=37986,
+                               sourcename='SGRA',
+                               shapeselect=4096,
+                               backend='xffts',
+                               skip_data=True):
     """
     Example:
 
-    spectra,headers,indices, data,hdrs,gal = load_2013_dataset_for_debugging(skip_data=False)
+    spectra,headers,indices, data,hdrs,gal = load_dataset_for_debugging(skip_data=False)
     make_blanks_freq(gal, hdrs[0], 'test', clobber=True)
     noise = np.std(data,axis=1)
     freq_step = np.array([h['FRES'] for h in hdrs])
@@ -168,7 +171,10 @@ def load_2013_dataset_for_debugging(lowhigh='low', downsample_factor=8,
 
     if lowhigh not in ('low','high'):
         raise ValueError
-    xtel = 'AP-H201-X202' if lowhigh=='low' else 'AP-H201-X201'
+    if backend == 'xffts': 
+        xtel = 'AP-H201-X202' if lowhigh=='low' else 'AP-H201-X201'
+    else:
+        xtel = 'AP-H201-F101' if lowhigh == 'high' else 'AP-H201-F102'
 
     apex_filename=datapath+dataset+".apex"
 
@@ -176,8 +182,8 @@ def load_2013_dataset_for_debugging(lowhigh='low', downsample_factor=8,
                                              skip_data=skip_data,
                                              downsample_factor=downsample_factor)
     data, hdrs, gal = select_apex_data(spectra, headers, indices,
-                                       sourcename='SGRA',
-                                       shapeselect=4096,
+                                       sourcename=sourcename,
+                                       shapeselect=shapeselect,
                                        tsysrange=[100,325],
                                        xtel=xtel,
                                        rchanrange=None,
@@ -547,14 +553,13 @@ def make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcs
 
 
 def make_blanks_merge(cubefilename, lowhigh='low', clobber=True,
-                      width=1.0*u.GHz, lowest_freq=None, pixsize =
-                      7.2*u.arcsec):
+                      width=1.0*u.GHz, lowest_freq=None, pixsize=7.2*u.arcsec,
+                      restfreq=218222.192*u.MHz):
     # total size is 2.3 x 0.4 degrees
     # 1150x
     # center is 0.55 -0.075
     naxis1 = 1150
     naxis2 = 200
-    restfreq = 218222.192*u.MHz
     bmaj = (1.22*10*u.m / restfreq.to(u.m,u.spectral()))**-1*u.radian
     cd3 = ((1*u.km/u.s)/constants.c * 218.2*u.GHz).to(u.Hz).value
     naxis3 = int(np.ceil(((width / (218.2*u.GHz) * constants.c) / (u.km/u.s)).decompose().value))
@@ -1026,9 +1031,12 @@ def build_cube_2013(mergefile=None,
 
 def make_high_mergecube(datasets_2014=datasets_2014):
     mergefile2 = 'APEX_H2CO_merge_high'
-    make_blanks_merge(os.path.join(mergepath,mergefile2), lowhigh='high')
+    make_blanks_merge(os.path.join(mergepath,mergefile2), lowhigh='high',
+                      lowest_freq=218e9, width=1.0*u.GHz)
+    # ('ao', 'high'): (218.0, 219.0),
     build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath,
                   datapath=aorawpath)
+    # (2013, 'high'): (217.5, 220.0)
     build_cube_2013(mergefile=mergefile2,
                     outpath=mergepath,
                     datapath=june2013datapath,
@@ -1036,15 +1044,15 @@ def make_high_mergecube(datasets_2014=datasets_2014):
                     scanblsub=True)
 
     log.info("Starting merge")
-    for lowhigh in ('low','high',):
-        mapnames = ['MAP_{0:03d}'.format(ii) for ii in range(1,130)]
-        log.info("Building cubes: "+str(mapnames)+" "+lowhigh)
-        build_cube_2014(mapnames,
-                        mergefile=mergefile2,
-                        outpath=mergepath,
-                        datapath=april2014path,
-                        lowhigh=lowhigh,
-                        datasets=datasets_2014)
+    mapnames = ['MAP_{0:03d}'.format(ii) for ii in range(1,130)]
+    log.info("Building cubes: "+str(mapnames)+" "+lowhigh)
+    # Frequency: (216.9, 219.4)
+    build_cube_2014(mapnames,
+                    mergefile=mergefile2,
+                    outpath=mergepath,
+                    datapath=april2014path,
+                    lowhigh='low',
+                    datasets=datasets_2014)
 
 
 def make_low_mergecube(datasets_2014=datasets_2014):
@@ -1095,6 +1103,9 @@ def integrate_slices_low(prefix='merged_datasets/APEX_H2CO_merge_low_sub'):
     hdu1.writeto(prefix+"_SiO5-4.fits", clobber=True)
 
 def integrate_mask(prefix, mask=h2copath+'APEX_H2CO_303_202_mask.fits'):
+    """
+    Integrate a cube with name specified by 'prefix' using a specific mask
+    """
     if isinstance(mask,str):
         mask = fits.getdata(mask)
     ffile = fits.open(prefix+'.fits')
@@ -1160,8 +1171,11 @@ def compute_noise_extras(prefix=june2013path+'APEX_H2CO_2013_%s_sub',
     hdu1 = fits.PrimaryHDU(data=integ1, header=hdr)
     hdu1.writeto(prefix+"_noise.fits", clobber=True)
 
-def moment_mask_cube(prefix, noise=None, kernelsize=[2,2,2], grow=1,
-                     sigmacut=3):
+def signal_to_noise_mask_cube(prefix, noise=None, kernelsize=[2,2,2], grow=1,
+                              sigmacut=3):
+    """
+    It's not clear that this has anything to do with moments...
+    """
     ffile = fits.open(prefix+'.fits')
     cube = ffile[0].data
     if noise is None:
@@ -1174,18 +1188,18 @@ def moment_mask_cube(prefix, noise=None, kernelsize=[2,2,2], grow=1,
     log.info("Completed cube smooth in %i seconds" % (time.time()-t0))
     mask = smcube > noise*sigmacut
 
-    mask_grow = scipy.ndimage.morphology.binary_dilation(mask, iterations=1)
+    mask_grow = scipy.ndimage.morphology.binary_dilation(mask, iterations=grow)
 
     ffile[0].data[True-mask_grow] = np.nan
-    ffile[0].writeto(prefix+"_moment_masked.fits", clobber=True)
+    ffile[0].writeto(prefix+"_snmasked.fits", clobber=True)
 
     ffile[0].data = mask_grow.astype('int')
     ffile[0].writeto(prefix+"_mask.fits", clobber=True)
 
-def do_momcube_masking_hi(prefix=h2copath+'APEX_H2CO_303_202'):
+def do_sncube_masking_hi(prefix=h2copath+'APEX_H2CO_303_202'):
     compute_noise_high(prefix)
-    moment_mask_cube(prefix)
-    integrate_slices_high(prefix+'_moment_masked')
+    signal_to_noise_mask_cube(prefix)
+    integrate_slices_high(prefix+'_snmasked')
 
 def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
                     debug=False, smooth=False, vsmooth=False, naxis3=400, crval3=50):
@@ -1349,16 +1363,21 @@ def do_everything():
     compute_noise_high(mergepath+'APEX_H2CO_merge_high_vsmoothds',[203,272])
     compute_noise_high(mergepath+'APEX_H2CO_303_202_vsmooth',[107,141])
     compute_noise_low()
-    moment_mask_cube(mergepath+'APEX_H2CO_303_202',
-                     noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_sub_noise.fits'))
-    moment_mask_cube(mergepath+'APEX_H2CO_303_202_smooth',
-                     noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_smooth_noise.fits'),
-                     sigmacut=3)
-    moment_mask_cube(mergepath+'APEX_H2CO_303_202_vsmooth',
-                     noise=fits.getdata(mergepath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
-                     sigmacut=3)
-    integrate_mask(mergepath+'APEX_H2CO_303_202_smooth',mask=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
-    integrate_mask(mergepath+'APEX_H2CO_303_202_vsmooth',mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
+    signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202',
+                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_sub_noise.fits'),
+                              grow=2)
+    signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_smooth',
+                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_smooth_noise.fits'),
+                              sigmacut=3)
+    signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_vsmooth',
+                              noise=fits.getdata(mergepath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
+                              sigmacut=3)
+    integrate_mask(mergepath+'APEX_H2CO_303_202',
+                   mask=mergepath+'APEX_H2CO_303_202_mask.fits')
+    integrate_mask(mergepath+'APEX_H2CO_303_202_smooth',
+                   mask=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
+    integrate_mask(mergepath+'APEX_H2CO_303_202_vsmooth',
+                   mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
     for fn in glob.glob(os.path.join(mergepath,'APEX_H2CO_30*fits')):
         try:
@@ -1368,15 +1387,22 @@ def do_everything():
             log.debug("Skipped file {0} because it exists".format(fn))
 
     # Create H2CO masks?
-    do_momcube_masking_hi()
+    # (they were already created above by signal_to_noise_mask_cube)
+    do_sncube_masking_hi()
 
     for line in all_lines:
-        if os.path.exists(mergepath+'APEX_{0}.fits'.format(line)):
-            integrate_mask(mergepath+'APEX_{0}'.format(line))
+        fn = mergepath+'APEX_{0}.fits'.format(line)
+        if os.path.exists(fn):
+            integrate_mask(mergepath+'APEX_{0}'.format(line),
+                           mask=mergepath+'APEX_H2CO_303_202_mask.fits')
             integrate_mask(mergepath+'APEX_{0}_smooth'.format(line),
                            mask=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
             integrate_mask(mergepath+'APEX_{0}_vsmooth'.format(line),
                            mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
+            log.debug("Integrated masked file {0}".format(fn))
+        else:
+            log.debug("File {0} does not exist".format(fn))
+
     for line in all_lines:
         if os.path.exists(mergepath+'APEX_{0}.fits'.format(line)):
             baseline_cube(mergepath+'APEX_{0}.fits'.format(line),
@@ -1429,28 +1455,30 @@ def doratio(h2copath=h2copath, maxratio=1):
         0.64 is the highest physical value
     
     """
+    ##### integrated #####
 
-    top = fits.getdata(h2copath+'APEX_H2CO_303_202_smooth_mask_integ.fits')
-    bottom = fits.getdata(h2copath+'APEX_H2CO_322_221_smooth_CH3OHchomped_mask_integ.fits')
-    
-    ratio = bottom/top
-    ratio[ratio<0.0] = np.nan
-    ratio[ratio>maxratio] = np.nan
-    
-    f = fits.open(h2copath+'APEX_H2CO_303_202_smooth_mask_integ.fits')
-    
-    f[0].data = ratio
-    
-    f.writeto(h2copath+'H2CO_322221_to_303202_integ.fits',clobber=True)
+    for smooth in ('','_smooth','_vsmooth'):
+        top = fits.getdata(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
+        bottom = fits.getdata(h2copath+'APEX_H2CO_322_221{0}_CH3OHchomped_mask_integ.fits'.format(smooth))
+        
+        ratio = bottom/top
+        ratio[ratio<0.0] = np.nan
+        ratio[ratio>maxratio] = np.nan
+        
+        f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
+        
+        f[0].data = ratio
+        
+        f.writeto(h2copath+'H2CO_322221_to_303202{0}_integ.fits'.format(smooth),clobber=True)
 
-    bottom = fits.getdata(h2copath+'APEX_H2CO_321_220_smooth_mask_integ.fits')
-    ratio = bottom/top
-    ratio[ratio<0.0] = np.nan
-    ratio[ratio>maxratio] = np.nan
-    
-    f[0].data = ratio
-    
-    f.writeto(h2copath+'H2CO_321220_to_303202_integ.fits',clobber=True)
+        bottom = fits.getdata(h2copath+'APEX_H2CO_321_220{0}_mask_integ.fits'.format(smooth))
+        ratio = bottom/top
+        ratio[ratio<0.0] = np.nan
+        ratio[ratio>maxratio] = np.nan
+        
+        f[0].data = ratio
+        
+        f.writeto(h2copath+'H2CO_321220_to_303202{0}_integ.fits'.format(smooth),clobber=True)
 
     ##### cube #####
     for smooth in ('','_smooth','_vsmooth'):
