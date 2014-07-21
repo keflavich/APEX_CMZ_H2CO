@@ -1033,19 +1033,9 @@ def make_high_mergecube(datasets_2014=datasets_2014):
     mergefile2 = 'APEX_H2CO_merge_high'
     make_blanks_merge(os.path.join(mergepath,mergefile2), lowhigh='high',
                       lowest_freq=218e9, width=1.0*u.GHz)
-    # ('ao', 'high'): (218.0, 219.0),
-    build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath,
-                  datapath=aorawpath)
-    # (2013, 'high'): (217.5, 220.0)
-    build_cube_2013(mergefile=mergefile2,
-                    outpath=mergepath,
-                    datapath=june2013datapath,
-                    lowhigh='high',
-                    scanblsub=True)
 
-    log.info("Starting merge")
     mapnames = ['MAP_{0:03d}'.format(ii) for ii in range(1,130)]
-    log.info("Building cubes: "+str(mapnames)+" "+lowhigh)
+    log.info("Building cubes: "+str(mapnames))
     # Frequency: (216.9, 219.4)
     build_cube_2014(mapnames,
                     mergefile=mergefile2,
@@ -1053,6 +1043,20 @@ def make_high_mergecube(datasets_2014=datasets_2014):
                     datapath=april2014path,
                     lowhigh='low',
                     datasets=datasets_2014)
+
+    log.info("Building Ao cubes")
+    # ('ao', 'high'): (218.0, 219.0),
+    build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath,
+                  datapath=aorawpath)
+
+    log.info("Building 2013 cubes")
+    # (2013, 'high'): (217.5, 220.0)
+    build_cube_2013(mergefile=mergefile2,
+                    outpath=mergepath,
+                    datapath=june2013datapath,
+                    lowhigh='high',
+                    scanblsub=True)
+
 
 
 def make_low_mergecube(datasets_2014=datasets_2014):
