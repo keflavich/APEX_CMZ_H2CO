@@ -20,6 +20,7 @@ import time
 import mpl_plot_templates
 import pylab as pl
 import os
+import errno
 from astropy import log
 import glob
 from scipy.ndimage import filters
@@ -73,6 +74,22 @@ mergepath = '/Users/adam/work/h2co/apex/merged_datasets/'
 aorawpath = '/Users/adam/work/h2co/apex/2010_reduced/2010_raw/'
 aopath = '/Users/adam/work/h2co/apex/2010_reduced/'
 diagplotdir = '/Users/adam/work/h2co/apex/diagnostic_plots/'
+
+
+def mkdir_p(path):
+    """ http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python """
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
+
+def checkdir_makedir(path):
+    dpath = os.path.split(path)[0]
+    if not os.path.exists(dpath):
+        mkdir_p(dpath)
+
 
 def MAD(a, c=0.6745, axis=None):
     """
@@ -604,8 +621,10 @@ def data_diagplot(data, dataset, ext='png', newfig=False,
                     alpha=0.5)
         axis.set_xlim(*xlim)
 
+    figfilename = os.path.join(diagplotdir, dataset+"_diagnostics."+ext)
+    checkdir_makedir(figfilename)
     try:
-        pl.savefig(os.path.join(diagplotdir, dataset+"_diagnostics."+ext),bbox_inches='tight')
+        pl.savefig(figfilename,bbox_inches='tight')
     except Exception as ex:
         log.exception(ex)
         print ex
@@ -646,7 +665,9 @@ def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png',
     pl.plot(tsys, noise, '.',alpha=0.5)
     pl.xlabel("TSYS")
     pl.ylabel("Noise")
-    pl.savefig(os.path.join(diagplotdir, dataset+"_tsys."+ext),bbox_inches='tight')
+    figfilename = os.path.join(diagplotdir, dataset+"_tsys."+ext)
+    checkdir_makedir(figfilename)
+    pl.savefig(figfilename,bbox_inches='tight')
 
     if newfig:
         pl.figure()
@@ -664,7 +685,9 @@ def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png',
         pl.plot(freq, d_to_plot)
     pl.xlabel("Frequency")
     pl.ylabel("Mean Counts")
-    pl.savefig(os.path.join(diagplotdir, dataset+"_masked."+ext),bbox_inches='tight')
+    figfilename = os.path.join(diagplotdir, dataset+"_masked."+ext)
+    checkdir_makedir(figfilename)
+    pl.savefig(figfilename,bbox_inches='tight')
 
     data_diagplot(data, dataset, ext=ext, newfig=newfig, freq=freq, **kwargs)
 
@@ -1330,10 +1353,10 @@ def do_everything():
                      noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_sub_noise.fits'))
     moment_mask_cube(mergepath+'APEX_H2CO_303_202_smooth',
                      noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_smooth_noise.fits'),
-                     sigmacut=5)
+                     sigmacut=3)
     moment_mask_cube(mergepath+'APEX_H2CO_303_202_vsmooth',
                      noise=fits.getdata(mergepath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
-                     sigmacut=5)
+                     sigmacut=3)
     integrate_mask(mergepath+'APEX_H2CO_303_202_smooth',mask=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
     integrate_mask(mergepath+'APEX_H2CO_303_202_vsmooth',mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
@@ -1398,58 +1421,66 @@ def do_everything_2013extrafreqs():
     #compute_noise_extras(lowhigh='high',pixrange=[0,4096])
 
 
-def doratio(h2copath=h2copath):
-    """ I swapped top and bottom because that's what the models were set up for... """
+def doratio(h2copath=h2copath, maxratio=1):
+    """
+    I swapped top and bottom because that's what the models were set up for... 
+
+    maxratio : float
+        0.64 is the highest physical value
+    
+    """
 
     top = fits.getdata(h2copath+'APEX_H2CO_303_202_smooth_mask_integ.fits')
     bottom = fits.getdata(h2copath+'APEX_H2CO_322_221_smooth_CH3OHchomped_mask_integ.fits')
     
     ratio = bottom/top
     ratio[ratio<0.0] = np.nan
-    ratio[ratio>0.64] = np.nan
+    ratio[ratio>maxratio] = np.nan
     
     f = fits.open(h2copath+'APEX_H2CO_303_202_smooth_mask_integ.fits')
     
     f[0].data = ratio
     
-    f.writeto(h2copath+'H2CO_322221_to_303202.fits',clobber=True)
+    f.writeto(h2copath+'H2CO_322221_to_303202_integ.fits',clobber=True)
 
     bottom = fits.getdata(h2copath+'APEX_H2CO_321_220_smooth_mask_integ.fits')
     ratio = bottom/top
     ratio[ratio<0.0] = np.nan
-    ratio[ratio>0.64] = np.nan
+    ratio[ratio>maxratio] = np.nan
     
     f[0].data = ratio
     
-    f.writeto(h2copath+'H2CO_321220_to_303202.fits',clobber=True)
+    f.writeto(h2copath+'H2CO_321220_to_303202_integ.fits',clobber=True)
 
     ##### cube #####
-    for smooth in ('smooth','vsmooth'):
-        top = fits.getdata(h2copath+'APEX_H2CO_303_202_{0}.fits'.format(smooth))
-        bottom = fits.getdata(h2copath+'APEX_H2CO_322_221_{0}_CH3OHchomped_masked.fits'.format(smooth))
+    for smooth in ('','_smooth','_vsmooth'):
+        top = fits.getdata(h2copath+'APEX_H2CO_303_202{0}.fits'.format(smooth))
+        bottom = fits.getdata(h2copath+'APEX_H2CO_322_221{0}_CH3OHchomped_masked.fits'.format(smooth))
         
         ratio = bottom/top
-        #ratio[ratio<0.0] = np.nan
-        #ratio[ratio>0.64] = np.nan
+        ratio[ratio<0.0] = np.nan
+        ratio[ratio>maxratio] = np.nan
         
-        f = fits.open(h2copath+'APEX_H2CO_303_202_{0}_mask.fits'.format(smooth))
+        f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth))
         
-        f[0].data = ratio
+        # mask now!
+        f[0].data = ratio * f[0].data.astype('bool')
         
-        f.writeto(h2copath+'H2CO_322221_to_303202_cube_{0}.fits'.format(smooth),clobber=True)
+        f.writeto(h2copath+'H2CO_322221_to_303202_cube{0}.fits'.format(smooth),clobber=True)
 
-        bottom = fits.getdata(h2copath+'APEX_H2CO_321_220_{0}.fits'.format(smooth))
+        bottom = fits.getdata(h2copath+'APEX_H2CO_321_220{0}.fits'.format(smooth))
         
         ratio = bottom/top
-        #ratio[ratio<0.0] = np.nan
-        #ratio[ratio>0.64] = np.nan
+        ratio[ratio<0.0] = np.nan
+        ratio[ratio>maxratio] = np.nan
         
-        f = fits.open(h2copath+'APEX_H2CO_303_202_{0}.fits'.format(smooth))
+        #f = fits.open(h2copath+'APEX_H2CO_303_202{0}.fits'.format(smooth))
+        f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth))
         
         # mask out...
         f[0].data = ratio * f[0].data.astype('bool')
         
-        f.writeto(h2copath+'H2CO_321220_to_303202_cube_{}.fits'.format(smooth),clobber=True)
+        f.writeto(h2copath+'H2CO_321220_to_303202_cube{}.fits'.format(smooth),clobber=True)
 
 
 
@@ -1614,36 +1645,37 @@ def temperaturemap(ratio_to_tem, path=h2copath):
                     rf[0].data = np.nansum(tmap*wt, axis=0)/np.nansum(wt, axis=0)
                     rf.writeto(pfx+'_wtdmeantemperature.fits', clobber=True)
 
-def mask_out_ch3oh(smooth='smooth', dpath=mergepath):
+def mask_out_ch3oh(smooth='_smooth', dpath=mergepath):
     nu_ch3oh = all_lines['CH3OH_422_312']
     nu_h2co = all_lines['H2CO_322_221']
     v_ch3oh = ((nu_ch3oh - nu_h2co)/nu_h2co * constants.c).to(u.km/u.s).value
 
-    hdu = fits.open(dpath+'APEX_H2CO_322_221_{0}.fits'.format(smooth))[0]
+    hdu = fits.open(dpath+'APEX_H2CO_322_221{0}.fits'.format(smooth))[0]
     dv = hdu.header['CDELT3']
     shift = v_ch3oh / dv
     log.info("CH3OH Masking: dv: {0} shift: {1} ".format(dv,shift))
 
-    mask = fits.getdata(dpath+'APEX_H2CO_303_202_{0}_mask.fits'.format(smooth)).astype('bool')
+    mask = fits.getdata(dpath+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth)).astype('bool')
     log.info("Mask shape: {0}".format(mask.shape))
     newmask = mask*False
     log.info("NewMask shape: {0}".format(newmask.shape))
     newmask[np.abs(shift):,:,:] = mask[:-np.abs(shift),:,:]
     log.info("NewMask number of masked pixels: {0}".format(newmask.sum()))
     hdu.data[newmask] = np.nan
-    hdu.writeto(dpath+'APEX_H2CO_322_221_{0}_CH3OHchomped.fits'.format(smooth), clobber=True)
+    hdu.writeto(dpath+'APEX_H2CO_322_221{0}_CH3OHchomped.fits'.format(smooth), clobber=True)
 
     hdu.data[True-mask] = np.nan
-    hdu.writeto(dpath+'APEX_H2CO_322_221_{0}_CH3OHchomped_masked.fits'.format(smooth), clobber=True)
+    hdu.writeto(dpath+'APEX_H2CO_322_221{0}_CH3OHchomped_masked.fits'.format(smooth), clobber=True)
 
-    integrate_mask(dpath+'APEX_H2CO_322_221_{0}_CH3OHchomped'.format(smooth),
-                   mask=dpath+'APEX_H2CO_303_202_{0}_mask.fits'.format(smooth))
+    integrate_mask(dpath+'APEX_H2CO_322_221{0}_CH3OHchomped'.format(smooth),
+                   mask=dpath+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth))
 
 def do_mask_ch3oh(dpath=mergepath):
+    mask_out_ch3oh('', dpath=dpath)
     # spatial smoothing = 2pix
-    mask_out_ch3oh('smooth', dpath=dpath)
+    mask_out_ch3oh('_smooth', dpath=dpath)
     # spatial smoothing = 4pix
-    mask_out_ch3oh('vsmooth', dpath=dpath)
+    mask_out_ch3oh('_vsmooth', dpath=dpath)
 
 def do_2014(datasets=datasets_2014):
     #datasets = ['E-093.C-0144A.2014APR02/E-093.C-0144A-2014-2014-04-01',
@@ -2140,7 +2172,8 @@ def PCA_clean(data,
         for ii in range(ncomponents):
             ax.plot(efuncarr[:,ii], label=str(ii), linewidth=2, alpha=0.5)
         ax.legend(loc='best')
-        fig.savefig(diagplotfilename)
+        checkdir_makedir(diagplotfilename)
+        fig.savefig(diagplotfilename, bbox_inches='tight')
 
     if freqaxis == 0 and timeaxis == 1:
         dsub = dsub.swapaxes(0,1)
