@@ -28,6 +28,11 @@ from scipy import signal,interpolate
 import warnings
 import image_tools
 
+datasets_ao = ['O-085.F-9311A-2010','E-085.B-0964A-2010']
+datasets_2013 = ['M-091.F-0019-2013-2013-06-08',
+                 'M-091.F-0019-2013-2013-06-11',
+                 'M-091.F-0019-2013-2013-06-12',
+                 'M-091.F-0019-2013-2013-06-13']
 datasets_2014 = {'E-093.C-0144A.2014JUN01/E-093.C-0144A-2014-2014-05-31': ('MAP_007',),
                  'E-093.C-0144A.2014MAY30/E-093.C-0144A-2014-2014-05-29': ('MAP_002','MAP_003','MAP_004'),
                  'E-093.C-0144A.2014MAY31/E-093.C-0144A-2014-2014-05-30': ('MAP_005','MAP_006'),
@@ -823,7 +828,7 @@ def build_cube_ao(window, freq=False, mergefile=None,
                   mergefilename=None,
                   datapath=aorawpath,
                   outpath=aopath,
-                  datasets=['O-085.F-9311A-2010','E-085.B-0964A-2010'],
+                  datasets=datasets_ao,
                   scanblsub=True,
                   verbose=False,
                   debug=False,
@@ -944,10 +949,7 @@ def build_cube_2013(mergefile=None,
                     downsample_factor=8,
                     datapath=june2013datapath,
                     outpath=june2013path,
-                    datasets=['M-091.F-0019-2013-2013-06-08',
-                              'M-091.F-0019-2013-2013-06-11',
-                              'M-091.F-0019-2013-2013-06-12',
-                              'M-091.F-0019-2013-2013-06-13'],
+                    datasets=datasets_2013,
                     scanblsub=True,
                     pca_clean=True,
                     extra_suffix="",
@@ -1640,8 +1642,8 @@ class TemperatureMapper(object):
         self.kwargs = kwargs
 
     def init(self):
-        self.Xarr = ph2cogrid(trange=self.trange, ntemp=self.ntemp, abundance=10**-8.5,
-                              nh2=3e22, **self.kwargs)
+        self.Xarr = ph2cogrid(trange=self.trange, ntemp=self.ntemp,
+                              abundances=(10**-8.5,), nh2=3e22, **self.kwargs)
         self.temperatures = np.linspace(self.trange[0], self.trange[1], self.ntemp)
 
 
