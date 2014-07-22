@@ -20,19 +20,18 @@ logfile = ("".join([time.strftime("apexcmzpipeline{0}_%y_%m_%d_%H:%M:%S"),".log"
 
 with log.log_to_file(logfile):
     for dataset in make_apex_cubes.datasets_ao:
-        make_apex_cubes.build_cube_ao(window='high',
-                                  datasets=[dataset],
-                                  datapath=make_apex_cubes.aorawpath,
-                                  timewise_pca=True,
-                                  pca_clean=True,
-                                  freq=True,
-                                  )
+        make_apex_cubes.build_cube_ao(window='high', datasets=[dataset],
+                                      datapath=make_apex_cubes.aorawpath,
+                                      outpath=make_apex_cubes.aopath,
+                                      timewise_pca=True, pca_clean=True,
+                                      freq=True,)
 
     for dataset in make_apex_cubes.datasets_2014:
         mapnames = make_apex_cubes.datasets_2014[dataset]
 
         build_cube_2014(mapnames,
                         datapath=make_apex_cubes.april2014path,
+                        outpath=make_apex_cubes.april2014path,
                         lowhigh='low',
                         pca_clean=True,
                         pcakwargs={},
@@ -41,6 +40,7 @@ with log.log_to_file(logfile):
     for dataset in make_apex_cubes.datasets_2013:
 
         build_cube_2013(datapath=make_apex_cubes.june2013path,
+                        outpath=make_apex_cubes.june2013path,
                         lowhigh='low',
                         pca_clean=True,
                         pcakwargs={},
