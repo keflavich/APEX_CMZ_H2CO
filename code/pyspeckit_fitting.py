@@ -77,12 +77,13 @@ simple_fitter = SpectralModel(simplemodel, 5,
 
 
 if __name__ == "__main__":
+    from paths import mergepath,regpath
 
     if 'cube' not in locals():
-        cube = pyspeckit.Cube('APEX_H2CO_merge_high_vsmoothds.fits')
+        cube = pyspeckit.Cube(mergepath+'APEX_H2CO_merge_high_vsmoothds.fits')
         etamb = 0.75 # http://www.apex-telescope.org/telescope/efficiency/
         cube.cube /= etamb
-        noise = fits.getdata('APEX_H2CO_merge_high_vsmoothds_noise.fits') / etamb
+        noise = fits.getdata(mergepath+'APEX_H2CO_merge_high_vsmoothds_noise.fits') / etamb
         spectra = {}
 
     cube.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
@@ -91,7 +92,7 @@ if __name__ == "__main__":
 
     import pyregion
 
-    regs = pyregion.open('spectral_apertures.reg')
+    regs = pyregion.open(regpath+'spectral_apertures.reg')
 
     for reg in regs:
         name = reg.attr[1]['text']

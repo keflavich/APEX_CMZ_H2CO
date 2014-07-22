@@ -87,7 +87,7 @@ def mkdir_p(path):
 
 def checkdir_makedir(path):
     dpath = os.path.split(path)[0]
-    if not os.path.exists(dpath):
+    if not os.path.exists(dpath) and dpath:
         mkdir_p(dpath)
 
 
@@ -811,6 +811,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
 
 
 def build_cube_ao(window, freq=False, mergefile=None,
+                  mergefilename=None,
                   datapath=aorawpath,
                   outpath=aopath,
                   datasets=['O-085.F-9311A-2010','E-085.B-0964A-2010'],
@@ -827,7 +828,10 @@ def build_cube_ao(window, freq=False, mergefile=None,
     if window not in ('low','high'):
         raise ValueError()
     if mergefile:
-        cubefilename=os.path.join(outpath,'APEX_H2CO_merge_%s' % window)
+        if mergefilename is not None:
+            cubefilename = mergefilename
+        else:
+            cubefilename=os.path.join(outpath,'APEX_H2CO_merge_%s' % window)
     elif freq:
         cubefilename=os.path.join(outpath,'APEX_H2CO_Ao_Freq_%s' % window)
     else:
@@ -1029,8 +1033,11 @@ def build_cube_2013(mergefile=None,
     cube[0].header['CRPIX3'] = crpix3
     cube.writeto(cubefilename+'_downsampled.fits', clobber=True)
 
-def make_high_mergecube(datasets_2014=datasets_2014):
-    mergefile2 = 'APEX_H2CO_merge_high'
+def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True):
+    if pca_clean:
+        mergefile2 = 'APEX_H2CO_merge_high'
+    else:
+        mergefile2 = 'APEX_H2CO_merge_high_nopca'
     make_blanks_merge(os.path.join(mergepath,mergefile2), lowhigh='high',
                       lowest_freq=218e9, width=1.0*u.GHz)
 
@@ -1042,12 +1049,14 @@ def make_high_mergecube(datasets_2014=datasets_2014):
                     outpath=mergepath,
                     datapath=april2014path,
                     lowhigh='low',
+                    pca_clean=pca_clean,
                     datasets=datasets_2014)
 
     log.info("Building Ao cubes")
     # ('ao', 'high'): (218.0, 219.0),
     build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath,
-                  datapath=aorawpath)
+                  pca_clean=pca_clean,
+                  mergefilename=mergefile2, datapath=aorawpath)
 
     log.info("Building 2013 cubes")
     # (2013, 'high'): (217.5, 220.0)
@@ -1055,6 +1064,7 @@ def make_high_mergecube(datasets_2014=datasets_2014):
                     outpath=mergepath,
                     datapath=june2013datapath,
                     lowhigh='high',
+                    pca_clean=pca_clean,
                     scanblsub=True)
 
 

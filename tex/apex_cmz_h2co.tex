@@ -94,8 +94,10 @@ removing the first 10 components showed no significant difference in the
 cleaning but did show signs of extracting large-scale correlated signal.
 
 \Figure{figures/M-091.F-0019-2013-2013-06-08_PCA_high_diagnostic.png}
-{The first 3 eigenspectra from an observation taken on June 8, 2013. \todo{This
-will be replaced with a higher-quality figure}}
+{The first 3 eigenspectra from an observation taken on June 8, 2013.  These
+show the baselines that are removed by PCA cleaning.  They do not include any
+signal from the spectral lines.  \todo{This will be
+replaced with a higher-quality figure}}
 {fig:eigenspectra}{0.5}{0}
 
 
@@ -116,7 +118,9 @@ mapping technique used here.
 \ref{sec:baseline}, we show maps of the \formaldehyde \threeohthree line before
 and after PCA subtraction.}
 
-The PPV cubes were created with units of brightness temperature.  
+The PPV cubes were created with units of brightness temperature ($T_A^*$).  The
+main beam efficiency is $\eta_{mb} = 0.75$ (gain $\sim39$
+Jy/K)\footnote{\url{http://www.apex-telescope.org/telescope/efficiency/}}.
 
 
 \section{Signal Extraction}
@@ -172,6 +176,18 @@ assess what systematic effect density may have: to this end, I propose to show
 temperature maps computed with (1) a $10\times$ higher density and (2) a
 $10\times$ lower abundance.}.
 
+\citet{Johnston2014a} noted a very high temperature peak, $T>320$K, using these
+lines of \formaldehyde toward The Brick, G0.253+0.015.  We measure similar line
+ratios toward The Brick, but on larger scales.  The interpretation of these
+line ratios is subject to some question, though.  Above 300K, the collision
+rates provided by LAMDA \citep{Schoier2005a,Wiesenfeld2013a} must be
+extrapolated.  Additionally, some of the ratios cannot be reproduced by high
+temperatures, but instead require that the lines be thermalized and therefore
+at very high densities.   Given the low brightness temperatures observed,
+the emission must be coming from an extremely small area, which is inconsistent
+with the observed large extent of the emission unless it is also extremely
+patchy.  That remains a possibility if we are observing massive, dense clouds
+with relatively uniformly turbulent properties.
 
 \FigureTwoAA
 {figures/H2CO_322221_to_303202_smooth_integ.pdf}
