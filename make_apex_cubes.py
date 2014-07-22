@@ -1553,8 +1553,8 @@ def docleannhits():
     nhm = scipy.ndimage.median_filter(nh, 5)
     f[0].data = nhm
 
-def ph2cogrid(ntemp=50, trange=[10,200], abundance=10**-8.5,
-              nh2=3e22):
+def ph2cogrid(ntemp=50, trange=[10,200], abundances=(10**-8.5,10**-9),
+              nh2=3e22, densityrange=[4,7]):
     import pyradex
 
     temperatures=np.linspace(trange[0],trange[1],ntemp)
@@ -1573,11 +1573,11 @@ def ph2cogrid(ntemp=50, trange=[10,200], abundance=10**-8.5,
                       h2column=nh2)
 
     Xarr = {}
-    for abundance in (abundance,):
+    for abundance in abundances:
         Xarr[abundance] = {}
         for nh2 in (nh2,):
 
-            densities = [10**x for x in xrange(4,7)]
+            densities = [10**x for x in xrange(*densityrange)]
             ratio1 = {d:[] for d in densities}
             ratio2 = {d:[] for d in densities}
             f1 = {d:[] for d in densities}
@@ -1607,7 +1607,11 @@ def ph2cogrid(ntemp=50, trange=[10,200], abundance=10**-8.5,
             ratio1 = {d:np.array(ratio1[d]) for d in densities}
             ratio2 = {d:np.array(ratio2[d]) for d in densities}
 
-            Xarr[abundance][nh2] = (f1,f2,f3,ratio1,ratio2)
+            Xarr[abundance][nh2] = {'flux1':f1,
+                                    'flux2':f2,
+                                    'flux3':f3,
+                                    'ratio1':ratio1,
+                                    'ratio2':ratio2}
 
     return Xarr
 
@@ -1626,12 +1630,16 @@ class TemperatureMapper(object):
         self.temperatures = np.linspace(self.trange[0], self.trange[1], self.ntemp)
 
 
-    def get_mapper(self, tmin=np.nan, tmax=np.nan):
+    def get_mapper(self, lineid, tmin=np.nan, tmax=np.nan):
         if not hasattr(self,'temperature'):
             self.init()
 
+        rationame = {'321220': 'ratio1',
+                     '322221': 'ratio2'}[lineid]
+
         # ugly hack because ph2co is indexed with floats
-        ratios = self.Xarr[self.Xarr.keys()[0]][3e22][3][1e4]
+        # Use FIXED abundance, FIXED column, FIXED density
+        ratios = self.Xarr[self.Xarr.keys()[0]][3e22][rationame][1e4]
 
         def ratio_to_tem(r):
             inds = np.argsort(ratios)
@@ -1640,8 +1648,8 @@ class TemperatureMapper(object):
 
         return ratio_to_tem
 
-    def __call__(self,x, **kwargs):
-        return self.get_mapper(**kwargs)(x)
+    def __call__(self, x, lineid='321220', **kwargs):
+        return self.get_mapper(lineid, **kwargs)(x)
 
 if 'tm' not in locals():
     tm = TemperatureMapper(trange=[10,300],ntemp=100)
@@ -1661,7 +1669,7 @@ def temperaturemap(ratio_to_tem, path=h2copath):
             for highline in ('321220','322221'):
                 pfx = '{2}/H2CO_{0}_to_303202{1}'.format(highline,suf,path)
                 rmap = fits.getdata(pfx+'.fits')
-                tmap = ratio_to_tem(rmap)#, tmin=10, tmax=300)
+                tmap = ratio_to_tem(rmap, highline)#, tmin=10, tmax=300)
                 rf = fits.open(pfx+'.fits')
                 rf[0].header['BUNIT'] = 'K'
                 rf[0].header['BTYPE'] = 'TKIN'
