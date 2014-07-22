@@ -368,10 +368,19 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
 
     if pca_clean:
         t0 = time.time()
-        # DON'T remove the mean: that's dealt with in 'spectral baselining' in
-        # a more conservative fashion
-        dmean = dsub.mean(axis=0)
-        dsub = PCA_clean(dsub-dmean, **pcakwargs) + dmean
+        if timewise_pca:
+            dsub = PCA_clean(dsub.T, smoothing_scale=False,
+                             diagplotfilename=os.path.join(diagplotdir,
+                                                           dataset+"_time_pca_diagnostic.png"),
+                             **pcakwargs).T
+        else:
+            # DON'T remove the mean: that's dealt with in 'spectral baselining' in
+            # a more conservative fashion
+            dmean = dsub.mean(axis=0)
+            dsub = PCA_clean(dsub-dmean, 
+                             diagplotfilename=os.path.join(diagplotdir,
+                                                           dataset+"_pca_diagnostic.png"),
+                             **pcakwargs) + dmean
         log.info("PCA cleaning took {0} seconds".format(time.time()-t0))
 
     # Standard Deviation can be fooled by obscene outliers
@@ -1033,9 +1042,13 @@ def build_cube_2013(mergefile=None,
     cube[0].header['CRPIX3'] = crpix3
     cube.writeto(cubefilename+'_downsampled.fits', clobber=True)
 
-def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True):
+def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True,
+                        timewise_pca=False):
     if pca_clean:
-        mergefile2 = 'APEX_H2CO_merge_high'
+        if timewise_pca:
+            mergefile2 = 'APEX_H2CO_merge_high_timepca'
+        else:
+            mergefile2 = 'APEX_H2CO_merge_high'
     else:
         mergefile2 = 'APEX_H2CO_merge_high_nopca'
     make_blanks_merge(os.path.join(mergepath,mergefile2), lowhigh='high',
@@ -1050,12 +1063,13 @@ def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True):
                     datapath=april2014path,
                     lowhigh='low',
                     pca_clean=pca_clean,
+                    timewise_pca=timewise_pca,
                     datasets=datasets_2014)
 
     log.info("Building Ao cubes")
     # ('ao', 'high'): (218.0, 219.0),
     build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath,
-                  pca_clean=pca_clean,
+                  pca_clean=pca_clean, timewise_pca=timewise_pca,
                   mergefilename=mergefile2, datapath=aorawpath)
 
     log.info("Building 2013 cubes")
@@ -1064,6 +1078,7 @@ def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True):
                     outpath=mergepath,
                     datapath=june2013datapath,
                     lowhigh='high',
+                    timewise_pca=timewise_pca,
                     pca_clean=pca_clean,
                     scanblsub=True)
 
