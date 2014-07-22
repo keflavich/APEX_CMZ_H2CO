@@ -1582,7 +1582,7 @@ def ph2cogrid(ntemp=50, trange=[10,200], abundances=(10**-8.5,10**-9),
     deltav = 5.0 # km/s
 
     R = pyradex.Radex(species='ph2co-h2',
-                      abundance=abundance,
+                      abundance=abundances[0],
                       collider_densities={'H2':density},
                       deltav=deltav,
                       column=None,
