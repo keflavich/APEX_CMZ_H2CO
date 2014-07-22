@@ -1,9 +1,12 @@
 import socket
+import inspect, os
+
+dirpath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) 
 
 if 'eso-macbook' in socket.gethostname():
-    execfile('run_pipeline_cyg.py')
+    execfile(os.path.join(dirpath,'run_pipeline_cyg.py'))
 elif 'cleese' in socket.gethostname():
-    execfile('run_pipeline_cleese.py')
+    execfile(os.path.join(dirpath,'run_pipeline_cleese.py'))
 else:
     raise ValueError("Machine {0} not recognized.".format(socket.gethostname()))
 
