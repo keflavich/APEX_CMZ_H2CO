@@ -6,7 +6,7 @@ from astropy import wcs
 from astropy import coordinates
 from astropy import units as u
 from astropy import constants
-from progressbar import ProgressBar
+from .progressbar import ProgressBar
 from astropy.convolution import convolve, Gaussian1DKernel
 from sdpy import makecube
 from astropy.io import fits

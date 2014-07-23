@@ -22,12 +22,14 @@ with log.log_to_file(logfile):
     for dataset in make_apex_cubes.datasets_2014:
         mapnames = make_apex_cubes.datasets_2014[dataset]
 
+        ds = os.path.split(dataset)[1]
+
         for mapname in mapnames:
             make_apex_cubes.build_cube_2014(mapname,
                                             datapath=make_apex_cubes.april2014path,
                                             outpath=make_apex_cubes.april2014path,
                                             lowhigh='low', pca_clean=True,
-                                            pcakwargs={}, datasets=[dataset])
+                                            pcakwargs={}, datasets=[ds])
 
     for dataset in make_apex_cubes.datasets_2013:
         make_apex_cubes.build_cube_2013(datapath=make_apex_cubes.june2013path,
