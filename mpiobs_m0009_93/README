@@ -1,0 +1,106 @@
+# MPIfR, 10 April 2014
+
+SCRIPTS:
+--------
+If your project id is M-093.F-0011-2014, then you have to:
+
+.rename your scripts and catalogs M0000_00* into M0011_93*
+
+.edit the project id, the line catalog name, and the source
+catalog name in the setup files, as well as all other occurences
+of "M0000_00" in all files.
+
+If you do not want to perform the two steps above by hand, then
+you can use the shell script rename.csh to do it automatically. 
+This script needs the project id as input parameter (e.g. 
+M0011_93). It copies and renames all M0000_00* files in the 
+current directory into M0011_93*. It also replaces all occurences 
+of M0000_00 and M-000.F-0000-0000 within these files with the 
+correct ids. If you use this script, make sure to remove all unused
+scripts in the directory *before* running it, and upload only the
+relevant scripts into the database.
+
+For heterodyne observations, we provide two scripting options:
+
+1. a "target" file (M0000-00-target.apecs), which is a script that 
+is executed in APECS to directly perform the observation of your 
+source. It requires a setup file M0000-00-xxxx-setup.apecs, with
+xxxx the name of the receiver.
+
+2. a "function" file (M0000_00-heterodyne-functions.apecs) which
+defines functions. One of these functions is then executed by the 
+observer in APECS to perform the observation of your source. It
+requires the setup file M0000_00-heterodyne-setup.apecs.
+
+Provide only the scripts (target or function, as well as their
+associated setup) that you want the observer to use (i.e. choose 
+option 1 *or* option 2).
+
+For option 1, if you want to observe with several receivers, then 
+prepare one setup file per receiver. If you have several setups 
+with the same receiver, then give them different names such as, for 
+instance:
+M0000_00-flash-setup1.apecs and M0000_00-flash-setup2.apecs
+or 
+M0000_00-flash-setup_co32.apecs and M0000_00-flash-setup_c18o32.apecs
+
+Do the same for the target files.
+
+For option 2, you can define several myLine() functions (e.g. 
+myLine1(), myLine2() etc) if you want to observe different
+transitions. You have to adjust the call of these functions
+in the observing functions accordingly.
+
+Note that python requires indentation within structures like 
+if statements or for loops or functions. Do not remove these 
+indentations!
+
+For heterodyne observations: the integration time you can spend 
+on-source in a single dump should not exceed the time after which 
+instabilities build up in the receiver (producing a.o. poor 
+baselines). Typical on-source integration times are 20-30 s. This 
+concerns the starring (ONOFF) mode (e.g. on(20)), the raster mode 
+(e.g. time = 20.), and the otf mode. For the otf mode, this rule 
+applies to the time spent per row*on2off, not to the individual 
+dump time! A typical dump time is 1 s (but it can be shorter or 
+longer -- max 4 s), so the typical maximum number of dumps per 
+row*on2off is 20-30.
+
+It is adviced to have scans (especially OTF) lasting no longer than
+about 30 minutes. Longer scans have higher chances to get canceled
+before the end (because of various issues that occur from time to 
+time in the observing system), which then makes it more difficult
+for the observer to recover the missing parts. 
+
+OBSERVING DATABASE:
+-------------------
+
+Once you have finished preparing your scripts, upload them into the
+database (button "uploads"). Upload the pdf file of *your proposal too*.
+Finally, fill in the obs form (button EditObsForm). Make sure that the
+source names and coordinates are the same as in your source catalog.
+Make sure that the coordinates are correct in both places! Last but 
+not least, give clear instructions to the observers on what your project 
+is about and how they should perform the observations: which scripts
+to use (e.g. target or functions), which sensitivity to achieve 
+*at which spectral resolution* (and, for OTF, at which angular 
+resolution), if the reference position is known to be clean or if the 
+observers should check it etc... Do not expect the observers to 
+systematically read your proposal. So put all the relevant information 
+in your instructions!
+
+After the observations have been done, you are adviced to read the
+"obs comments" section in your account. It is the place where the 
+observers should report on the observing sessions and the possible
+issues that may affect your data. You should also check the comments 
+in front of each source on the main page of your account.
+
+HELP:
+-----
+
+If you are unsure about your scripts or your instructions, you can
+contact Arnaud Belloche (belloche@mpifr-bonn.mpg.de) or, if not
+available, Friedrich Wyrowski (wyrowski@mpifr-bonn.mpg.de).
+
+If you need help to prepare your scripts for LABOCA/SABOCA, contact 
+Axel Weiss (aweiss@mpifr-bonn.mpg.de).

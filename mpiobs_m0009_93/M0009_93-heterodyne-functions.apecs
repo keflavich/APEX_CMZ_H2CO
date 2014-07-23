@@ -1,0 +1,200 @@
+# MPIFR, 10 April 2014
+###################################################################
+###              FUNCTIONS TO OBSERVE YOUR SOURCE(S)            ###
+###              valid for heterodyne receivers only            ###
+###                                                             ###
+### The source (and offset) must be set by the observer before  ###
+### executing the functions                                     ###
+###                                                             ###
+### Remove the sections you don't need below!                   ###
+###                                                             ###
+###################################################################
+
+
+############################################################
+### FUNCTION TO SET THE RECEIVER AND TRANSITION.  MANDATORY!
+### You can define several functions (e.g. myLine1(), 
+### myLine2()) if you want to observe several transitions.
+### Remove the parts you don't need below! 
+############################################################
+
+def myLine():
+   #####################
+   # RECEIVER AND TRANSITION
+   # Uncomment the one you need and remove the other ones
+
+   # APEX1 (HET230)
+   setup_shfi(fename='het230',linename='shfi219ghz',sideband='',mode='spec')
+
+   # APEX2 (HET345)
+   #setup_shfi(fename='het345',linename='CO(3-2)',sideband='',mode='spec')
+
+   # APEX3 (HET460)
+   #setup_shfi(fename='het460',linename='CO(4-3)',sideband='',mode='spec')
+   
+   # PI460/PI1100
+   #setup_pi(fenames=['pi460','pi1100'],linenames=['CO(4-3)','CO(9-8)'],sidebands=['', ''], mode='spec')
+
+   # Explanations for APEX1/APEX2/APEX3/PI460/PI1100:
+   # sidebands: 'LSB', 'USB', or ''. If left empty, the sidebands 
+   #            specified in the line catalog will be used
+   # mode: 'spec' for spectroscopy, 'cont' for continuum
+   # Information about the bandwidth and spectral resolution can be found in
+   # Tables 3.4, 3.5, and 3.6 of the APECS user manual version 2.7.
+
+   # FLASH
+   #setup_flash(fenames=['flash345','flash460l'],linenames=['CO(3-2)','CO(4-3)'],sidebands=['',''],mode='spec')
+   #
+   # fenames: the tuning range of flash460 is divided into two bands: flash460l
+   #          and flash460h. Flash460l has a tuning range of ~385 (LSB) to 
+   #          ~495 (USB) GHz. Flash460h has a tuning range of 460 (LSB) to 
+   #          510 (USB) GHz (check with R. Guesten!). In the overlapping 
+   #          region, check the receiver performance to select the band with 
+   #          the best receiver temperature.
+   #          For flash345, the tuning range is 272 (LSB) to 377 (USB) GHz.
+   # sidebands: 'LSB', 'USB', or ''. If left empty, the sidebands 
+   #            specified in the line catalog will be used
+   # mode: 'spec' for spectroscopy, 'cont' for continuum
+   # Information about the bandwidth and spectral resolution can be found in
+   # Tables 3.4, 3.5, and 3.6 of the APECS user manual version 2.7 (NB: each
+   # XFFTS band has 65536 channels for FLASH345 and 32768 for FLASH460)
+
+   # CHAMP+
+   #setup_champ(fenames=['champ690','champ810'],linenames=['CO(6-5)','CO(7-6)'],sidebands=['', ''],mode='spec',bw=2.8,numchan=2048,derotangle=19.1,derotmode='eq')
+   #
+   # sidebands: 'LSB', 'USB', or ''. If left empty, the sidebands 
+   #            specified in the line catalog will be used
+   # mode: 'spec' for spectroscopy, 'cont' for continuum
+   # bw: the bandwidth is fixed to 2.8 GHz.
+   # numchan: between 1 and 8192 in powers of two (1, 2, 4, ...)
+   # derotangle: the derotation angle of 19.1 degrees in 
+   #   "eq"(uatorial) mode leads to equidistant rows when using 
+   #   "raster" or "otf" modes. The angle should be 0.0 for "hexa"
+   #   mode.
+
+
+############################################################
+### FUNCTION TO DEFINE THE SWITCHING MODE.     MANDATORY!
+### (total power OR wobbler)
+### Remove the parts you don't need below! 
+############################################################
+
+def mySwitch():
+   #####################
+   # TOTAL POWER MODE
+   tp()
+   use_ref('on')
+   # reference position defined by an offset from the source:
+   reference(600.,0.,on2off=1,unit='arcsec',mode='rel',system='EQ')
+
+   # OR reference position defined with absolute coordinates:
+   #reference('12:34:56','20:00:00',on2off=1,unit='hdms',mode='abs',system='EQ')
+
+   #####################
+   # WOBBLER MODE (+- amplitude arcsec)
+   # amplitude max: about 120 arcsec, depending on the wobbling rate.
+   #wob(amplitude=100.0, rate=1.5, mode='sym', blank=-1)
+
+   # OR for continuum observations:
+   #wob(amplitude=100.0, rate=1.0, mode='sym', blank=-1)
+
+
+############################################################
+### FUNCTION TO PERFORM THE TUNING.   MANDATORY!
+### The source has to be set by the observer before.
+############################################################
+
+def myTune():
+   go()
+   print ' '
+   dummy = raw_input('\033[32;1mTune receiver - and press RETURN when ready!\033[0m ')
+   print ' '
+
+
+############################################################
+### FUNCTION TO EXECUTE YOUR OBSERVATION
+### The observer will execute the observation by typing in
+### APECS, e.g., obsOnOff(nr=8)
+### Remove the parts you don't need below! 
+############################################################
+
+#####################
+# ONOFF LOOP
+# NB: in total power mode with reference parameter on2off=1, 
+# or in wobbler mode with symmetric mode, the parameter time
+# is the integration time in seconds on the ON position 
+# only. The OFF position will be observed for the same duration.
+# Do not remove the indentation inside the for loop, it is 
+# mandatory in python!
+
+def obsOnOff(nr=1):
+   myLine()
+   myTune()
+   mySwitch()
+   for i in xrange(nr):
+     calibrate('cold')
+     print i+1," of "+str(nr)
+     repeat(6)
+     on(time=20)
+   repeat(1)
+
+
+#####################
+# RASTER MAP
+
+def obsRaster(nr=1):
+   myLine()
+   myTune()
+   mySwitch()
+   for i in xrange(nr):
+     calibrate('cold')
+     print i+1," of "+str(nr)
+     repeat(1)
+     raster(xlen=18.0, xstep=9.0, ylen=18.0, ystep=9.0, time=20.0, direction='x', zigzag=0, angle=0., size_unit='arcsec', angle_unit='deg', system='EQ', mode='ordered', on2cal=0)
+
+#####################
+# OTF MAP
+# If the otf scan lasts longer than typically 10 minutes, then you can (should)
+# insert calibrations with the parameter on2cal. No calibration will be
+# performed during the map if it is set to 0, but calibrations will be 
+# performed at the beginning and every X rows if it is set to X. If X is
+# different from 0, then you should remove the command calibrate before the
+# otf.
+
+def obsOtf(nr=1):
+   myLine()
+   myTune()
+   mySwitch()
+   for i in xrange(nr):
+     calibrate('cold')
+     print i+1," of "+str(nr)
+     repeat(1)
+     otf(xlen=60.0, xstep=3.0, ylen=60.0, ystep=3.0, time=1.0, direction='x', zigzag=0, angle=0., size_unit='arcsec', angle_unit='deg', system='EQ', mode='ordered', on2cal=0)
+
+#####################
+# SPECIAL RASTER MODE FOR CHAMP+
+
+def obsHexa(nr=1):
+   myLine()
+   myTune()
+   mySwitch()
+   for i in xrange(nr):
+     calibrate('cold')
+     print i+1," of "+str(nr)
+     repeat(1)
+     hexa(time=10.0, sampling='full', beamsize=0.0, unit='arcsec',feedsep=2, system='EQ', mode='ordered', on2cal=0)
+
+#####################
+# SPECIAL RASTER MODE WITH 25 POSITIONS FOR CHAMP+
+
+def obsHexa25(nr=1):
+   myLine()
+   myTune()
+   mySwitch()
+   for i in xrange(nr):
+     calibrate('cold')
+     print i+1," of "+str(nr)
+     repeat(1)
+     hexa25(time=10.0, step=3.75, unit='arcsec', system='EQ', mode='ordered', on2cal=0)
+
+############################################################

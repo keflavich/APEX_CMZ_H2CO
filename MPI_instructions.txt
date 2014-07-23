@@ -1,0 +1,63 @@
+Each field should be observed 4x to achieve the target noise of 0.04 K RMS in a 3 km/s channel.
+
+Observations are 8x8' OTF maps with off-positions scheduled every 7 minutes (15
+scans).  The observing script describes 2 OTF maps observed with perpendicular
+scans to minimize cross-hatching.  Two sets of these two perpendicular scans
+should be required to reach the target noise (4 OTF maps total, 2 in each
+direction, or 2 runs of the script).
+
+The scans are oriented in Galactic coordinates.  There are three off positions
+selected to exclude CO emission.  13CO should be detected at all or nearly all
+positions, though at varying velocities.  The tuning center is exactly 219 GHz
+to include the 13CO 2-1 line (220.399) and the SiO 5-4 line (217.105)
+simultaneously.
+
+The priority order is given in the observing scripts, but is reproduced here as well:
+Map_115  
+Map_116  
+Map_117  
+Map_118  
+Map_119  
+Map_120  
+Map_121  
+Map_122  
+Map_123  
+Map_124  
+Map_055  
+Map_056  
+Map_057  
+Map_058  
+Map_032  
+Map_031  
+Map_030  
+Map_029  
+Map_028  
+Map_027  
+Map_026  
+Map_025  
+Map_024  
+Map_023  
+Map_022  
+Map_021  
+Map_020  
+Map_019  
+Map_018  
+Map_013  
+Map_012  
+Map_011  
+Map_010  
+Map_009  
+Map_008  
+Map_007  
+Map_006  
+Map_005  
+Map_004  
+Map_003  
+Map_002  
+Map_001  
+
+
+SUMMARY:
+OTF mapping of the entire CMZ.  Each field should be observed with 4 OTF
+macros.  One of three different off positions is specified for each field in
+the observing script.

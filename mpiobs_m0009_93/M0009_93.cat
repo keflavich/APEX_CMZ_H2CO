@@ -1,0 +1,52 @@
+!# MPIFR, 10 April 2014
+!#################################################################
+!#
+!# USE J2000 COORDINATES ONLY!!!
+!#
+!#NAME    COOR-SYSTEM    RA       DEC      VELO-SYSTEM  VELO km/s
+!#################################################################
+!
+Map_115   EQ 2000  17:49:35.939    -27:42:26.99     LSR 0.0  ! Top Priority
+Map_116   EQ 2000  17:49:11.443    -27:39:11.79     LSR 0.0  ! Top Priority
+Map_117   EQ 2000  17:49:19.469    -27:48:31.6      LSR 0.0  ! Top Priority
+Map_118   EQ 2000  17:48:54.958    -27:45:16.23     LSR 0.0  ! Top Priority
+Map_119   EQ 2000  17:49:35.939    -27:42:26.99     LSR 0.0  ! Top Priority
+Map_120   EQ 2000  17:49:11.443    -27:39:11.79     LSR 0.0  ! Top Priority
+Map_121   EQ 2000  17:49:03.604    -27:54:22.09     LSR 0.0  ! Top Priority
+Map_122   EQ 2000  17:48:39.079    -27:51:06.55     LSR 0.0  ! Top Priority
+Map_123   EQ 2000  17:48:49.831    -27:59:41.64     LSR 0.0  ! Top Priority
+Map_124   EQ 2000  17:48:25.292    -27:56:25.95     LSR 0.0  ! Top Priority
+Map_055   EQ 2000  17:45:43.002    -29:03:16.88     LSR 0.0  ! Secondary Priority
+Map_056   EQ 2000  17:46:00.888    -28:57:06.31     LSR 0.0  ! Secondary Priority
+Map_057   EQ 2000  17:46:18.045    -28:51:24.86     LSR 0.0  ! Secondary Priority
+Map_058   EQ 2000  17:46:31.981    -28:45:26.48     LSR 0.0  ! Secondary Priority
+Map_032   EQ 2000  17:49:27.897    -27:33:07.23     LSR 0.0  ! Tertiary Priority
+Map_031   EQ 2000  17:49:52.379    -27:36:22.25     LSR 0.0  ! Tertiary Priority
+Map_030   EQ 2000  17:48:11.81     -28:00:50.61     LSR 0.0  ! Tertiary Priority
+Map_029   EQ 2000  17:48:36.36     -28:04:06.44     LSR 0.0  ! Tertiary Priority
+Map_028   EQ 2000  17:47:55.391    -28:07:01.54     LSR 0.0  ! Tertiary Priority
+Map_027   EQ 2000  17:47:38.787    -28:13:37.26     LSR 0.0  ! Tertiary Priority
+Map_026   EQ 2000  17:48:19.956    -28:10:17.56     LSR 0.0  ! Tertiary Priority
+Map_025   EQ 2000  17:48:02.94     -28:16:30.48     LSR 0.0  ! Tertiary Priority
+Map_024   EQ 2000  17:48:16.585    -28:21:15.21     LSR 0.0  ! Tertiary Priority
+Map_023   EQ 2000  17:45:23.807    -29:24:01.11     LSR 0.0  ! Tertiary Priority
+Map_022   EQ 2000  17:44:59.831    -29:24:32.03     LSR 0.0  ! Tertiary Priority
+Map_021   EQ 2000  17:44:39.492    -29:25:31.86     LSR 0.0  ! Tertiary Priority
+Map_020   EQ 2000  17:44:42.07     -29:17:08.5      LSR 0.0  ! Tertiary Priority
+Map_019   EQ 2000  17:45:14.47     -29:17:32.32     LSR 0.0  ! Tertiary Priority
+Map_018   EQ 2000  17:44:55.258    -29:09:57.23     LSR 0.0  ! Tertiary Priority
+Map_013   EQ 2000  17:45:42.144    -28:49:05.38     LSR 0.0  ! Tertiary Priority
+Map_012   EQ 2000  17:46:00.601    -28:41:58.8      LSR 0.0  ! Tertiary Priority
+Map_011   EQ 2000  17:45:25.12     -28:55:40.1      LSR 0.0  ! Tertiary Priority
+Map_010   EQ 2000  17:45:15.98     -29:03:26.92     LSR 0.0  ! Tertiary Priority
+Map_009   EQ 2000  17:45:30.673    -29:10:46.88     LSR 0.0  ! Tertiary Priority
+Map_008   EQ 2000  17:47:50.014    -28:23:22.7      LSR 0.0  ! Tertiary Priority
+Map_007   EQ 2000  17:47:21.809    -28:19:02.78     LSR 0.0  ! Tertiary Priority
+Map_006   EQ 2000  17:47:25.321    -28:27:19.97     LSR 0.0  ! Tertiary Priority
+Map_005   EQ 2000  17:46:56.702    -28:24:05.97     LSR 0.0  ! Tertiary Priority
+Map_004   EQ 2000  17:47:05.676    -28:33:15.79     LSR 0.0  ! Tertiary Priority
+Map_003   EQ 2000  17:46:43.289    -28:38:58.53     LSR 0.0  ! Tertiary Priority
+Map_002   EQ 2000  17:46:40.119    -28:30:34.89     LSR 0.0  ! Tertiary Priority
+Map_001   EQ 2000  17:46:18.22     -28:35:37.89     LSR 0.0  ! Tertiary Priority
+!
+!################## end of source catalog ########################

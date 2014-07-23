@@ -1,0 +1,120 @@
+# HET230 Setup File for project E-093.C-0144A-2014
+
+# Load special SHFI commands
+exec_apecs_script('shfi_commands')
+
+# Load APEX-1 observing functions:
+execfile('/homes/software/apecs/start_het230.apecs')
+
+# User line catalog for APEX-1
+linecats('e-093.c-0144a-2014.lin')
+
+# Setup for APEX-1 (frontend, backend, lines)
+# Uncomment the setup for the line to observe, or enter manually!
+
+
+# User source catalog
+sourcecats(['e-093.c-0144a-2014.cat'])
+
+# List of targets. Uncomment the one to observe, or enter manually!
+# source('Map_001', cats='user')
+# source('Map_002', cats='user')
+# source('Map_003', cats='user')
+# source('Map_004', cats='user')
+# source('Map_005', cats='user')
+# source('Map_006', cats='user')
+# source('Map_007', cats='user')
+# source('Map_008', cats='user')
+# source('Map_009', cats='user')
+# source('Map_010', cats='user')
+# source('Map_011', cats='user')
+# source('Map_012', cats='user')
+# source('Map_013', cats='user')
+# source('Map_015', cats='user')
+# source('Map_016', cats='user')
+# source('Map_017', cats='user')
+# source('Map_019', cats='user')
+# source('Map_020', cats='user')
+# source('Map_021', cats='user')
+# source('Map_023', cats='user')
+# source('Map_024', cats='user')
+# source('Map_025', cats='user')
+# source('Map_027', cats='user')
+# source('Map_028', cats='user')
+# source('Map_029', cats='user')
+# source('Map_031', cats='user')
+# source('Map_032', cats='user')
+# source('Map_033', cats='user')
+# source('Map_035', cats='user')
+# source('Map_036', cats='user')
+# source('Map_037', cats='user')
+# source('Map_038', cats='user')
+# source('Map_039', cats='user')
+# source('Map_040', cats='user')
+# source('Map_041', cats='user')
+# source('Map_042', cats='user')
+# source('Map_043', cats='user')
+# source('Map_044', cats='user')
+# source('Map_046', cats='user')
+# source('Map_047', cats='user')
+
+# Reference position (just for safety in this macro as well...)
+use_ref('on')
+# Relative reference: use in worst-case-scenaro
+reference(x=0, y=3600, time=0.0, on2off=1, unit='arcsec', mode='rel',
+          system='ho', epoch=2000.0)
+# Reference 1: for l > 0.7
+reference(x="17:52:06.854",x="-28:30:31.32", time=0.0, on2off=1, unit='hdms', mode='abs',
+          system='eq', epoch=2000.0)
+# Reference 2: for 0.0 < l < 0.7
+reference(x="17:43:53.890",x="-28:07:04.68", time=0.0, on2off=1, unit='hdms', mode='abs',
+          system='eq', epoch=2000.0)
+# Reference 3: for l < 0.0
+reference(x="17:48:11.934",x="-29:44:41.83", time=0.0, on2off=1, unit='hdms', mode='abs',
+          system='eq', epoch=2000.0)
+
+
+# Improved metrology settings:
+use_linear_sensors('on')
+use_tiltmeters('on')
+
+#-------------------------------------------------------------
+#APEX-1 observe file: het230_observe.apecs
+
+# HET230 Observe File for project E-093.C-0144A-2014
+
+# Total power mode. Reference position:
+# TODO: Determine if this can be automatically selected based on source properties
+# Reference 1: for l > 0.7
+reference(x="17:52:06.854",x="-28:30:31.32", time=0.0, on2off=1, unit='hdms', mode='abs',
+          system='eq', epoch=2000.0)
+# Reference 2: for 0.0 < l < 0.7
+reference(x="17:43:53.890",x="-28:07:04.68", time=0.0, on2off=1, unit='hdms', mode='abs',
+          system='eq', epoch=2000.0)
+# Reference 3: for l < 0.0
+reference(x="17:48:11.934",x="-29:44:41.83", time=0.0, on2off=1, unit='hdms', mode='abs',
+          system='eq', epoch=2000.0)
+
+# Offsets
+offset(x=0.0, y=0.0, unit='arcsec', system='EQ', epoch=2000.0)
+
+# Observing mode: On-The-Fly mapping (with a reference)
+# PI comment:
+# The position angle is set to scan along Galactic coordinates
+
+calibrate('cold')
+for i in xrange(8): # adjust to observing needs...
+    print ' '; print 'Loop #:',i+1,'starting...'; print ' '
+    tp()
+    repeat(1) # adjust to observing needs...
+    otf(xlen=480, ylen=480, xstep=18, ystep=9, time=0.5, direction='x',
+        zigzag=1, angle=58.6, size_unit='arcsec', angle_unit='deg', system='eq',
+        on2cal=14, epoch=2000.0)
+    otf(xlen=480, ylen=480, xstep=9, ystep=18, time=0.5, direction='y',
+        zigzag=1, angle=58.6, size_unit='arcsec', angle_unit='deg', system='eq',
+        on2cal=14, epoch=2000.0)
+tp()
+
+# Further instructions for the observer:
+# None.
+

@@ -1,0 +1,224 @@
+\input{preface}
+
+\title{APEX CMZ Survey}
+\input{authors}
+
+\section{Abstract}
+
+\footnote{Compiled on \today\ at \currenttime}
+
+
+\section{Introduction}
+\todo{To do.  To-do items are coded in red.}
+
+
+
+
+\section{Observations \& Data Reduction}
+
+\subsection{Observations}
+We observed the Central Molecular Zone from $-0.4 < \ell < 1.6$ with the SHFI-1
+instrument \citep{Vassilev2008a} on the APEX telescope using the XFFTS backend.
+The observations were divided into 25 hours in June 2013 and 75 hours in
+April-July 2014.  
+
+The 2013 observations were taken in $4\arcmin \times 4\arcmin$ patches, and the
+frequency range covered was 217.5-220 GHz and 216-218.5 GHz in the two spectral
+windows.  Scans were performed along lines of constant RA and Dec.
+
+The 2014 observing strategy was modified to use larger $8\arcmin \times
+8\arcmin$ scans along lines of Galactic latitude and longitude.  The frequency
+range was also shifted to cover windows over 217-219.5 and 218.4-220.9 GHz, thus
+including the bright \thirteenco and \ceighteeno 2-1 lines.
+
+The raw data were acquired with 32768 spectral channels in each window, yielding
+0.1 \kms resolution.  We downsampled the data by a factor of 8 to 0.8 \kms
+resolution to make the data more manageable.  We also expect to see no lines
+narrower than a few \kms in the CMZ, particularly not with the relatively
+shallow observations we have acquired.
+
+\subsection{Reduction}
+\subsubsection{Calibration}
+Calibration was performed at the telescope using the standard APEX calibration tools
+\footnote{See the observing manuals:
+\url{www.apex-telescope.org/documents/public/APEX-MPI-MAN-0012.pdf}
+\url{www.apex-telescope.org/documents/public/APEX-MPI-MAN-0013.pdf} }.
+These yield flux-calibrated spectra at each position with appropriate pointing
+information.  Typical flux calibration uncertainties are $\sim$ \todo{???} and
+pointing errors \todo{???} ($\sigma<2$\arcsec ?).
+
+\subsubsection{Flagging bad spectra}
+Spectra were removed if they showed excessive noise compared to the
+theoretically expectation given the measured system temperature.  As in
+\citet{Ao2013a}, the threshold was set to $1.5\times$ the theoretical noise,
+i.e. $1.5 \sqrt{2} T_{sys} (\Delta\nu t_{exp})**0.5$, where $t_{exp}$ is the
+exposure time (integration time) per spectrum in seconds and $\Delta\nu$ is the
+channel width in Hz.  This approach resulted in $\sim0.2\%$ of the data being
+removed.  
+
+At the position of Sgr B2, the noise was significantly higher due to signal
+from the continuum source.  We therefore disabled flagging in a
+$\sim2.5\arcmin$ box around Sgr B2.
+
+
+\subsubsection{Baselining}
+\label{sec:baseline}
+The data showed significant baseline structure, leading to large-scale
+correlated components in the resulting spectra.  Removing these baselines by
+the usual technique of masking out the emitting spectral region and fitting a
+low-order polynomial to the surroundings is somewhat impractical in the
+Galactic Center, where baseline ripples are on comparable scales to the
+extremely wide spectral lines.
+
+We perform a scan-by-scan baseline subtraction as follows: 
+\begin{enumerate}
+    \item Compute the mean spectrum across the scan
+    \item Identify pixels $>1-\sigma$ above the mean spectrum to be ignored
+        when baseline fitting (this is a simple `line masking' process)
+    \item Fit a line to each spectral channel across the scan
+    \item Smooth the fitted line parameters with a gaussian with with
+        $\sigma=10$ channels, interpolating into the line-masked regions
+    \item Subtract the fitted baselines
+\end{enumerate}
+
+We therefore adopted a principle component analysis (PCA) baseline removal
+approach in which the data were spectrally smoothed and downsampled by an
+additional factor of 25, for a characteristic frequency scale of 15 MHz.  The
+data had their means subtracted before PCA cleaning so that only time-variable
+baseline variation was removed.  The resulting data were decomposed into
+eigenspectra, of which the 3 most correlated components were then set to zero.
+These components visually match the baseline ripples, and due to the wide
+smoothing (20 \kms resolution), no line information is lost.  The selection of
+3 components was determined empirically by examining the eigenspectra; a test
+removing the first 10 components showed no significant difference in the
+cleaning but did show signs of extracting large-scale correlated signal.
+
+\Figure{figures/M-091.F-0019-2013-2013-06-08_PCA_high_diagnostic.png}
+{The first 3 eigenspectra from an observation taken on June 8, 2013.  These
+show the baselines that are removed by PCA cleaning.  They do not include any
+signal from the spectral lines.  \todo{This will be
+replaced with a higher-quality figure}}
+{fig:eigenspectra}{0.5}{0}
+
+
+\subsubsection{Mapmaking}
+The maps were made by computing an output grid in Galactic coordinates with
+10\arcsec pixels and adding each spectrum to the appropriate pixel\footnote{We
+use the term `pixel' to refer to a square data element projected on the sky
+with axes in Galactic coordinates.  The term `voxel' is used to indicate a cubic data
+element, with two axes in galactic coordinates and a third in frequency or
+velocity}.  In order
+to avoid empty pixels and maximize the signal-to-noise, the spectra were added
+to the grid with a weight set from a gaussian with $FWHM=10\arcsec$, which
+effectively smooths the output images from $FWHM\approx28\arcsec$ to
+$\approx30\arcsec$.  See \citet{Mangum2007a} for more detail on the on-the-fly
+mapping technique used here.
+
+\todo{To demonstrate the utility of the PCA subtraction approach described in Section
+\ref{sec:baseline}, we show maps of the \formaldehyde \threeohthree line before
+and after PCA subtraction.}
+
+The PPV cubes were created with units of brightness temperature ($T_A^*$).  The
+main beam efficiency is $\eta_{mb} = 0.75$ (gain $\sim39$
+Jy/K)\footnote{\url{http://www.apex-telescope.org/telescope/efficiency/}}.
+
+
+\section{Signal Extraction}
+We use the method described partially in \citet{Ao2013a} and more thoroughly in
+\citet{Dame2011b} to mask the data cubes at locations of significant signal in 
+the brightest line. 
+A noise map was created by computing the sample standard deviation over a
+200-pixel range in which no signal was identified.
+We use the \formaldehyde \threeohthree line to create the mask by
+the following procedure:
+
+\begin{enumerate}
+    \item Smooth the data with a gaussian of width 2 pixels in each direction
+        (spatial and spectral)
+    \item Identify all pixels with brightness $T_A > 3\sigma$, where the noise
+        map was \emph{not} smoothed
+    \item Grow the mask from the previous step by 1 pixel in each direction
+        (this is known in image processing as binary dilation)
+\end{enumerate}
+
+The \formaldehyde \threeohthree mask was then applied to the \threetwoone and
+\threetwotwo cubes, and all three cubes were integrated.  There is some overlap
+between the \methanol \fourtwotwo line and the \formaldehyde \threetwotwo
+line in PPV space, so we shifted the \formaldehyde mask to the velocity of the
+\methanol line in the \formaldehyde \threetwotwo cube and excluded any pixels
+expected to have signal.  There were XXX voxels excluded in this fashion.
+
+
+\section{Ratio and Temperature Maps}
+\label{sec:h2co}
+We created two independent ratio maps, \threeohthree/\threetwotwo and
+\threeohthree/\threetwoone, so that the two ratios (which are expected to be
+the same) can be used as a sanity check.
+
+\subsection{Computing Temperature}
+\todo{Unless there's a strong reason not to, I will use the same grid that
+Yiping used.}
+We use RADEX \citet{van-Der-Tak2007a} to create a model grid for the
+p-\formaldehyde lines over a sparse grid of density ($n=10^{4,5,6,7}$ \percc),
+a fixed assumed line gradient of 5 \kms / pc, a fixed column of \formaldehyde
+$N(\formaldehyde) = 9.5\ee{13}$ \persc (which corresponds to an abundance
+$X=10^{-8.5}$ at $N(\hh) = 3\ee{22}$ \persc, and a range of temperatures from
+10 to 300 K with 100 evenly spaced grid points.  The grid was created using
+the \texttt{pyradex} wrapper of
+RADEX\footnote{\url{https://github.com/keflavich/pyradex}}.
+
+The line brightnesses returned from RADEX were then divided to create ratios,
+and the grid inverted to allow interpolation of a measured ratio onto the input
+temperature grid.   This approach requires that the ratios be monotonic with
+temperature, which generally holds.  It also required us to \emph{a priori} select
+a density from the grid; we selected $n=10^4$ \percc.  \todo{It is important to
+assess what systematic effect density may have: to this end, I propose to show
+temperature maps computed with (1) a $10\times$ higher density and (2) a
+$10\times$ lower abundance.}.
+
+\citet{Johnston2014a} noted a very high temperature peak, $T>320$K, using these
+lines of \formaldehyde toward The Brick, G0.253+0.015.  We measure similar line
+ratios toward The Brick, but on larger scales.  The interpretation of these
+line ratios is subject to some question, though.  Above 300K, the collision
+rates provided by LAMDA \citep{Schoier2005a,Wiesenfeld2013a} must be
+extrapolated.  Additionally, some of the ratios cannot be reproduced by high
+temperatures, but instead require that the lines be thermalized and therefore
+at very high densities.   Given the low brightness temperatures observed,
+the emission must be coming from an extremely small area, which is inconsistent
+with the observed large extent of the emission unless it is also extremely
+patchy.  That remains a possibility if we are observing massive, dense clouds
+with relatively uniformly turbulent properties.
+
+\FigureTwoAA
+{figures/H2CO_322221_to_303202_smooth_integ.pdf}
+{figures/H2CO_321220_to_303202_smooth_integ.pdf}
+{Maps of the ratio of the integrated \para \threetwotwo / \threeohthree (top)
+and \threetwoone/\threeohthree (bottom).  The data cubes were masked by
+signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
+indicating nondetections.  The \threetwotwo line is also masked where it
+overlaps with the \methanol \fourtwotwo line, resulting in a large masked area
+around Sgr B2 in the top panel.  The Sgr B2 peaks also exhibit \formaldehyde absorption and therefore
+bias the line ratios.  Higher ratios (red) correspond to higher
+temperatures and/or densities.  \todo{Further modeling is required to determine
+which.}
+}
+{fig:ratiomaps}{1}{7in}
+
+
+\section{Conclusion}
+
+
+\textbf{Acknowledgements}:
+
+\textbf{Code Packages Used}:
+
+\begin{itemize}
+    \item sdpy \url{https://github.com/keflavich/sdpy}
+    \item aplpy \url{http://aplpy.github.io}
+    \item pyradex \url{https://github.com/keflavich/pyradex}
+\end{itemize}
+
+
+\input{solobib}
+\end{document}
+

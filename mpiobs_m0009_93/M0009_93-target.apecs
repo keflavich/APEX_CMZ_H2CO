@@ -1,0 +1,194 @@
+# MPIFR, 10 April 2014
+###################################################################
+###               SCRIPT TO OBSERVE YOUR SOURCE(S)              ###
+###              valid for heterodyne receivers only            ###
+###                                                             ###
+### The receiver must be tuned by the observer before           ###
+###                                                             ###
+### Remove the sections you don't need below!                   ###
+###                                                             ###
+###################################################################
+
+############################################################
+###   Source (from your source catalog)
+############################################################
+####DONE four times
+#source('Map_116', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',system='EQ', epoch=2000.0)
+#### DONE three times
+#source('Map_115',cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs', system='EQ', epoch=2000.0)
+#### DONE twice 2014-05-07&08 (ABE)
+#source('Map_117', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs', system='EQ', epoch=2000.0)
+#source('Map_118', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs', system='EQ', epoch=2000.0)
+#source('Map_119', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_120', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_121', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_122', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_123', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_124', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_055', cats='all')
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_056', cats='all')
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_057', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_058', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_032', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_031', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_030', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_029', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_028', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_027', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_026', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_025', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_024', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_023', cats='all')
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_022', cats='all')
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_021', cats='all')
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_020', cats='all')
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_019', cats='all')
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_018', cats='all')
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_013', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_012', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_011', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_010', cats='all')
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_009', cats='all')
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_008', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_007', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_006', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_005', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_004', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_003', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_002', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_001', cats='all')
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+
+setup_shfi(fename='het230',linename='shfi219ghz',sideband='',mode='spec')
+go()
+print ' '
+dummy = raw_input('\033[32;1mTune receiver if required - and press RETURN when ready!\033[0m ')
+print ' '
+
+use_ref('on')
+# reference position defined by an offset from the source:
+# [AG] Absolute references selected to avoid 12CO emission from Dame et al. 2001
+# [AG] Further refinement may be possible / necessary (only for 13CO)
+# [AG] TODO: Determine if this can be automatically selected based on source properties
+# [AG] Reference 1: for l > 0.7
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+## [AG] Reference 2: for 0.0 < l < 0.7
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+## [AG] Reference 3: for l < 0.0
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+
+
+#####################
+# OTF MAP
+# Section written by Adam Ginsburg [AG]
+# calibrate('cold') # REMOVED because of on2cal [AG]
+# tp() scans added to match ESO obs [AG]
+# Integration time dropped from 1.0 to 0.5 per Axel's recommendation [AG]
+# Each scan requires 480 / 9 * 0.5 = 26.6666 seconds
+# Calibrations should be performed every 10 minutes, so on2cal=15
+# (every 6.66 minutes, plus overheads) should be fine
+# Arnaud Belloche used 0.25s, step=9 (both directions) on May 7, 2014
+#
+# 2014-05-07 ABE: I change the step in scanning direction to 9'' and 
+# dumptime to 0.25s, to ensure proper Nyquist sampling
+# 2014-05-08 ABE: I change on2off from 1 to 3 in the above reference definition
+#
+tp()
+repeat(1)
+otf(xlen=480, ylen=480, xstep=9, ystep=9, time=0.25, direction='x', zigzag=1,
+    angle=58.6, size_unit='arcsec', angle_unit='deg', system='eq', on2cal=15,
+    epoch=2000.0)
+otf(xlen=480, ylen=480, xstep=9, ystep=9, time=0.25, direction='y', zigzag=1,
+    angle=58.6, size_unit='arcsec', angle_unit='deg', system='eq', on2cal=15,
+    epoch=2000.0)
+tp()
+# If the otf scan lasts longer than typically 10 minutes, then you can
+# insert calibrations with the parameter on2cal. No calibration will be
+# performed during the map if it is set to 0, but calibrations will be 
+# performed at the beginning and every X rows if it is set to X. If X is
+# different from 0, then you should remove the command calibrate before the
+# otf.
+
+# ABE: this is no longer necessary
