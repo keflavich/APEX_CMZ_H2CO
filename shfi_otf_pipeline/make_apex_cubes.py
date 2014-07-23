@@ -820,9 +820,11 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
 
     log.info("Data has been collected and flagged, now adding to cube.")
 
-    add_pipeline_parameters_to_file(cubefilename, 'generic',
-                                    kernel_fwhm=kernel_fwhm,
-                                    pca_clean=pca_clean, scanblsub=scanblsub)
+    headerpars = dict(kernel_fwhm=kernel_fwhm, pca_clean=pca_clean,
+                      scanblsub=scanblsub)
+    if 'pcakwargs' in kwargs:
+        headerpars.update(kwargs['pcakwargs'])
+    add_pipeline_parameters_to_file(cubefilename, 'generic', **headerpars)
                                     
 
     for dataset in all_data:
@@ -956,9 +958,11 @@ def build_cube_ao(window, freq=False, mergefile=None,
     else:
         excludefitrange = [700,1300] # FIX THIS when velos are fixed
 
-    add_pipeline_parameters_to_file(cubefilename, 'ao',
-                                    kernel_fwhm=kernel_fwhm,
-                                    pca_clean=pca_clean, scanblsub=scanblsub)
+    headerpars = dict(kernel_fwhm=kernel_fwhm, pca_clean=pca_clean,
+                      scanblsub=scanblsub)
+    if 'pcakwargs' in kwargs:
+        headerpars.update(kwargs['pcakwargs'])
+    add_pipeline_parameters_to_file(cubefilename, 'ao', **headerpars)
 
     log.info("Data has been collected and flagged, now adding to cube.")
 
@@ -1047,9 +1051,11 @@ def build_cube_2013(mergefile=None,
 
         make_blanks_freq(all_gal_vect, hdrs[0], cubefilename, clobber=True)
 
-    add_pipeline_parameters_to_file(cubefilename, '2013',
-                                    kernel_fwhm=kernel_fwhm,
-                                    pca_clean=pca_clean, scanblsub=scanblsub)
+    headerpars = dict(kernel_fwhm=kernel_fwhm, pca_clean=pca_clean,
+                      scanblsub=scanblsub)
+    if 'pcakwargs' in kwargs:
+        headerpars.update(kwargs['pcakwargs'])
+    add_pipeline_parameters_to_file(cubefilename, '2013', **headerpars)
 
     # need two loops to avoid loading too much stuff into memory
     for dataset in datasets:
@@ -1164,9 +1170,11 @@ def build_cube_2014(sourcename,
         log.info("Making blanks for "+cubefilename)
         make_blanks_freq(all_gal_vect, hdrs[0], cubefilename, clobber=True)
 
-    add_pipeline_parameters_to_file(cubefilename, '2014',
-                                    kernel_fwhm=kernel_fwhm,
-                                    pca_clean=pca_clean, scanblsub=scanblsub)
+    headerpars = dict(kernel_fwhm=kernel_fwhm, pca_clean=pca_clean,
+                      scanblsub=scanblsub)
+    if 'pcakwargs' in kwargs:
+        headerpars.update(kwargs['pcakwargs'])
+    add_pipeline_parameters_to_file(cubefilename, '2014', **headerpars)
 
     # need two loops to avoid loading too much stuff into memory
     for dataset in datasets:
