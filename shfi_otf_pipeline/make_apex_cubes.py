@@ -501,6 +501,10 @@ def add_pipeline_header_data(header):
     header['PIPELINE'] = 'Ginsburg 2014 SHFI OTF Pipeline'
     header['TELESCOP'] = 'APEX'
     header['INSTRUME'] = 'SHFI-1'
+    from .version import version,githash
+    header['PIPEVERS'] = version
+    header['PIPEGIT']  = githash
+    header['PIPEDATE'] = time.strftime("%y_%m_%d_%H:%M:%S")
 
 def make_blanks(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
 
