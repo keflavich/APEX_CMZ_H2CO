@@ -1296,8 +1296,7 @@ def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True,
                     lowhigh='high',
                     timewise_pca=timewise_pca,
                     pca_clean=pca_clean,
-                    scanblsub=scanblsub,
-                    scanblsub=True)
+                    scanblsub=scanblsub)
 
 
 
