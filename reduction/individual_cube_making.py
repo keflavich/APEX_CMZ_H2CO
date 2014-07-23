@@ -22,18 +22,19 @@ with log.log_to_file(logfile):
     for dataset in make_apex_cubes.datasets_2014:
         mapnames = make_apex_cubes.datasets_2014[dataset]
 
-        make_apex_cubes.build_cube_2014(mapnames,
-                                        datapath=make_apex_cubes.april2014path,
-                                        outpath=make_apex_cubes.april2014path,
-                                        lowhigh='low', pca_clean=True,
-                                        pcakwargs={}, datasets=[dataset])
+        for mapname in mapnames:
+            make_apex_cubes.build_cube_2014(mapname,
+                                            datapath=make_apex_cubes.april2014path,
+                                            outpath=make_apex_cubes.april2014path,
+                                            lowhigh='low', pca_clean=True,
+                                            pcakwargs={}, datasets=[dataset])
 
     for dataset in make_apex_cubes.datasets_2013:
-
         make_apex_cubes.build_cube_2013(datapath=make_apex_cubes.june2013path,
                                         outpath=make_apex_cubes.june2013path,
                                         lowhigh='low', pca_clean=True,
-                                        pcakwargs={}, datasets=[dataset])
+                                        pcakwargs={}, datasets=[dataset],
+                                        extra_suffix=dataset[-5:])
 
     for dataset in make_apex_cubes.datasets_ao:
         make_apex_cubes.build_cube_ao(window='high', datasets=[dataset],

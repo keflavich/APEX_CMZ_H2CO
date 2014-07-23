@@ -1,4 +1,4 @@
-import make_apex_cubes
+from shfi_otf_pipeline import make_apex_cubes
 
 datasets = {2013:make_apex_cubes.june2013datapath+'M-091.F-0019-2013-2013-06-11',
             'ao':make_apex_cubes.aorawpath+'E-085.B-0964A-2010_merge',
