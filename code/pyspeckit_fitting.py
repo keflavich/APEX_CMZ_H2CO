@@ -4,6 +4,7 @@ from astropy.io import fits
 from pyspeckit.spectrum import models
 from pyspeckit.spectrum.models.model import SpectralModel
 import FITS_tools
+from paths import h2copath, mergepath, figurepath
 
 # create the Formaldehyde Radex fitter
 # This step cannot be easily generalized: the user needs to read in their own grids
@@ -90,25 +91,6 @@ if __name__ == "__main__":
                              multisingle='multi')
     cube.Registry.add_fitter('h2co_simple', simple_fitter, 4, multisingle='multi')
 
-    import pyregion
-
-    regs = pyregion.open(regpath+'spectral_apertures.reg')
-
-    for reg in regs:
-        name = reg.attr[1]['text']
-        if name not in spectra:
-            sp = cube.get_apspec(reg.coord_list,coordsys='galactic',wunit='degree')
-            sp.specname = reg.attr[1]['text']
-            sp.error[:] = sp.stats((218e9,218.1e9))['std']
-        sp.plotter()
-        #sp.specfit(fittype='h2co_mm_radex', multifit=True, guesses=[100,14.3,4.0,40,7.0],
-        #           limits=[(20,200),(11,15),(3,5.5),(-105,105),(2,18)], limited=[(True,True)]*5,
-        #           fixed=[False,True,True,False,False], quiet=False,)
-        sp.specfit(fittype='h2co_simple', multifit=True,
-                   guesses=[1,25,5,0.5,1])
-        sp.specfit.plot_fit()
-        spectra[sp.specname] = sp
-
     cube.fiteach(fittype='h2co_simple', guesses=[1,25,5,0.5,1], multicore=8, errmap=noise, sigmacut=5)
     amp,vel,wid,ratio,ch3oh = cube.parcube
     eamp,evel,ewid,eratio,ech3oh = cube.errcube
@@ -121,80 +103,3 @@ if __name__ == "__main__":
     tmap = tm(ratio)
     ratioimg.data = tmap
     ratioimg.writeto('H2CO_fitted_tmap.fits', clobber=True)
-    # use_nearest_as_guess=True, 
-
-
-    individual_fits=False
-    if individual_fits:
-        flux = 3.6 # Jy
-        col_per_jy = 2e22 # cm^-2
-        dvdpc = 5.0 # km/s/pc
-        logX = -8.3
-        logcol = np.log10(flux*col_per_jy/dvdpc) + logX
-
-        spectra['WarmSpot'].specfit(fittype='h2co_mm_radex', multifit=True,
-                                    guesses=[100,logcol,4.5,35,3.0],
-                                    limits=[(20,200),(11,15),(3,5.5),(-105,105),(1,5)],
-                                    limited=[(True,True)]*5,
-                                    fixed=[False,True,True,False,False],
-                                    quiet=False,)
-
-        spectra['WarmSpot'].specfit(fittype='h2co_mm_radex', multifit=True,
-                                    guesses=[100,logcol+np.log10(2/3.),4.5,27,3.0]+[100,logcol+np.log10(1.0/3.),4.5,53,3.0],
-                                    limits=[(20,200),(11,15),(3,5.5),(-105,105),(1,8)]+[(20,200),(11,15),(3,5.5),(-105,105),(1,6)],
-                                    limited=[(True,True)]*10,
-                                    fixed=[False,True,True,False,False]*2,
-                                    quiet=False,)
-
-        flux = 5.0
-        logX = -8.5
-        logcol = np.log10(flux*col_per_jy/dvdpc / 2.) + logX
-
-        spectra['Brick SW'].specfit(fittype='h2co_mm_radex', multifit=True,
-                                    guesses=[133,12.94,5.977,37.17,9.88],
-                                    limits=[(20,200),(11,15),(3,6.5),(-105,105),(1,15)],
-                                    limited=[(True,True)]*5,
-                                    #fixed=[False,False,True,False,False],
-                                    fixed=[False,True,True,False,False])
-
-        spectra['50kmsColdExtension'].specfit(fittype='h2co_mm_radex', multifit=True,
-                                    guesses=[33,12.94,4.0,24.4,7],
-                                    limits=[(20,200),(11,15),(3,6.5),(-105,105),(1,15)],
-                                    limited=[(True,True)]*5,
-                                    #fixed=[False,False,True,False,False],
-                                    fixed=[False,False,True,False,False])
-
-        #spectra['Sgr B2 SW'].specfit(fittype='h2co_mm_radex', multifit=True,
-        #                            guesses=[125,14.14,4.0,47.72,5.66]+[125,14.14,4.0,55.72,5.66],
-        #                            limits=[(20,200),(11,15),(3,6.5),(-105,105),(1,15)]*2,
-        #                            limited=[(True,True)]*5*2,
-        #                            #fixed=[False,False,True,False,False],
-        #                            fixed=[False,False,True,True,True]+[False,False,True,False,False])
-
-
-
-    dopymc = False
-    if dopymc:
-        import agpy
-
-        sp = spectra['20 kms']
-        # SHOULD BE 
-        spmc = sp.specfit.get_pymc(use_fitted_values=True, db='hdf5', dbname='h2co_mm_fit_20kmsCld.hdf5')
-        #spmc = sp.specfit.fitter.get_pymc(sp.xarr, sp.data, sp.error,
-        #                                  use_fitted_values=True, db='hdf5',
-        #                                  dbname='h2co_mm_fit_20kmsCld.hdf5')
-        spmc.sample(100000)
-        agpy.pymc_plotting.hist2d(spmc, 'TEMPERATURE0', 'DENSITY0', doerrellipse=False, clear=True, bins=50, fignum=4)
-        agpy.pymc_plotting.hist2d(spmc, 'TEMPERATURE0', 'COLUMN0', doerrellipse=False, clear=True, bins=50,fignum=5)
-        agpy.pymc_plotting.hist2d(spmc, 'DENSITY0', 'COLUMN0', doerrellipse=False, clear=True, bins=50,fignum=6)
-
-
-        pars = dict([(k,spmc.trace(k)[-50:]) for k in sp.specfit.parinfo.keys()])
-        sp.plotter.autorefresh=False
-        for ii in xrange(0,50):
-            sp.specfit.plot_model([pars[k][ii] for k in sp.specfit.parinfo.keys()],
-                                  clear=False,
-                                  composite_fit_color='r',
-                                  plotkwargs={'alpha':0.01})
-
-        sp.plotter.refresh()
