@@ -112,7 +112,7 @@ if __name__ == "__main__":
     cube.fiteach(fittype='h2co_simple', guesses=[1,25,5,0.5,1], multicore=8, errmap=noise, sigmacut=5)
     amp,vel,wid,ratio,ch3oh = cube.parcube
     eamp,evel,ewid,eratio,ech3oh = cube.errcube
-    ok = (amp > 0) & (amp > eamp*2) & (vel > -100) & (vel < 150) & (wid > ewid*2) & (ratio > 0) & (ratio < 1) & (eratio < 0.3)
+    ok = (amp > 0) & (amp > eamp*5) & (vel > -100) & (vel < 150) & (wid > ewid*2) & (ratio > 0) & (ratio < 1) & (eratio < 0.3) & (eratio < ratio) & (wid < 20)
     hdr = FITS_tools.strip_headers.flatten_header(cube.header)
     ratio[True-ok] = np.nan
     ratioimg = fits.PrimaryHDU(data=ratio, header=hdr)

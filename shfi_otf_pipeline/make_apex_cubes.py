@@ -497,6 +497,11 @@ def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
                               varweight=varweight,
                               continuum_prefix=None)
 
+def add_pipeline_header_data(header):
+    header['PIPELINE'] = 'Ginsburg 2014 SHFI OTF Pipeline'
+    header['TELESCOP'] = 'APEX'
+    header['INSTRUME'] = 'SHFI-1'
+
 def make_blanks(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
 
     lrange = (gal.l.wrap_at(180*u.deg).deg.min()+15/3600.,
@@ -511,22 +516,30 @@ def make_blanks(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
     restfreq = (header['RESTF']*u.MHz)
     bmaj = (1.22*10*u.m / restfreq.to(u.m,u.spectral()))*u.radian
 
-    makecube.generate_header(np.mean(lrange), np.mean(brange), naxis1=naxis1,
-                             naxis2=naxis2, naxis3=4096, coordsys='galactic',
-                             ctype3='VRAD',
-                             bmaj=bmaj.to(u.deg).value,
-                             bmin=bmaj.to(u.deg).value,
-                             pixsize=pixsize.to(u.arcsec).value,
-                             cunit3='km/s',
-                             output_flatheader='header.txt',
-                             output_cubeheader='cubeheader.txt',
-                             cd3=header['VRES'],
-                             crval3=-1*header['VRES']*header['RCHAN'],
-                             crpix3=1,
-                             clobber=True, bunit="K",
-                             restfreq=restfreq.to(u.Hz).value, radio=True)
+    cubeheader, flatheader = makecube.generate_header(np.mean(lrange),
+                                                      np.mean(brange),
+                                                      naxis1=naxis1,
+                                                      naxis2=naxis2,
+                                                      naxis3=4096,
+                                                      coordsys='galactic',
+                                                      ctype3='VRAD',
+                                                      bmaj=bmaj.to(u.deg).value,
+                                                      bmin=bmaj.to(u.deg).value,
+                                                      pixsize=pixsize.to(u.arcsec).value,
+                                                      cunit3='km/s',
+                                                      output_flatheader='header.txt',
+                                                      output_cubeheader='cubeheader.txt',
+                                                      cd3=header['VRES'],
+                                                      crval3=-1*header['VRES']*header['RCHAN'],
+                                                      crpix3=1, clobber=True,
+                                                      bunit="K",
+                                                      restfreq=restfreq.to(u.Hz).value,
+                                                      radio=True)
+    add_pipeline_header_data(cubeheader)
+    add_pipeline_header_data(flatheader)
 
-    makecube.make_blank_images(cubefilename, clobber=clobber)
+    makecube.make_blank_images(cubefilename, cubeheader=cubeheader,
+                               flatheader=flatheader, clobber=clobber)
 
 def make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
     """ complete freq covg """
@@ -547,23 +560,31 @@ def make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcs
     #scalefactor = 1./downsample_factor
     #crpix3 = (rchan-1)*scalefactor+0.5+scalefactor/2.
 
-    makecube.generate_header(np.mean(lrange), np.mean(brange), naxis1=naxis1,
-                             naxis2=naxis2, naxis3=header['NCHAN'],
-                             coordsys='galactic',
-                             bmaj=bmaj.to(u.deg).value,
-                             bmin=bmaj.to(u.deg).value,
-                             pixsize=pixsize.to(u.arcsec).value,
-                             cunit3='Hz',
-                             ctype3='FREQ',
-                             output_flatheader='header.txt',
-                             output_cubeheader='cubeheader.txt',
-                             cd3=header['FRES']*1e6,
-                             crval3=restfreq.to(u.Hz).value,
-                             crpix3=rchan,
-                             clobber=True, bunit="K",
-                             restfreq=restfreq.to(u.Hz).value, radio=True)
+    cubeheader, flatheader = makecube.generate_header(np.mean(lrange),
+                                                      np.mean(brange),
+                                                      naxis1=naxis1,
+                                                      naxis2=naxis2,
+                                                      naxis3=header['NCHAN'],
+                                                      coordsys='galactic',
+                                                      bmaj=bmaj.to(u.deg).value,
+                                                      bmin=bmaj.to(u.deg).value,
+                                                      pixsize=pixsize.to(u.arcsec).value,
+                                                      cunit3='Hz',
+                                                      ctype3='FREQ',
+                                                      output_flatheader='header.txt',
+                                                      output_cubeheader='cubeheader.txt',
+                                                      cd3=header['FRES']*1e6,
+                                                      crval3=restfreq.to(u.Hz).value,
+                                                      crpix3=rchan,
+                                                      clobber=True, bunit="K",
+                                                      restfreq=restfreq.to(u.Hz).value,
+                                                      radio=True)
 
-    makecube.make_blank_images(cubefilename, clobber=clobber)
+    add_pipeline_header_data(cubeheader)
+    add_pipeline_header_data(flatheader)
+
+    makecube.make_blank_images(cubefilename, flatheader=flatheader,
+                               cubeheader=cubeheader, clobber=clobber)
 
 
 def make_blanks_merge(cubefilename, lowhigh='low', clobber=True,
@@ -580,22 +601,30 @@ def make_blanks_merge(cubefilename, lowhigh='low', clobber=True,
     if lowest_freq is None:
         lowest_freq = 216.8e9 if lowhigh=='low' else 218e9
 
-    makecube.generate_header(0.55, -0.075, naxis1=naxis1,
-                             naxis2=naxis2, naxis3=naxis3, coordsys='galactic',
-                             bmaj=bmaj.to(u.deg).value,
-                             bmin=bmaj.to(u.deg).value,
-                             pixsize=pixsize.to(u.arcsec).value,
-                             cunit3='Hz',
-                             ctype3='FREQ',
-                             output_flatheader='header.txt',
-                             output_cubeheader='cubeheader.txt',
-                             cd3=cd3,
-                             crval3=lowest_freq,
-                             crpix3=1,
-                             clobber=True, bunit="K",
-                             restfreq=restfreq.to(u.Hz).value, radio=True)
+    cubeheader, flatheader = makecube.generate_header(0.55, -0.075,
+                                                      naxis1=naxis1,
+                                                      naxis2=naxis2,
+                                                      naxis3=naxis3,
+                                                      coordsys='galactic',
+                                                      bmaj=bmaj.to(u.deg).value,
+                                                      bmin=bmaj.to(u.deg).value,
+                                                      pixsize=pixsize.to(u.arcsec).value,
+                                                      cunit3='Hz',
+                                                      ctype3='FREQ',
+                                                      output_flatheader='header.txt',
+                                                      output_cubeheader='cubeheader.txt',
+                                                      cd3=cd3,
+                                                      crval3=lowest_freq,
+                                                      crpix3=1, clobber=True,
+                                                      bunit="K",
+                                                      restfreq=restfreq.to(u.Hz).value,
+                                                      radio=True)
 
-    makecube.make_blank_images(cubefilename, clobber=clobber)
+    add_pipeline_header_data(cubeheader)
+    add_pipeline_header_data(flatheader)
+
+    makecube.make_blank_images(cubefilename, flatheader=flatheader,
+                               cubeheader=cubeheader, clobber=clobber)
 
 def data_diagplot(data, dataset, ext='png', newfig=False,
                   max_size=1024, freq=None, scans=None,
