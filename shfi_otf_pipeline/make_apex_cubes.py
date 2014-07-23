@@ -1607,7 +1607,7 @@ def do_extract_subcubes(outdir=mergepath):
 
 
 def do_everything():
-    make_high_mergecube()
+    make_high_mergecube(mergefile2='APEX_H2CO_merge_high')
     make_low_mergecube()
     os.chdir(mergepath)
     os.system('./APEX_H2CO_merge_high_starlink_custom.sh')

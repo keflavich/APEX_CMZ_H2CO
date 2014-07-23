@@ -25,7 +25,7 @@ except CalledProcessError:
 logfile = ("".join([time.strftime("apexcmzpipeline{0}_%y_%m_%d_%H:%M:%S"),".log"])).format(label)
 
 # with log.log_to_file(logfile.replace(".log","_default.log")):
-#    make_apex_cubes.do_everything(mergefile2='APEX_H2CO_merge_high')
+#    make_apex_cubes.do_everything()
 # with log.log_to_file(logfile.replace(".log","_nopca.log")):
 #    make_apex_cubes.make_high_mergecube(pca_clean=False, mergefile2='APEX_H2CO_merge_high_nopca')
 # with log.log_to_file(logfile.replace(".log","_timepca.log")):
