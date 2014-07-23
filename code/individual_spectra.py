@@ -22,6 +22,7 @@ for spname in ('brick1','brick2'):
     sp.specfit.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
                              multisingle='multi')
     sp.specfit.Registry.add_fitter('h2co_simple', simple_fitter, 4, multisingle='multi')
+    sp.error[:] = sp.stats([218e9, 218.1e9])['std']
     sp.specfit(fittype='h2co_simple', multifit=True,
                guesses=[1,25,5,0.5,1]*ncomp)
 

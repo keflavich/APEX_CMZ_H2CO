@@ -479,8 +479,13 @@ def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
 
     nhits = cubefilename+"_nhits.fits"
 
-    makecube.add_data_to_cube(cubefilename+".fits", data=data, flatheader='header.txt',
-                              cubeheader='cubeheader.txt', linefreq=218.22219, allow_smooth=True,
+    flatheader = fits.getheader(nhits)
+    cubeheader = fits.getheader(cubefilename+".fits")
+
+    makecube.add_data_to_cube(cubefilename+".fits", data=data,
+                              flatheader=flatheader,
+                              cubeheader=cubeheader, linefreq=218.22219,
+                              allow_smooth=True,
                               nhits=nhits,
                               data_iterator=data_iterator,
                               coord_iterator=coord_iterator,
