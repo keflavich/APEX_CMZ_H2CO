@@ -497,9 +497,9 @@ def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
                               varweight=varweight,
                               continuum_prefix=None)
 
-def add_pipeline_parameters_to_file(filename, pipeline_type, **kwargs):
+def add_pipeline_parameters_to_file(fileprefix, pipeline_type, **kwargs):
 
-    f = fits.open(filename)
+    f = fits.open(fileprefix+".fits")
     f[0].header['PIPECALL'] = (pipeline_type,'build_cube function called')
     for k,v in kwargs.iteritems():
         try:
@@ -507,7 +507,7 @@ def add_pipeline_parameters_to_file(filename, pipeline_type, **kwargs):
         except:
             log.warning("Header could not be updated with key/value pair"
                         "{k}:{v}".format(k=k, v=v))
-    f.writeto(filename, clobber=True)
+    f.writeto(fileprefix+".fits", clobber=True)
 
 def add_pipeline_header_data(header):
     header['PIPELINE'] = 'Ginsburg 2014 SHFI OTF Pipeline'
