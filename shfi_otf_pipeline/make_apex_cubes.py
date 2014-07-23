@@ -1129,6 +1129,7 @@ def build_cube_2014(sourcename,
                     scanblsub=True,
                     verbose=True,
                     pca_clean=True,
+                    extra_suffix='',
                     **kwargs
                     ):
     """
@@ -1143,6 +1144,8 @@ def build_cube_2014(sourcename,
                                   'APEX_H2CO_2014_%s_%s' % (sourcename, lowhigh))
     else:
         raise ValueError("Use a mergefile")
+    if extra_suffix:
+        cubefilename = cubefilename + extra_suffix
 
     log.info("Building cubes for "+cubefilename)
 
@@ -2022,7 +2025,7 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
                              verbose=False, smoothing_width=10,
                              automask=False, smooth_all=False,
                              smoothing_kernel_size_scale=40,
-                             nsigma_ignore=1.5, return_mask=False):
+                             nsigma_ignore=1, return_mask=False):
     """
     Use linear algebra to fit a time-baseline to each scan to remove spectral
     baseline drifts.

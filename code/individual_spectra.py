@@ -43,6 +43,8 @@ for reg in regs:
         sp.specname = reg.attr[1]['text']
         sp.error[:] = sp.stats((218e9,218.1e9))['std']
         spectra[name] = sp
+    else:
+        sp = spectra[name]
 
     sp.plotter()
 
