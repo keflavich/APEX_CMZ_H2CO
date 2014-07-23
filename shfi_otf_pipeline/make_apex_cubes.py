@@ -1068,7 +1068,7 @@ def build_cube_2013(mergefile=None,
     # need two loops to avoid loading too much stuff into memory
     for dataset in datasets:
 
-        log.info("Adding data set {0} to cube file {1}".format(dataset, cubefilename)
+        log.info("Adding data set {0} to cube file {1}".format(dataset, cubefilename))
 
         apex_filename=datapath+dataset+".apex"
 
