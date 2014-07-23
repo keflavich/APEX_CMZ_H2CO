@@ -106,4 +106,5 @@ setup(name=PACKAGENAME,
       zip_safe=False,
       use_2to3=True,
       **package_info
+     )
 
