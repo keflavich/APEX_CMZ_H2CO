@@ -3,6 +3,7 @@ import pyspeckit
 from paths import h2copath, mergepath, figurepath, regpath
 import os
 from pyspeckit_fitting import h2co_radex_fitter, simplemodel, simple_fitter
+from astropy.io import fits
 
 
 if 'cube' not in locals():

@@ -2018,7 +2018,7 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
                              verbose=False, smoothing_width=10,
                              automask=False, smooth_all=False,
                              smoothing_kernel_size_scale=40,
-                             nsigma_ignore=1.0, return_mask=False):
+                             nsigma_ignore=1.5, return_mask=False):
     """
     Use linear algebra to fit a time-baseline to each scan to remove spectral
     baseline drifts.
@@ -2052,8 +2052,9 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
         the frequency domain; smoothing_kernel_size_scale * smoothing_width
         defines the number of pixels to use when interpolating
     nsigma_ignore : float
-        The number of standard deviations above which the mean spectrum ought
-        to be before it is ignored
+        Fit masking control parameter.  Pixels with values greater than the
+        mean noise + nsigma_ignore * std(mean_spectrum) will be ignored for
+        fitting then interpolated back over later
     return_mask : bool
         Return an array of the mask used for each scan
     """
@@ -2086,7 +2087,7 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
                                             nsigma_ignore*mean_spectrum.std()))
             if verbose:
                 nflag = (~mask_pixels).sum()
-                log.info(("Masked {0} pixels"
+                log.info(("Masked {0} pixels for scanblsub fitting"
                           " in scan {1}-{2} "
                           "({3}%)").format(nflag, ii, jj,
                                            nflag/float(mask_pixels.size),)
