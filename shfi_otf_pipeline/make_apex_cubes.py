@@ -1029,7 +1029,6 @@ def build_cube_2013(mergefile=None,
     if extra_suffix:
         cubefilename = cubefilename + extra_suffix
 
-
     xtel = 'AP-H201-X202' if lowhigh=='low' else 'AP-H201-X201'
 
     if not mergefile:
@@ -1068,6 +1067,8 @@ def build_cube_2013(mergefile=None,
 
     # need two loops to avoid loading too much stuff into memory
     for dataset in datasets:
+
+        log.info("Adding data set {0} to cube file {1}".format(dataset, cubefilename)
 
         apex_filename=datapath+dataset+".apex"
 
@@ -1195,7 +1196,7 @@ def build_cube_2014(sourcename,
 
         apex_filename=datapath+dataset+".apex"
         
-        log.info("".join(("Loading data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+        log.info("".join(("Loading data for dataset ",dataset," in filename ",apex_filename,"  t=",str(time.time()-t0))))
 
         spectra,headers,indices = load_apex_cube(apex_filename, skip_data=False,
                                                  downsample_factor=downsample_factor,
@@ -1207,7 +1208,7 @@ def build_cube_2014(sourcename,
         #    tsysrange=[100,325]
         tsysrange=[100,325]
 
-        log.info("".join(("Selecting data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+        log.info("".join(("Selecting data for dataset ",dataset," in filename ",apex_filename,"  t=",str(time.time()-t0))))
 
         data, hdrs, gal = select_apex_data(spectra, headers, indices,
                                            sourcename=sourcename,
@@ -1220,7 +1221,7 @@ def build_cube_2014(sourcename,
                                            rchanrange=None,
                                            skip_data=False)
 
-        log.info("".join(("Processing data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+        log.info("".join(("Processing data for dataset ",dataset," in filename ",apex_filename,"  t=",str(time.time()-t0))))
 
         data, gal, hdrs = process_data(data, gal, hdrs, os.path.join(outpath,
                                                                      dataset)+"_"+xtel,
@@ -1228,7 +1229,7 @@ def build_cube_2014(sourcename,
                                        pca_clean=pca_clean,
                                        **kwargs)
 
-        log.info("".join(("Adding data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+        log.info("".join(("Adding data for dataset ",dataset," to filename ",cubefilename,"  t=",str(time.time()-t0))))
 
         add_apex_data(data, hdrs, gal, cubefilename, retfreq=True,
                       kernel_fwhm=kernel_fwhm,
@@ -1236,7 +1237,7 @@ def build_cube_2014(sourcename,
                       # downsample factor for freqarr
                       )
         # FORCE cleanup
-        log.info("".join(("Clearing data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+        log.info("".join(("Clearing data for dataset ",dataset," to filename ",cubefilename,"  t=",str(time.time()-t0))))
         del data,hdrs,gal
 
     log.info("".join(("Continuum subtracting ",cubefilename)))
@@ -2078,8 +2079,7 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
     if kernel_size % 2 == 0:
         kernel_size += 1
 
-    if return_mask and automask > 0:
-        masklist = []
+    masklist = []
 
     for ii,jj in zip([0]+scans.tolist(),
                      scans.tolist()+[data.shape[timeaxis]]):
@@ -2106,7 +2106,7 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
             # mask_pixels is an include mask
             inds = np.arange(data.shape[freqaxis])[mask_pixels]
             y = data[ii:jj,mask_pixels]
-            if return_mask:
+            if return_mask and automask > 0:
                 masklist.append(mask_pixels)
 
         # X is a vector of the X-values and a constant (1)
