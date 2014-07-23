@@ -1,6 +1,8 @@
 import socket
+import itertools
 import inspect
 import os
+import time
 
 dirpath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) 
 
@@ -11,7 +13,7 @@ elif 'cleese' in socket.gethostname():
 else:
     raise ValueError("Machine {0} not recognized.".format(socket.gethostname()))
 
-parameters = {'timepca': [True, False],
+parameters = {'timewise_pca': [True, False],
               'pca_clean': [True, False],
               'scanblsub': [True, False],
               'subspectralmeans': [True, False],
@@ -22,7 +24,7 @@ par_pairs = [[(k,v) for v in parameters[k]] for k in parameters]
 par_sets = [dict(x) for x in itertools.product(*par_pairs)]
 
 def prune(pars):
-    if pars['timepca'] and not pars['pca_clean']:
+    if pars['timewise_pca'] and not pars['pca_clean']:
         return False
     if pars['automask'] and not pars['scanblsub']:
         return False
@@ -37,7 +39,7 @@ test_dataset='M-093.F-0009-2014-2014-04/M-093.F-0009-2014-2014-05-12'
 dataset='M-093.F-0009-2014-2014-05-12'
 source_name ='MAP_055'
 
-short_names = {'timepca':'tp',
+short_names = {'timewise_pca':'tp',
                'pca_clean':'pca',
                'scanblsub':'blsub',
                'subspectralmeans':'msub',
@@ -45,7 +47,7 @@ short_names = {'timepca':'tp',
                'automask':'auto'}
 
 dpath = make_apex_cubes.april2014path
-outpath = 'parameter_tests/'
+outpath = '/Volumes/passport/apex/parameter_tests/'
 if not os.path.exists(outpath):
     os.mkdir(outpath)
 
@@ -53,12 +55,17 @@ results = {}
 
 for pars in par_sets_pruned:
     suffix = "_".join(short_names[k]+str(int(v)) for k,v in pars.iteritems()) 
+    log.info(suffix)
+    t0 = time.time()
     make_apex_cubes.build_cube_2014(source_name,
                                     datasets=[test_dataset],
                                     lowhigh='low',
                                     outpath=outpath,
                                     extra_suffix="_"+suffix,
                                     **pars)
+
+    dt = time.time() - t0
+    log.info("Finished {0} in {1}s".format(suffix, dt))
 
     fpath = os.path.join(outpath,
                          'APEX_H2CO_2014_{source_name}_{lowhigh}_{suffix}_sub.fits'.
@@ -76,7 +83,8 @@ for pars in par_sets_pruned:
                        'cubecut': h2cocubecut,
                        'integ': inth2co,
                        'peak': peakh2co,
-                       'spec': spec}
+                       'spec': spec,
+                       'time': dt}
 
 import pylab as pl
 
