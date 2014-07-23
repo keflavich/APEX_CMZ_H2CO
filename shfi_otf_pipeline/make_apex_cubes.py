@@ -1255,6 +1255,7 @@ def build_cube_2014(sourcename,
 
 
 def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True,
+                        scanblsub=True,
                         timewise_pca=False):
     if pca_clean:
         if timewise_pca:
@@ -1276,6 +1277,7 @@ def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True,
                     lowhigh='low',
                     pca_clean=pca_clean,
                     timewise_pca=timewise_pca,
+                    scanblsub=scanblsub,
                     datasets=datasets_2014)
 
     log.info("Building Ao cubes")
@@ -1283,6 +1285,7 @@ def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True,
     build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath,
                   pca_clean=pca_clean, timewise_pca=timewise_pca,
                   mergefilename=os.path.join(mergepath, mergefile2),
+                  scanblsub=scanblsub,
                   datapath=aorawpath)
 
     log.info("Building 2013 cubes")
@@ -1293,6 +1296,7 @@ def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True,
                     lowhigh='high',
                     timewise_pca=timewise_pca,
                     pca_clean=pca_clean,
+                    scanblsub=scanblsub,
                     scanblsub=True)
 
 
@@ -1955,7 +1959,7 @@ def do_mask_ch3oh(dpath=mergepath):
     # spatial smoothing = 4pix
     mask_out_ch3oh('_vsmooth', dpath=dpath)
 
-def do_2014(datasets=datasets_2014):
+def do_2014(datasets=datasets_2014, scanblsub=True):
     #datasets = ['E-093.C-0144A.2014APR02/E-093.C-0144A-2014-2014-04-01',
     #            'E-093.C-0144A.2014APR03/E-093.C-0144A-2014-2014-04-02']
     #build_cube_2014('MAP_001', datasets=datasets, scanblsub=True, lowhigh='low')
@@ -1964,8 +1968,10 @@ def do_2014(datasets=datasets_2014):
 
     for dataset in datasets:
         for source in datasets[dataset]:
-            build_cube_2014(source, datasets=[dataset], scanblsub=True, lowhigh='low')
-            build_cube_2014(source, datasets=[dataset], scanblsub=True, lowhigh='high')
+            build_cube_2014(source, datasets=[dataset], scanblsub=scanblsub,
+                            lowhigh='low')
+            build_cube_2014(source, datasets=[dataset], scanblsub=scanblsub,
+                            lowhigh='high')
 
 
 def do_2014_merge(datasets=datasets_2014):
