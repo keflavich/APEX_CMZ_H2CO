@@ -881,6 +881,7 @@ def build_cube_ao(window, freq=False, mergefile=None,
                   datapath=aorawpath,
                   outpath=aopath,
                   datasets=datasets_ao,
+                  kernel_fwhm=10/3600.,
                   scanblsub=True,
                   verbose=False,
                   debug=False,
@@ -978,6 +979,7 @@ def build_cube_ao(window, freq=False, mergefile=None,
 
         add_apex_data(data, hdrs, gal, cubefilename,
                       excludefitrange=excludefitrange,
+                      kernel_fwhm=kernel_fwhm,
                       retfreq=freq,
                       varweight=True,
                       debug=debug)
@@ -1008,6 +1010,7 @@ def build_cube_2013(mergefile=None,
                     datapath=june2013datapath,
                     outpath=june2013path,
                     datasets=datasets_2013,
+                    kernel_fwhm=10/3600.,
                     scanblsub=True,
                     pca_clean=True,
                     extra_suffix="",
@@ -1088,6 +1091,7 @@ def build_cube_2013(mergefile=None,
                                        **kwargs)
 
         add_apex_data(data, hdrs, gal, cubefilename, retfreq=True,
+                      kernel_fwhm=kernel_fwhm,
                       varweight=True,)
         # FORCE cleanup
         del data,hdrs,gal
@@ -1113,6 +1117,7 @@ def build_cube_2014(sourcename,
                     lowhigh='low',
                     downsample_factor=8,
                     datapath=april2014path,
+                    kernel_fwhm=10/3600.,
                     outpath=april2014path,
                     datasets=None,
                     scanblsub=True,
@@ -1217,6 +1222,7 @@ def build_cube_2014(sourcename,
         log.info("".join(("Adding data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
 
         add_apex_data(data, hdrs, gal, cubefilename, retfreq=True,
+                      kernel_fwhm=kernel_fwhm,
                       varweight=True,
                       # downsample factor for freqarr
                       )
