@@ -25,13 +25,13 @@ except CalledProcessError:
 logfile = ("".join([time.strftime("apexcmzpipeline{0}_%y_%m_%d_%H:%M:%S"),".log"])).format(label)
 
 # with log.log_to_file(logfile.replace(".log","_default.log")):
-#    make_apex_cubes.do_everything()
+#    make_apex_cubes.do_everything(mergefile2='APEX_H2CO_merge_high')
 # with log.log_to_file(logfile.replace(".log","_nopca.log")):
-#    make_apex_cubes.make_high_mergecube(pca_clean=False)
+#    make_apex_cubes.make_high_mergecube(pca_clean=False, mergefile2='APEX_H2CO_merge_high_nopca')
 # with log.log_to_file(logfile.replace(".log","_timepca.log")):
-#    make_apex_cubes.make_high_mergecube(timewise_pca=True)
+#    make_apex_cubes.make_high_mergecube(timewise_pca=True, mergefile2='APEX_H2CO_merge_high_timepca')
 # with log.log_to_file(logfile.replace(".log","_unclean.log")):
-#    make_apex_cubes.make_high_mergecube(pca_clean=False, scanblsub=False)
+#    make_apex_cubes.make_high_mergecube(pca_clean=False, scanblsub=False, mergefile2='APEX_H2CO_merge_high_nopca_noscanblsub')
 
 #/scratch/aginsbur/apex/reduced/april2014/M-093.F-0009-2014-2014-04/M-093.F-0009-2014-2014-05-08.apex
 #/scratch/aginsbur/apex/APEX_CMZ_H2CO/raw_data/M-093.F-0009-2014-2014-05-08.apex

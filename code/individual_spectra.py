@@ -7,10 +7,11 @@ from astropy.io import fits
 
 
 if 'cube' not in locals():
-    cube = pyspeckit.Cube(os.path.join(mergepath, 'APEX_H2CO_merge_high.fits'))
+    cube = pyspeckit.Cube(os.path.join(mergepath, 'APEX_H2CO_merge_high_sub.fits'))
     etamb = 0.75 # http://www.apex-telescope.org/telescope/efficiency/
     cube.cube /= etamb
-    noise = fits.getdata(mergepath+'APEX_H2CO_merge_high_noise.fits') / etamb
+    noise = fits.getdata(mergepath+'APEX_H2CO_merge_high_sub_noise.fits') / etamb
+    cube.errorcube = noise[None,:,:] * np.ones(cube.cube.shape)
     spectra = {}
 
 cube.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
@@ -31,7 +32,9 @@ cube.Registry.add_fitter('h2co_simple', simple_fitter, 4, multisingle='multi')
 
 regs = pyregion.open(regpath+'spectral_apertures.reg')
 with open(regpath+'spectral_ncomp.txt') as f:
-    ncomps = eval(f.read())
+    pars = eval(f.read())
+
+width_limit = 15 # km/s
 
 for reg in regs:
     name = reg.attr[1]['text']
@@ -43,25 +46,34 @@ for reg in regs:
 
     sp.plotter()
 
-    ncomp = ncomps[sp.specname]
+    ncomp = pars[sp.specname]['ncomp']
+    velos = pars[sp.specname]['velo']
     spname = sp.specname.replace(" ","_")
 
     sp.specfit.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
                              multisingle='multi')
     sp.specfit.Registry.add_fitter('h2co_simple', simple_fitter, 4, multisingle='multi')
+    guesses_simple = [x for ii in range(ncomp) 
+                      for x in (1,velos[ii],5,0.5,1)]
     sp.specfit(fittype='h2co_simple', multifit=True,
-               guesses=[1,25,5,0.5,1]*ncomp)
+               guesses=guesses_simple)
 
     sp.plotter()
     sp.specfit.plot_fit()
     sp.plotter.savefig(os.path.join(figurepath,
                                     "{0}_fit_4_lines_simple.pdf".format(spname)))
 
+    guesses = [x for ii in range(ncomp)
+               for x in (100,14,4.5,
+                         sp.specfit.parinfo['VELOCITY{0}'.format(ii)].value,
+                         (sp.specfit.parinfo['WIDTH{0}'.format(ii)].value
+                          if sp.specfit.parinfo['WIDTH{0}'.format(ii)].value < width_limit 
+                          else 5))
+              ]
+
     sp.specfit(fittype='h2co_mm_radex', multifit=True,
-               guesses=[100,14,4.5,
-                        sp.specfit.parinfo['VELOCITY0'].value,
-                        sp.specfit.parinfo['WIDTH0'].value]*ncomp,
-               limits=[(20,200),(11,15),(3,5.5),(-105,105),(1,8)]*ncomp,
+               guesses=guesses,
+               limits=[(20,200),(11,15),(3,5.5),(-105,105),(1,width_limit)]*ncomp,
                limited=[(True,True)]*5*ncomp,
                fixed=[False,False,False,True,True]*ncomp,
                quiet=False,)

@@ -506,7 +506,7 @@ def add_pipeline_parameters_to_file(fileprefix, pipeline_type, **kwargs):
 
     f = fits.open(fileprefix+".fits")
     f[0].header['PIPECALL'] = (pipeline_type,'build_cube function called')
-    for ii(k,v) in enumerate(kwargs.iteritems()):
+    for ii,(k,v) in enumerate(kwargs.iteritems()):
         try:
             keypair = "{k}:{v}".format(k=k, v=v)
             f[0].header['PIPEKW{0:02d}'.format(ii)] = str(v)
@@ -1262,14 +1262,18 @@ def build_cube_2014(sourcename,
 
 def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True,
                         scanblsub=True,
-                        timewise_pca=False):
-    if pca_clean:
-        if timewise_pca:
-            mergefile2 = 'APEX_H2CO_merge_high_timepca'
-        else:
-            mergefile2 = 'APEX_H2CO_merge_high'
-    else:
-        mergefile2 = 'APEX_H2CO_merge_high_nopca'
+                        timewise_pca=False,
+                        mergefile2=None):
+
+    if mergefile2 is None:
+        raise ValueError("Must specify a merge filename")
+    #if pca_clean:
+    #    if timewise_pca:
+    #        mergefile2 = 'APEX_H2CO_merge_high_timepca'
+    #    else:
+    #        mergefile2 = 'APEX_H2CO_merge_high'
+    #else:
+    #    mergefile2 = 'APEX_H2CO_merge_high_nopca'
     make_blanks_merge(os.path.join(mergepath,mergefile2), lowhigh='high',
                       lowest_freq=218e9, width=1.0*u.GHz)
 
