@@ -497,6 +497,18 @@ def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
                               varweight=varweight,
                               continuum_prefix=None)
 
+def add_pipeline_parameters_to_file(filename, pipeline_type, **kwargs):
+
+    f = fits.open(filename)
+    f[0].header['PIPECALL'] = (pipeline_type,'build_cube function called')
+    for k,v in kwargs.iteritems():
+        try:
+            f[0].header[k] = str(v)
+        except:
+            log.warning("Header could not be updated with key/value pair"
+                        "{k}:{v}".format(k=k, v=v))
+    f.writeto(filename, clobber=True)
+
 def add_pipeline_header_data(header):
     header['PIPELINE'] = 'Ginsburg 2014 SHFI OTF Pipeline'
     header['TELESCOP'] = 'APEX'
@@ -808,6 +820,11 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
 
     log.info("Data has been collected and flagged, now adding to cube.")
 
+    add_pipeline_parameters_to_file(cubefilename, 'generic',
+                                    kernel_fwhm=kernel_fwhm,
+                                    pca_clean=pca_clean, scanblsub=scanblsub)
+                                    
+
     for dataset in all_data:
 
         if not mergefile:
@@ -939,6 +956,10 @@ def build_cube_ao(window, freq=False, mergefile=None,
     else:
         excludefitrange = [700,1300] # FIX THIS when velos are fixed
 
+    add_pipeline_parameters_to_file(cubefilename, 'ao',
+                                    kernel_fwhm=kernel_fwhm,
+                                    pca_clean=pca_clean, scanblsub=scanblsub)
+
     log.info("Data has been collected and flagged, now adding to cube.")
 
     for dataset in all_data:
@@ -1026,6 +1047,10 @@ def build_cube_2013(mergefile=None,
 
         make_blanks_freq(all_gal_vect, hdrs[0], cubefilename, clobber=True)
 
+    add_pipeline_parameters_to_file(cubefilename, '2013',
+                                    kernel_fwhm=kernel_fwhm,
+                                    pca_clean=pca_clean, scanblsub=scanblsub)
+
     # need two loops to avoid loading too much stuff into memory
     for dataset in datasets:
 
@@ -1076,6 +1101,144 @@ def build_cube_2013(mergefile=None,
     crpix3 = (cube[0].header['CRPIX3']-1)*scalefactor+0.5+scalefactor/2.
     cube[0].header['CRPIX3'] = crpix3
     cube.writeto(cubefilename+'_downsampled.fits', clobber=True)
+
+def build_cube_2014(sourcename,
+                    mergefile=None,
+                    lowhigh='low',
+                    downsample_factor=8,
+                    datapath=april2014path,
+                    outpath=april2014path,
+                    datasets=None,
+                    scanblsub=True,
+                    verbose=True,
+                    pca_clean=True,
+                    **kwargs
+                    ):
+    """
+    Wrapper.  Because each field has its own name in 2014, this will need to be
+    modified for the mergefile to accept wildcards or something for sourcename
+    selection
+    """
+    if mergefile:
+        cubefilename=os.path.join(outpath,mergefile)
+    elif isinstance(sourcename, str):
+        cubefilename=os.path.join(outpath, 
+                                  'APEX_H2CO_2014_%s_%s' % (sourcename, lowhigh))
+    else:
+        raise ValueError("Use a mergefile")
+
+    log.info("Building cubes for "+cubefilename)
+
+    xtel = 'AP-H201-X202' if lowhigh=='low' else 'AP-H201-X201'
+
+    t0 = time.time()
+
+    if not mergefile:
+        # Need two loops.  First one is just to determine map extent.
+        all_gal = {}
+        for dataset in datasets:
+
+            apex_filename=datapath+dataset+".apex"
+
+            log.info("".join(("Pre-Loading data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+
+            spectra,headers,indices = load_apex_cube(apex_filename,
+                                                     skip_data=True,
+                                                     downsample_factor=downsample_factor)
+            data, hdrs, gal = select_apex_data(spectra, headers, indices,
+                                               sourcename=sourcename,
+                                               shapeselect=32768/downsample_factor,
+                                               tsysrange=[100,325],
+                                               xtel=xtel,
+                                               rchanrange=None,
+                                               skip_data=True)
+            all_gal[dataset] = gal
+
+        all_gal_vect = coordinates.SkyCoord(np.hstack([all_gal[g].l.to(u.radian).value
+                                                       for g in all_gal]) * u.radian,
+                                            np.hstack([all_gal[g].b.to(u.radian).value
+                                                       for g in all_gal]) * u.radian,
+                                            frame='galactic')
+        all_gal_vect.l.wrap_angle = 180*u.deg
+
+        log.info("Making blanks for "+cubefilename)
+        make_blanks_freq(all_gal_vect, hdrs[0], cubefilename, clobber=True)
+
+    add_pipeline_parameters_to_file(cubefilename, '2014',
+                                    kernel_fwhm=kernel_fwhm,
+                                    pca_clean=pca_clean, scanblsub=scanblsub)
+
+    # need two loops to avoid loading too much stuff into memory
+    for dataset in datasets:
+
+        apex_filename=datapath+dataset+".apex"
+        
+        log.info("".join(("Loading data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+
+        spectra,headers,indices = load_apex_cube(apex_filename, skip_data=False,
+                                                 downsample_factor=downsample_factor,
+                                                 )
+
+        #if dataset == 'M-091.F-0019-2013-2013-06-13':
+        #    tsysrange=[100,260]
+        #else:
+        #    tsysrange=[100,325]
+        tsysrange=[100,325]
+
+        log.info("".join(("Selecting data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+
+        data, hdrs, gal = select_apex_data(spectra, headers, indices,
+                                           sourcename=sourcename,
+                                           # NOT ignored, even though it's not used above...
+                                           # this is only OK because the bad shapes are from
+                                           # Saturn
+                                           #shapeselect=4096,
+                                           tsysrange=tsysrange,
+                                           xtel=xtel,
+                                           rchanrange=None,
+                                           skip_data=False)
+
+        log.info("".join(("Processing data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+
+        data, gal, hdrs = process_data(data, gal, hdrs, os.path.join(outpath,
+                                                                     dataset)+"_"+xtel,
+                                       scanblsub=scanblsub, verbose=verbose,
+                                       pca_clean=pca_clean,
+                                       **kwargs)
+
+        log.info("".join(("Adding data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+
+        add_apex_data(data, hdrs, gal, cubefilename, retfreq=True,
+                      varweight=True,
+                      # downsample factor for freqarr
+                      )
+        # FORCE cleanup
+        log.info("".join(("Clearing data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+        del data,hdrs,gal
+
+    log.info("".join(("Continuum subtracting ",cubefilename)))
+
+    cube = fits.open(cubefilename+'.fits', memmap=False)
+    cont = fits.getdata(cubefilename+'_continuum.fits')
+    data = cube[0].data
+    cube[0].data = data - cont
+    cube.writeto(cubefilename+'_sub.fits', clobber=True)
+
+    log.info("Downsampling "+cubefilename)
+
+    # Downsample by averaging over a factor of 8
+    avg = FITS_tools.downsample.downsample_axis(cube[0].data, 2, 0)
+    cube[0].data = avg
+    cube[0].header['CDELT3'] *= 2
+    scalefactor = 1./2.
+    crpix3 = (cube[0].header['CRPIX3']-1)*scalefactor+0.5+scalefactor/2.
+    cube[0].header['CRPIX3'] = crpix3
+    cube.writeto(cubefilename+'_downsampled.fits', clobber=True)
+
+    log.info("Done with "+cubefilename)
+
+
+
 
 def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True,
                         timewise_pca=False):
@@ -1817,138 +1980,6 @@ def get_info_2014(datapath='/Users/adam/work/h2co/apex/april2014/',
         log.info("{0}:{1}".format(dataset, str(info[dataset])))
 
     return info
-
-
-def build_cube_2014(sourcename,
-                    mergefile=None,
-                    lowhigh='low',
-                    downsample_factor=8,
-                    datapath=april2014path,
-                    outpath=april2014path,
-                    datasets=None,
-                    scanblsub=True,
-                    verbose=True,
-                    pca_clean=True,
-                    **kwargs
-                    ):
-    """
-    Wrapper.  Because each field has its own name in 2014, this will need to be
-    modified for the mergefile to accept wildcards or something for sourcename
-    selection
-    """
-    if mergefile:
-        cubefilename=os.path.join(outpath,mergefile)
-    elif isinstance(sourcename, str):
-        cubefilename=os.path.join(outpath, 
-                                  'APEX_H2CO_2014_%s_%s' % (sourcename, lowhigh))
-    else:
-        raise ValueError("Use a mergefile")
-
-    log.info("Building cubes for "+cubefilename)
-
-    xtel = 'AP-H201-X202' if lowhigh=='low' else 'AP-H201-X201'
-
-    t0 = time.time()
-
-    if not mergefile:
-        # Need two loops.  First one is just to determine map extent.
-        all_gal = {}
-        for dataset in datasets:
-
-            apex_filename=datapath+dataset+".apex"
-
-            log.info("".join(("Pre-Loading data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
-
-            spectra,headers,indices = load_apex_cube(apex_filename,
-                                                     skip_data=True,
-                                                     downsample_factor=downsample_factor)
-            data, hdrs, gal = select_apex_data(spectra, headers, indices,
-                                               sourcename=sourcename,
-                                               shapeselect=32768/downsample_factor,
-                                               tsysrange=[100,325],
-                                               xtel=xtel,
-                                               rchanrange=None,
-                                               skip_data=True)
-            all_gal[dataset] = gal
-
-        all_gal_vect = coordinates.SkyCoord(np.hstack([all_gal[g].l.to(u.radian).value
-                                                       for g in all_gal]) * u.radian,
-                                            np.hstack([all_gal[g].b.to(u.radian).value
-                                                       for g in all_gal]) * u.radian,
-                                            frame='galactic')
-        all_gal_vect.l.wrap_angle = 180*u.deg
-
-        log.info("Making blanks for "+cubefilename)
-        make_blanks_freq(all_gal_vect, hdrs[0], cubefilename, clobber=True)
-
-    # need two loops to avoid loading too much stuff into memory
-    for dataset in datasets:
-
-        apex_filename=datapath+dataset+".apex"
-        
-        log.info("".join(("Loading data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
-
-        spectra,headers,indices = load_apex_cube(apex_filename, skip_data=False,
-                                                 downsample_factor=downsample_factor,
-                                                 )
-
-        #if dataset == 'M-091.F-0019-2013-2013-06-13':
-        #    tsysrange=[100,260]
-        #else:
-        #    tsysrange=[100,325]
-        tsysrange=[100,325]
-
-        log.info("".join(("Selecting data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
-
-        data, hdrs, gal = select_apex_data(spectra, headers, indices,
-                                           sourcename=sourcename,
-                                           # NOT ignored, even though it's not used above...
-                                           # this is only OK because the bad shapes are from
-                                           # Saturn
-                                           #shapeselect=4096,
-                                           tsysrange=tsysrange,
-                                           xtel=xtel,
-                                           rchanrange=None,
-                                           skip_data=False)
-
-        log.info("".join(("Processing data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
-
-        data, gal, hdrs = process_data(data, gal, hdrs, os.path.join(outpath,
-                                                                     dataset)+"_"+xtel,
-                                       scanblsub=scanblsub, verbose=verbose,
-                                       pca_clean=pca_clean,
-                                       **kwargs)
-
-        log.info("".join(("Adding data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
-
-        add_apex_data(data, hdrs, gal, cubefilename, retfreq=True,
-                      varweight=True,
-                      # downsample factor for freqarr
-                      )
-        # FORCE cleanup
-        log.info("".join(("Clearing data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
-        del data,hdrs,gal
-
-    log.info("".join(("Continuum subtracting ",cubefilename)))
-
-    cube = fits.open(cubefilename+'.fits', memmap=False)
-    cont = fits.getdata(cubefilename+'_continuum.fits')
-    data = cube[0].data
-    cube[0].data = data - cont
-    cube.writeto(cubefilename+'_sub.fits', clobber=True)
-
-    log.info("Downsampling "+cubefilename)
-
-    # Downsample by averaging over a factor of 8
-    avg = FITS_tools.downsample.downsample_axis(cube[0].data, 2, 0)
-    cube[0].data = avg
-    cube[0].header['CDELT3'] *= 2
-    scalefactor = 1./2.
-    crpix3 = (cube[0].header['CRPIX3']-1)*scalefactor+0.5+scalefactor/2.
-    cube[0].header['CRPIX3'] = crpix3
-    cube.writeto(cubefilename+'_downsampled.fits', clobber=True)
-
-    log.info("Done with "+cubefilename)
 
 
 def identify_scans_fromcoords(gal):
