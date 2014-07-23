@@ -1072,7 +1072,8 @@ def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True,
     # ('ao', 'high'): (218.0, 219.0),
     build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath,
                   pca_clean=pca_clean, timewise_pca=timewise_pca,
-                  mergefilename=mergefile2, datapath=aorawpath)
+                  mergefilename=os.path.join(mergepath, mergefile2),
+                  datapath=aorawpath)
 
     log.info("Building 2013 cubes")
     # (2013, 'high'): (217.5, 220.0)
