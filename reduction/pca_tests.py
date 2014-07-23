@@ -1,4 +1,4 @@
-from make_apex_cubes import efuncs
+from shfi_otf_pipeline.make_apex_cubes import efuncs
 import numpy as np
 import pylab as pl
 

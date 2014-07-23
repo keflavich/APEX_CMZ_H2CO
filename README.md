@@ -22,3 +22,10 @@ did not.
 Here are the target regions colored by their association with the selected off
 position:
 ![Imgur](http://i.imgur.com/LzAC4KJ.png)
+
+
+Pipeline
+========
+
+An [example run of the pipeline](https://rawgit.com/keflavich/63b33d71a109e294bc4c/raw/835dec4970db738b2fb68e9070084c4180dd1053/ExampleAPEXMappingReduction.html)
+is hosted on [gist](https://gist.github.com/keflavich/63b33d71a109e294bc4c).

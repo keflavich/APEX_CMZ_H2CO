@@ -117,7 +117,7 @@ if __name__ == "__main__":
     ratio[True-ok] = np.nan
     ratioimg = fits.PrimaryHDU(data=ratio, header=hdr)
     ratioimg.writeto('H2CO_fitted_ratios.fits', clobber=True)
-    from make_apex_cubes import tm
+    from shfi_otf_pipeline.make_apex_cubes import tm
     tmap = tm(ratio)
     ratioimg.data = tmap
     ratioimg.writeto('H2CO_fitted_tmap.fits', clobber=True)

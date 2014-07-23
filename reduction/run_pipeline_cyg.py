@@ -1,4 +1,4 @@
-import make_apex_cubes
+from shfi_otf_pipeline import make_apex_cubes
 from os.path import join
 from astropy import log
 import time
