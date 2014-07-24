@@ -27,6 +27,7 @@ from scipy.ndimage import filters
 from scipy import signal,interpolate
 import warnings
 import image_tools
+import spectral_cube
 
 datasets_ao = ['O-085.F-9311A-2010','E-085.B-0964A-2010']
 datasets_2013 = ['M-091.F-0019-2013-2013-06-08',
@@ -307,13 +308,13 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
 
     return data,hdrs,gal
 
-def process_data(data, gal, hdrs, dataset, scanblsub=True,
+def process_data(data, gal, hdrs, dataset, scanblsub=False,
                  subspectralmeans=True, verbose=False, noisefactor=1.5,
                  linemask=False, automask=2,
                  zero_edge_pixels=0,
                  subtract_time_average=False,
                  pca_clean=False,
-                 timewise_pca=False,
+                 timewise_pca=True,
                  pcakwargs={},
                  **kwargs):
 
@@ -765,7 +766,7 @@ def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png',
     data_diagplot(data, dataset, ext=ext, newfig=newfig, freq=freq, **kwargs)
 
 def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
-                       outpath='./', datasets=[], scanblsub=True,
+                       outpath='./', datasets=[], scanblsub=False,
                        shapeselect=None,
                        sourcename=None,
                        tsysrange=[100,250],
@@ -774,6 +775,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                        pixsize=7.2*u.arcsec,
                        kernel_fwhm=10/3600.,
                        pca_clean=False,
+                       timewise_pca=True,
                        verbose=False, debug=False, **kwargs):
     """
     TODO: comment!
@@ -830,6 +832,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
     log.info("Data has been collected and flagged, now adding to cube.")
 
     headerpars = dict(kernel_fwhm=kernel_fwhm, pca_clean=pca_clean,
+                      timewise_pca=timewise_pca,
                       scanblsub=scanblsub)
     if 'pcakwargs' in kwargs:
         headerpars.update(kwargs['pcakwargs'])
@@ -853,6 +856,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
 
         data, gal, hdrs = process_data(data, gal, hdrs, dataset+"_"+xtel,
                                        scanblsub=scanblsub, verbose=verbose,
+                                       timewise_pca=timewise_pca,
                                        pca_clean=pca_clean, **kwargs)
 
         add_apex_data(data, hdrs, gal, cubefilename,
@@ -891,10 +895,11 @@ def build_cube_ao(window, freq=False, mergefile=None,
                   outpath=aopath,
                   datasets=datasets_ao,
                   kernel_fwhm=10/3600.,
-                  scanblsub=True,
+                  scanblsub=False,
                   verbose=False,
                   debug=False,
                   pca_clean=True,
+                  timewise_pca=True,
                   **kwargs):
     """
     TODO: comment!
@@ -969,6 +974,7 @@ def build_cube_ao(window, freq=False, mergefile=None,
         excludefitrange = [700,1300] # FIX THIS when velos are fixed
 
     headerpars = dict(kernel_fwhm=kernel_fwhm, pca_clean=pca_clean,
+                      timewise_pca=timewise_pca,
                       scanblsub=scanblsub)
     if 'pcakwargs' in kwargs:
         headerpars.update(kwargs['pcakwargs'])
@@ -984,6 +990,7 @@ def build_cube_ao(window, freq=False, mergefile=None,
         data, gal, hdrs = process_data(data, gal, hdrs, dataset+"_"+xtel,
                                        scanblsub=scanblsub, verbose=verbose,
                                        pca_clean=pca_clean,
+                                       timewise_pca=timewise_pca,
                                        **kwargs)
 
         add_apex_data(data, hdrs, gal, cubefilename,
@@ -1020,7 +1027,8 @@ def build_cube_2013(mergefile=None,
                     outpath=june2013path,
                     datasets=datasets_2013,
                     kernel_fwhm=10/3600.,
-                    scanblsub=True,
+                    scanblsub=False,
+                    timewise_pca=True,
                     pca_clean=True,
                     extra_suffix="",
                     verbose=True, **kwargs):
@@ -1063,6 +1071,7 @@ def build_cube_2013(mergefile=None,
         make_blanks_freq(all_gal_vect, hdrs[0], cubefilename, clobber=True)
 
     headerpars = dict(kernel_fwhm=kernel_fwhm, pca_clean=pca_clean,
+                      timewise_pca=timewise_pca,
                       scanblsub=scanblsub)
     if 'pcakwargs' in kwargs:
         headerpars.update(kwargs['pcakwargs'])
@@ -1097,6 +1106,7 @@ def build_cube_2013(mergefile=None,
         
         data, gal, hdrs = process_data(data, gal, hdrs, dataset+"_"+xtel,
                                        scanblsub=scanblsub, verbose=verbose,
+                                       timewise_pca=timewise_pca,
                                        pca_clean=pca_clean,
                                        **kwargs)
 
@@ -1130,9 +1140,10 @@ def build_cube_2014(sourcename,
                     kernel_fwhm=10/3600.,
                     outpath=april2014path,
                     datasets=None,
-                    scanblsub=True,
+                    scanblsub=False,
                     verbose=True,
                     pca_clean=True,
+                    timewise_pca=True,
                     extra_suffix='',
                     **kwargs
                     ):
@@ -1189,6 +1200,7 @@ def build_cube_2014(sourcename,
         make_blanks_freq(all_gal_vect, hdrs[0], cubefilename, clobber=True)
 
     headerpars = dict(kernel_fwhm=kernel_fwhm, pca_clean=pca_clean,
+                      timewise_pca=timewise_pca,
                       scanblsub=scanblsub)
     if 'pcakwargs' in kwargs:
         headerpars.update(kwargs['pcakwargs'])
@@ -1229,6 +1241,7 @@ def build_cube_2014(sourcename,
         data, gal, hdrs = process_data(data, gal, hdrs, os.path.join(outpath,
                                                                      dataset)+"_"+xtel,
                                        scanblsub=scanblsub, verbose=verbose,
+                                       timewise_pca=timewise_pca,
                                        pca_clean=pca_clean,
                                        **kwargs)
 
@@ -1268,8 +1281,8 @@ def build_cube_2014(sourcename,
 
 
 def make_high_mergecube(pca_clean=True,
-                        scanblsub=True,
-                        timewise_pca=False,
+                        scanblsub=False,
+                        timewise_pca=True,
                         mergefile2=None):
 
     if mergefile2 is None:
@@ -1318,7 +1331,7 @@ def make_high_mergecube(pca_clean=True,
 
 
 def make_low_mergecube(datasets_2014=datasets_2014, pca_clean=True,
-                       scanblsub=True, timewise_pca=False, mergefile1=None):
+                       scanblsub=False, timewise_pca=True, mergefile1=None):
     mergefile1 = 'APEX_H2CO_merge_low'
     make_blanks_merge(os.path.join(mergepath,mergefile1), lowhigh='low')
     build_cube_ao(window='low',
@@ -1335,7 +1348,7 @@ def make_low_mergecube(datasets_2014=datasets_2014, pca_clean=True,
                     outpath=mergepath,
                     datapath=june2013datapath,
                     lowhigh='low',
-                    scanblsub=True)
+                    scanblsub=scanblsub)
 
     log.info("Starting merge")
     for lowhigh in ('low',):
@@ -1380,11 +1393,14 @@ def integrate_mask(prefix, mask=h2copath+'APEX_H2CO_303_202_mask.fits'):
     Integrate a cube with name specified by 'prefix' using a specific mask
     """
     if isinstance(mask,str):
-        mask = fits.getdata(mask)
+        mask = fits.getdata(mask).astype('bool')
     ffile = fits.open(prefix+'.fits')
-    ffile[0].data *= mask
+    cd = ffile[0].header['CDELT3']
+    ffile[0].data *= mask * cd
+    ffile[0].data[~mask.astype('bool')] = np.nan
 
-    integ1,hdr = cubes.integ(ffile, [0,ffile[0].shape[0]], average=np.nanmean)
+    integ1,hdr = cubes.integ(ffile, [0,ffile[0].shape[0]], average=np.nansum)
+    hdr['BUNIT'] = ('K km/s',"Integrated over masked region")
     hdu1 = fits.PrimaryHDU(data=integ1, header=hdr)
     hdu1.writeto(prefix+"_mask_integ.fits", clobber=True)
 
@@ -1408,15 +1424,18 @@ def integrate_h2co_by_freq(filename):
                                         rest_value=bright_lines[line]*u.GHz,
                                         velocity_convention='radio')
         subcube1 = scube.spectral_slab(-100*u.km/u.s, 150*u.km/u.s)
+        ncube = scube.spectral_slab(-150*u.km/u.s, -100*u.km/u.s)
+        noise = ncube.apply_numpy_function(np.std, axis=0)
         #mask._wcs = subcube1.wcs
-        subcube = subcube1.with_mask(subcube1>0.05)#.with_mask(mask)
+        subcube = subcube1.with_mask(subcube1>noise)#.with_mask(mask)
         if subcube.shape[0] == 1:
             # implies out of range
             continue
         mom0 = subcube.moment0()
         mom1 = subcube.moment1()
         mom2 = subcube.moment2()
-        outfn = 'projections/'+filename.replace(".fits","_{line}_{mom}.fits")
+        fn = os.path.split(filename)[1]
+        outfn = 'projections/'+fn.replace(".fits","_{line}_{mom}.fits")
         mom0.hdu.writeto(outfn.format(line=line, mom='mom0'),clobber=True)
         mom1.hdu.writeto(outfn.format(line=line, mom='mom1'),clobber=True)
         mom2.hdu.writeto(outfn.format(line=line, mom='mom2'),clobber=True)
@@ -1448,6 +1467,7 @@ def signal_to_noise_mask_cube(prefix, noise=None, kernelsize=[2,2,2], grow=1,
                               sigmacut=3):
     """
     It's not clear that this has anything to do with moments...
+    (this was called moment_mask_cube in the past, which I think is just wrong)
     """
     ffile = fits.open(prefix+'.fits')
     cube = ffile[0].data
@@ -1470,7 +1490,8 @@ def signal_to_noise_mask_cube(prefix, noise=None, kernelsize=[2,2,2], grow=1,
     ffile[0].writeto(prefix+"_mask.fits", clobber=True)
 
 def do_sncube_masking_hi(prefix=h2copath+'APEX_H2CO_303_202'):
-    compute_noise_high(prefix)
+    # 0-25 not checked! arbitrary choice.
+    compute_noise_high(prefix, pixrange=[0,25])
     signal_to_noise_mask_cube(prefix)
     integrate_slices_high(prefix+'_snmasked')
 
@@ -1487,12 +1508,14 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
                                     velocity_convention='radio')
     svcube = vcube.spectral_slab(-150*u.km/u.s, 250*u.km/u.s)
 
-    outheader = svcube.wcs.to_header()
+    outheader = svcube.header
     outheader['CRPIX3'] = 1
     outheader['CRVAL3'] = crval3
     outheader['CUNIT3'] = 'km/s'
     outheader['CDELT3'] = 1.0
     outheader['NAXIS3'] = naxis3
+    outheader['NAXIS2'] = svcube.shape[1]
+    outheader['NAXIS1'] = svcube.shape[2]
 
     if smooth:
         #cubesm = gsmooth_cube(ffile[0].data, [3,2,2], use_fft=True,
@@ -1512,15 +1535,10 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
         outheader['CDELT3'] = outheader['CDELT3'] * kw
         outheader['NAXIS3'] = outheader['NAXIS3'] / kw
     
-    svcube.write(outfilename)
-
     # Now that we've written this out, we use interpolation to force the cube
     # onto a grid that starts at *exactly* -150 km/s
-    newhdu = cube_regrid.regrid_fits_cube(outfilename, outheader, order=1,
-                                          prefilter=False,
-                                          outfilename=outfilename,
-                                          clobber=True
-                                         )
+    newhdu = cube_regrid.regrid_cube_hdu(svcube.hdu, outheader, order=1, prefilter=False)
+    newhdu.writeto(outfilename, output_verify='fix', clobber=True)
 
     log.info("Completed cube extraction to {1} in {0} seconds.".format(time.time()-t0,
                                                                        outfilename))
@@ -1571,9 +1589,14 @@ def make_line_mask(freqarr, lines=bright_lines):
     return mask
 
 
-def do_extract_subcubes(outdir=mergepath):
+def do_extract_subcubes(outdir=mergepath, frange=None):
 
     for line,freq in all_lines.iteritems():
+        if frange is not None:
+            if freq<frange[0] or freq>frange[1]:
+                log.info("Skipping line {0}".format(line))
+                continue
+
         log.info("Extracting {0}".format(line))
         if freq < 218:
             cubefilename = os.path.join(mergepath,'APEX_H2CO_merge_low_sub.fits')
@@ -1596,16 +1619,16 @@ def do_extract_subcubes(outdir=mergepath):
             log.info("Skipping line {0}".format(line))
 
 
-def do_everything(pca_clean=True, scanblsub=True,
-                  timewise_pca=False, mergefile2=None):
-    make_high_mergecube(mergefile2='APEX_H2CO_merge_high', pca_clean=pca_clean,
+def do_everything(pca_clean=True, scanblsub=False,
+                  timewise_pca=True, mergefile2='APEX_H2CO_merge_high'):
+    make_high_mergecube(mergefile2=mergefile2, pca_clean=pca_clean,
                         scanblsub=scanblsub, timewise_pca=timewise_pca)
     #make_low_mergecube() # there's only one really useful overlap region
     os.chdir(mergepath)
     # vsmoothds is made here:
     os.system('./APEX_H2CO_merge_high_starlink_custom.sh')
     os.chdir('../')
-    do_extract_subcubes(outdir=mergepath)
+    do_extract_subcubes(outdir=mergepath, frange=[218,219])
     compute_noise_high()
     compute_noise_high(mergepath+'APEX_H2CO_merge_high_smooth',[203,272])
     compute_noise_high(mergepath+'APEX_H2CO_merge_high_vsmoothds',[203,272])
@@ -1634,9 +1657,11 @@ def do_everything(pca_clean=True, scanblsub=True,
         except OSError:
             log.debug("Skipped file {0} because it exists".format(fn))
 
-    # Create H2CO masks?
-    # (they were already created above by signal_to_noise_mask_cube)
+    # Create a few integrated H2CO 303 maps
     do_sncube_masking_hi()
+
+    # Use spectral_cube to do a bunch of integrations
+    integrate_h2co_by_freq(mergepath+mergefile2+".fits")
 
     for line in all_lines:
         fn = mergepath+'APEX_{0}.fits'.format(line)
@@ -1687,9 +1712,9 @@ def baseline_cube(cubefn, maskfn, order=5):
 
 def do_everything_2013extrafreqs():
     build_cube_2013(lowhigh='low',
-                    scanblsub=True)
+                    scanblsub=False)
     build_cube_2013(lowhigh='high',
-                    scanblsub=True)
+                    scanblsub=False)
     #raise NotImplementedError
     #compute_noise_extras(lowhigh='low',pixrange=[0,4096])
     #compute_noise_extras(lowhigh='high',pixrange=[0,4096])
@@ -1961,7 +1986,7 @@ def do_mask_ch3oh(dpath=mergepath):
     # spatial smoothing = 4pix
     mask_out_ch3oh('_vsmooth', dpath=dpath)
 
-def do_2014(datasets=datasets_2014, scanblsub=True):
+def do_2014(datasets=datasets_2014, scanblsub=False):
     #datasets = ['E-093.C-0144A.2014APR02/E-093.C-0144A-2014-2014-04-01',
     #            'E-093.C-0144A.2014APR03/E-093.C-0144A-2014-2014-04-02']
     #build_cube_2014('MAP_001', datasets=datasets, scanblsub=True, lowhigh='low')

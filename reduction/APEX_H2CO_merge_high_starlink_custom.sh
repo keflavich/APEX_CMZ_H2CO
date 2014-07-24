@@ -26,3 +26,14 @@ rm APEX_H2CO_merge_high_vsmoothds.sdf
 sqorst temp mode=factors  axis=2 factors=0.4 out=APEX_H2CO_merge_high_vsmoothds
 rm APEX_H2CO_merge_high_vsmoothds.fits
 ndf2fits APEX_H2CO_merge_high_vsmoothds APEX_H2CO_merge_high_vsmoothds.fits
+
+rm APEX_H2CO_merge_high.sdf
+rm APEX_H2CO_merge_high_smooth.sdf
+rm APEX_H2CO_merge_high_vrebin.sdf
+rm APEX_H2CO_merge_high_vsmoothds.sdf
+rm APEX_H2CO_merge_high_baseline.sdf
+rm APEX_H2CO_merge_high_sub.sdf
+rm APEX_H2CO_merge_high_vrebin2.sdf  temp.sdf
+rm APEX_H2CO_merge_high_baseline2.sdf
+rm APEX_H2CO_merge_high_sub2.sdf
+rm APEX_H2CO_merge_high_vsmooth.sdf

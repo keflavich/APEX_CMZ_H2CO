@@ -5,20 +5,21 @@ from pyspeckit.spectrum import models
 from pyspeckit.spectrum.models.model import SpectralModel
 import FITS_tools
 from paths import h2copath, mergepath, figurepath
+from shfi_otf_pipeline.make_apex_cubes import tm
 
 # create the Formaldehyde Radex fitter
 # This step cannot be easily generalized: the user needs to read in their own grids
-texgrid1 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_5kms_temperature_para_tex1.fits')
-taugrid1 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_5kms_temperature_para_tau1.fits')
-texgrid2 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_5kms_temperature_para_tex2.fits')
-taugrid2 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_5kms_temperature_para_tau2.fits')
-hdr = fits.getheader('/Users/adam/work/h2co/radex/thermom/303-202_321-220_5kms_temperature_para_tau2.fits')
+texgrid1 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tex1.fits')
+taugrid1 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tau1.fits')
+texgrid2 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tex2.fits')
+taugrid2 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tau2.fits')
+hdr = fits.getheader('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tau2.fits')
 
-texgrid1b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_5kms_temperature_para_tex1.fits')
-taugrid1b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_5kms_temperature_para_tau1.fits')
-texgrid2b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_5kms_temperature_para_tex2.fits')
-taugrid2b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_5kms_temperature_para_tau2.fits')
-hdrb = fits.getheader('/Users/adam/work/h2co/radex/thermom/303-202_322-221_5kms_temperature_para_tau2.fits')
+texgrid1b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tex1.fits')
+taugrid1b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tau1.fits')
+texgrid2b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tex2.fits')
+taugrid2b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tau2.fits')
+hdrb = fits.getheader('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tau2.fits')
 
 # # this deserves a lot of explanation:
 # # models.formaldehyde.formaldehyde_radex is the MODEL that we are going to fit
@@ -33,7 +34,7 @@ h2co_radex_fitter = SpectralModel(models.formaldehyde_mm.formaldehyde_mm_radex,
                                   parlimited=[(True,True), (True,True),
                                               (True,True), (False,False),
                                               (True,False)],
-                                  parlimits=[(5,205), (10,17), (2,7), (0,0), (0,0)],
+                                  parlimits=[(5,300), (11,17), (3,7), (0,0), (0,0)],
                                   parsteps=[0.01,0.01,0.1,0,0], fitunits='Hz',
                                   texgrid=((218.1,218.3,texgrid1b),
                                            (218.35,218.55,texgrid2b),
@@ -89,17 +90,22 @@ if __name__ == "__main__":
 
     cube.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
                              multisingle='multi')
-    cube.Registry.add_fitter('h2co_simple', simple_fitter, 4, multisingle='multi')
+    cube.Registry.add_fitter('h2co_simple', simple_fitter, 5, multisingle='multi')
 
-    cube.fiteach(fittype='h2co_simple', guesses=[1,25,5,0.5,1], multicore=8, errmap=noise, sigmacut=5)
+    cube.fiteach(fittype='h2co_simple', guesses=[1,25,5,0.5,1], multicore=8, errmap=noise, sigmacut=4)
+
+    hdr = FITS_tools.strip_headers.flatten_header(cube.header)
+
     amp,vel,wid,ratio,ch3oh = cube.parcube
     eamp,evel,ewid,eratio,ech3oh = cube.errcube
+    ratioimg = fits.PrimaryHDU(data=ratio, header=hdr)
+    ratioimg.writeto('H2CO_fitted_ratios_raw.fits', clobber=True)
+
     ok = (amp > 0) & (amp > eamp*5) & (vel > -100) & (vel < 150) & (wid > ewid*2) & (ratio > 0) & (ratio < 1) & (eratio < 0.3) & (eratio < ratio) & (wid < 20)
-    hdr = FITS_tools.strip_headers.flatten_header(cube.header)
+    ratio = ratio.copy()
     ratio[True-ok] = np.nan
     ratioimg = fits.PrimaryHDU(data=ratio, header=hdr)
     ratioimg.writeto('H2CO_fitted_ratios.fits', clobber=True)
-    from shfi_otf_pipeline.make_apex_cubes import tm
     tmap = tm(ratio)
     ratioimg.data = tmap
     ratioimg.writeto('H2CO_fitted_tmap.fits', clobber=True)

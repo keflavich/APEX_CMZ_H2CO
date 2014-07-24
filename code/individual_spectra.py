@@ -75,7 +75,7 @@ for reg in regs:
 
     sp.specfit(fittype='h2co_mm_radex', multifit=True,
                guesses=guesses,
-               limits=[(20,200),(11,15),(3,5.5),(-105,105),(1,width_limit)]*ncomp,
+               limits=[(10,300),(11,15),(3,5.5),(-105,105),(1,width_limit)]*ncomp,
                limited=[(True,True)]*5*ncomp,
                fixed=[False,False,False,True,True]*ncomp,
                quiet=False,)
