@@ -1475,7 +1475,7 @@ def do_sncube_masking_hi(prefix=h2copath+'APEX_H2CO_303_202'):
     integrate_slices_high(prefix+'_snmasked')
 
 def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
-                    debug=False, smooth=False, vsmooth=False, naxis3=400, crval3=50):
+                    debug=False, smooth=False, vsmooth=False, naxis3=400, crval3=-150):
     t0 = time.time()
     log.info(("Extracting subcube at {0} from {1}"
               " with smooth={2} and vsmooth={3}").format(linefreq,
@@ -1486,6 +1486,13 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
     vcube = cube.with_spectral_unit(u.km/u.s, rest_value=linefreq,
                                     velocity_convention='radio')
     svcube = vcube.spectral_slab(-150*u.km/u.s, 250*u.km/u.s)
+
+    outheader = svcube.wcs.to_header()
+    outheader['CRPIX3'] = 1
+    outheader['CRVAL3'] = crval3
+    outheader['CUNIT3'] = 'km/s'
+    outheader['CDELT3'] = 1.0
+    outheader['NAXIS3'] = naxis3
 
     if smooth:
         #cubesm = gsmooth_cube(ffile[0].data, [3,2,2], use_fft=True,
@@ -1501,18 +1508,14 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
                                                   use_fft=False,
                                                   numcores=4)
         svcube._data = cubesm
+
+        outheader['CDELT3'] = outheader['CDELT3'] * kw
+        outheader['NAXIS3'] = outheader['NAXIS3'] / kw
     
     svcube.write(outfilename)
 
     # Now that we've written this out, we use interpolation to force the cube
     # onto a grid that starts at *exactly* -150 km/s
-    outheader = svcube.wcs.to_header()
-    outheader['CRPIX3'] = 201
-    outheader['CRVAL3'] = crval3
-    outheader['CUNIT3'] = 'km/s'
-    outheader['CDELT3'] = 1.0
-    outheader['NAXIS3'] = naxis3
-
     newhdu = cube_regrid.regrid_fits_cube(outfilename, outheader, order=1,
                                           prefilter=False,
                                           outfilename=outfilename,
