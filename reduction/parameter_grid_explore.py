@@ -4,6 +4,8 @@ import inspect
 import os
 import time
 import spectral_cube
+from astropy import units as u
+from astropy.io import fits
 
 dirpath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) 
 

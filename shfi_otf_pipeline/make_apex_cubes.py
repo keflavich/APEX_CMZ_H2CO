@@ -1481,42 +1481,11 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
               " with smooth={2} and vsmooth={3}").format(linefreq,
                                                          cubefilename, smooth,
                                                          vsmooth))
-    ffile = fits.open(cubefilename)
-    # I don't know why this is necessary, but there were weird bugs showing up
-    # if I did not add this (some parts of the cube defaulted to 3e-319)
-    # Added June 16: float32->float64 because otherwise regridding can fail
-    ffile[0].data = ffile[0].data.astype('float64')
-    hdr = ffile[0].header
 
-    cdk = 'CD3_3' if 'CD3_3' in hdr else 'CDELT3'
-
-    if debug:
-        xarr = (np.arange(hdr['NAXIS3'])+1-hdr['CRPIX3']) * hdr[cdk] + hdr['CRVAL3']
-        log.debug("xarr min={0} max={1}".format(xarr.min(),xarr.max()))
-
-    hdr['CTYPE3'] = 'VELO'
-    cdfrq = hdr[cdk]
-    crvfreq = hdr['CRVAL3']
-    crpixf = hdr['CRPIX3']
-    hdr[cdk] = -((cdfrq/crvfreq)*constants.c).to(u.km/u.s).value
-    hdr['CRVAL3'] = 0.0
-    hdr['CRPIX3'] = (linefreq.to(u.Hz).value-crvfreq)/cdfrq + crpixf
-    hdr['CUNIT3'] = 'km/s'
-
-    if debug:
-        xarr = (np.arange(hdr['NAXIS3'])+1-hdr['CRPIX3']) * hdr[cdk] + hdr['CRVAL3']
-        log.debug("xarr min={0} max={1}".format(xarr.min(),xarr.max()))
-
-    for k in ['CTYPE3','CRVAL3',cdk,'CRPIX3','CUNIT3']:
-        assert ffile[0].header[k] == hdr[k]
-
-    outhdr = hdr.copy()
-    outhdr[cdk] = 1.0
-    outhdr['RESTFREQ'] = linefreq.to(u.Hz).value
-    outhdr['RESTFRQ'] = linefreq.to(u.Hz).value
-    outhdr['CRVAL3'] = crval3
-    outhdr['CRPIX3'] = (naxis3-1)/2.
-    outhdr['NAXIS3'] = naxis3
+    cube = spectral_cube.SpectralCube.read(cubefilename)
+    vcube = cube.with_spectral_unit(u.km/u.s, rest_value=linefreq,
+                                    velocity_convention='radio')
+    svcube = vcube.spectral_slab(-150*u.km/u.s, 250*u.km/u.s)
 
     if smooth:
         #cubesm = gsmooth_cube(ffile[0].data, [3,2,2], use_fft=True,
@@ -1525,30 +1494,30 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
         # this is an "optimal smooth", boosting s/n and smoothing to 36"
         # resolution.
         kw = 2 if not vsmooth else 4
-        cubesm = cube_regrid.spatial_smooth_cube(ffile[0].data, kw,
+        cubesm = cube_regrid.spatial_smooth_cube(svcube.filled_data[:], kw,
                                                  use_fft=False,
                                                  numcores=4)
         cubesm = cube_regrid.spectral_smooth_cube(cubesm, 3/2.35,
                                                   use_fft=False,
                                                   numcores=4)
-        ffile[0].data = cubesm
-
-        outhdr[cdk] = 3.0
-        outhdr['CRVAL3'] = 50
-        outhdr['CRPIX3'] = 70
-        outhdr['NAXIS3'] = 140
+        svcube._data = cubesm
     
-    if debug:
-        xarr = (np.arange(outhdr['NAXIS3'])+1-outhdr['CRPIX3']) * outhdr[cdk] + outhdr['CRVAL3']
-        log.debug("xarr min={0} max={1}".format(xarr.min(),xarr.max()))
-        xarr = (-xarr/3e5) * linefreq + linefreq
-        log.debug("xarr min={0} max={1}".format(xarr.min(),xarr.max()))
-        return hdr,outhdr
+    svcube.write(outfilename)
 
-    newhdu = cube_regrid.regrid_cube_hdu(ffile[0], outhdr, order=1,
-                                         prefilter=False)
+    # Now that we've written this out, we use interpolation to force the cube
+    # onto a grid that starts at *exactly* -150 km/s
+    outheader = svcube.wcs.to_header()
+    outheader['CRPIX3'] = 201
+    outheader['CRVAL3'] = crval3
+    outheader['CUNIT3'] = 'km/s'
+    outheader['CDELT3'] = 1.0
+    outheader['NAXIS3'] = naxis3
 
-    newhdu.writeto(outfilename, clobber=True)
+    newhdu = cube_regrid.regrid_fits_cube(outfilename, outheader, order=1,
+                                          prefilter=False,
+                                          outfilename=outfilename,
+                                          clobber=True
+                                         )
 
     log.info("Completed cube extraction to {1} in {0} seconds.".format(time.time()-t0,
                                                                        outfilename))
