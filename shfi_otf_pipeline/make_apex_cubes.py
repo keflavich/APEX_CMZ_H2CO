@@ -1890,7 +1890,7 @@ class TemperatureMapper(object):
 
 
     def get_mapper(self, lineid, tmin=np.nan, tmax=np.nan):
-        if not hasattr(self,'temperature'):
+        if not hasattr(self,'temperatures'):
             self.init()
 
         rationame = {'321220': 'ratio1',
@@ -1913,32 +1913,41 @@ class TemperatureMapper(object):
 if 'tm' not in locals():
     tm = TemperatureMapper(trange=[10,300],ntemp=100)
 
-def do_temperature():
-    temperaturemap(tm)
+def do_temperature(ratio=True):
+    temperaturemap(tm, ratio=ratio)
 
-def temperaturemap(ratio_to_tem, path=h2copath):
-    doratio()
+def temperaturemap(ratio_to_tem, path=h2copath, ratio=True):
+    if ratio:
+        doratio()
 
     import scipy.stats
 
-    for smooth in ('smooth','vsmooth'):
-        for suf in ('','_cube_{0}'):
-            if suf:
-                suf = suf.format(smooth)
+    for suf_ in ('{0}','{0}_integ','_cube{0}'):
+        for smooth in ('','_smooth','_vsmooth'):
+
+            suf = suf_.format(smooth)
+
             for highline in ('321220','322221'):
                 pfx = '{2}/H2CO_{0}_to_303202{1}'.format(highline,suf,path)
+                if os.path.exists(pfx+'.fits'):
+                    log.info("Temperature mapping {0}".format(pfx))
+                else:
+                    log.info("Skipping {0}".format(pfx))
+                    continue
                 rmap = fits.getdata(pfx+'.fits')
                 tmap = ratio_to_tem(rmap, highline)#, tmin=10, tmax=300)
                 rf = fits.open(pfx+'.fits')
                 rf[0].header['BUNIT'] = 'K'
                 rf[0].header['BTYPE'] = 'TKIN'
+                del rf[0].header['LONPOLE']
+                del rf[0].header['LATPOLE']
                 rf[0].data = tmap
                 rf.writeto(pfx+'_temperature.fits',clobber=True)
                 #mask = fits.getdata('APEX_H2CO_303_202_smooth_mask_integ.fits') > 0.018
-                if not suf:
-                    mask = fits.getdata(path+'APEX_H2CO_322_221_{0}_mask_integ.fits'.format(smooth)) > 0.0025
+                if 'cube' not in suf:
+                    mask = fits.getdata(path+'APEX_H2CO_322_221{0}_mask_integ.fits'.format(smooth)) > 0.0025
                 else:
-                    mask = fits.getdata(path+'APEX_H2CO_303_202_{0}_mask.fits'.format(smooth)).astype('bool')
+                    mask = fits.getdata(path+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth)).astype('bool')
                 tmap[True-mask] = np.nan
                 rf[0].data = tmap
                 rf.writeto(pfx+'_temperature_masked.fits',clobber=True)
@@ -1949,7 +1958,7 @@ def temperaturemap(ratio_to_tem, path=h2copath):
                     rf[0].data = scipy.stats.nanmedian(tmap, axis=0)
                     rf.writeto(pfx+'_midtemperature.fits', clobber=True)
 
-                    wt = fits.getdata(path+'APEX_H2CO_303_202_smooth.fits').astype('bool')
+                    wt = fits.getdata(path+'APEX_H2CO_303_202{0}.fits'.format(smooth)).astype('bool')
                     wt[(True-mask) | (tmap==0) | (True-np.isfinite(tmap))] = 0
                     rf[0].data = np.nansum(tmap*wt, axis=0)/np.nansum(wt, axis=0)
                     rf.writeto(pfx+'_wtdmeantemperature.fits', clobber=True)
