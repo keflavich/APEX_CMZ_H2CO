@@ -3,6 +3,7 @@ import itertools
 import inspect
 import os
 import time
+import spectral_cube
 
 dirpath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) 
 

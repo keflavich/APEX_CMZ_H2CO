@@ -32,7 +32,7 @@ with log.log_to_file(logfile):
                                             pcakwargs={}, datasets=[ds])
 
     for dataset in make_apex_cubes.datasets_2013:
-        make_apex_cubes.build_cube_2013(datapath=make_apex_cubes.june2013path,
+        make_apex_cubes.build_cube_2013(datapath=make_apex_cubes.june2013datapath,
                                         outpath=make_apex_cubes.june2013path,
                                         lowhigh='low', pca_clean=True,
                                         pcakwargs={}, datasets=[dataset],

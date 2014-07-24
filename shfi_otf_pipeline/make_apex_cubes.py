@@ -362,7 +362,10 @@ def process_data(data, gal, hdrs, dataset, scanblsub=True,
                                                  automask=automask,
                                                  smooth_all=True,
                                                  return_mask=True)
-        mask = mask_pix.max(axis=timeaxis).astype('bool')
+        if len(mask_pix) == 0:
+            mask = None
+        else:
+            mask = mask_pix.max(axis=timeaxis).astype('bool')
     elif subtract_time_average:
         # subtracting mean spectrum from all spectra
         dsub = data - data.mean(axis=timeaxis)
@@ -1264,7 +1267,7 @@ def build_cube_2014(sourcename,
 
 
 
-def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True,
+def make_high_mergecube(pca_clean=True,
                         scanblsub=True,
                         timewise_pca=False,
                         mergefile2=None):
@@ -1314,12 +1317,23 @@ def make_high_mergecube(datasets_2014=datasets_2014, pca_clean=True,
 
 
 
-def make_low_mergecube(datasets_2014=datasets_2014):
+def make_low_mergecube(datasets_2014=datasets_2014, pca_clean=True,
+                       scanblsub=True, timewise_pca=False, mergefile1=None):
     mergefile1 = 'APEX_H2CO_merge_low'
     make_blanks_merge(os.path.join(mergepath,mergefile1), lowhigh='low')
-    build_cube_ao(window='low', mergefile=True, freq=True, outpath=mergepath)
+    build_cube_ao(window='low',
+                  mergefile=True,
+                  freq=True,
+                  outpath=mergepath,
+                  datapath=june2013datapath,
+                  timewise_pca=timewise_pca,
+                  pca_clean=pca_clean,
+                  scanblsub=scanblsub,
+                  mergefilename=os.path.join(mergepath, mergefile1),
+                 )
     build_cube_2013(mergefile=mergefile1,
                     outpath=mergepath,
+                    datapath=june2013datapath,
                     lowhigh='low',
                     scanblsub=True)
 
@@ -1610,10 +1624,13 @@ def do_extract_subcubes(outdir=mergepath):
             log.info("Skipping line {0}".format(line))
 
 
-def do_everything():
-    make_high_mergecube(mergefile2='APEX_H2CO_merge_high')
-    make_low_mergecube()
+def do_everything(pca_clean=True, scanblsub=True,
+                  timewise_pca=False, mergefile2=None):
+    make_high_mergecube(mergefile2='APEX_H2CO_merge_high', pca_clean=pca_clean,
+                        scanblsub=scanblsub, timewise_pca=timewise_pca)
+    #make_low_mergecube() # there's only one really useful overlap region
     os.chdir(mergepath)
+    # vsmoothds is made here:
     os.system('./APEX_H2CO_merge_high_starlink_custom.sh')
     os.chdir('../')
     do_extract_subcubes(outdir=mergepath)
