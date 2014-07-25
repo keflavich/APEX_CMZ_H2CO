@@ -1625,6 +1625,11 @@ def do_everything(pca_clean=True, scanblsub=False,
                   timewise_pca=True, mergefile2='APEX_H2CO_merge_high'):
     make_high_mergecube(mergefile2=mergefile2, pca_clean=pca_clean,
                         scanblsub=scanblsub, timewise_pca=timewise_pca)
+
+    do_postprocessing()
+
+
+def do_postprocessing(mergefile2='APEX_H2CO_merge_high'):
     #make_low_mergecube() # there's only one really useful overlap region
     os.chdir(mergepath)
     # vsmoothds is made here:
@@ -1690,6 +1695,9 @@ def do_everything(pca_clean=True, scanblsub=False,
             baseline_cube(mergepath+'APEX_{0}_vsmooth.fits'.format(line),
                           maskfn=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
+    #compute_noise_high(mergepath+'APEX_H2CO_303_202_bl',[350,400])
+    #compute_noise_high(mergepath+'APEX_H2CO_303_202_smooth_bl',[175,200])
+    #compute_noise_high(mergepath+'APEX_H2CO_303_202_vsmooth_bl',[80,100])
     signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_sub_noise.fits'),
                               grow=2)
@@ -1971,7 +1979,7 @@ def temperaturemap(ratio_to_tem, path=h2copath, ratio=True):
                 if 'cube' not in suf:
                     mask = fits.getdata(path+'APEX_H2CO_322_221{0}_mask_integ.fits'.format(smooth)) > 0.0025
                 else:
-                    mask = fits.getdata(path+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth.strip('_bl'))).astype('bool')
+                    mask = fits.getdata(path+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth.rstrip('_bl'))).astype('bool')
                 tmap[True-mask] = np.nan
                 rf[0].data = tmap
                 rf.writeto(pfx+'_temperature_masked.fits',clobber=True)

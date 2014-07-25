@@ -111,7 +111,7 @@ def parameter_grid_explore(build_cube_function,
 
         fpath = os.path.join(outpath,
                              fname_template.format(source_name=source_name,
-                                                   lowhigh='low',
+                                                   lowhigh=lowhigh,
                                                    suffix=suffix))
         cube = spectral_cube.SpectralCube.read(fpath)
 
