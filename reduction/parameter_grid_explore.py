@@ -57,6 +57,15 @@ def build_cube_function_2014(test_dataset, sourcename, outpath, pars, suffix):
                                     extra_suffix="_"+suffix,
                                     **pars)
 
+def parameter_grid_explore_2014():
+    return parameter_grid_explore(build_cube_function=build_cube_function_2014,
+                                  test_dataset='M-093.F-0009-2014-2014-04/M-093.F-0009-2014-2014-05-12',
+                                  source_name='MAP_055',
+                                  fname_template='APEX_H2CO_2014_{source_name}_{lowhigh}_{suffix}_sub.fits',
+                                  lowhigh='low',
+                                  outpath=outpath,)
+
+
 def build_cube_function_2013(test_dataset, sourcename, outpath, pars, suffix):
     make_apex_cubes.build_cube_2013(datasets=[test_dataset],
                                     lowhigh='high',
@@ -69,18 +78,17 @@ def parameter_grid_explore_2013():
     return parameter_grid_explore(build_cube_function=build_cube_function_2013,
                                   test_dataset='M-091.F-0019-2013-2013-06-11',
                                   source_name=None,
+                                  lowhigh='high',
+                                  fname_template='APEX_H2CO_2013_{lowhigh}_{suffix}_sub.fits',
                                   outpath=outpath,)
 
 
-def parameter_grid_explore_2014():
-    return parameter_grid_explore(build_cube_function=build_cube_function_2014,
-                                  test_dataset='M-093.F-0009-2014-2014-04/M-093.F-0009-2014-2014-05-12',
-                                  source_name='MAP_055',
-                                  outpath=outpath,)
 
 def parameter_grid_explore(build_cube_function,
                            test_dataset='M-093.F-0009-2014-2014-04/M-093.F-0009-2014-2014-05-12',
                            source_name='MAP_055', 
+                           fname_template='',
+                           lowhigh='',
                            outpath='/Volumes/passport/apex/parameter_tests/',):
 
     if not os.path.exists(outpath):
@@ -102,9 +110,9 @@ def parameter_grid_explore(build_cube_function,
         log.info("Finished {0} in {1}s".format(suffix, dt))
 
         fpath = os.path.join(outpath,
-                             'APEX_H2CO_2014_{source_name}_{lowhigh}_{suffix}_sub.fits'.
-                             format(source_name=source_name, lowhigh='low',
-                                    suffix=suffix))
+                             fname_template.format(source_name=source_name,
+                                                   lowhigh='low',
+                                                   suffix=suffix))
         cube = spectral_cube.SpectralCube.read(fpath)
 
         h2cocube = cube.with_spectral_unit(u.km/u.s, rest_value=218.22219*u.GHz, velocity_convention='radio')
