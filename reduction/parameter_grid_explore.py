@@ -53,6 +53,7 @@ def build_cube_function_2014(test_dataset, sourcename, outpath, pars, suffix):
                                     datasets=[test_dataset],
                                     lowhigh='low',
                                     outpath=outpath,
+                                    datapath=make_apex_cubes.april2014path,
                                     extra_suffix="_"+suffix,
                                     **pars)
 
@@ -60,13 +61,13 @@ def build_cube_function_2013(test_dataset, sourcename, outpath, pars, suffix):
     make_apex_cubes.build_cube_2013(datasets=[test_dataset],
                                     lowhigh='high',
                                     outpath=outpath,
+                                    datapath=make_apex_cubes.june2013path,
                                     extra_suffix="_"+suffix,
                                     **pars)
 
 def parameter_grid_explore_2013():
     return parameter_grid_explore(build_cube_function=build_cube_function_2013,
                                   test_dataset='M-091.F-0019-2013-2013-06-11',
-                                  dpath=make_apex_cubes.june2013path,
                                   source_name=None,
                                   outpath=outpath,)
 
@@ -75,13 +76,11 @@ def parameter_grid_explore_2014():
     return parameter_grid_explore(build_cube_function=build_cube_function_2014,
                                   test_dataset='M-093.F-0009-2014-2014-04/M-093.F-0009-2014-2014-05-12',
                                   source_name='MAP_055',
-                                  dpath=make_apex_cubes.april2014path,
                                   outpath=outpath,)
 
 def parameter_grid_explore(build_cube_function,
                            test_dataset='M-093.F-0009-2014-2014-04/M-093.F-0009-2014-2014-05-12',
                            source_name='MAP_055', 
-                           dpath=make_apex_cubes.april2014path,
                            outpath='/Volumes/passport/apex/parameter_tests/',):
 
     if not os.path.exists(outpath):
