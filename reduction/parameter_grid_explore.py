@@ -61,7 +61,7 @@ def build_cube_function_2013(test_dataset, sourcename, outpath, pars, suffix):
     make_apex_cubes.build_cube_2013(datasets=[test_dataset],
                                     lowhigh='high',
                                     outpath=outpath,
-                                    datapath=make_apex_cubes.june2013path,
+                                    datapath=make_apex_cubes.june2013datapath,
                                     extra_suffix="_"+suffix,
                                     **pars)
 
