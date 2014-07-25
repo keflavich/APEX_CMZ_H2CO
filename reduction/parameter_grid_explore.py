@@ -48,7 +48,7 @@ short_names = {'timewise_pca':'tp',
                'subtract_time_average':'tsub',
                'automask':'auto'}
 
-def build_cube_function_2014(test_dataset, sourcename, outpath, pars):
+def build_cube_function_2014(test_dataset, sourcename, outpath, pars, suffix):
     make_apex_cubes.build_cube_2014(source_name,
                                     datasets=[test_dataset],
                                     lowhigh='low',
@@ -56,7 +56,7 @@ def build_cube_function_2014(test_dataset, sourcename, outpath, pars):
                                     extra_suffix="_"+suffix,
                                     **pars)
 
-def build_cube_function_2013(test_dataset, sourcename, outpath, pars):
+def build_cube_function_2013(test_dataset, sourcename, outpath, pars, suffix):
     make_apex_cubes.build_cube_2013(datasets=[test_dataset],
                                     lowhigh='high',
                                     outpath=outpath,
@@ -96,7 +96,8 @@ def parameter_grid_explore(build_cube_function,
         build_cube_function(test_dataset=test_dataset,
                             sourcename=source_name,
                             outpath=outpath,
-                            pars=pars)
+                            pars=pars,
+                            suffix=suffix)
 
         dt = time.time() - t0
         log.info("Finished {0} in {1}s".format(suffix, dt))
