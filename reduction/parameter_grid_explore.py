@@ -67,6 +67,7 @@ def parameter_grid_explore_2013():
     return parameter_grid_explore(build_cube_function=build_cube_function_2013,
                                   test_dataset='M-091.F-0019-2013-2013-06-11',
                                   dpath=make_apex_cubes.june2013path,
+                                  source_name=None,
                                   outpath=outpath,)
 
 
@@ -93,7 +94,7 @@ def parameter_grid_explore(build_cube_function,
         log.info(suffix)
         t0 = time.time()
         build_cube_function(test_dataset=test_dataset,
-                            sourcename=sourcename,
+                            sourcename=source_name,
                             outpath=outpath,
                             pars=pars)
 
