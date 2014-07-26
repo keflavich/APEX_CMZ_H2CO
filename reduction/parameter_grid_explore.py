@@ -3,6 +3,7 @@ import itertools
 import inspect
 import os
 import time
+import operator
 import spectral_cube
 from astropy import units as u
 from astropy.io import fits
@@ -145,6 +146,9 @@ def parameter_grid_explore(build_cube_function,
                            'peak': peakh2co,
                            'spec': spec,
                            'time': dt}
+
+    times = {r:results[r]['time'] for r in results}
+    print sorted(times.iteritems(), key=operator.itemgetter(1))
 
     return results
 
