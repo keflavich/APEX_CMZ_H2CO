@@ -97,7 +97,7 @@ def parameter_grid_explore_ao():
                                   test_dataset='O-085.F-9311A-2010',
                                   source_name=None,
                                   lowhigh='high',
-                                  fname_template='APEX_H2CO_ao_{lowhigh}_{suffix}_sub.fits',
+                                  fname_template='APEX_H2CO_Ao_{lowhigh}_{suffix}_sub.fits',
                                   outpath=outpath,)
 
 
@@ -148,6 +148,7 @@ def parameter_grid_explore(build_cube_function,
                            'time': dt}
 
     times = {r:results[r]['time'] for r in results}
+    # http://stackoverflow.com/questions/613183/sort-a-python-dictionary-by-value
     print sorted(times.iteritems(), key=operator.itemgetter(1))
 
     return results
