@@ -83,6 +83,24 @@ def parameter_grid_explore_2013():
                                   outpath=outpath,)
 
 
+def build_cube_function_ao(test_dataset, sourcename, outpath, pars, suffix):
+    make_apex_cubes.build_cube_ao(datasets=[test_dataset],
+                                    lowhigh='high',
+                                    outpath=outpath,
+                                    datapath=make_apex_cubes.aorawpath,
+                                    extra_suffix="_"+suffix,
+                                    **pars)
+
+def parameter_grid_explore_ao():
+    return parameter_grid_explore(build_cube_function=build_cube_function_ao,
+                                  test_dataset='O-085.F-9311A-2010',
+                                  source_name=None,
+                                  lowhigh='high',
+                                  fname_template='APEX_H2CO_ao_{lowhigh}_{suffix}_sub.fits',
+                                  outpath=outpath,)
+
+
+
 
 def parameter_grid_explore(build_cube_function,
                            test_dataset='M-093.F-0009-2014-2014-04/M-093.F-0009-2014-2014-05-12',
