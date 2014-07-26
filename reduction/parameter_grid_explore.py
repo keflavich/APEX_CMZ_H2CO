@@ -84,12 +84,12 @@ def parameter_grid_explore_2013():
 
 
 def build_cube_function_ao(test_dataset, sourcename, outpath, pars, suffix):
-    make_apex_cubes.build_cube_ao(datasets=[test_dataset],
-                                    lowhigh='high',
-                                    outpath=outpath,
-                                    datapath=make_apex_cubes.aorawpath,
-                                    extra_suffix="_"+suffix,
-                                    **pars)
+    make_apex_cubes.build_cube_ao(window='high',
+                                  datasets=[test_dataset],
+                                  outpath=outpath,
+                                  datapath=make_apex_cubes.aorawpath,
+                                  extra_suffix="_"+suffix,
+                                  **pars)
 
 def parameter_grid_explore_ao():
     return parameter_grid_explore(build_cube_function=build_cube_function_ao,

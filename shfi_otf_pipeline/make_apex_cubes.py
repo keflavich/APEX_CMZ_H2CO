@@ -902,6 +902,7 @@ def build_cube_ao(window, freq=False, mergefile=None,
                   debug=False,
                   pca_clean=True,
                   timewise_pca=True,
+                  extra_suffix="",
                   **kwargs):
     """
     TODO: comment!
@@ -919,6 +920,9 @@ def build_cube_ao(window, freq=False, mergefile=None,
         cubefilename=os.path.join(outpath,'APEX_H2CO_Ao_Freq_%s' % window)
     else:
         cubefilename=os.path.join(outpath,'APEX_H2CO_Ao_%s' % window)
+
+    if extra_suffix:
+        cubefilename = cubefilename + extra_suffix
 
     #rcr = [-1000,0] if window == 'low' else [0,5000]
     xtel = 'AP-H201-F101' if window == 'high' else 'AP-H201-F102'
