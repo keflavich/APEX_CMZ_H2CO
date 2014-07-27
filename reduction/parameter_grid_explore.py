@@ -79,7 +79,7 @@ def build_cube_function_2013(test_dataset, sourcename, outpath, pars, suffix):
 
 def parameter_grid_explore_2013():
     return parameter_grid_explore(build_cube_function=build_cube_function_2013,
-                                  test_dataset='M-091.F-0019-2013-2013-06-08',
+                                  test_dataset='M-091.F-0019-2013-2013-06-12',
                                   source_name=None,
                                   lowhigh='high',
                                   fname_template='APEX_H2CO_2013_{lowhigh}_{suffix}_sub.fits',
