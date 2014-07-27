@@ -171,6 +171,8 @@ def plot_pargrid_results(results, outpath=outpath):
     intids,suffixes_sorted = zip(*suffixes_sortorder)
     for ii,suffix in enumerate(suffixes_sorted):
 
+
+        title_ids = re.sub("[0123]","",suffix)
         title = re.sub("[abcdefghijklmnopqrstuvwxyz_]","",suffix)
         pl.figure(1)
         pl.subplot(6,5,ii+1)
@@ -182,7 +184,7 @@ def plot_pargrid_results(results, outpath=outpath):
         pl.title(title)
         pl.xticks([])
         pl.yticks([])
-        pl.suptitle("Integrated")
+        pl.suptitle("Integrated\n{0}".format(title_ids))
 
         pl.figure(2)
         pl.subplot(6,5,ii+1)
@@ -193,7 +195,7 @@ def plot_pargrid_results(results, outpath=outpath):
         pl.title(title)
         pl.xticks([])
         pl.yticks([])
-        pl.suptitle("Peak")
+        pl.suptitle("Peak\n{0}".format(title_ids))
 
         pl.figure(3)
         pl.subplot(6,5,ii+1)
@@ -213,7 +215,7 @@ def plot_pargrid_results(results, outpath=outpath):
         pl.title(title)
         pl.xticks([])
         pl.yticks([])
-        pl.suptitle("Integrated: Difference from Fiducial (no cleaning)")
+        pl.suptitle("Integrated: Difference from Fiducial (no cleaning)\n{0}".format(title_ids))
 
         pl.figure(5)
         pl.subplot(6,5,ii+1)
@@ -224,7 +226,7 @@ def plot_pargrid_results(results, outpath=outpath):
         pl.title(title)
         pl.xticks([])
         pl.yticks([])
-        pl.suptitle("Integrated: Difference from TP1")
+        pl.suptitle("Integrated: Difference from TP1\n{0}".format(title_ids))
         
         pl.figure(6)
         pl.subplot(6,5,ii+1)
@@ -234,7 +236,7 @@ def plot_pargrid_results(results, outpath=outpath):
         pl.yticks([])
         #pl.ylim(-0.005,0.007)
         pl.xlim(1500,2500)
-        pl.suptitle("Spectrum: Difference from Fiducial (no cleaning)")
+        pl.suptitle("Spectrum: Difference from Fiducial (no cleaning)\n{0}".format(title_ids))
 
 
     pl.figure(1)
