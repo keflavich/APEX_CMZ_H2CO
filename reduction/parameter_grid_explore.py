@@ -153,9 +153,10 @@ def parameter_grid_explore(build_cube_function,
 
     return results
 
-def plot_pargrid_results(results):
+def plot_pargrid_results(results, outpath=outpath):
     for ii in range(1,7):
-        pl.figure(ii)
+        pl.close(ii)
+        pl.figure(ii, figsize=(20,20))
         pl.clf()
 
     for ii,suffix in enumerate(results):
