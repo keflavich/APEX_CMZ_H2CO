@@ -58,7 +58,7 @@ keys = ['scanblsub',
         'timewise_pca']
 
 def build_cube_function_2014(test_dataset, sourcename, outpath, pars, suffix):
-    make_apex_cubes.build_cube_2014(source_name,
+    make_apex_cubes.build_cube_2014(sourcename,
                                     datasets=[test_dataset],
                                     lowhigh='low',
                                     outpath=outpath,
