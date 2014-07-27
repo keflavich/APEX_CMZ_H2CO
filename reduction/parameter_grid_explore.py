@@ -161,7 +161,7 @@ def plot_pargrid_results(results, outpath=outpath):
 
     for ii,suffix in enumerate(results):
 
-        title = suffix.replace("abcdefghijklmnopqrstuvwxyz_")
+        title = suffix.replace("abcdefghijklmnopqrstuvwxyz_","")
         pl.figure(1)
         pl.subplot(6,5,ii+1)
         val = results[suffix]['integ'].value
