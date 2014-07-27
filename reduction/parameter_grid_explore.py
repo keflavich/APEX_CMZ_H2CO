@@ -164,7 +164,11 @@ def plot_pargrid_results(results, outpath=outpath):
         title = suffix.replace("abcdefghijklmnopqrstuvwxyz_")
         pl.figure(1)
         pl.subplot(6,5,ii+1)
-        pl.imshow(results[suffix]['integ'].value, vmin=-1e4, vmax=3e4)
+        val = results[suffix]['integ'].value
+        valok = np.isfinite(val)
+        pl.imshow(val,
+                  vmin=np.percentile(val[valok],1),
+                  vmax=np.percentile(val[valok],99),)
         pl.title(title)
         pl.xticks([])
         pl.yticks([])
@@ -172,7 +176,10 @@ def plot_pargrid_results(results, outpath=outpath):
 
         pl.figure(2)
         pl.subplot(6,5,ii+1)
-        pl.imshow(results[suffix]['peak'].data, vmin=0.01, vmax=2.7)
+        val = results[suffix]['peak'].data
+        pl.imshow(val,
+                  vmin=np.percentile(val[valok],1),
+                  vmax=np.percentile(val[valok],99),)
         pl.title(title)
         pl.xticks([])
         pl.yticks([])
@@ -181,7 +188,7 @@ def plot_pargrid_results(results, outpath=outpath):
         pl.figure(3)
         pl.subplot(6,5,ii+1)
         pl.plot(results[suffix]['spec'].value)
-        pl.ylim(-0.005,0.007)
+        #pl.ylim(-0.005,0.007)
         pl.xlim(1500,2500)
         pl.title(title)
         pl.xticks([])
@@ -189,7 +196,10 @@ def plot_pargrid_results(results, outpath=outpath):
 
         pl.figure(4)
         pl.subplot(6,5,ii+1)
-        pl.imshow(results[suffix]['integ'].value-results['blsub0_auto0_msub0_pca0_tsub0_tp0']['integ'].value, vmin=-1e4, vmax=3e4)
+        val = results[suffix]['integ'].value-results['blsub0_auto0_msub0_pca0_tsub0_tp0']['integ'].value
+        pl.imshow(val,
+                  vmin=np.percentile(val[valok],5),
+                  vmax=np.percentile(val[valok],95),)
         pl.title(title)
         pl.xticks([])
         pl.yticks([])
@@ -197,7 +207,10 @@ def plot_pargrid_results(results, outpath=outpath):
 
         pl.figure(5)
         pl.subplot(6,5,ii+1)
-        pl.imshow(results[suffix]['integ'].value-results['blsub0_auto0_msub1_pca1_tsub0_tp1']['integ'].value, vmin=-1e4, vmax=3e4)
+        val = results[suffix]['integ'].value-results['blsub0_auto0_msub1_pca1_tsub0_tp1']['integ'].value
+        pl.imshow(val,
+                  vmin=np.percentile(val[valok],1),
+                  vmax=np.percentile(val[valok],99),)
         pl.title(title)
         pl.xticks([])
         pl.yticks([])
@@ -209,7 +222,7 @@ def plot_pargrid_results(results, outpath=outpath):
         pl.title(title)
         pl.xticks([])
         pl.yticks([])
-        pl.ylim(-0.005,0.007)
+        #pl.ylim(-0.005,0.007)
         pl.xlim(1500,2500)
         pl.suptitle("Spectrum: Difference from Fiducial (no cleaning)")
 
