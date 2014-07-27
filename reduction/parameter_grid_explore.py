@@ -9,6 +9,7 @@ import numpy as np
 from astropy import units as u
 from astropy.io import fits
 import pylab as pl
+import re
 
 dirpath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) 
 
@@ -162,7 +163,7 @@ def plot_pargrid_results(results, outpath=outpath):
 
     for ii,suffix in enumerate(results):
 
-        title = suffix.replace("abcdefghijklmnopqrstuvwxyz_","")
+        title = re.sub("abcdefghijklmnopqrstuvwxyz_","",suffix)
         pl.figure(1)
         pl.subplot(6,5,ii+1)
         val = results[suffix]['integ'].value
