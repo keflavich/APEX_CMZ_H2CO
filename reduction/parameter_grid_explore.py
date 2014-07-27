@@ -5,6 +5,7 @@ import os
 import time
 import operator
 import spectral_cube
+import numpy as np
 from astropy import units as u
 from astropy.io import fits
 import pylab as pl
