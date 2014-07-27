@@ -50,6 +50,12 @@ short_names = {'timewise_pca':'tp',
                'subspectralmeans':'msub',
                'subtract_time_average':'tsub',
                'automask':'auto'}
+keys = ['scanblsub',
+        'automask',
+        'subspectralmeans',
+        'pca_clean',
+        'subtract_time_average',
+        'timewise_pca']
 
 def build_cube_function_2014(test_dataset, sourcename, outpath, pars, suffix):
     make_apex_cubes.build_cube_2014(source_name,
@@ -118,7 +124,7 @@ def parameter_grid_explore(build_cube_function,
     results = {}
 
     for pars in par_sets_pruned:
-        suffix = "_".join(short_names[k]+str(int(v)) for k,v in pars.iteritems()) 
+        suffix = "_".join(short_names[k]+str(int(pars[k])) for k in keys) 
         log.info(suffix)
         t0 = time.time()
         build_cube_function(test_dataset=test_dataset,
@@ -161,7 +167,9 @@ def plot_pargrid_results(results, outpath=outpath):
         pl.figure(ii, figsize=(20,20))
         pl.clf()
 
-    for ii,suffix in enumerate(results):
+    suffixes_sortorder = sorted([(int(re.sub("[abcdefghijklmnopqrstuvwxyz_]","",suffix)),suffix) for suffix in results])
+    intids,suffixes_sorted = zip(*suffixes_sortorder)
+    for ii,suffix in enumerate(suffixes_sorted):
 
         title = re.sub("[abcdefghijklmnopqrstuvwxyz_]","",suffix)
         pl.figure(1)
