@@ -450,6 +450,9 @@ def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
                   debug=False, kernel_fwhm=10./3600.):
 
 
+    if debug and log.level > 10:
+        log.level = 10
+
     log.info("Data shape: {}".format(data.shape))
     if data.ndim != 2:
         raise ValueError('Data shape is NOT ok.')
@@ -493,7 +496,7 @@ def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
                               nhits=nhits,
                               data_iterator=data_iterator,
                               coord_iterator=coord_iterator,
-                              velo_iterator=velo_iterator, debug=debug,
+                              velo_iterator=velo_iterator,
                               progressbar=True, coordsys='galactic',
                               velocity_offset=0.0, negative_mean_cut=None,
                               add_with_kernel=True, kernel_fwhm=kernel_fwhm,
@@ -1035,7 +1038,7 @@ def build_cube_2013(mergefile=None,
                     kernel_fwhm=10/3600.,
                     scanblsub=False,
                     timewise_pca=True,
-                    pca_clean=True,
+                    pca_clean=False, # 2013 data can't handle cleaning.  =(
                     extra_suffix="",
                     verbose=True, **kwargs):
     if mergefile:
