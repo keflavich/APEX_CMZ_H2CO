@@ -531,6 +531,8 @@ def add_pipeline_header_data(header):
     from .version import version,githash
     header['PIPEVERS'] = version
     header['PIPEGIT']  = githash
+    impory sdpy.version
+    header['SDPYVERS'] = sdpy.version.version
     header['PIPEDATE'] = time.strftime("%y_%m_%d_%H:%M:%S")
 
 def make_blanks(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
