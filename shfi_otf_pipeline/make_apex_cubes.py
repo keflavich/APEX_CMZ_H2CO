@@ -1306,9 +1306,11 @@ def build_cube_2014(sourcename,
 
 
 
-def make_high_mergecube(pca_clean=True,
-                        scanblsub=False,
-                        timewise_pca=True,
+def make_high_mergecube(pca_clean={'2014':True,
+                                   '2013':False,
+                                   'ao':True},
+                        scanblsub={'2014':False, '2013':False, 'ao':False},
+                        timewise_pca={'2014': True, '2013':False, 'ao':True},
                         mergefile2=None):
 
     if mergefile2 is None:
@@ -1331,17 +1333,17 @@ def make_high_mergecube(pca_clean=True,
                     outpath=mergepath,
                     datapath=april2014path,
                     lowhigh='low',
-                    pca_clean=pca_clean,
-                    timewise_pca=timewise_pca,
-                    scanblsub=scanblsub,
+                    pca_clean=pca_clean['2014'],
+                    timewise_pca=timewise_pca['2014'],
+                    scanblsub=scanblsub['2014'],
                     datasets=datasets_2014)
 
     log.info("Building Ao cubes")
     # ('ao', 'high'): (218.0, 219.0),
     build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath,
-                  pca_clean=pca_clean, timewise_pca=timewise_pca,
+                  pca_clean=pca_clean['ao'], timewise_pca=timewise_pca['ao'],
                   mergefilename=os.path.join(mergepath, mergefile2),
-                  scanblsub=scanblsub,
+                  scanblsub=scanblsub['ao'],
                   datapath=aorawpath)
 
     log.info("Building 2013 cubes")
@@ -1350,9 +1352,9 @@ def make_high_mergecube(pca_clean=True,
                     outpath=mergepath,
                     datapath=june2013datapath,
                     lowhigh='high',
-                    timewise_pca=timewise_pca,
-                    pca_clean=pca_clean,
-                    scanblsub=scanblsub)
+                    timewise_pca=timewise_pca['2013'],
+                    pca_clean=pca_clean['2013'],
+                    scanblsub=scanblsub['2013'])
 
 
 
