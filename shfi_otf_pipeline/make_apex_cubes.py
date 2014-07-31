@@ -1037,7 +1037,7 @@ def build_cube_2013(mergefile=None,
                     datasets=datasets_2013,
                     kernel_fwhm=10/3600.,
                     scanblsub=False,
-                    timewise_pca=True,
+                    timewise_pca=False, # 2013 data can't handle cleaning.
                     pca_clean=False, # 2013 data can't handle cleaning.  =(
                     extra_suffix="",
                     verbose=True, **kwargs):
