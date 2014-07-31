@@ -528,12 +528,27 @@ def add_pipeline_header_data(header):
     header['PIPELINE'] = 'Ginsburg 2014 SHFI OTF Pipeline'
     header['TELESCOP'] = 'APEX'
     header['INSTRUME'] = 'SHFI-1'
+    header['PIPEDATE'] = (time.strftime("%y_%m_%d_%H:%M:%S"), 'Date pipeline was run')
     from .version import version,githash
     header['PIPEVERS'] = version
     header['PIPEGIT']  = githash
-    impory sdpy.version
-    header['SDPYVERS'] = sdpy.version.version
-    header['PIPEDATE'] = time.strftime("%y_%m_%d_%H:%M:%S")
+    import sdpy.version
+    header['SDPYVERS'] = (sdpy.version.version, 'sdpy version')
+    import astropy.version
+    header['ASTROPYV'] = (astropy.version.version,'Astropy version')
+    try:
+        import pyspeckit
+        header['PYSPECKV'] = pyspeckit.__version__
+    except ImportError,AttributeError:
+        pass
+    import FITS_tools.version
+    header['FITSTOOV'] = (FITS_tools.version.version,'FITS_tools version')
+    import scipy.version
+    header['SCIPYVER'] = (scipy.version.version,'scipy version')
+    import numpy.version
+    header['NUMPYVER'] = (numpy.version.version,'numpy version')
+    import spectral_cube.version
+    header['SPCUBEVE'] = (spectral_cube.version.version,'spectral_cube version')
 
 def make_blanks(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
 
