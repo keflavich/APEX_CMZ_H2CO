@@ -1664,7 +1664,7 @@ def do_postprocessing(mergefile2='APEX_H2CO_merge_high'):
     os.system('./APEX_H2CO_merge_high_starlink_custom.sh')
     os.chdir('../')
     do_extract_subcubes(outdir=mergepath, frange=[218,219])
-    compute_noise_high()
+    compute_noise_high(mergepath+'APEX_H2CO_merge_high_sub', pixrange=[700,900])
     compute_noise_high(mergepath+'APEX_H2CO_merge_high_smooth',[203,272])
     compute_noise_high(mergepath+'APEX_H2CO_merge_high_vsmoothds',[203,272])
     compute_noise_high(mergepath+'APEX_H2CO_303_202_vsmooth',[75,100])
