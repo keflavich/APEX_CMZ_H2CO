@@ -38,6 +38,12 @@ logfile = ("".join([time.strftime("apexcmzpipeline{0}_%y_%m_%d_%H:%M:%S"),".log"
 #                                        scanblsub={'2014':False, '2013':False, 'ao':False},
 #                                        timewise_pca={'2014':False, '2013':False, 'ao':False}, 
 #                                        mergefile2='APEX_H2CO_merge_high_nopca_noscanblsub')
+# with log.log_to_file(logfile.replace(".log","_only_clean_2014.log")):
+#    make_apex_cubes.make_high_mergecube(pca_clean={'2014':True, '2013':False, 'ao':False},
+#                                        scanblsub={'2014':False, '2013':False, 'ao':False},
+#                                        timewise_pca={'2014':True, '2013':False, 'ao':False}, 
+#                                        mergefile2='APEX_H2CO_merge_high_pca2014only')
+#
 
 #/scratch/aginsbur/apex/reduced/april2014/M-093.F-0009-2014-2014-04/M-093.F-0009-2014-2014-05-08.apex
 #/scratch/aginsbur/apex/APEX_CMZ_H2CO/raw_data/M-093.F-0009-2014-2014-05-08.apex
