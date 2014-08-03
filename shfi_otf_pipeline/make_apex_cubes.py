@@ -1654,7 +1654,7 @@ def do_everything(pca_clean={'2014':True, '2013':False, 'ao':True},
     make_high_mergecube(mergefile2=mergefile2, pca_clean=pca_clean,
                         scanblsub=scanblsub, timewise_pca=timewise_pca)
 
-    do_postprocessing()
+    do_postprocessing(mergefile2=mergefile2)
 
 
 def do_postprocessing(mergefile2='APEX_H2CO_merge_high'):
