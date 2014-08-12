@@ -518,6 +518,9 @@ def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
 
 def add_pipeline_parameters_to_file(fileprefix, pipeline_type, **kwargs):
 
+    if not os.path.exists(fileprefix+".fits"):
+        return False
+
     f = fits.open(fileprefix+".fits")
     f[0].header['PIPECALL'] = (pipeline_type,'build_cube function called')
     for ii,(k,v) in enumerate(kwargs.iteritems()):
