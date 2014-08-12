@@ -2079,9 +2079,13 @@ def do_2014(datasets=datasets_2014, scanblsub=False):
         for source in datasets[dataset]:
             build_cube_2014(source, datasets=[dataset], scanblsub=scanblsub,
                             mergefile='APEX_2014_low',
+                            outpath=mergepath,
+                            datapath=april2014path,
                             lowhigh='low')
             build_cube_2014(source, datasets=[dataset], scanblsub=scanblsub,
                             mergefile='APEX_2014_high',
+                            outpath=mergepath,
+                            datapath=april2014path,
                             lowhigh='high')
 
 
