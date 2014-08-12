@@ -2081,12 +2081,10 @@ def do_2014(datasets=datasets_2014, scanblsub=False):
     for dataset in datasets:
         for source in datasets[dataset]:
             build_cube_2014(source, datasets=[dataset], scanblsub=scanblsub,
-                            mergefile='APEX_2014_low',
                             outpath=mergepath,
                             datapath=april2014path,
                             lowhigh='low')
             build_cube_2014(source, datasets=[dataset], scanblsub=scanblsub,
-                            mergefile='APEX_2014_high',
                             outpath=mergepath,
                             datapath=april2014path,
                             lowhigh='high')
@@ -2105,6 +2103,7 @@ def do_2014_merge(datasets=datasets_2014):
         build_cube_2014(mapnames,
                         mergefile=mergefile,
                         outpath=mergepath,
+                        datapath=april2014path,
                         lowhigh=lowhigh,
                         datasets=datasets)
 
