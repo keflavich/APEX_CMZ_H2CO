@@ -1616,7 +1616,8 @@ bandwidths = {'H2CO_303_202':25,
               #'H2S 2(2,0)-2(1,1)': 216.71044, ??
               }
 
-
+lines218 = {x:v for x,v in all_lines.iteritems()
+            if 'H2CO' in x or 'CH3OH_422_312' in x}
 
 def make_line_mask(freqarr, lines=bright_lines):
     mask = np.ones(freqarr.size, dtype='bool')
@@ -1627,9 +1628,10 @@ def make_line_mask(freqarr, lines=bright_lines):
     return mask
 
 
-def do_extract_subcubes(outdir=mergepath, frange=None):
+def do_extract_subcubes(outdir=mergepath, merge_prefix='APEX_H2CO_merge',
+                        frange=None, lines=all_lines):
 
-    for line,freq in all_lines.iteritems():
+    for line,freq in lines.iteritems():
         if frange is not None:
             if freq<frange[0] or freq>frange[1]:
                 log.info("Skipping line {0}".format(line))
@@ -1637,9 +1639,9 @@ def do_extract_subcubes(outdir=mergepath, frange=None):
 
         log.info("Extracting {0}".format(line))
         if freq < 218:
-            cubefilename = os.path.join(mergepath,'APEX_H2CO_merge_low_sub.fits')
+            cubefilename = os.path.join(mergepath, merge_prefix+'_low_sub.fits')
         else:
-            cubefilename = os.path.join(mergepath,'APEX_H2CO_merge_high_sub.fits')
+            cubefilename = os.path.join(mergepath, merge_prefix+'_high_sub.fits')
 
         header = fits.getheader(cubefilename)
         ww = wcs.WCS(header)
@@ -1647,11 +1649,14 @@ def do_extract_subcubes(outdir=mergepath, frange=None):
         nax = header['NAXIS%i' % (ww.wcs.spec+1)]
         freqarr = wspec.wcs_pix2world(np.arange(nax),0)[0]
         if freq*1e9 > freqarr.min() and freq*1e9 < freqarr.max():
-            extract_subcube(cubefilename, 'APEX_{0}_smooth.fits'.format(line),
+            extract_subcube(cubefilename,
+                            os.path.join(outdir, 'APEX_{0}_smooth.fits').format(line),
                             linefreq=freq*u.GHz, smooth=True)
-            extract_subcube(cubefilename, 'APEX_{0}_vsmooth.fits'.format(line),
+            extract_subcube(cubefilename,
+                            os.path.join(outdir, 'APEX_{0}_vsmooth.fits').format(line),
                             linefreq=freq*u.GHz, smooth=True, vsmooth=True)
-            extract_subcube(cubefilename, 'APEX_{0}.fits'.format(line),
+            extract_subcube(cubefilename,
+                            os.path.join(outdir, 'APEX_{0}.fits').format(line),
                             linefreq=freq*u.GHz)
         else:
             log.info("Skipping line {0}".format(line))
@@ -1664,16 +1669,17 @@ def do_everything(pca_clean={'2014':True, '2013':False, 'ao':True},
     make_high_mergecube(mergefile2=mergefile2, pca_clean=pca_clean,
                         scanblsub=scanblsub, timewise_pca=timewise_pca)
 
-    do_postprocessing(mergefile2=mergefile2)
+    do_postprocessing()
 
 
-def do_postprocessing(mergefile2='APEX_H2CO_merge_high'):
+def do_postprocessing():
     #make_low_mergecube() # there's only one really useful overlap region
     os.chdir(mergepath)
     # vsmoothds is made here:
     os.system('./APEX_H2CO_merge_high_starlink_custom.sh')
     os.chdir('../')
-    do_extract_subcubes(outdir=mergepath, frange=[218,219])
+    do_extract_subcubes(outdir=mergepath, frange=[218,219],
+                        lines=lines218)
     compute_noise_high(mergepath+'APEX_H2CO_merge_high_sub', pixrange=[700,900])
     compute_noise_high(mergepath+'APEX_H2CO_merge_high_smooth',[203,272])
     compute_noise_high(mergepath+'APEX_H2CO_merge_high_vsmoothds',[203,272])
@@ -1711,7 +1717,7 @@ def do_postprocessing(mergefile2='APEX_H2CO_merge_high'):
     # On second thought, let's not go to camelot
     # (this function proved ineffective)
 
-    for line in all_lines:
+    for line in lines218:
         fn = mergepath+'APEX_{0}.fits'.format(line)
         if os.path.exists(fn):
             integrate_mask(mergepath+'APEX_{0}'.format(line),
@@ -1724,7 +1730,7 @@ def do_postprocessing(mergefile2='APEX_H2CO_merge_high'):
         else:
             log.debug("File {0} does not exist".format(fn))
 
-    for line in all_lines:
+    for line in lines218:
         if os.path.exists(mergepath+'APEX_{0}.fits'.format(line)):
             baseline_cube(mergepath+'APEX_{0}.fits'.format(line),
                           maskfn=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
@@ -1746,7 +1752,7 @@ def do_postprocessing(mergefile2='APEX_H2CO_merge_high'):
                               noise=fits.getdata(mergepath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
                               sigmacut=3)
 
-    for line in all_lines:
+    for line in lines218:
         if os.path.exists(mergepath+'APEX_{0}_bl.fits'.format(line)):
             integrate_mask(mergepath+'APEX_{0}_bl'.format(line),
                            mask=mergepath+'APEX_H2CO_303_202_mask.fits')
