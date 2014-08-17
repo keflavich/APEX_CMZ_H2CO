@@ -1,0 +1,10 @@
+{"Brick SW":           {'ncomp':1, 'velo':[38]},
+ "Brick NE":           {'ncomp':2, 'velo':[38,16]},
+ "50kms A":            {'ncomp':1, 'velo':[53],},
+ "Sgr A":              {'ncomp':1, 'velo':[46],},
+ "20 kms":             {'ncomp':1, 'velo':[16],},
+ "Sgr B2 SW":          {'ncomp':2, 'velo':[51,80]},
+ "Sgr B2 NE":          {'ncomp':2, 'velo':[65,80]},
+ "WarmSpot":           {'ncomp':2, 'velo':[29,50]},
+ "CoolSpot":           {'ncomp':1, 'velo':[42]},
+ "50kmsColdExtension": {'ncomp':2, 'velo':[25,60]},}
