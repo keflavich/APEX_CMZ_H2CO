@@ -39,7 +39,8 @@ shallow observations we have acquired.
 
 \subsection{Reduction}
 \subsubsection{Calibration}
-Calibration was performed at the telescope using the standard APEX calibration tools
+Calibration was performed at the telescope using the standard APEX calibration
+tools
 \footnote{See the observing manuals:
 \url{www.apex-telescope.org/documents/public/APEX-MPI-MAN-0012.pdf}
 \url{www.apex-telescope.org/documents/public/APEX-MPI-MAN-0013.pdf} }.
@@ -51,7 +52,7 @@ pointing errors \todo{???} ($\sigma<2$\arcsec ?).
 Spectra were removed if they showed excessive noise compared to the
 theoretically expectation given the measured system temperature.  As in
 \citet{Ao2013a}, the threshold was set to $1.5\times$ the theoretical noise,
-i.e. $1.5 \sqrt{2} T_{sys} (\Delta\nu t_{exp})**0.5$, where $t_{exp}$ is the
+i.e. $1.5 \sqrt{2} T_{sys} (\Delta\nu t_{exp})^0.5$, where $t_{exp}$ is the
 exposure time (integration time) per spectrum in seconds and $\Delta\nu$ is the
 channel width in Hz.  This approach resulted in $\sim0.2\%$ of the data being
 removed.  
@@ -61,44 +62,42 @@ from the continuum source.  We therefore disabled flagging in a
 $\sim2.5\arcmin$ box around Sgr B2.
 
 
-\subsubsection{Baselining}
-\label{sec:baseline}
-The data showed significant baseline structure, leading to large-scale
-correlated components in the resulting spectra.  Removing these baselines by
-the usual technique of masking out the emitting spectral region and fitting a
-low-order polynomial to the surroundings is somewhat impractical in the
-Galactic Center, where baseline ripples are on comparable scales to the
-extremely wide spectral lines.
+% Removing these baselines by
+% the usual technique of masking out the emitting spectral region and fitting a
+% low-order polynomial to the surroundings is somewhat impractical in the
+% Galactic Center, where baseline ripples are on comparable scales to the
+% extremely wide spectral lines.
 
-We perform a scan-by-scan baseline subtraction as follows: 
-\begin{enumerate}
-    \item Compute the mean spectrum across the scan
-    \item Identify pixels $>1-\sigma$ above the mean spectrum to be ignored
-        when baseline fitting (this is a simple `line masking' process)
-    \item Fit a line to each spectral channel across the scan
-    \item Smooth the fitted line parameters with a gaussian with with
-        $\sigma=10$ channels, interpolating into the line-masked regions
-    \item Subtract the fitted baselines
-\end{enumerate}
-
-We therefore adopted a principle component analysis (PCA) baseline removal
-approach in which the data were spectrally smoothed and downsampled by an
-additional factor of 25, for a characteristic frequency scale of 15 MHz.  The
-data had their means subtracted before PCA cleaning so that only time-variable
-baseline variation was removed.  The resulting data were decomposed into
-eigenspectra, of which the 3 most correlated components were then set to zero.
-These components visually match the baseline ripples, and due to the wide
-smoothing (20 \kms resolution), no line information is lost.  The selection of
-3 components was determined empirically by examining the eigenspectra; a test
-removing the first 10 components showed no significant difference in the
-cleaning but did show signs of extracting large-scale correlated signal.
-
-\Figure{figures/M-091.F-0019-2013-2013-06-08_PCA_high_diagnostic.png}
-{The first 3 eigenspectra from an observation taken on June 8, 2013.  These
-show the baselines that are removed by PCA cleaning.  They do not include any
-signal from the spectral lines.  \todo{This will be
-replaced with a higher-quality figure}}
-{fig:eigenspectra}{0.5}{0}
+%This method was abandoned: it resulted in negative bowls
+% We perform a scan-by-scan baseline subtraction as follows: 
+% \begin{enumerate}
+%     \item Compute the mean spectrum across the scan
+%     \item Identify pixels $>1-\sigma$ above the mean spectrum to be ignored
+%         when baseline fitting (this is a simple `line masking' process)
+%     \item Fit a line to each spectral channel across the scan
+%     \item Smooth the fitted line parameters with a gaussian with with
+%         $\sigma=10$ channels, interpolating into the line-masked regions
+%     \item Subtract the fitted baselines
+% \end{enumerate}
+% 
+% We therefore adopted a principle component analysis (PCA) baseline removal
+% approach in which the data were spectrally smoothed and downsampled by an
+% additional factor of 25, for a characteristic frequency scale of 15 MHz.  The
+% data had their means subtracted before PCA cleaning so that only time-variable
+% baseline variation was removed.  The resulting data were decomposed into
+% eigenspectra, of which the 3 most correlated components were then set to zero.
+% These components visually match the baseline ripples, and due to the wide
+% smoothing (20 \kms resolution), no line information is lost.  The selection of
+% 3 components was determined empirically by examining the eigenspectra; a test
+% removing the first 10 components showed no significant difference in the
+% cleaning but did show signs of extracting large-scale correlated signal.
+% 
+% \Figure{figures/M-091.F-0019-2013-2013-06-08_PCA_high_diagnostic.png}
+% {The first 3 eigenspectra from an observation taken on June 8, 2013.  These
+% show the baselines that are removed by PCA cleaning.  They do not include any
+% signal from the spectral lines.  \todo{This will be
+% replaced with a higher-quality figure}}
+% {fig:eigenspectra}{0.5}{0}
 
 
 \subsubsection{Mapmaking}
@@ -124,6 +123,7 @@ Jy/K)\footnote{\url{http://www.apex-telescope.org/telescope/efficiency/}}.
 
 
 \section{Signal Extraction}
+\label{sec:signal}
 We use the method described partially in \citet{Ao2013a} and more thoroughly in
 \citet{Dame2011b} to mask the data cubes at locations of significant signal in 
 the brightest line. 
@@ -148,6 +148,16 @@ line in PPV space, so we shifted the \formaldehyde mask to the velocity of the
 \methanol line in the \formaldehyde \threetwotwo cube and excluded any pixels
 expected to have signal.  There were XXX voxels excluded in this fashion.
 
+
+\subsubsection{Baselining}
+\label{sec:baseline}
+The data showed significant baseline structure, leading to large-scale
+correlated components in the resulting spectra.  The baselines were removed
+after cube generation by first identifying bright regions in the \para
+\threeohthree line using the technique described in Section \ref{sec:signal},
+masking those out for each other line, then fitting a 5th-order polynomial to
+the remaining spectra over the velocity range -150 to 250 \kms and subtracting
+it.
 
 \section{Ratio and Temperature Maps}
 \label{sec:h2co}

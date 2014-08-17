@@ -2,7 +2,7 @@ import pyregion
 import pyspeckit
 from paths import h2copath, mergepath, figurepath, regpath
 import os
-from pyspeckit_fitting import h2co_radex_fitter, simplemodel, simple_fitter
+from pyspeckit_fitting import simplemodel, simple_fitter
 from astropy.io import fits
 
 
@@ -14,9 +14,10 @@ if 'cube' not in locals():
     cube.errorcube = noise[None,:,:] * np.ones(cube.cube.shape)
     spectra = {}
 
-cube.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
-                         multisingle='multi')
-cube.Registry.add_fitter('h2co_simple', simple_fitter, 4, multisingle='multi')
+# Not necessary:
+#cube.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
+#                         multisingle='multi')
+#cube.Registry.add_fitter('h2co_simple', simple_fitter, 4, multisingle='multi')
 
 #spectra = {
 #        'brick1': cube.get_apspec((0.2426,0.0081,30), coordsys='galactic', wunit='arcsec'),
@@ -52,8 +53,6 @@ for reg in regs:
     velos = pars[sp.specname]['velo']
     spname = sp.specname.replace(" ","_")
 
-    sp.specfit.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
-                             multisingle='multi')
     sp.specfit.Registry.add_fitter('h2co_simple', simple_fitter, 4, multisingle='multi')
     guesses_simple = [x for ii in range(ncomp) 
                       for x in (1,velos[ii],5,0.5,1)]
@@ -73,6 +72,8 @@ for reg in regs:
                           else 5))
               ]
 
+    sp.specfit.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
+                             multisingle='multi')
     sp.specfit(fittype='h2co_mm_radex', multifit=True,
                guesses=guesses,
                limits=[(10,300),(11,15),(3,5.5),(-105,105),(1,width_limit)]*ncomp,

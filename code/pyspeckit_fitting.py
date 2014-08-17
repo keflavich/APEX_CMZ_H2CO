@@ -1,5 +1,6 @@
 import pyspeckit
 import numpy as np
+from astropy import log
 from astropy.io import fits
 from pyspeckit.spectrum import models
 from pyspeckit.spectrum.models.model import SpectralModel
@@ -7,47 +8,51 @@ import FITS_tools
 from paths import h2copath, mergepath, figurepath
 from shfi_otf_pipeline.make_apex_cubes import tm
 
-# create the Formaldehyde Radex fitter
-# This step cannot be easily generalized: the user needs to read in their own grids
-texgrid1 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tex1.fits')
-taugrid1 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tau1.fits')
-texgrid2 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tex2.fits')
-taugrid2 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tau2.fits')
-hdr = fits.getheader('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tau2.fits')
+try:
+    # create the Formaldehyde Radex fitter
+    # This step cannot be easily generalized: the user needs to read in their own grids
+    texgrid1 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tex1.fits')
+    taugrid1 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tau1.fits')
+    texgrid2 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tex2.fits')
+    taugrid2 = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tau2.fits')
+    hdr = fits.getheader('/Users/adam/work/h2co/radex/thermom/303-202_321-220_temperature_para_300Kmax_5kms_tau2.fits')
 
-texgrid1b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tex1.fits')
-taugrid1b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tau1.fits')
-texgrid2b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tex2.fits')
-taugrid2b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tau2.fits')
-hdrb = fits.getheader('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tau2.fits')
+    texgrid1b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tex1.fits')
+    taugrid1b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tau1.fits')
+    texgrid2b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tex2.fits')
+    taugrid2b = fits.getdata('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tau2.fits')
+    hdrb = fits.getheader('/Users/adam/work/h2co/radex/thermom/303-202_322-221_temperature_para_300Kmax_5kms_tau2.fits')
 
-# # this deserves a lot of explanation:
-# # models.formaldehyde.formaldehyde_radex is the MODEL that we are going to fit
-# # models.model.SpectralModel is a wrapper to deal with parinfo, multiple peaks,
-# # and annotations
-# # all of the parameters after the first are passed to the model function 
+    # # this deserves a lot of explanation:
+    # # models.formaldehyde.formaldehyde_radex is the MODEL that we are going to fit
+    # # models.model.SpectralModel is a wrapper to deal with parinfo, multiple peaks,
+    # # and annotations
+    # # all of the parameters after the first are passed to the model function 
 
-h2co_radex_fitter = SpectralModel(models.formaldehyde_mm.formaldehyde_mm_radex,
-                                  5,
-                                  parnames=['temperature','column','density','center','width'],
-                                  parvalues=[50,12,4.5,0,1],
-                                  parlimited=[(True,True), (True,True),
-                                              (True,True), (False,False),
-                                              (True,False)],
-                                  parlimits=[(5,300), (11,17), (3,7), (0,0), (0,0)],
-                                  parsteps=[0.01,0.01,0.1,0,0], fitunits='Hz',
-                                  texgrid=((218.1,218.3,texgrid1b),
-                                           (218.35,218.55,texgrid2b),
-                                           (218.6,218.85,texgrid2)),
-                                  # specify the frequency range over which the grid is valid (in GHz)
-                                  taugrid=((218.1,218.3,taugrid1b),
-                                           (218.35,218.55,taugrid2b),
-                                           (218.6,218.85,taugrid2)),
-                                  hdr=hdrb,
-                                  shortvarnames=("T","N","n","v","\\sigma"),
-                                  # specify the parameter names (TeX is OK)
-                                  grid_vwidth=5.0,
-                                  )
+    h2co_radex_fitter = SpectralModel(models.formaldehyde_mm.formaldehyde_mm_radex,
+                                      5,
+                                      parnames=['temperature','column','density','center','width'],
+                                      parvalues=[50,12,4.5,0,1],
+                                      parlimited=[(True,True), (True,True),
+                                                  (True,True), (False,False),
+                                                  (True,False)],
+                                      parlimits=[(5,300), (11,17), (3,7), (0,0), (0,0)],
+                                      parsteps=[0.01,0.01,0.1,0,0], fitunits='Hz',
+                                      texgrid=((218.1,218.3,texgrid1b),
+                                               (218.35,218.55,texgrid2b),
+                                               (218.6,218.85,texgrid2)),
+                                      # specify the frequency range over which the grid is valid (in GHz)
+                                      taugrid=((218.1,218.3,taugrid1b),
+                                               (218.35,218.55,taugrid2b),
+                                               (218.6,218.85,taugrid2)),
+                                      hdr=hdrb,
+                                      shortvarnames=("T","N","n","v","\\sigma"),
+                                      # specify the parameter names (TeX is OK)
+                                      grid_vwidth=5.0,
+                                      )
+except IOError as ex:
+    log.exception("Could not read files from disk: cannot load H2CO RADEX fitter")
+    log.exception(ex)
 
 
 def simplemodel(xarr, amplitude, velocity, width, ratio, amp2):
