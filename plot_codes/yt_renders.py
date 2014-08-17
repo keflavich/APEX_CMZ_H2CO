@@ -148,7 +148,7 @@ def render_13co(pf=yt13co, outdir='yt_renders_13CO',
     tf.plot('tf.png')
 
     north_vector = [1, 0, 0]
-    center = yt13co.domain_dimensions /2.
+    center = pf.domain_dimensions /2.
     cam = pf.h.camera(center, camera_angle, scale, size, tf,
                       north_vector=north_vector, fields='flux')
 
