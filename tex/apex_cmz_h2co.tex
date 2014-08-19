@@ -113,9 +113,9 @@ effectively smooths the output images from $FWHM\approx28\arcsec$ to
 $\approx30\arcsec$.  See \citet{Mangum2007a} for more detail on the on-the-fly
 mapping technique used here.
 
-\todo{To demonstrate the utility of the PCA subtraction approach described in Section
-\ref{sec:baseline}, we show maps of the \formaldehyde \threeohthree line before
-and after PCA subtraction.}
+%\todo{To demonstrate the utility of the PCA subtraction approach described in Section
+%\ref{sec:baseline}, we show maps of the \formaldehyde \threeohthree line before
+%and after PCA subtraction.}
 
 The PPV cubes were created with units of brightness temperature ($T_A^*$).  The
 main beam efficiency is $\eta_{mb} = 0.75$ (gain $\sim39$
@@ -149,7 +149,7 @@ line in PPV space, so we shifted the \formaldehyde mask to the velocity of the
 expected to have signal.  There were XXX voxels excluded in this fashion.
 
 
-\subsubsection{Baselining}
+\subsection{Baselining}
 \label{sec:baseline}
 The data showed significant baseline structure, leading to large-scale
 correlated components in the resulting spectra.  The baselines were removed
@@ -159,11 +159,15 @@ masking those out for each other line, then fitting a 5th-order polynomial to
 the remaining spectra over the velocity range -150 to 250 \kms and subtracting
 it.
 
+After performing this baselining, the signal was re-extracted
+
 \section{Ratio and Temperature Maps}
 \label{sec:h2co}
 We created two independent ratio maps, \threeohthree/\threetwotwo and
 \threeohthree/\threetwoone, so that the two ratios (which are expected to be
-the same) can be used as a sanity check.
+the same) can be used as a sanity check.  However, in many regions, especially
+those with the greatest signal, the \threetwotwo line is strongly affected by
+contamination from a \methanol line, so the ratio is not particularly reliable.
 
 \subsection{Computing Temperature}
 \todo{Unless there's a strong reason not to, I will use the same grid that
@@ -200,8 +204,8 @@ patchy.  That remains a possibility if we are observing massive, dense clouds
 with relatively uniformly turbulent properties.
 
 \FigureTwoAA
-{figures/H2CO_322221_to_303202_smooth_integ.pdf}
-{figures/H2CO_321220_to_303202_smooth_integ.pdf}
+{figures/big_H2CO_322221_to_303202_smooth_bl_integ.pdf}
+{figures/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
 {Maps of the ratio of the integrated \para \threetwotwo / \threeohthree (top)
 and \threetwoone/\threeohthree (bottom).  The data cubes were masked by
 signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
@@ -214,6 +218,45 @@ which.}
 }
 {fig:ratiomaps}{1}{7in}
 
+\section{Examination of Individual Spectra}
+In order to maximize the signal-to-noise and acquire the strongest constraint
+on the temperature, we extract spectra for regions with bright lines.  This
+approach is similar to the approach adopted in \citet{Ao2013a}, but for a much
+larger area.
+
+\subsection{Sources in the Ring}
+The \citet{Molinari2011a} ring has attracted a great deal of attention recently,
+as it has the most gas in the CMZ and a large, but unrealized, star-forming potential
+\citep{Longmore2013a,Longmore2012b,Longmore2012a,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
+The star formation in this region is suppressed relative to expectations based
+on nearby star-forming regions and nearby (on a different scale) Galactic
+disks.  Hypotheses for this depressed star formation rate include suppressed
+fragmentation by cosmic ray and X-ray heating and a raised star formation
+threshold from enhanced turbulence.
+
+\subsubsection{The Brick: G0.253+0.016}
+We examine two lines of sight through The Brick, in the northeast at
+G0.241+0.006 and in the southwest at G0.261+0.028.  The northeast line of sight
+has two independent velocity components with dramatically different
+temperatures: a 30 \kms component with only a lower limit on temperature,
+$T>300$ K, and a 0 \kms component with $T=73\pm3$ K.  The southwest line of
+sight has only one component with $T=157\pm10$ K.
+
+\subsubsection{Cloud d: G0.38+0.04}
+Cloud ``d'' is one of the possible protoclusters identified in
+\citet{Longmore2013a}.  It exhibits bright and relatively narrow (FWHM$\sim7.3$
+\kms) \para emission and has a tightly constrained temperature $T=84\pm5$ K.
+
+\Figure{figures/G0.38+0.04_fit_h2co_mm_radex.pdf}
+{The 218-219 GHz spectrum of Cloud d}
+{fig:cloudDspec}{0.5}{0.0}
+
+\subsection{Clouds e/f: G0.47+0.01}
+Clouds ``e'' and ``f'' together make another proto-cluster in
+\citet{Longmore2013a}.  These clouds are marginally warmer than cloud d, with
+$T=110\pm20$ K.  However, because of the region of parameter space the lines
+allow, the density is reasonably constrained to be $n(\hh)\sim10^{4\pm0.2}$ \percc,
+much lower than in cloud d and more comparable to The Brick.
 
 \section{Conclusion}
 

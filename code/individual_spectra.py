@@ -1,12 +1,28 @@
 import pyregion
+import numpy as np
 import pyspeckit
+from astropy import table
 from paths import h2copath, mergepath, figurepath, regpath
 import os
 from pyspeckit_fitting import simplemodel, simple_fitter
+try:
+    from pyspeckit_fitting import h2co_radex_fitter
+    radexfit=True
+except ImportError:
+    radexfit=False
 from astropy.io import fits
 
 
 if 'cube' not in locals():
+    # Use the individual spectral line cubes because they have been more
+    # cleanly baselined
+    # (unfortunately, this doesn't appar to work)
+    #h2co303 = pyspeckit.Cube(mpath('APEX_H2CO_303_202_bl.fits'))
+    #h2co322 = pyspeckit.Cube(mpath('APEX_H2CO_322_221_bl.fits'))
+    #h2co321 = pyspeckit.Cube(mpath('APEX_H2CO_321_220_bl.fits'))
+    #cube = pyspeckit.CubeStack([h2co303,h2co321,h2co322])
+    #cube.xarr.refX = 218222190000.0
+    #cube.xarr.refX_units = 'Hz'
     cube = pyspeckit.Cube(os.path.join(mergepath, 'APEX_H2CO_merge_high_sub.fits'))
     etamb = 0.75 # http://www.apex-telescope.org/telescope/efficiency/
     cube.cube /= etamb
@@ -29,6 +45,24 @@ if 'cube' not in locals():
 #    'brick1': {'ncomp': 1},
 #    'brick2': {'ncomp': 2},
 #}
+parmap_simple = {'ampH2CO':'AMPLITUDE',
+          'ampCH3OH':'AMPCH3OH',
+          'width':'WIDTH',
+          'center':'VELOCITY',
+          'h2coratio':'RATIO',}
+parmap_radex = {
+          'temperature':'TEMPERATURE',
+          'density':'DENSITY',
+          'column':'COLUMN',
+          'denswidth':'WIDTH',
+          'denscenter':'CENTER',}
+
+def set_row(parinfo, ncomp, row, parmap):
+
+    for ii in range(ncomp):
+        for par in parmap:
+            row[par+"_"+str(ii)] = parinfo[parmap[par]+str(ii)].value
+            row["e"+par+"_"+str(ii)] = parinfo[parmap[par]+str(ii)].error
 
 
 regs = pyregion.open(regpath+'spectral_apertures.reg')
@@ -37,12 +71,27 @@ with open(regpath+'spectral_ncomp.txt') as f:
 
 width_limit = 15 # km/s
 
-for reg in regs:
+name_column = table.Column(data=[reg.attr[1]['text'] for reg in regs],
+                           name='Source_Name')
+columns = [table.Column(name="{ee}{name}_{ii}".format(name=name,
+                                                      ii=ii,
+                                                      ee=ee),
+                        dtype='float',
+                        length=len(regs))
+           for ii in range(max([pars[p]['ncomp'] for p in pars]))
+           for name in ['ampH2CO','ampCH3OH','width','center','h2coratio',
+                        'density','column','temperature','denscenter','denswidth']
+           for ee in ['','e']
+          ]
+out_table = table.Table([name_column] + columns)
+
+for row_number,reg in enumerate(regs):
     name = reg.attr[1]['text']
     if name not in spectra:
         sp = cube.get_apspec(reg.coord_list,coordsys='galactic',wunit='degree')
         sp.specname = reg.attr[1]['text']
-        sp.error[:] = sp.stats((218e9,218.1e9))['std']
+        # Error is already computed above; this is an old hack
+        #sp.error[:] = sp.stats((218e9,218.1e9))['std']
         spectra[name] = sp
     else:
         sp = spectra[name]
@@ -59,30 +108,35 @@ for reg in regs:
     sp.specfit(fittype='h2co_simple', multifit=True,
                guesses=guesses_simple)
 
+    set_row(sp.specfit.parinfo, ncomp, out_table[row_number], parmap=parmap_simple)
+
+
     sp.plotter()
     sp.specfit.plot_fit()
     sp.plotter.savefig(os.path.join(figurepath,
                                     "{0}_fit_4_lines_simple.pdf".format(spname)))
 
-    guesses = [x for ii in range(ncomp)
-               for x in (100,14,4.5,
-                         sp.specfit.parinfo['VELOCITY{0}'.format(ii)].value,
-                         (sp.specfit.parinfo['WIDTH{0}'.format(ii)].value
-                          if sp.specfit.parinfo['WIDTH{0}'.format(ii)].value < width_limit 
-                          else 5))
-              ]
+    if radexfit:
+        guesses = [x for ii in range(ncomp)
+                   for x in (100,14,4.5,
+                             sp.specfit.parinfo['VELOCITY{0}'.format(ii)].value,
+                             (sp.specfit.parinfo['WIDTH{0}'.format(ii)].value
+                              if sp.specfit.parinfo['WIDTH{0}'.format(ii)].value < width_limit 
+                              else 5))
+                  ]
 
-    sp.specfit.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
-                             multisingle='multi')
-    sp.specfit(fittype='h2co_mm_radex', multifit=True,
-               guesses=guesses,
-               limits=[(10,300),(11,15),(3,5.5),(-105,105),(1,width_limit)]*ncomp,
-               limited=[(True,True)]*5*ncomp,
-               fixed=[False,False,False,True,True]*ncomp,
-               quiet=False,)
-    sp.plotter.savefig(os.path.join(figurepath,
-                                    "{0}_fit_h2co_mm_radex.pdf".format(spname)))
+        sp.specfit.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
+                                 multisingle='multi')
+        sp.specfit(fittype='h2co_mm_radex', multifit=True,
+                   guesses=guesses,
+                   limits=[(10,300),(11,15),(3,5.5),(-105,125),(1,width_limit)]*ncomp,
+                   limited=[(True,True)]*5*ncomp,
+                   fixed=[False,False,False,True,True]*ncomp,
+                   quiet=False,)
+        sp.plotter.savefig(os.path.join(figurepath,
+                                        "{0}_fit_h2co_mm_radex.pdf".format(spname)))
 
+        set_row(sp.specfit.parinfo, ncomp, out_table[row_number], parmap=parmap_radex)
 
     individual_fits=False
     if individual_fits:
@@ -158,3 +212,5 @@ for reg in regs:
                                   plotkwargs={'alpha':0.01})
 
         sp.plotter.refresh()
+
+out_table.write("fitted_line_parameters.ipac", format='ascii.ipac')

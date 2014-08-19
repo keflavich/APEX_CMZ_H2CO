@@ -7,7 +7,7 @@ import matplotlib
 cm = matplotlib.cm.RdYlBu_r
 cm.set_bad('#888888')
 
-for bl in ("","_bl"):
+for bl in ("_bl",):
     for smooth in ("","_smooth","_vsmooth"):
         ratio1 = 'H2CO_321220_to_303202{0}{1}_integ.fits'.format(smooth,bl)
         ratio2 = 'H2CO_322221_to_303202{0}{1}_integ.fits'.format(smooth,bl)
@@ -24,3 +24,5 @@ for bl in ("","_bl"):
             F.tick_labels.set_yformat('d.dd')
             F.recenter(0.31, -0.05, width=1.1, height=0.3)
             F.save(os.path.join(figurepath, ratio.replace(".fits",".pdf")))
+            F.recenter(0.55,-0.075,width=2.3,height=0.40)
+            F.save(os.path.join(figurepath, "big_"+ratio.replace(".fits",".pdf")))

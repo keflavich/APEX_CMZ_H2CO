@@ -8,6 +8,7 @@ from astropy.utils.console import ProgressBar
 import paths
 import subprocess
 from itertools import izip
+import os
 
 red = pl.mpl.colors.LinearSegmentedColormap('red',
                                             {'red':[(0,1,1),(1,1,1)],
@@ -38,6 +39,19 @@ if 'cube_h2co303' not in locals():
     cube_h2co321 = SpectralCube.read(paths.mpath('APEX_H2CO_321_220_bl.fits'))
     mask._wcs = cube_h2co321.wcs
     yth2co321 = cube_h2co321.with_mask(mask).to_yt()
+
+    temcube = SpectralCube.read(paths.dpath('H2CO_321220_to_303202_cube_bl_temperature.fits'))
+    mask._wcs = temcube.wcs
+    yttem = temcube.with_mask(mask).to_yt()
+
+def isosurfaces(yt13co):
+    yt13co.periodicity = (True,True,True)
+    surface2k = yt13co.surface(yt13co.all_data(), 'flux', 2)
+    surface2k.export_sketchfab(title='CMZ 13CO 2-1',
+                             description='Monochrome 13CO 2K isosurface')
+    surface4k = yt13co.surface(yt13co.all_data(), 'flux', 4)
+    surface4k.export_sketchfab(title='CMZ 13CO 2-1',
+                             description='Monochrome 13CO 4K isosurface')
 
 def render_chem(yth2co321=yth2co321, yth2co303=yth2co303, ytsio=ytsio,
                 outdir='yt_renders_chem3', size=512, scale=1100.,
@@ -130,8 +144,14 @@ def render_chem(yth2co321=yth2co321, yth2co303=yth2co303, ytsio=ytsio,
 
 
 def render_13co(pf=yt13co, outdir='yt_renders_13CO',
-                size=512, scale=1100., nframes=60,
-                movie=True, camera_angle=[-0.6, 0.4, 0.6]):
+                size=512, scale=1100., nframes=180,
+                movie=True,
+                camera_angle=[0, 0, 1],
+                north_vector = [1, 0, 0],
+                rot_vector1=[1,0,0],
+                rot_vector2=[0.5,0.5,0.0],
+                rot_vector3=[0.0,0.5,0.5],
+               ):
 
     if not os.path.exists(paths.mpath(outdir)):
         os.makedirs(paths.mpath(outdir))
@@ -144,10 +164,7 @@ def render_13co(pf=yt13co, outdir='yt_renders_13CO',
     tf.add_gaussian(10, 5, [1.0, 0.0, 0.0, 0.5])
     tf.map_to_colormap(10, 30, colormap=red, scale=1)
 
-    pl.figure(1)
-    tf.plot('tf.png')
 
-    north_vector = [1, 0, 0]
     center = pf.domain_dimensions /2.
     cam = pf.h.camera(center, camera_angle, scale, size, tf,
                       north_vector=north_vector, fields='flux')
@@ -156,19 +173,23 @@ def render_13co(pf=yt13co, outdir='yt_renders_13CO',
 
     images = [im]
 
-    pl.figure(2)
-    pl.clf()
-    pl.imshow(images[0][:,:,:3])
-    pl.draw()
-    pl.show()
-
     if movie:
         pb = ProgressBar(nframes)
-        for ii,im in enumerate(cam.rotation(2 * np.pi, nframes)):
+        for ii,im in enumerate(cam.rotation(2 * np.pi, nframes/3, rot_vector=rot_vector1)):
             images.append(im)
             im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" % (ii))),
                                         rescale=False)
             pb.update(ii)
+        for jj,im in enumerate(cam.rotation(2 * np.pi, nframes/3, rot_vector=rot_vector2)):
+            images.append(im)
+            im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" % (ii+jj))),
+                                       rescale=False)
+            pb.update(ii+jj)
+        for kk,im in enumerate(cam.rotation(2 * np.pi, nframes/3, rot_vector=rot_vector3)):
+            images.append(im)
+            im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" % (ii+jj+kk))),
+                                        rescale=False)
+            pb.update(ii+jj+kk)
 
         save_images(images, paths.mpath(outdir))
 
