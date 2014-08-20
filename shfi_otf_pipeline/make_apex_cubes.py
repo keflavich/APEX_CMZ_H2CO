@@ -2527,7 +2527,7 @@ def PCA_subtract(data, smoothing_scale=None, ncomponents=3):
 def extract_co_subcubes(mergepath=april2014path):
     extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
                     os.path.join(mergepath,'APEX_13CO_2014_merge.fits'),
-                    linefreq=220.39868*u.GHz, naxis3=400)
+                    linefreq=220.39868*u.GHz, naxis3=500, crval3=-225)
     extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
                     os.path.join(mergepath,'APEX_C18O_2014_merge.fits'),
-                    linefreq=219.56036*u.GHz, naxis3=400)
+                    linefreq=219.56036*u.GHz, naxis3=500, crval3=-225)
