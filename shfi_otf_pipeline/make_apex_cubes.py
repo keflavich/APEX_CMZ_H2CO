@@ -1671,7 +1671,7 @@ def do_extract_subcubes(outdir=mergepath, merge_prefix='APEX_H2CO_merge',
             log.info("Skipping line {0}".format(line))
 
 
-def do_everything(pca_clean={'2014':True, '2013':False, 'ao':True},
+def do_everything(pca_clean={'2014':False, '2013':False, 'ao':False},
                   scanblsub={'2014':False, '2013':False, 'ao':False},
                   timewise_pca={'2014':True, '2013':False, 'ao':True},
                   mergefile2='APEX_H2CO_merge_high'):
