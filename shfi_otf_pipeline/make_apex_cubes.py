@@ -42,6 +42,7 @@ datasets_2014 = {'E-093.C-0144A.2014JUN01/E-093.C-0144A-2014-2014-05-31': ('MAP_
                  'E-093.C-0144A.2014JUN02/E-093.C-0144A-2014-2014-06-01': ('MAP_009','MAP_010','MAP_008',),
                  'E-093.C-0144A.2014JUN03/E-093.C-0144A-2014-2014-06-02': ('MAP_011','MAP_012','MAP_013', 'MAP_018', 'MAP_019'),
                  'E-093.C-0144A.2014JUN06/E-093.C-0144A-2014-2014-06-05': ('Map_020', 'Map_021', 'Map_022', 'Map_023', 'Map_024', 'Map_025'),
+                 # There is some corrupt data in 06-06
                  'E-093.C-0144A.2014JUN07/E-093.C-0144A-2014-2014-06-06': ('Map_001', 'Map_026', 'Map_027', 'Map_028', 'Map_029', 'Map_030'),
                  'E-093.C-0144A.2014JUL29/E-093.C-0144A-2014-2014-07-28': ('MAP_002', 'MAP_001'),
                  'E-093.C-0144A.2014JUL29/E-093.C-0144A-2014-2014-07-29': ('MAP_002',),
@@ -1278,6 +1279,7 @@ def build_cube_2014(sourcename,
                                            # this is only OK because the bad shapes are from
                                            # Saturn
                                            #shapeselect=4096,
+                                           shapeselect=32768/downsample_factor,
                                            tsysrange=tsysrange,
                                            xtel=xtel,
                                            rchanrange=None,

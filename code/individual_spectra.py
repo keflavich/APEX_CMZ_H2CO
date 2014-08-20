@@ -11,6 +11,9 @@ try:
 except ImportError:
     radexfit=False
 from astropy.io import fits
+import photutils
+from astropy import coordinates
+from astropy import units as u
 
 
 if 'cube' not in locals():
@@ -85,6 +88,29 @@ columns = [table.Column(name="{ee}{name}_{ii}".format(name=name,
           ]
 out_table = table.Table([name_column] + columns)
 
+column_image = fits.open('/Users/adam/work/gc/gcmosaic_column_conv36.fits')[0]
+
+#apertures = [('circular',reg.coord_list[2]*u.deg) for reg in regs]
+radii = np.array([reg.coord_list[2] for reg in
+                  regs])/column_image.header['CDELT2']
+positions = coordinates.SkyCoord([(reg.coord_list[0]*u.deg,
+                                   reg.coord_list[1]*u.deg) for reg in regs],
+                                 frame='galactic')
+surfdens = []
+for name, pos, ap in zip(name_column,positions,radii):
+    phot_table, aux_dict = photutils.aperture_photometry(column_image,
+                                                         pos, 
+                                                        ('circular',ap))
+    phsum = phot_table['aperture_sum']*1e22
+    area = np.pi*(ap)**2
+    phmean = (phsum / area) * u.cm**-2
+
+    surfdens.append(phmean)
+surfdens_column = table.Column(data=surfdens, dtype='float',
+                               name='higalcolumndens')
+out_table.add_column(surfdens_column)
+
+
 for row_number,reg in enumerate(regs):
     name = reg.attr[1]['text']
     if name not in spectra:
@@ -95,6 +121,7 @@ for row_number,reg in enumerate(regs):
         spectra[name] = sp
     else:
         sp = spectra[name]
+
 
     sp.plotter()
 
