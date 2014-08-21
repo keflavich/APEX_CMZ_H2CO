@@ -2,7 +2,7 @@ import pyregion
 import numpy as np
 import pyspeckit
 from astropy import table
-from paths import h2copath, mergepath, figurepath, regpath
+from paths import h2copath, mergepath, figurepath, regpath, analysispath
 import os
 from pyspeckit_fitting import simplemodel, simple_fitter
 try:
@@ -240,4 +240,4 @@ for row_number,reg in enumerate(regs):
 
         sp.plotter.refresh()
 
-out_table.write("fitted_line_parameters.ipac", format='ascii.ipac')
+out_table.write(os.path.join(analysispath,"fitted_line_parameters.ipac"), format='ascii.ipac')
