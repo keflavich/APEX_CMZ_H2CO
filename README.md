@@ -23,6 +23,8 @@ Here are the target regions colored by their association with the selected off
 position:
 ![Imgur](http://i.imgur.com/LzAC4KJ.png)
 
+August 21 observing stats:
+![stats image](observing/observing_stats.png)
 
 Pipeline
 ========
