@@ -14,6 +14,7 @@ figurepath = os.path.join(root, 'apex_cmz_h2co/tex/figures/')
 regpath = os.path.join(root, 'apex_cmz_h2co/regions/')
 gridpath = os.path.join(root, 'h2co/radex/thermom/')
 analysispath = os.path.join(root, 'apex_cmz_h2co/analysis/')
+observingpath = os.path.join(root, 'apex_cmz_h2co/observing/')
 
 def mpath(x, mergepath=mergepath):
     return os.path.join(mergepath,x)
@@ -23,3 +24,9 @@ def gpath(x, gridpath=gridpath):
 
 def fpath(x, figurepath=figurepath):
     return os.path.join(figurepath, x)
+
+def rpath(x, regpath=regpath):
+    return os.path.join(regpath, x)
+
+def opath(x, observingpath=observingpath):
+    return os.path.join(observingpath, x)

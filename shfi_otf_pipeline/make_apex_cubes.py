@@ -1547,7 +1547,8 @@ def do_sncube_masking_hi(prefix=h2copath+'APEX_H2CO_303_202'):
     integrate_slices_high(prefix+'_snmasked')
 
 def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
-                    debug=False, smooth=False, vsmooth=False, naxis3=400, crval3=-150):
+                    debug=False, smooth=False, vsmooth=False, naxis3=400,
+                    vmin=-150*u.km/u.s, vmax=250*u.km/u.s):
     t0 = time.time()
     log.info(("Extracting subcube at {0} from {1}"
               " with smooth={2} and vsmooth={3}").format(linefreq,
@@ -1557,7 +1558,8 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
     cube = spectral_cube.SpectralCube.read(cubefilename)
     vcube = cube.with_spectral_unit(u.km/u.s, rest_value=linefreq,
                                     velocity_convention='radio')
-    svcube = vcube.spectral_slab(-150*u.km/u.s, 250*u.km/u.s)
+    svcube = vcube.spectral_slab(vmin, vmax)
+    crval3 = vmin.to(u.km/u.s).value
 
     outheader = svcube.header
     outheader['CRPIX3'] = 1
@@ -2531,7 +2533,9 @@ def PCA_subtract(data, smoothing_scale=None, ncomponents=3):
 def extract_co_subcubes(mergepath=april2014path):
     extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
                     os.path.join(mergepath,'APEX_13CO_2014_merge.fits'),
-                    linefreq=220.39868*u.GHz, naxis3=500, crval3=-225)
+                    linefreq=220.39868*u.GHz, naxis3=500, vmin=-225*u.km/u.s,
+                    vmax=275*u.km/u.s)
     extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
                     os.path.join(mergepath,'APEX_C18O_2014_merge.fits'),
-                    linefreq=219.56036*u.GHz, naxis3=500, crval3=-225)
+                    linefreq=219.56036*u.GHz, naxis3=500, vmin=-225*u.km/u.s,
+                    vmax=275*u.km/u.s)

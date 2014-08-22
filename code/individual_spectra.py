@@ -76,6 +76,10 @@ width_limit = 15 # km/s
 
 name_column = table.Column(data=[reg.attr[1]['text'] for reg in regs],
                            name='Source_Name')
+lon_column = table.Column(data=[reg.coord_list[0] for reg in regs],
+                          name='GLON')
+lat_column = table.Column(data=[reg.coord_list[1] for reg in regs],
+                          name='GLAT')
 columns = [table.Column(name="{ee}{name}_{ii}".format(name=name,
                                                       ii=ii,
                                                       ee=ee),
@@ -86,9 +90,11 @@ columns = [table.Column(name="{ee}{name}_{ii}".format(name=name,
                         'density','column','temperature','denscenter','denswidth']
            for ee in ['','e']
           ]
-out_table = table.Table([name_column] + columns)
+out_table = table.Table([name_column, lon_column, lat_column] + columns)
 
+# TODO: replace this with a permanent path
 column_image = fits.open('/Users/adam/work/gc/gcmosaic_column_conv36.fits')[0]
+dusttem_image = fits.open('/Users/adam/work/gc/gcmosaic_temp_conv36.fits')[0]
 
 #apertures = [('circular',reg.coord_list[2]*u.deg) for reg in regs]
 radii = np.array([reg.coord_list[2] for reg in
@@ -97,6 +103,7 @@ positions = coordinates.SkyCoord([(reg.coord_list[0]*u.deg,
                                    reg.coord_list[1]*u.deg) for reg in regs],
                                  frame='galactic')
 surfdens = []
+dusttem = []
 for name, pos, ap in zip(name_column,positions,radii):
     phot_table, aux_dict = photutils.aperture_photometry(column_image,
                                                          pos, 
@@ -106,9 +113,19 @@ for name, pos, ap in zip(name_column,positions,radii):
     phmean = (phsum / area) * u.cm**-2
 
     surfdens.append(phmean)
+
+    tem_table, aux_dict = photutils.aperture_photometry(dusttem_image, pos,
+                                                        ('circular',ap))
+    temsum = tem_table['aperture_sum']
+    area = np.pi*(ap)**2
+    temmean = (temsum / area) * u.cm**-2
+    dusttem.append(temmean)
+
 surfdens_column = table.Column(data=surfdens, dtype='float',
                                name='higalcolumndens')
+dusttem_column = table.Column(data=dusttem, dtype='float', name='higaldusttem')
 out_table.add_column(surfdens_column)
+out_table.add_column(dusttem_column)
 
 
 for row_number,reg in enumerate(regs):

@@ -4,6 +4,7 @@ import pylab as pl
 import numpy as np
 from astropy import log
 from astropy import units as u
+from astropy import coordinates
 from paths import analysispath
 from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
                                texgrid322, taugrid322, hdr)
@@ -48,7 +49,7 @@ tarr = temparr[:,0,0]
 # ratio is not.
 modelratio = tline321/tline303
 
-fittable = table.Table.read(os.paths.join(analysispath,
+fittable = table.Table.read(os.path.join(analysispath,
                                           "fitted_line_parameters.ipac"),
                             format='ascii.ipac')
 fittable.add_columns([table.Column(name=name, dtype='float', length=len(fittable))
@@ -59,7 +60,6 @@ fittable.add_columns([table.Column(name=name, dtype='float', length=len(fittable
 if not os.path.exists(paths.fpath('param_fits')):
     os.makedirs(paths.fpath('param_fits'))
 
-arbitrary_scale = 1
 nlevs=5
 
 density_label = 'Density $n(\mathrm{H}_2)$ [log cm$^{-3}$]'
@@ -74,9 +74,9 @@ for row in fittable:
     elinewidth = row['ewidth_0']
 
     par1 = row['ampH2CO_0']
-    epar1 = row['eampH2CO_0']*arbitrary_scale
+    epar1 = row['eampH2CO_0']
     par2 = row['ampH2CO_0']*row['h2coratio_0']
-    epar2 = row['ampH2CO_0']*row['eh2coratio_0']*arbitrary_scale
+    epar2 = row['ampH2CO_0']*row['eh2coratio_0']
     #match,indbest,chi2b = grid_fitter.grid_2p_getmatch(par1, epar1, tline303,
     #                                                   par2, epar2, tline321)
     ratio = row['h2coratio_0']
@@ -277,47 +277,59 @@ for row in fittable:
 
     pl.savefig(paths.fpath('param_fits/{name}_h2coratio_minaxis.pdf'.format(name=row['Source_Name'])), bbox_inches='tight')
 
-    # Show the constraints provided by individual parameters
-    pl.figure(3)
-    pl.clf()
-    # chi2b = chi2r + chi2_1 + chi2_2 + chi2X + chi2_h2
-    ax1 = pl.subplot(2,3,1)
-    pl.contourf(darr, tarr, chi2r.min(axis=1), levels=chi2r.min()+np.arange(nlevs), alpha=0.5)
-    pl.xlabel(density_label)
-    pl.ylabel(temperature_label)
-    pl.title("Ratio $3_{0,3}-2_{0,2}/3_{2,1}-2_{2,0}$")
-    ax2 = pl.subplot(2,3,2)
-    pl.contourf(darr, tarr, chi2r.min(axis=0), levels=chi2r.min()+np.arange(nlevs), alpha=0.5)
-    pl.xlabel(density_label)
-    pl.ylabel(column_label)
-    pl.title("Ratio $3_{0,3}-2_{0,2}/3_{2,1}-2_{2,0}$")
-    ax4 = pl.subplot(2,3,6)
-    pl.contourf(darr, carr, chi2X.min(axis=0), levels=chi2r.min()+np.arange(nlevs), alpha=0.5)
-    pl.ylabel(column_label)
-    pl.xlabel(density_label)
-    pl.title("log(p-H$_2$CO/H$_2$) $= {0:0.1f}\pm{1:0.1f}$".format(logabundance, elogabundance))
-    ax3 = pl.subplot(2,3,3)
-    pl.contourf(darr, carr, chi2_h2.min(axis=0), levels=chi2_h2.min()+np.arange(nlevs), alpha=0.5)
-    pl.xlabel(density_label)
-    pl.ylabel(column_label)
-    pl.title("Total log$(N(\\mathrm{{H}}_2)) = {0:0.1f}\pm{1:0.1f}$".format(logh2column,
-                                                                                    elogh2column))
-    ax5 = pl.subplot(2,3,5)
-    pl.contourf(darr, carr, (chi2_ff.min(axis=0)),
-                levels=chi2_ff.min()+np.arange(nlevs), alpha=0.5)
-    pl.xlabel(density_label)
-    pl.ylabel(column_label)
-    pl.title("Line Brightness + $ff\leq1$")
-    ax6 = pl.subplot(2,3,4)
-    pl.contourf(darr, tarr, (chi2_ff.min(axis=1)),
-                levels=chi2_ff.min()+np.arange(nlevs), alpha=0.5)
-    pl.xlabel(density_label)
-    pl.ylabel(temperature_label)
-    pl.title("Line Brightness + $ff\leq1$")
 
-    pl.subplots_adjust(wspace=0.4, hspace=0.4)
-    pl.savefig(paths.fpath('param_fits/{name}_parameter_constraints.pdf'.format(name=row['Source_Name'])), bbox_inches='tight')
-    #break
+    for xax,yax,xlabel,ylabel,axis,ptype in zip((darr,darr,carr),
+                                                (carr,tarr,tarr),
+                                                (density_label, density_label,
+                                                 column_label), (column_label,
+                                                                 temperature_label,
+                                                                 temperature_label),
+                                                (0, 1, 2),
+                                                ('dens_col','dens_tem','col_tem')):
+        # Show the constraints provided by individual parameters
+        pl.figure(3)
+        pl.clf()
+        # chi2b = chi2r + chi2_1 + chi2_2 + chi2X + chi2_h2
+        ax1 = pl.subplot(2,2,1)
+        pl.contourf(xax, yax, chi2r.min(axis=axis), levels=chi2r.min()+np.arange(nlevs), alpha=0.5)
+        pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
+        pl.xlabel(xlabel)
+        pl.ylabel(ylabel)
+        pl.title("Ratio $3_{0,3}-2_{0,2}/3_{2,1}-2_{2,0}$")
+        ax4 = pl.subplot(2,2,2)
+        pl.contourf(xax, yax, chi2X.min(axis=axis), levels=chi2X.min()+np.arange(nlevs), alpha=0.5)
+        pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
+        pl.ylabel(ylabel)
+        pl.xlabel(xlabel)
+        pl.title("log(p-H$_2$CO/H$_2$) $= {0:0.1f}\pm{1:0.1f}$".format(logabundance, elogabundance))
+        ax3 = pl.subplot(2,2,3)
+        pl.contourf(xax, yax, chi2_h2.min(axis=axis), levels=chi2_h2.min()+np.arange(nlevs), alpha=0.5)
+        pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
+        pl.xlabel(xlabel)
+        pl.ylabel(ylabel)
+        pl.title("Total log$(N(\\mathrm{{H}}_2)) = {0:0.1f}\pm{1:0.1f}$".format(logh2column,
+                                                                                        elogh2column))
+        ax5 = pl.subplot(2,2,4)
+        pl.contourf(xax, yax, (chi2_ff.min(axis=axis)),
+                    levels=chi2_ff.min()+np.arange(nlevs), alpha=0.5)
+        pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
+        pl.contour(xax, yax, (tline < 10*par1), levels=[0.5], color='k')
+        pl.contour(xax, yax, (tline < 100*par1), levels=[0.5], color='k')
+        pl.contour(xax, yax, (tline < 10*par2), levels=[0.5], color='k', linestyle='--')
+        pl.contour(xax, yax, (tline < 100*par2), levels=[0.5], color='k', linestyle='--')
+        pl.xlabel(xlabel)
+        pl.ylabel(ylabel)
+        pl.title("Line Brightness + $ff\leq1$")
+
+        if xax is carr:
+            for ss in range(1,5):
+                ax = pl.subplot(2,2,ss)
+                ax.xaxis.set_ticks(np.arange(carr.min(), carr.max()))
+
+        pl.subplots_adjust(wspace=0.4, hspace=0.4)
+        outf = paths.fpath('param_fits/{name}_{ptype}_parameter_constraints.pdf'.format(name=row['Source_Name'],
+                                                                                            ptype=ptype))
+        pl.savefig(outf, bbox_inches='tight')
 
     deltachi2b = (chi2b-chi2b.min())
     for parname,pararr in zip(('temperature','column','density'),
@@ -335,5 +347,41 @@ for row in fittable:
 fittable.write(os.path.join(analysispath,
                             'fitted_line_parameters_Chi2Constraints.ipac'),
                format='ascii.ipac')
+
+fig4 = pl.figure(4)
+fig4.clf()
+ax = fig4.add_subplot(1,3,1)
+ax.errorbar(fittable['temperature_chi2'], fittable['density_chi2'],
+            yerr=[fittable['density_chi2']-fittable['dmin1sig_chi2'],
+                  fittable['dmax1sig_chi2']-fittable['density_chi2']],
+            xerr=[fittable['temperature_chi2']-fittable['tmin1sig_chi2'],
+                  fittable['tmax1sig_chi2']-fittable['temperature_chi2']],
+            linestyle='none', marker='s', linewidth=2, alpha=0.5)
+ax2 = fig4.add_subplot(1,3,2)
+ax2.errorbar(fittable['temperature_chi2'], fittable['temperature_0'],
+             yerr=fittable['etemperature_0'],
+             xerr=[fittable['temperature_chi2']-fittable['tmin1sig_chi2'],
+                   fittable['tmax1sig_chi2']-fittable['temperature_chi2']],
+             linestyle='none', marker='s', linewidth=2, alpha=0.5)
+ax2.plot([0,300],[0,300],'k--',linewidth=2,alpha=0.5)
+
+
+fig5 = pl.figure(5)
+fig5.clf()
+ax5 = fig5.gca()
+ax5.errorbar(coordinates.Angle(fittable['GLON']*u.deg).wrap_at(180*u.deg).value,
+             fittable['temperature_chi2'],
+             yerr=[fittable['temperature_chi2']-fittable['tmin1sig_chi2'],
+                   fittable['tmax1sig_chi2']-fittable['temperature_chi2']],
+             linestyle='none', marker='s', linewidth=2, alpha=0.5)
+
+fig6 = pl.figure(6)
+fig6.clf()
+ax6 = fig6.gca()
+ax6.errorbar(fittable['higaldusttem'],
+             fittable['temperature_chi2'],
+             yerr=[fittable['temperature_chi2']-fittable['tmin1sig_chi2'],
+                   fittable['tmax1sig_chi2']-fittable['temperature_chi2']],
+             linestyle='none', marker='s', linewidth=2, alpha=0.5)
 
 pl.show()

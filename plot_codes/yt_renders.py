@@ -144,7 +144,7 @@ def render_chem(yth2co321=yth2co321, yth2co303=yth2co303, ytsio=ytsio,
 
 
 def render_13co(pf=yt13co, outdir='yt_renders_13CO',
-                size=512, scale=1100., nframes=180,
+                size=512, scale=1200., nframes=180,
                 movie=True,
                 camera_angle=[0, 0, 1],
                 north_vector = [1, 0, 0],
@@ -194,7 +194,6 @@ def render_13co(pf=yt13co, outdir='yt_renders_13CO',
         save_images(images, paths.mpath(outdir))
 
         pipe = make_movie(paths.mpath(outdir))
-        pipe.terminate()
         
         return images
     else:
@@ -223,14 +222,14 @@ def make_movie(moviepath, overwrite=True):
     outpath = os.path.join(moviepath,'out.mp4')
 
     if os.path.exists(outpath) and overwrite:
-        command = ['ffmpeg', '-y', '-r','1','-i',
+        command = ['ffmpeg', '-y', '-r','5','-i',
                    os.path.join(moviepath,'%04d.png'),
                    '-c:v','libx264','-r','30','-pix_fmt', 'yuv420p',
                    outpath]
     elif os.path.exists(outpath):
         log.info("File {0} exists - skipping".format(outpath))
     else:
-        command = ['ffmpeg', '-r', '1', '-i',
+        command = ['ffmpeg', '-r', '5', '-i',
                    os.path.join(moviepath,'%04d.png'),
                    '-c:v','libx264','-r','30','-pix_fmt', 'yuv420p',
                    outpath]
