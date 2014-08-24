@@ -53,3 +53,6 @@ coverage.xml
 docs/_build/
 
 orbit_K14.dat
+ipython_log*py
+version.py
+cython_version.py
