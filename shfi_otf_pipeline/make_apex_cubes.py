@@ -1702,13 +1702,14 @@ def do_postprocessing():
     #compute_noise_low()
     signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_sub_noise.fits'),
+                              sigmacut=2,
                               grow=2)
     signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_smooth',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_smooth_noise.fits'),
-                              sigmacut=3)
+                              sigmacut=2)
     signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_vsmooth',
                               noise=fits.getdata(mergepath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
-                              sigmacut=3)
+                              sigmacut=2)
     integrate_mask(mergepath+'APEX_H2CO_303_202',
                    mask=mergepath+'APEX_H2CO_303_202_mask.fits')
     integrate_mask(mergepath+'APEX_H2CO_303_202_smooth',

@@ -218,6 +218,52 @@ which.}
 }
 {fig:ratiomaps}{1}{7in}
 
+\section{Line Modeling}
+In order to extract more detailed information about the gas properties and
+acquire a more detailed understanding of the uncertainties in the ratio-derived
+temperature map described above, we extracted spectra from individual regions
+with relatively high signal-to-noise and modeled them in further detail.
+
+The RADEX grids described above were used, but with finer spacing in density,
+column density, and temperature.  We then upsampled the grids by spline
+interpolating between grid points to acquire a high-resolution ($250^3$) grid
+covering $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N <
+10^{15.1}$ \persc\perkmspc.
+
+We created $\chi^2$ grids using independent constraints from the line ratio,
+the \formaldehyde abundance, and the total column density of \hh.  We use the
+line \emph{ratio} rather than line brightnesses to avoid uncertainties due to
+the ``filling factor'' of the emitting gas: even for diffuse clouds, the
+filling factor of the emitting regions may be $ff<<1$ if the emission is
+isolated to compact shocked regions, as expected if highly supersonic
+$\mathcal{M}>10$ turbulence is energetically dominant in the clouds.  We use an
+abundance $N(\para)/N(\hh) = X(\para) = 10^{9.08\pm1} = 1.2\ee{9} \times/\div
+10$, allowing for dramatic uncertainty in the \formaldehyde abundance
+\citep{Ginsburg2013a,Carey1998a,Wootten1978a,Mundy1987a}.  To constrain the
+total column density, we use the Herschel dust maps to derive an \hh column
+density, which has a nominal $\sim2-3\times$ uncertainty.  We treat the erro as
+$10\times$ to account for the abundance uncertainty again.
+
+These constraints are shown projected onto the three planes of our fitted
+parameter space in the multi-paneled Figures
+\ref{fig:coltemconstraints}-\ref{fig:parsonbrightness}.
+
+\Figure{figures/d:G0.38+0.04_fit_4_lines_simple.pdf}
+{Spectrum of ``cloud d"}
+{fig:clouddspec}{0.5}{0}
+\Figure{figures/param_fits/d:G0.38+0.04_col_tem_parameter_constraints.pdf}
+{caption}
+{fig:coltemconstraints}{0.5}{0}
+\Figure{figures/param_fits/d:G0.38+0.04_dens_col_parameter_constraints.pdf}
+{caption}
+{fig:denscolconstraints}{0.5}{0}
+\Figure{figures/param_fits/d:G0.38+0.04_dens_tem_parameter_constraints.pdf}
+{caption}
+{fig:denstemconstraints}{0.5}{0}
+\Figure{figures/param_fits/d:G0.38+0.04_h2coratio_minaxis.pdf}
+{caption}
+{fig:parsonbrightness}{0.5}{0}
+
 \section{Examination of Individual Spectra}
 \todo{The modeling is ambiguous still: it is necessary to impose some sort of
 restriction on the abundance or column density in order to acquire reasonable

@@ -2,9 +2,10 @@ import pyregion
 import numpy as np
 import pyspeckit
 from astropy import table
+import spectral_cube
 from paths import h2copath, mergepath, figurepath, regpath, analysispath
 import os
-from pyspeckit_fitting import simplemodel, simple_fitter
+from pyspeckit_fitting import simplemodel, simple_fitter, simple_fitter2
 try:
     from pyspeckit_fitting import h2co_radex_fitter
     radexfit=True
@@ -26,11 +27,16 @@ if 'cube' not in locals():
     #cube = pyspeckit.CubeStack([h2co303,h2co321,h2co322])
     #cube.xarr.refX = 218222190000.0
     #cube.xarr.refX_units = 'Hz'
-    cube = pyspeckit.Cube(os.path.join(mergepath, 'APEX_H2CO_merge_high_sub.fits'))
+    #cube = pyspeckit.Cube(os.path.join(mergepath, 'APEX_H2CO_merge_high_sub.fits'))
     etamb = 0.75 # http://www.apex-telescope.org/telescope/efficiency/
-    cube.cube /= etamb
+    #cube.cube /= etamb
     noise = fits.getdata(mergepath+'APEX_H2CO_merge_high_sub_noise.fits') / etamb
-    cube.errorcube = noise[None,:,:] * np.ones(cube.cube.shape)
+    noisehdr = fits.getheader(mergepath+'APEX_H2CO_merge_high_sub_noise.fits')
+    #errorcube = noise[None,:,:] * np.ones(cube.cube.shape)
+
+    cube = spectral_cube.SpectralCube.read(os.path.join(mergepath, 'APEX_H2CO_merge_high_sub.fits'))
+    cube._data /= etamb
+
     spectra = {}
 
 # Not necessary:
@@ -53,6 +59,12 @@ parmap_simple = {'ampH2CO':'AMPLITUDE',
           'width':'WIDTH',
           'center':'VELOCITY',
           'h2coratio':'RATIO',}
+parmap_simple2 = {'ampH2CO':'AMPLITUDE',
+          'ampCH3OH':'AMPCH3OH',
+          'width':'WIDTH',
+          'center':'VELOCITY',
+          'h2coratio321303':'RATIO321303',
+          'h2coratio322321':'RATIO322321',}
 parmap_radex = {
           'temperature':'TEMPERATURE',
           'density':'DENSITY',
@@ -68,11 +80,11 @@ def set_row(parinfo, ncomp, row, parmap):
             row["e"+par+"_"+str(ii)] = parinfo[parmap[par]+str(ii)].error
 
 
-regs = pyregion.open(regpath+'spectral_apertures.reg')
+regs = pyregion.open(regpath+'spectral_apertures.reg') + pyregion.open(regpath+'target_fields_8x8.reg')
 with open(regpath+'spectral_ncomp.txt') as f:
     pars = eval(f.read())
 
-width_limit = 15 # km/s
+width_min,width_max = 1,15
 
 name_column = table.Column(data=[reg.attr[1]['text'] for reg in regs],
                            name='Source_Name')
@@ -86,7 +98,8 @@ columns = [table.Column(name="{ee}{name}_{ii}".format(name=name,
                         dtype='float',
                         length=len(regs))
            for ii in range(max([pars[p]['ncomp'] for p in pars]))
-           for name in ['ampH2CO','ampCH3OH','width','center','h2coratio',
+           for name in ['ampH2CO','ampCH3OH','width','center','h2coratio321303',
+                        'h2coratio322321',
                         'density','column','temperature','denscenter','denswidth']
            for ee in ['','e']
           ]
@@ -127,11 +140,21 @@ dusttem_column = table.Column(data=dusttem, dtype='float', name='higaldusttem')
 out_table.add_column(surfdens_column)
 out_table.add_column(dusttem_column)
 
+xarr = pyspeckit.units.SpectroscopicAxis(cube.spectral_axis.value,
+                                         unit=str(cube.spectral_axis.unit),
+                                         refX=cube.wcs.wcs.restfrq,
+                                         refX_units='Hz')
+
 
 for row_number,reg in enumerate(regs):
     name = reg.attr[1]['text']
     if name not in spectra:
-        sp = cube.get_apspec(reg.coord_list,coordsys='galactic',wunit='degree')
+        #sp = cube.get_apspec(reg.coord_list,coordsys='galactic',wunit='degree')
+        shape = pyregion.ShapeList([reg])
+        mask = shape.get_mask(header=noisehdr, shape=noise.shape)
+        scube = cube.subcube_from_ds9region(shape)
+        data = scube.apply_numpy_function(np.nanmean, axis=(1,2))
+        sp = pyspeckit.Spectrum(data=data, xarr=xarr, header=cube.wcs.to_header())
         sp.specname = reg.attr[1]['text']
         # Error is already computed above; this is an old hack
         #sp.error[:] = sp.stats((218e9,218.1e9))['std']
@@ -146,13 +169,13 @@ for row_number,reg in enumerate(regs):
     velos = pars[sp.specname]['velo']
     spname = sp.specname.replace(" ","_")
 
-    sp.specfit.Registry.add_fitter('h2co_simple', simple_fitter, 4, multisingle='multi')
+    sp.specfit.Registry.add_fitter('h2co_simple', simple_fitter2, 6, multisingle='multi')
     guesses_simple = [x for ii in range(ncomp) 
-                      for x in (1,velos[ii],5,0.5,1)]
+                      for x in (1,velos[ii],5,0.5,1.0,1)]
     sp.specfit(fittype='h2co_simple', multifit=True,
                guesses=guesses_simple)
 
-    set_row(sp.specfit.parinfo, ncomp, out_table[row_number], parmap=parmap_simple)
+    set_row(sp.specfit.parinfo, ncomp, out_table[row_number], parmap=parmap_simple2)
 
 
     sp.plotter()
@@ -165,7 +188,11 @@ for row_number,reg in enumerate(regs):
                    for x in (100,14,4.5,
                              sp.specfit.parinfo['VELOCITY{0}'.format(ii)].value,
                              (sp.specfit.parinfo['WIDTH{0}'.format(ii)].value
-                              if sp.specfit.parinfo['WIDTH{0}'.format(ii)].value < width_limit 
+                              if
+                              (sp.specfit.parinfo['WIDTH{0}'.format(ii)].value
+                               < width_max and
+                               sp.specfit.parinfo['WIDTH{0}'.format(ii)].value
+                               > width_min)
                               else 5))
                   ]
 
@@ -173,7 +200,7 @@ for row_number,reg in enumerate(regs):
                                  multisingle='multi')
         sp.specfit(fittype='h2co_mm_radex', multifit=True,
                    guesses=guesses,
-                   limits=[(10,300),(11,15),(3,5.5),(-105,125),(1,width_limit)]*ncomp,
+                   limits=[(10,300),(11,15),(3,5.5),(-105,125),(width_min,width_max)]*ncomp,
                    limited=[(True,True)]*5*ncomp,
                    fixed=[False,False,False,True,True]*ncomp,
                    quiet=False,)

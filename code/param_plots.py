@@ -47,7 +47,8 @@ tarr = temparr[:,0,0]
 
 # While the individual lines are subject to filling factor uncertainties, the
 # ratio is not.
-modelratio = tline321/tline303
+modelratio1 = tline321/tline303
+modelratio2 = tline322/tline321
 
 fittable = table.Table.read(os.path.join(analysispath,
                                           "fitted_line_parameters.ipac"),
@@ -75,13 +76,16 @@ for row in fittable:
 
     par1 = row['ampH2CO_0']
     epar1 = row['eampH2CO_0']
-    par2 = row['ampH2CO_0']*row['h2coratio_0']
-    epar2 = row['ampH2CO_0']*row['eh2coratio_0']
+    par2 = row['ampH2CO_0']*row['h2coratio321303_0']
+    epar2 = row['ampH2CO_0']*row['eh2coratio321303_0']
     #match,indbest,chi2b = grid_fitter.grid_2p_getmatch(par1, epar1, tline303,
     #                                                   par2, epar2, tline321)
-    ratio = row['h2coratio_0']
-    eratio = row['eh2coratio_0']
-    match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio, modelratio)
+    ratio = row['h2coratio321303_0']
+    eratio = row['eh2coratio321303_0']
+    match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio, modelratio1)
+    ratio2 = row['h2coratio322321_0']
+    eratio2 = row['eh2coratio322321_0']
+    match2,indbest2,chi2r2 = grid_fitter.grid_getmatch(ratio2, eratio2, modelratio2)
 
     # We can impose a "loose" abundance constraint
     # Given that we know the H2 density, and the line width is ~5-10 km/s,
@@ -313,10 +317,10 @@ for row in fittable:
         pl.contourf(xax, yax, (chi2_ff.min(axis=axis)),
                     levels=chi2_ff.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
-        pl.contour(xax, yax, (tline < 10*par1), levels=[0.5], color='k')
-        pl.contour(xax, yax, (tline < 100*par1), levels=[0.5], color='k')
-        pl.contour(xax, yax, (tline < 10*par2), levels=[0.5], color='k', linestyle='--')
-        pl.contour(xax, yax, (tline < 100*par2), levels=[0.5], color='k', linestyle='--')
+        pl.contour(xax, yax, (tline303 < 10*par1).max(axis=axis), levels=[0.5], colors='k')
+        pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis), levels=[0.5], colors='k')
+        pl.contour(xax, yax, (tline321 < 10*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
+        pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
         pl.xlabel(xlabel)
         pl.ylabel(ylabel)
         pl.title("Line Brightness + $ff\leq1$")

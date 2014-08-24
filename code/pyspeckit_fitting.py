@@ -78,6 +78,35 @@ simple_fitter = SpectralModel(simplemodel, 5,
                               shortvarnames=('A','v',r'\sigma','R','A_2'),
                               )
 
+def simplemodel2(xarr, amplitude, velocity, width, ratio321303, ratio322321, amp2):
+
+    x = xarr.as_unit('km/s')
+    voff322 = x.x_to_coord(218.475632e9,'Hz')
+    voff321 = x.x_to_coord(218.760066e9,'Hz')
+    voff3 = x.x_to_coord(218.44005,'GHz')
+    x = np.array(x) # make sure xarr is no longer a spectroscopic axis
+    G = (amplitude*(np.exp(-(x-velocity)**2/(2.0*width**2)) +
+                    np.exp(-(x-velocity-voff322)**2/(2.0*width**2))*ratio321303*ratio322321 +
+                    np.exp(-(x-velocity-voff321)**2/(2.0*width**2))*ratio321303) +
+         amp2 * np.exp(-(x-velocity-voff3)**2/(2.0*width**2)))
+
+    return G
+
+simple_fitter2 = SpectralModel(simplemodel2, 6,
+                              parnames=['Amplitude', 'Velocity', 'Width',
+                                        'Ratio321303', 'Ratio322321',
+                                        'AmpCH3OH'], 
+                              parvalues=[1,0,1,0.5,1.0,0.5],
+                              parlimited=[(True,False),
+                                          (False,False),
+                                          (True,False),
+                                          (True,True),
+                                          (True,True),
+                                          (True,False)],
+                              parlimits=[(0,0),(0,0),(0,0),(0,1),(0.3,1.1),(0,0)],
+                              shortvarnames=('A','v',r'\sigma','R1','R2','A_2'),
+                              )
+
 
 
 if __name__ == "__main__":
