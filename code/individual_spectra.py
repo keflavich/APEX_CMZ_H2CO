@@ -109,30 +109,12 @@ out_table = table.Table([name_column, lon_column, lat_column] + columns)
 column_image = fits.open('/Users/adam/work/gc/gcmosaic_column_conv36.fits')[0]
 dusttem_image = fits.open('/Users/adam/work/gc/gcmosaic_temp_conv36.fits')[0]
 
-#apertures = [('circular',reg.coord_list[2]*u.deg) for reg in regs]
-radii = np.array([reg.coord_list[2] for reg in
-                  regs])/column_image.header['CDELT2']
-positions = coordinates.SkyCoord([(reg.coord_list[0]*u.deg,
-                                   reg.coord_list[1]*u.deg) for reg in regs],
-                                 frame='galactic')
 surfdens = []
 dusttem = []
-for name, pos, ap in zip(name_column,positions,radii):
-    phot_table, aux_dict = photutils.aperture_photometry(column_image,
-                                                         pos, 
-                                                        ('circular',ap))
-    phsum = phot_table['aperture_sum']*1e22
-    area = np.pi*(ap)**2
-    phmean = (phsum / area) * u.cm**-2
-
-    surfdens.append(phmean)
-
-    tem_table, aux_dict = photutils.aperture_photometry(dusttem_image, pos,
-                                                        ('circular',ap))
-    temsum = tem_table['aperture_sum']
-    area = np.pi*(ap)**2
-    temmean = (temsum / area) * u.cm**-2
-    dusttem.append(temmean)
+for reg in regs:
+    mask = pyregion.ShapeList([reg]).get_mask(column_image)
+    surfdens.append(column_image.data[mask].mean())
+    dusttem.append(dusttem_image.data[mask].mean())
 
 surfdens_column = table.Column(data=surfdens, dtype='float',
                                name='higalcolumndens')
