@@ -15,6 +15,7 @@ from astropy.io import fits
 import photutils
 from astropy import coordinates
 from astropy import units as u
+from astropy.utils.console import ProgressBar
 
 
 if 'cube' not in locals():
@@ -63,8 +64,8 @@ parmap_simple2 = {'ampH2CO':'AMPLITUDE',
           'ampCH3OH':'AMPCH3OH',
           'width':'WIDTH',
           'center':'VELOCITY',
-          'h2coratio321303':'RATIO321303',
-          'h2coratio322321':'RATIO322321',}
+          'h2coratio321303':'RATIO321303X',
+          'h2coratio322321':'RATIO322321X',}
 parmap_radex = {
           'temperature':'TEMPERATURE',
           'density':'DENSITY',
@@ -111,7 +112,8 @@ dusttem_image = fits.open('/Users/adam/work/gc/gcmosaic_temp_conv36.fits')[0]
 
 surfdens = []
 dusttem = []
-for reg in regs:
+log.info("Herschel parameter extraction.")
+for reg in ProgressBar(regs):
     mask = pyregion.ShapeList([reg]).get_mask(column_image)
     surfdens.append(column_image.data[mask].mean())
     dusttem.append(dusttem_image.data[mask].mean())

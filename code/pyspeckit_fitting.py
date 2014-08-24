@@ -94,7 +94,7 @@ def simplemodel2(xarr, amplitude, velocity, width, ratio321303, ratio322321, amp
 
 simple_fitter2 = SpectralModel(simplemodel2, 6,
                               parnames=['Amplitude', 'Velocity', 'Width',
-                                        'Ratio321303', 'Ratio322321',
+                                        'Ratio321303x', 'Ratio322321x',
                                         'AmpCH3OH'], 
                               parvalues=[1,0,1,0.5,1.0,0.5],
                               parlimited=[(True,False),

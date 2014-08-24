@@ -32,6 +32,9 @@ tline303 = map_coordinates(tline303a,
 tline321 = map_coordinates(tline321a,
                            upsinds/upsample_factor[:,None,None,None],
                            mode='nearest')
+tline322 = map_coordinates(tline322a,
+                           upsinds/upsample_factor[:,None,None,None],
+                           mode='nearest')
 densityarr = ((uxinds + hdr['CRPIX1']-1)*hdr['CDELT1'] /
               float(upsample_factor[2])+hdr['CRVAL1']) # log density
 columnarr  = ((uyinds + hdr['CRPIX2']-1)*hdr['CDELT2'] /
