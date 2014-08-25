@@ -17,6 +17,9 @@ from astropy import coordinates
 from astropy import units as u
 from astropy import log
 from astropy.utils.console import ProgressBar
+import pylab as pl
+
+pl.ioff()
 
 
 if 'cube' not in locals():
@@ -86,8 +89,6 @@ regs = pyregion.open(regpath+'spectral_apertures.reg') + pyregion.open(regpath+'
 with open(regpath+'spectral_ncomp.txt') as f:
     pars = eval(f.read())
 
-width_min,width_max = 1,15
-
 name_column = table.Column(data=[reg.attr[1]['text'] for reg in regs],
                            name='Source_Name')
 lon_column = table.Column(data=[reg.coord_list[0] for reg in regs],
@@ -114,9 +115,10 @@ dusttem_image = fits.open('/Users/adam/work/gc/gcmosaic_temp_conv36.fits')[0]
 surfdens = []
 dusttem = []
 log.info("Herschel parameter extraction.")
+herschelok = np.isfinite(column_image.data) & np.isfinite(dusttem_image.data)
 for reg in ProgressBar(regs):
-    mask = pyregion.ShapeList([reg]).get_mask(column_image)
-    surfdens.append(column_image.data[mask].mean())
+    mask = pyregion.ShapeList([reg]).get_mask(column_image) & herschelok
+    surfdens.append(column_image.data[mask].mean()*1e22)
     dusttem.append(dusttem_image.data[mask].mean())
 
 surfdens_column = table.Column(data=surfdens, dtype='float',
@@ -150,10 +152,17 @@ for row_number,reg in enumerate(regs):
         # Error is already computed above; this is an old hack
         #sp.error[:] = sp.stats((218e9,218.1e9))['std']
         spectra[name] = sp
+        sp.units = "$T_{MB}$ [K]"
     else:
         sp = spectra[name]
 
+    if 'Map' in name:
+        width_min,width_max = 1,25
+    else:
+        width_min,width_max = 1,15
 
+
+    sp.plotter.autorefresh=False
     sp.plotter()
 
     ncomp = pars[sp.specname]['ncomp']
@@ -173,7 +182,7 @@ for row_number,reg in enumerate(regs):
 
 
     sp.plotter()
-    sp.specfit.plot_fit()
+    sp.specfit.plot_fit(show_components=True)
     sp.plotter.savefig(os.path.join(figurepath,
                                     "{0}_fit_4_lines_simple.pdf".format(spname)))
 
@@ -278,4 +287,5 @@ for row_number,reg in enumerate(regs):
 
         sp.plotter.refresh()
 
-out_table.write(os.path.join(analysispath,"fitted_line_parameters.ipac"), format='ascii.ipac')
+out_table.write(os.path.join(analysispath,"fitted_line_parameters.ipac"),
+                format='ascii.ipac')

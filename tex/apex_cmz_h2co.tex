@@ -219,6 +219,7 @@ which.}
 {fig:ratiomaps}{1}{7in}
 
 \section{Line Modeling}
+\label{sec:linemodeling}
 In order to extract more detailed information about the gas properties and
 acquire a more detailed understanding of the uncertainties in the ratio-derived
 temperature map described above, we extracted spectra from individual regions
@@ -246,66 +247,137 @@ $10\times$ to account for the abundance uncertainty again.
 
 These constraints are shown projected onto the three planes of our fitted
 parameter space in the multi-paneled Figures
-\ref{fig:coltemconstraints}-\ref{fig:parsonbrightness}.
+\ref{fig:coltemconstraints}-\ref{fig:parsonbrightness}.  The fitted parameters
+displayed in Figure \ref{fig:parsonbrightness} are the amplitude of the
+\formaldehyde \threeohthree line, the centroid velocity, the line width
+($\sigma$, not FWHM), the ratio $R1 = \Rone$,
+the ratio $R2 = \Rtwo$, and the amplitude of
+the \methanol \fourtwotwo line.
 
 \Figure{figures/d:G0.38+0.04_fit_4_lines_simple.pdf}
-{Spectrum of ``cloud d"}
+{Fitted spectrum of ``cloud d".  The fitted parameters and their corresponding
+errors are shown in the legend.  The parameters are the amplitude of the
+\formaldehyde \threeohthree line, the centroid velocity, the line width
+($\sigma$, not FWHM), the ratio $R1 = \Rone$,
+the ratio $R2 = \Rtwo$, and the amplitude of
+the \methanol \fourtwotwo line.  }
 {fig:clouddspec}{0.5}{0}
 \Figure{figures/param_fits/d:G0.38+0.04_col_tem_parameter_constraints.pdf}
-{caption}
+{The parameter constraints projected (marginalized) onto the temperature/column
+density plane.\newline
+(top left) Constraints imposed by the measured ratio \Rone are shown in filled contours,
+with blue corresponding to $\Delta\chi^2 < 1$, cyan $1 < \Delta\chi^2 < 2$,
+yellow $2 < \Delta\chi^2 < 3$, and red $3 < \Delta\chi^2 < 4$.  The solid
+contours show the joint constraints imposed by including restrictions on the
+total column density, filling factor, and abundance, following the same color
+scheme.  The solid grayscale contours show the constraints imposed by
+$R2=\Rtwo$, from black ($\Delta\chi^2 < 1$) to white.  In this case, $R2$
+imposes only a weak lower limit on column. \newline
+(top right) The same colorscheme as before, showing the constraints imposed by
+assuming the abundance of \para relative to \hh is as labeled.  In this case,
+the abundance does not constraint these parameters. \newline
+(bottom left) The same colorscheme as before, showing the constraints imposed
+by the measured total column density of \hh, converted to a constraint on the
+\para column by assuming a velocity gradient (5 \kms \perpc) and abundance as
+shown in the top right panel.  The uncertainty is dominated by the abundance
+uncertainty.  \newline
+(bottom right) The same colorscheme as before, showing the constraints imposed
+by forcing the filling factor of the line emission to be $ff < 1$.
+}
 {fig:coltemconstraints}{0.5}{0}
 \Figure{figures/param_fits/d:G0.38+0.04_dens_col_parameter_constraints.pdf}
-{caption}
+{The constraints in density-column parameter space.
+See Figure \ref{fig:coltemconstraints} for details.  In the bottom-right panel, the
+solid line shows the contour corresponding to $ff(\threeohthree)=0.1$ in
+black.}
 {fig:denscolconstraints}{0.5}{0}
 \Figure{figures/param_fits/d:G0.38+0.04_dens_tem_parameter_constraints.pdf}
-{caption}
+{The constraints in density-temperature parameter space.
+See Figure \ref{fig:coltemconstraints} for details.}
 {fig:denstemconstraints}{0.5}{0}
 \Figure{figures/param_fits/d:G0.38+0.04_h2coratio_minaxis.pdf}
-{caption}
+{The line brightness of \para \threeohthree (top row) and \para \threetwoone
+(bottom row) in the three different projections of parameter space.  The
+grayscale images correspond to a slice through the parameter spaces at the
+location of the best-fit parameter.  The colored contours show the allowed
+marginalized regions in each parameter space as described in the
+\ref{fig:Seecoltemconstraints} caption.}
 {fig:parsonbrightness}{0.5}{0}
 
-\section{Examination of Individual Spectra}
-\todo{The modeling is ambiguous still: it is necessary to impose some sort of
-restriction on the abundance or column density in order to acquire reasonable
-constraints on the temperature.}
-In order to maximize the signal-to-noise and acquire the strongest constraint
-on the temperature, we extract spectra for regions with bright lines.  This
-approach is similar to the approach adopted in \citet{Ao2013a}, but for a much
-larger area.
+\section{Discussion of Heating Mechanisms}
+\citet{Ao2013a} examined four heating mechanisms in the inner $\sim 40$ pc,
+concluding that the only viable heating mechanisms capable of explaining the
+high observed temperatures in the molecular gas are cosmic ray and turbulent
+heating.  
 
-\subsection{Sources in the Ring}
-The \citet{Molinari2011a} ring has attracted a great deal of attention recently,
-as it has the most gas in the CMZ and a large, but unrealized, star-forming potential
-\citep{Longmore2013a,Longmore2012b,Longmore2012a,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
-The star formation in this region is suppressed relative to expectations based
-on nearby star-forming regions and nearby (on a different scale) Galactic
-disks.  Hypotheses for this depressed star formation rate include suppressed
-fragmentation by cosmic ray and X-ray heating and a raised star formation
-threshold from enhanced turbulence.
+The cosmic ray heating rate required by the \citet{Ao2013a} analysis is high,
+$\zeta\sim1-2\ee{-14}$ \pers, but plausible.  The turbulence in the CMZ is
+enough to explain the observed gas temperatures.  However, it is still possible
+to distinguish cosmic ray and turbulent heating if one dominates over the
+other: turbulent heating depends strongly on the velocity dispersion ($\Gamma
+\propto \sigma_V^3$), while CR heating should have no dependence on the
+velocity dispersion.  Additionally, turbulence has a scale dependence, since
+the global dynamics (rotation) dominates over turbulence on scales larger than
+the scale height in the CMZ: $h\sim10$ pc (4\arcmin) in the 100-pc `ring',
+$h\sim50$ pc (20\arcmin) in the $\ell=1.3\arcdeg$ cloud \citep{Kruijssen2013a}.
+% I'm not sure this really makes sense.  Is it even possible to measure the gas
+% temperature on larger physical/angular scales?
 
-\subsubsection{The Brick: G0.253+0.016}
-We examine two lines of sight through The Brick, in the northeast at
-G0.241+0.006 and in the southwest at G0.261+0.028.  The northeast line of sight
-has two independent velocity components with dramatically different
-temperatures: a 30 \kms component with only a lower limit on temperature,
-$T>300$ K, and a 0 \kms component with $T=73\pm3$ K.  The southwest line of
-sight has only one component with $T=157\pm10$ K.
+These differences result in testable predictions.  If turbulence is the
+dominant heating mechanism in the CMZ clouds, there should be a correlation
+between the observed line width and the gas kinetic temperature.
 
-\subsubsection{Cloud d: G0.38+0.04}
-Cloud ``d'' is one of the possible protoclusters identified in
-\citet{Longmore2013a}.  It exhibits bright and relatively narrow (FWHM$\sim7.3$
-\kms) \para emission and has a tightly constrained temperature $T=84\pm5$ K.
+\todo{This is speculative.}  In a highly turbulent medium, most of the power
+dissipation happens on the smallest size scale (if $L > \sigma_v^3$).  If the
+cooling rate is enhanced in the postshock medium, the high gas temperature will
+be isolated to high-density, compact clumps, but these clumps will also
+dominate the line emission.  \todo{This should result in a density dependence
+of the temperature or observed temperature $T(n) > n^1$, maybe $T(n) \sim n^2$ ?}
+Cosmic rays should not exhibit this behavior; they should heat all scales equally
+and care only about the \emph{mean} density.
 
-\Figure{figures/G0.38+0.04_fit_h2co_mm_radex.pdf}
-{The 218-219 GHz spectrum of Cloud d}
-{fig:cloudDspec}{0.5}{0.0}
-
-\subsection{Clouds e/f: G0.47+0.01}
-Clouds ``e'' and ``f'' together make another proto-cluster in
-\citet{Longmore2013a}.  These clouds are marginally warmer than cloud d, with
-$T=110\pm20$ K.  However, because of the region of parameter space the lines
-allow, the density is reasonably constrained to be $n(\hh)\sim10^{4\pm0.2}$ \percc,
-much lower than in cloud d and more comparable to The Brick.
+%\section{Examination of Individual Spectra}
+%%\todo{The modeling is ambiguous still: it is necessary to impose some sort of
+%%restriction on the abundance or column density in order to acquire reasonable
+%%constraints on the temperature.}
+%In order to maximize the signal-to-noise and acquire the strongest constraint
+%on the temperature, we extract spectra for regions with bright lines.  This
+%approach is similar to the approach adopted in \citet{Ao2013a}, but for a much
+%larger area.
+%
+%\subsection{Sources in the Ring}
+%The \citet{Molinari2011a} ring has attracted a great deal of attention recently,
+%as it has the most gas in the CMZ and a large, but unrealized, star-forming potential
+%\citep{Longmore2013a,Longmore2012b,Longmore2012a,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
+%The star formation in this region is suppressed relative to expectations based
+%on nearby star-forming regions and nearby (on a different scale) Galactic
+%disks.  Hypotheses for this depressed star formation rate include suppressed
+%fragmentation by cosmic ray and X-ray heating and a raised star formation
+%threshold from enhanced turbulence.
+%
+%\subsubsection{The Brick: G0.253+0.016}
+%We examine two lines of sight through The Brick, in the northeast at
+%G0.241+0.006 and in the southwest at G0.261+0.028.  The northeast line of sight
+%has two independent velocity components with dramatically different
+%temperatures: a 30 \kms component with only a lower limit on temperature,
+%$T>300$ K, and a 0 \kms component with $T=73\pm3$ K.  The southwest line of
+%sight has only one component with $T=157\pm10$ K.
+%
+%\subsubsection{Cloud d: G0.38+0.04}
+%Cloud ``d'' is one of the possible protoclusters identified in
+%\citet{Longmore2013a}.  It exhibits bright and relatively narrow (FWHM$\sim7.3$
+%\kms) \para emission and has a tightly constrained temperature $T=84\pm5$ K.
+%
+%\Figure{figures/G0.38+0.04_fit_h2co_mm_radex.pdf}
+%{The 218-219 GHz spectrum of Cloud d}
+%{fig:cloudDspec}{0.5}{0.0}
+%
+%\subsection{Clouds e/f: G0.47+0.01}
+%Clouds ``e'' and ``f'' together make another proto-cluster in
+%\citet{Longmore2013a}.  These clouds are marginally warmer than cloud d, with
+%$T=110\pm20$ K.  However, because of the region of parameter space the lines
+%allow, the density is reasonably constrained to be $n(\hh)\sim10^{4\pm0.2}$ \percc,
+%much lower than in cloud d and more comparable to The Brick.
 
 \section{Conclusion}
 

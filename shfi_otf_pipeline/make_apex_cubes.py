@@ -1547,8 +1547,8 @@ def do_sncube_masking_hi(prefix=h2copath+'APEX_H2CO_303_202'):
     integrate_slices_high(prefix+'_snmasked')
 
 def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
-                    debug=False, smooth=False, vsmooth=False, naxis3=400,
-                    vmin=-150*u.km/u.s, vmax=250*u.km/u.s):
+                    debug=False, smooth=False, vsmooth=False, naxis3=500,
+                    vmin=-225*u.km/u.s, vmax=275*u.km/u.s):
     t0 = time.time()
     log.info(("Extracting subcube at {0} from {1}"
               " with smooth={2} and vsmooth={3}").format(linefreq,

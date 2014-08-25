@@ -83,12 +83,12 @@ def render_chem(yth2co321=yth2co321, yth2co303=yth2co303, ytsio=ytsio,
     tf3.add_step(0.25,0.5,[0,0,1,1])
     tf3.map_to_colormap(0.5,2,scale=1,colormap=blue)
 
-    center = yth2co303.domain_dimensions /2.
-    camh2co303 = yth2co303.h.camera(center, camera_angle, scale, size, tf3,
+    center = yth2co303.dataset.domain_dimensions /2.
+    camh2co303 = yth2co303.dataset.h.camera(center, camera_angle, scale, size, tf3,
                                     north_vector=north_vector, fields='flux')
-    camh2co321 = yth2co321.h.camera(center, camera_angle, scale, size, tf2,
+    camh2co321 = yth2co321.dataset.h.camera(center, camera_angle, scale, size, tf2,
                                     north_vector=north_vector, fields='flux')
-    camsio = ytsio.h.camera(center, camera_angle, scale, size, tf1,
+    camsio = ytsio.dataset.h.camera(center, camera_angle, scale, size, tf1,
                             north_vector=north_vector, fields='flux')
 
     imh2co303  = camh2co303.snapshot()
@@ -143,7 +143,7 @@ def render_chem(yth2co321=yth2co321, yth2co303=yth2co303, ytsio=ytsio,
         return imh2co303,imh2co321,imsio
 
 
-def render_13co(pf=yt13co, outdir='yt_renders_13CO',
+def render_13co(ytcube=yt13co, outdir='yt_renders_13CO',
                 size=512, scale=1200., nframes=180,
                 movie=True,
                 camera_angle=[0, 0, 1],
@@ -165,8 +165,8 @@ def render_13co(pf=yt13co, outdir='yt_renders_13CO',
     tf.map_to_colormap(10, 30, colormap=red, scale=1)
 
 
-    center = pf.domain_dimensions /2.
-    cam = pf.h.camera(center, camera_angle, scale, size, tf,
+    center = ytcube.dataset.domain_dimensions /2.
+    cam = ytcube.dataset.h.camera(center, camera_angle, scale, size, tf,
                       north_vector=north_vector, fields='flux')
 
     im  = cam.snapshot()
@@ -178,18 +178,35 @@ def render_13co(pf=yt13co, outdir='yt_renders_13CO',
         for ii,im in enumerate(cam.rotation(2 * np.pi, nframes/3, rot_vector=rot_vector1)):
             images.append(im)
             im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" % (ii))),
-                                        rescale=False)
+                         rescale=False)
             pb.update(ii)
         for jj,im in enumerate(cam.rotation(2 * np.pi, nframes/3, rot_vector=rot_vector2)):
             images.append(im)
-            im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" % (ii+jj))),
-                                       rescale=False)
+            im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" %
+                                                  (ii+jj))), rescale=False)
             pb.update(ii+jj)
         for kk,im in enumerate(cam.rotation(2 * np.pi, nframes/3, rot_vector=rot_vector3)):
             images.append(im)
-            im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" % (ii+jj+kk))),
-                                        rescale=False)
+            im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" %
+                                                  (ii+jj+kk))), rescale=False)
             pb.update(ii+jj+kk)
+
+        TheBrick = ytcube.world2yt([0.253, 0.016])
+        for LL, snapshot in enumerate(cam.move_to(TheBrick, 5)):
+            snapshot.write_png(paths.mpath(os.path.join(outdir,'%04i.png' %
+                                                        (ii+jj+kk+LL))),
+                               rescale=False)
+            pb.update(ii+jj+kk+LL)
+        for mm, snapshot in enumerate(cam.zoomin(5, 5)):
+            snapshot.write_png(paths.mpath(os.path.join(outdir,'%04i.png' %
+                                                        (ii+jj+kk+LL+mm))),
+                               rescale=False)
+            pb.update(ii+jj+kk+LL+mm)
+        for nn,im in enumerate(cam.rotation(2*np.pi, nframes/3, rot_vector=rot_vector1)):
+            images.append(im)
+            im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" % (ii+jj+kk+LL+mm+nn))),
+                         rescale=False)
+            pb.update(ii+jj+kk+LL+mm+nn)
 
         save_images(images, paths.mpath(outdir))
 
