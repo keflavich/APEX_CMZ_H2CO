@@ -1,0 +1,45 @@
+# Region file format: DS9 version 4.1
+global color=green dashlist=8 3 width=1 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1
+galactic
+box(0.37027937,0.050204274,480",480",359.76573) # color=blue text={Map_001 Off 2}
+box(0.48383402,0.025440612,480",480",359.76573) # color=blue text={Map_002 Off 2}
+box(0.37028085,-0.0570956,480",480",359.76573) # color=blue text={Map_003 Off 2}
+box(0.4941575,-0.077726647,480",480",359.76573) # color=blue text={Map_004 Off 2}
+box(0.60770686,0.029570046,480",480",359.76573) # color=blue text={Map_005 Off 2}
+box(0.61596419,-0.08804256,480",480",359.76573) # color=blue text={Map_006 Off 2}
+box(0.72744399,-0.005508248,480",480",359.76573) # color=blue text={Map_007 Off 2}
+box(0.71918456,-0.13136847,480",480",359.76573) # color=blue text={Map_008 Off 2}
+box(359.77978,-0.1066165,480",480",359.76573) # color=blue text={Map_009 Off 3}
+box(359.85617,0.0027465204,480",480",359.76573) # color=blue text={Map_010 Off 3}
+box(359.98418,0.041952615,480",480",359.76573) # color=blue text={Map_011 Off 2}
+box(0.24639979,0.050205314,480",480",359.76573) # color=blue text={Map_012 Off 2}
+box(0.11013123,0.046078159,480",480",359.76573) # color=blue text={Map_013 Off 2}
+box(359.72432,0.010495992,480",480",359.76573) # color=blue text={Map_018 Off 3}
+box(359.65296,-0.11507694,480",480",359.76573) # color=blue text={Map_019 Off 3}
+box(359.59712,-0.011208714,480",480",359.76573) # color=blue text={Map_020 Off 3}
+box(359.47302,-0.076316778,480",480",359.76573) # color=blue text={Map_021 Off 3}
+box(359.52576,-0.13057674,480",480",359.76573) # color=blue text={Map_022 Off 3}
+box(359.5785,-0.20033859,480",480",359.76573) # color=blue text={Map_023 Off 3}
+box(0.7998381,-0.19647351,480",480",359.76573) # color=blue text={Map_024 Off 1}
+box(0.84171146,-0.11276379,480",480",359.76573) # color=blue text={Map_025 Off 1}
+box(0.96267967,-0.11275938,480",480",359.76573) # color=blue text={Map_026 Off 1}
+box(0.83705965,-0.012004908,480",480",359.76573) # color=blue text={Map_027 Off 2}
+box(0.96268105,-0.0073542981,480",480",359.76573) # color=blue text={Map_028 Off 2}
+box(1.0820903,-0.11120707,480",480",359.76573) # color=blue text={Map_029 Off 1}
+box(1.0820892,-0.0058022328,480",480",359.76573) # color=blue text={Map_030 Off 2}
+box(1.6225941,-0.11346139,480",480",359.76573) # color=blue text={Map_031 Off 1}
+box(1.6226022,-0.0080577197,480",480",359.76573) # color=blue text={Map_032 Off 1}
+box(359.90985,-0.079792312,480",480",359.76573) # color=cyan text={Map_055 Off 3}
+box(0.031671058,-0.081855661,480",480",359.76573) # color=cyan text={Map_056 Off 3}
+box(0.14522949,-0.085982476,480",480",359.76573) # color=cyan text={Map_057 Off 2}
+box(0.25672373,-0.077729547,480",480",359.76573) # color=cyan text={Map_058 Off 2}
+box(1.5044993,-0.11346098,480",480",359.76573) # color=purple text={Map_115 Off 1}
+box(1.5045085,-0.0080590378,480",480",359.76573) # color=purple text={Map_116 Off 1}
+box(1.3864076,-0.11346067,480",480",359.76573) # color=purple text={Map_117 Off 1}
+box(1.3864134,-0.0080589713,480",480",359.76573) # color=purple text={Map_118 Off 1}
+box(1.5044993,-0.11346098,480",480",359.76573) # color=purple text={Map_119 Off 1}
+box(1.5045085,-0.0080590378,480",480",359.76573) # color=purple text={Map_120 Off 1}
+box(1.2728543,-0.11346424,480",480",359.76573) # color=purple text={Map_121 Off 1}
+box(1.2728592,-0.0080634451,480",480",359.76573) # color=purple text={Map_122 Off 1}
+box(1.1706598,-0.11574005,480",480",359.76573) # color=purple text={Map_123 Off 1}
+box(1.1706628,-0.010337139,480",480",359.76573) # color=purple text={Map_124 Off 1}

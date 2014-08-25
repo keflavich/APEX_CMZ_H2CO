@@ -15,6 +15,7 @@ from astropy.io import fits
 import photutils
 from astropy import coordinates
 from astropy import units as u
+from astropy import log
 from astropy.utils.console import ProgressBar
 
 
@@ -81,7 +82,7 @@ def set_row(parinfo, ncomp, row, parmap):
             row["e"+par+"_"+str(ii)] = parinfo[parmap[par]+str(ii)].error
 
 
-regs = pyregion.open(regpath+'spectral_apertures.reg') + pyregion.open(regpath+'target_fields_8x8.reg')
+regs = pyregion.open(regpath+'spectral_apertures.reg') + pyregion.open(regpath+'target_fields_8x8_gal.reg')
 with open(regpath+'spectral_ncomp.txt') as f:
     pars = eval(f.read())
 
@@ -129,6 +130,7 @@ xarr = pyspeckit.units.SpectroscopicAxis(cube.spectral_axis.value,
                                          refX=cube.wcs.wcs.restfrq,
                                          refX_units='Hz')
 
+noiseokmask = np.isfinite(noise)
 
 for row_number,reg in enumerate(regs):
     name = reg.attr[1]['text']
@@ -138,7 +140,12 @@ for row_number,reg in enumerate(regs):
         mask = shape.get_mask(header=noisehdr, shape=noise.shape)
         scube = cube.subcube_from_ds9region(shape)
         data = scube.apply_numpy_function(np.nanmean, axis=(1,2))
-        sp = pyspeckit.Spectrum(data=data, xarr=xarr, header=cube.wcs.to_header())
+        error = ((noise[mask & noiseokmask]**2).sum()**0.5/np.count_nonzero(mask))
+        sp = pyspeckit.Spectrum(data=data,
+                                error=np.ones(data.size)*error,
+                                xarr=xarr, header=cube.wcs.to_header())
+        sp.header['ERROR'] = error
+        sp.error[:] = sp.stats((218.5e9,218.65e9))['std']
         sp.specname = reg.attr[1]['text']
         # Error is already computed above; this is an old hack
         #sp.error[:] = sp.stats((218e9,218.1e9))['std']
@@ -155,9 +162,12 @@ for row_number,reg in enumerate(regs):
 
     sp.specfit.Registry.add_fitter('h2co_simple', simple_fitter2, 6, multisingle='multi')
     guesses_simple = [x for ii in range(ncomp) 
-                      for x in (1,velos[ii],5,0.5,1.0,1)]
+                      for x in (sp.data.max(),velos[ii],5,0.5,1.0,sp.data.max())]
     sp.specfit(fittype='h2co_simple', multifit=True,
-               guesses=guesses_simple)
+               guesses=guesses_simple,
+               limited=[(True,True)] * 6,
+               limits=[(0,1e5),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
+              )
 
     set_row(sp.specfit.parinfo, ncomp, out_table[row_number], parmap=parmap_simple2)
 
