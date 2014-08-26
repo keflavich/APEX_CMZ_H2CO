@@ -1905,7 +1905,7 @@ def docleannhits():
     f[0].data = nhm
 
 def ph2cogrid(ntemp=50, trange=[10,200], abundances=(10**-8.5,10**-9),
-              nh2=3e22, densityrange=[4,7]):
+              Nh2=(3e22,3e23), logdensities=(4,5)):
     import pyradex
 
     temperatures=np.linspace(trange[0],trange[1],ntemp)
@@ -1921,14 +1921,14 @@ def ph2cogrid(ntemp=50, trange=[10,200], abundances=(10**-8.5,10**-9),
                       deltav=deltav,
                       column=None,
                       temperature=temperatures[0],
-                      h2column=nh2)
+                      h2column=Nh2[0])
 
     Xarr = {}
     for abundance in abundances:
         Xarr[abundance] = {}
-        for nh2 in (nh2,):
+        for h2column in Nh2:
 
-            densities = [10**x for x in xrange(*densityrange)]
+            densities = [10**x for x in logdensities]
             ratio1 = {d:[] for d in densities}
             ratio2 = {d:[] for d in densities}
             f1 = {d:[] for d in densities}
@@ -1938,8 +1938,10 @@ def ph2cogrid(ntemp=50, trange=[10,200], abundances=(10**-8.5,10**-9),
             for density in densities:
                 R.density = {'H2': density}
                 for temperature in temperatures:
+                    R.abundance = abundance
                     R.temperature = temperature
-                    print R.run_radex(),
+                    log.info(str((R.run_radex(), R.column, R.density['H2'],
+                                  R.temperature, R.abundance)))
 
                     F1 = R.T_B[2]  # 218.222192 3_0_3
                     F2 = R.T_B[12] # 218.760066 3_2_1
@@ -1958,7 +1960,7 @@ def ph2cogrid(ntemp=50, trange=[10,200], abundances=(10**-8.5,10**-9),
             ratio1 = {d:np.array(ratio1[d]) for d in densities}
             ratio2 = {d:np.array(ratio2[d]) for d in densities}
 
-            Xarr[abundance][nh2] = {'flux1':f1,
+            Xarr[abundance][h2column] = {'flux1':f1,
                                     'flux2':f2,
                                     'flux3':f3,
                                     'ratio1':ratio1,
@@ -1977,11 +1979,15 @@ class TemperatureMapper(object):
 
     def init(self):
         self.Xarr = ph2cogrid(trange=self.trange, ntemp=self.ntemp,
-                              abundances=(10**-8.5,), nh2=3e22, **self.kwargs)
-        self.temperatures = np.linspace(self.trange[0], self.trange[1], self.ntemp)
+                              logdensities=(4,5), abundances=(10**-8.5,),
+                              Nh2=(3e22,3e23), **self.kwargs)
+        self.temperatures = np.linspace(self.trange[0], self.trange[1],
+                                        self.ntemp)
 
 
-    def get_mapper(self, lineid, tmin=np.nan, tmax=np.nan):
+    def get_mapper(self, lineid, tmin=np.nan, tmax=np.nan,
+                   density=1e4,
+                   column=3e22):
         if not hasattr(self,'temperatures'):
             self.init()
 
@@ -1990,7 +1996,7 @@ class TemperatureMapper(object):
 
         # ugly hack because ph2co is indexed with floats
         # Use FIXED abundance, FIXED column, FIXED density
-        ratios = self.Xarr[self.Xarr.keys()[0]][3e22][rationame][1e4]
+        ratios = self.Xarr[self.Xarr.keys()[0]][column][rationame][density]
 
         def ratio_to_tem(r):
             inds = np.argsort(ratios)
@@ -2007,8 +2013,12 @@ if 'tm' not in locals():
 
 def do_temperature(ratio=True):
     temperaturemap(tm, ratio=ratio)
+    temperaturemap(tm, ratio=False, Nnsuffix='_dens1e5_col3e22', density=1e5)
+    temperaturemap(tm, ratio=False, Nnsuffix='_dens1e4_col3e23', density=1e4,
+                   column=3e23)
 
-def temperaturemap(ratio_to_tem, path=h2copath, ratio=True):
+def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
+                   **kwargs):
     if ratio:
         doratio()
 
@@ -2027,14 +2037,14 @@ def temperaturemap(ratio_to_tem, path=h2copath, ratio=True):
                     log.info("Skipping {0}".format(pfx))
                     continue
                 rmap = fits.getdata(pfx+'.fits')
-                tmap = ratio_to_tem(rmap, highline)#, tmin=10, tmax=300)
+                tmap = ratio_to_tem(rmap, highline, **kwargs)#, tmin=10, tmax=300)
                 rf = fits.open(pfx+'.fits')
                 rf[0].header['BUNIT'] = 'K'
                 rf[0].header['BTYPE'] = 'TKIN'
                 del rf[0].header['LONPOLE']
                 del rf[0].header['LATPOLE']
                 rf[0].data = tmap
-                rf.writeto(pfx+'_temperature.fits',clobber=True)
+                rf.writeto(pfx+'_temperature{suffix}.fits'.format(suffix=Nnsuffix),clobber=True)
                 #mask = fits.getdata('APEX_H2CO_303_202_smooth_mask_integ.fits') > 0.018
                 if 'cube' not in suf:
                     mask = fits.getdata(path+'APEX_H2CO_322_221{0}_mask_integ.fits'.format(smooth)) > 0.0025
@@ -2042,18 +2052,19 @@ def temperaturemap(ratio_to_tem, path=h2copath, ratio=True):
                     mask = fits.getdata(path+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth.rstrip('_bl'))).astype('bool')
                 tmap[True-mask] = np.nan
                 rf[0].data = tmap
-                rf.writeto(pfx+'_temperature_masked.fits',clobber=True)
+                rf.writeto(pfx+'_temperature{suffix}_masked.fits'.format(suffix=Nnsuffix),
+                           clobber=True)
 
                 if 'cube' in suf:
                     rf[0].data = np.nanmax(tmap, axis=0)
-                    rf.writeto(pfx+'_peaktemperature.fits', clobber=True)
+                    rf.writeto(pfx+'_peaktemperature{suffix}.fits'.format(suffix=Nnsuffix), clobber=True)
                     rf[0].data = scipy.stats.nanmedian(tmap, axis=0)
-                    rf.writeto(pfx+'_midtemperature.fits', clobber=True)
+                    rf.writeto(pfx+'_midtemperature{suffix}.fits'.format(suffix=Nnsuffix), clobber=True)
 
                     wt = fits.getdata(path+'APEX_H2CO_303_202{0}.fits'.format(smooth)).astype('bool')
                     wt[(True-mask) | (tmap==0) | (True-np.isfinite(tmap))] = 0
                     rf[0].data = np.nansum(tmap*wt, axis=0)/np.nansum(wt, axis=0)
-                    rf.writeto(pfx+'_wtdmeantemperature.fits', clobber=True)
+                    rf.writeto(pfx+'_wtdmeantemperature{suffix}.fits'.format(suffix=Nnsuffix), clobber=True)
 
 def mask_out_ch3oh(smooth='_smooth', dpath=mergepath):
     nu_ch3oh = all_lines['CH3OH_422_312']

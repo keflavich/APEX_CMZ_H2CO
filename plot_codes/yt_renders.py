@@ -40,9 +40,9 @@ if 'cube_h2co303' not in locals():
     mask._wcs = cube_h2co321.wcs
     yth2co321 = cube_h2co321.with_mask(mask).to_yt()
 
-    temcube = SpectralCube.read(paths.dpath('H2CO_321220_to_303202_cube_bl_temperature.fits'))
-    mask._wcs = temcube.wcs
-    yttem = temcube.with_mask(mask).to_yt()
+    #temcube = SpectralCube.read(paths.dpath('H2CO_321220_to_303202_cube_bl_temperature.fits'))
+    #mask._wcs = temcube.wcs
+    #yttem = temcube.with_mask(mask).to_yt()
 
 def isosurfaces(yt13co):
     yt13co.periodicity = (True,True,True)
@@ -171,44 +171,56 @@ def render_13co(ytcube=yt13co, outdir='yt_renders_13CO',
 
     im  = cam.snapshot()
 
-    images = [im]
+    #images = [im]
 
     if movie:
-        pb = ProgressBar(nframes)
+        pb = ProgressBar(nframes*2+30)
         for ii,im in enumerate(cam.rotation(2 * np.pi, nframes/3, rot_vector=rot_vector1)):
-            images.append(im)
+            #images.append(im)
             im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" % (ii))),
                          rescale=False)
             pb.update(ii)
         for jj,im in enumerate(cam.rotation(2 * np.pi, nframes/3, rot_vector=rot_vector2)):
-            images.append(im)
+            #images.append(im)
             im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" %
                                                   (ii+jj))), rescale=False)
             pb.update(ii+jj)
         for kk,im in enumerate(cam.rotation(2 * np.pi, nframes/3, rot_vector=rot_vector3)):
-            images.append(im)
+            #images.append(im)
             im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" %
                                                   (ii+jj+kk))), rescale=False)
             pb.update(ii+jj+kk)
 
-        TheBrick = ytcube.world2yt([0.253, 0.016])
-        for LL, snapshot in enumerate(cam.move_to(TheBrick, 5)):
+        TheBrick = ytcube.world2yt([0.253, 0.016, 35])
+        for LL, snapshot in enumerate(cam.move_to(TheBrick, 15)):
+            #images.append(snapshot)
             snapshot.write_png(paths.mpath(os.path.join(outdir,'%04i.png' %
                                                         (ii+jj+kk+LL))),
                                rescale=False)
             pb.update(ii+jj+kk+LL)
-        for mm, snapshot in enumerate(cam.zoomin(5, 5)):
+        for mm, snapshot in enumerate(cam.zoomin(5, 15)):
+            #images.append(snapshot)
             snapshot.write_png(paths.mpath(os.path.join(outdir,'%04i.png' %
                                                         (ii+jj+kk+LL+mm))),
                                rescale=False)
             pb.update(ii+jj+kk+LL+mm)
         for nn,im in enumerate(cam.rotation(2*np.pi, nframes/3, rot_vector=rot_vector1)):
-            images.append(im)
+            #images.append(im)
             im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" % (ii+jj+kk+LL+mm+nn))),
                          rescale=False)
             pb.update(ii+jj+kk+LL+mm+nn)
+        for oo,im in enumerate(cam.rotation(2 * np.pi, nframes/3, rot_vector=rot_vector2)):
+            #images.append(im)
+            im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" %
+                                                  (ii+jj+kk+LL+mm+nn+oo))), rescale=False)
+            pb.update(ii+jj+kk+LL+mm+nn+oo)
+        for pp,im in enumerate(cam.rotation(2 * np.pi, nframes/3, rot_vector=rot_vector3)):
+            #images.append(im)
+            im.write_png(paths.mpath(os.path.join(outdir,"%04i.png" %
+                                                  (ii+jj+kk+LL+mm+nn+oo+pp))), rescale=False)
+            pb.update(ii+jj+kk+LL+mm+nn+oo+pp)
 
-        save_images(images, paths.mpath(outdir))
+        #save_images(images, paths.mpath(outdir))
 
         pipe = make_movie(paths.mpath(outdir))
         

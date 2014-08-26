@@ -17,7 +17,8 @@ for smooth in ("","_smooth","_vsmooth"):
     F.set_tick_labels_format('d.dd','d.dd')
     F.recenter(0.3,-0.03,width=1.2,height=0.30)
     peaksn = os.path.join(h2copath,'APEX_H2CO_303_202{0}_bl_mask_integ.fits'.format(smooth))
-    F.show_contour(peaksn, levels=[4,7,11,20,38], colors=[(0,0,0,0.5)]*5, #smooth=3,
+    F.show_contour(peaksn, levels=[4,7,11,20,38], colors=[(0.25,0.25,0.25,0.5)]*5, #smooth=3,
+                   linewidths=[1.0]*5,
                    zorder=10, convention='calabretta')
     F.add_colorbar()
     F.colorbar.set_axis_label_text('T (K)')
@@ -30,7 +31,7 @@ for smooth in ("","_smooth","_vsmooth"):
     dusttemperature = '/Users/adam/work/gc/gcmosaic_temp_conv25.fits'
     F.show_contour(dusttemperature,
                    levels=[20,25],
-                   colors=[(0,0,x,0.5) for x in [0.8,0.6,0.4,0.2]], zorder=10)
+                   colors=[(0,0,x,0.5) for x in [0.9,0.7,0.6,0.2]], zorder=10)
     F.recenter(0.3,-0.03,width=1.2,height=0.30)
     F.save(os.path.join(figurepath,'lores{0}_tmap_withtdustcontours.pdf'.format(smooth)))
     F.recenter(0.55,-0.075,width=2.3,height=0.40)

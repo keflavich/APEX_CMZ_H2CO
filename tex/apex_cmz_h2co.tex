@@ -170,8 +170,9 @@ those with the greatest signal, the \threetwotwo line is strongly affected by
 contamination from a \methanol line, so the ratio is not particularly reliable.
 
 \subsection{Computing Temperature}
-\todo{Unless there's a strong reason not to, I will use the same grid that
-Yiping used.}
+\label{sec:h2cotemmap}
+\todo{Different grids have been used at different stages.  The specific numbers
+will need to be updated.}
 We use RADEX \citet{van-Der-Tak2007a} to create a model grid for the
 p-\formaldehyde lines over a sparse grid of density ($n=10^{4,5,6,7}$ \percc),
 a fixed assumed line gradient of 5 \kms / pc, a fixed column of \formaldehyde
@@ -184,11 +185,16 @@ RADEX\footnote{\url{https://github.com/keflavich/pyradex}}.
 The line brightnesses returned from RADEX were then divided to create ratios,
 and the grid inverted to allow interpolation of a measured ratio onto the input
 temperature grid.   This approach requires that the ratios be monotonic with
-temperature, which generally holds.  It also required us to \emph{a priori} select
-a density from the grid; we selected $n=10^4$ \percc.  \todo{It is important to
-assess what systematic effect density may have: to this end, I propose to show
-temperature maps computed with (1) a $10\times$ higher density and (2) a
-$10\times$ lower abundance.}.
+temperature, which generally holds.  It also required us to \emph{a priori}
+select a density from the grid; we selected $n=10^4$ \percc.  The choice of
+density and assumed column density have only a minor effect on the derived
+temperature.  If the density is $n(\hh)\sim10^5$ \percc rather than $10^4$
+\percc, the kinetic temperature will be about 10\% lower than we report.  If
+the column is $N(\hh)=3\ee{23}$ \persc rather than $N(\hh)=3\ee{22}$ \persc, or
+correspondingly if the abundance is $10\times$ larger, then the temperature
+will be 10\% lower for $T>175$ K; below that temperature the difference is
+$<5\%$.  Therefore the systematic effects from the assumed density and
+temperature are relatively small.
 
 \citet{Johnston2014a} noted a very high temperature peak, $T>320$K, using these
 lines of \formaldehyde toward The Brick, G0.253+0.015.  We measure similar line
@@ -217,6 +223,13 @@ temperatures and/or densities.  \todo{Further modeling is required to determine
 which.}
 }
 {fig:ratiomaps}{1}{7in}
+
+\Figure{figures/big_lores_smooth_tmap_withcontours.pdf}
+{A temperature map derived from the \threetwoone/\threeohthree ratio map shown
+in Figure \ref{fig:ratiomaps} using the method described in Section
+\ref{sec:h2cotemmap}.  The contours correspond to the integrated \threeohthree
+line intensity at levels [4,7,11,20,38] K \kms.}
+{fig:temmap}{0.6}{0}
 
 \section{Line Modeling}
 \label{sec:linemodeling}
@@ -253,6 +266,10 @@ displayed in Figure \ref{fig:parsonbrightness} are the amplitude of the
 ($\sigma$, not FWHM), the ratio $R1 = \Rone$,
 the ratio $R2 = \Rtwo$, and the amplitude of
 the \methanol \fourtwotwo line.
+
+While $R2$ can, in some cases, provide significant constraints on various
+parameters, we do not use it in general because of the ambiguity imposed by the
+overlap with the \methanol \fourtwotwo line.
 
 \Figure{figures/d:G0.38+0.04_fit_4_lines_simple.pdf}
 {Fitted spectrum of ``cloud d".  The fitted parameters and their corresponding

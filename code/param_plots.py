@@ -376,56 +376,6 @@ ax2.errorbar(fittable['temperature_chi2'], fittable['temperature_0'],
              linestyle='none', marker='s', linewidth=2, alpha=0.5)
 ax2.plot([0,300],[0,300],'k--',linewidth=2,alpha=0.5)
 
-
-fig5 = pl.figure(5)
-fig5.clf()
-ax5 = fig5.gca()
-maps = np.char.startswith(fittable['Source_Name'], 'Map')
-ax5.errorbar(coordinates.Angle(fittable['GLON']*u.deg).wrap_at(180*u.deg).value[maps],
-             fittable['temperature_chi2'][maps],
-             yerr=[(fittable['temperature_chi2']-fittable['tmin1sig_chi2'])[maps],
-                   (fittable['tmax1sig_chi2']-fittable['temperature_chi2'])[maps]],
-             linestyle='none', marker='s', linewidth=2, alpha=0.5, color='r')
-ax5.set_ylim(0,150)
-ax5.set_ylabel("Kinetic Temperature (K)")
-ax5.set_xlabel("Galactic Longitude ($^{\\circ}$)")
-fig5.savefig(paths.fpath('chi2_temperature_vs_glon_byfield.pdf'),
-                         bbox_inches='tight')
-ax5.errorbar(coordinates.Angle(fittable['GLON']*u.deg).wrap_at(180*u.deg).value[~maps],
-             fittable['temperature_chi2'][~maps],
-             yerr=[(fittable['temperature_chi2']-fittable['tmin1sig_chi2'])[~maps],
-                   (fittable['tmax1sig_chi2']-fittable['temperature_chi2'])[~maps]],
-             linestyle='none', marker='s', linewidth=2, alpha=0.5)
-fig5.savefig(paths.fpath('chi2_temperature_vs_glon_fieldsandsources.pdf'),
-                         bbox_inches='tight')
-
-fig6 = pl.figure(6)
-fig6.clf()
-ax6 = fig6.gca()
-ax6.errorbar(fittable['higaldusttem'],
-             fittable['temperature_chi2'],
-             yerr=[fittable['temperature_chi2']-fittable['tmin1sig_chi2'],
-                   fittable['tmax1sig_chi2']-fittable['temperature_chi2']],
-             linestyle='none', marker='s', linewidth=2, alpha=0.5)
-
-fig7 = pl.figure(7)
-fig7.clf()
-ax7 = fig7.gca()
-ax7.errorbar(fittable['width_0'][maps]*(8*np.log(2))**0.5,
-             fittable['temperature_chi2'][maps],
-             yerr=[(fittable['temperature_chi2']-fittable['tmin1sig_chi2'])[maps],
-                   (fittable['tmax1sig_chi2']-fittable['temperature_chi2'])[maps]],
-             linestyle='none', marker='s', linewidth=2, alpha=0.5, color='r')
-ax7.set_xlabel("Line FWHM (km s$^{-1}$)")
-ax7.set_ylabel("Kinetic Temperature (K)")
-fig7.savefig(paths.fpath('chi2_temperature_vs_linewidth_byfield.pdf'),
-                         bbox_inches='tight')
-ax7.errorbar(fittable['width_0'][~maps]*(8*np.log(2))**0.5,
-             fittable['temperature_chi2'][~maps],
-             yerr=[(fittable['temperature_chi2']-fittable['tmin1sig_chi2'])[~maps],
-                   (fittable['tmax1sig_chi2']-fittable['temperature_chi2'])[~maps]],
-             linestyle='none', marker='s', linewidth=2, alpha=0.5, color='b')
-fig7.savefig(paths.fpath('chi2_temperature_vs_linewidth_fieldsandsources.pdf'),
-                         bbox_inches='tight')
+execfile(paths.pcpath('parameter_comparisons.py'))
 
 pl.show()

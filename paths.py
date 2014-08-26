@@ -1,11 +1,41 @@
 import os
-root = '/Users/adam/work/gc/apex/'
-datapath = os.path.join(root, 'h2co_cubes')
-mergepath = os.path.join(root, 'merged_datasets') 
 
-def dpath(x, datapath=datapath):
-    return os.path.join(datapath, x)
+root = os.path.expanduser('~/work')
 
-def mpath(x, datapath=mergepath):
-    return os.path.join(datapath, x)
+june2013datapath = os.path.join(root, 'h2co/apex/june2013/raw/M-091.F-0019-2013/')
+june2013path = os.path.join(root, 'h2co/apex/june2013/')
+april2014path = os.path.join(root, 'h2co/apex/april2014/')
+h2copath = os.path.join(root, 'h2co/apex/h2co_cubes/')
+mergepath = os.path.join(root, 'h2co/apex/merged_datasets/')
+aorawpath = os.path.join(root, 'h2co/apex/2010_reduced/2010_raw/')
+aopath = os.path.join(root, 'h2co/apex/2010_reduced/')
+diagplotdir = os.path.join(root, 'h2co/apex/diagnostic_plots/')
+figurepath = os.path.join(root, 'apex_cmz_h2co/tex/figures/')
+regpath = os.path.join(root, 'apex_cmz_h2co/regions/')
+gridpath = os.path.join(root, 'h2co/radex/thermom/')
+analysispath = os.path.join(root, 'apex_cmz_h2co/analysis/')
+plotcodepath = os.path.join(root, 'apex_cmz_h2co/plot_codes/')
+observingpath = os.path.join(root, 'apex_cmz_h2co/observing/')
 
+def mpath(x, mergepath=mergepath):
+    return os.path.join(mergepath,x)
+
+def gpath(x, gridpath=gridpath):
+    return os.path.join(gridpath, x)
+
+def fpath(x, figurepath=figurepath):
+    return os.path.join(figurepath, x)
+
+def rpath(x, regpath=regpath):
+    return os.path.join(regpath, x)
+
+def opath(x, observingpath=observingpath):
+    return os.path.join(observingpath, x)
+
+def hpath(x, h2copath=h2copath):
+    return os.path.join(h2copath, x)
+datapath = h2copath
+dpath = hpath
+
+def pcpath(x, plotcodepath=plotcodepath):
+    return os.path.join(plotcodepath, x)
