@@ -359,22 +359,6 @@ fittable.write(os.path.join(analysispath,
                             'fitted_line_parameters_Chi2Constraints.ipac'),
                format='ascii.ipac')
 
-fig4 = pl.figure(4)
-fig4.clf()
-ax = fig4.add_subplot(1,3,1)
-ax.errorbar(fittable['temperature_chi2'], fittable['density_chi2'],
-            yerr=[fittable['density_chi2']-fittable['dmin1sig_chi2'],
-                  fittable['dmax1sig_chi2']-fittable['density_chi2']],
-            xerr=[fittable['temperature_chi2']-fittable['tmin1sig_chi2'],
-                  fittable['tmax1sig_chi2']-fittable['temperature_chi2']],
-            linestyle='none', marker='s', linewidth=2, alpha=0.5)
-ax2 = fig4.add_subplot(1,3,2)
-ax2.errorbar(fittable['temperature_chi2'], fittable['temperature_0'],
-             yerr=fittable['etemperature_0'],
-             xerr=[fittable['temperature_chi2']-fittable['tmin1sig_chi2'],
-                   fittable['tmax1sig_chi2']-fittable['temperature_chi2']],
-             linestyle='none', marker='s', linewidth=2, alpha=0.5)
-ax2.plot([0,300],[0,300],'k--',linewidth=2,alpha=0.5)
 
 execfile(paths.pcpath('parameter_comparisons.py'))
 
