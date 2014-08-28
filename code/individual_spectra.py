@@ -77,36 +77,44 @@ parmap_radex = {
           'denswidth':'WIDTH',
           'denscenter':'CENTER',}
 
-def set_row(parinfo, ncomp, row, parmap):
+def set_row(parinfo, ncomp, rows, parmap):
 
-    for ii in range(ncomp):
+    assert ncomp == len(rows)
+
+    for ii,row in enumerate(rows):
         for par in parmap:
-            row[par+"_"+str(ii)] = parinfo[parmap[par]+str(ii)].value
-            row["e"+par+"_"+str(ii)] = parinfo[parmap[par]+str(ii)].error
+            row[par] = parinfo[parmap[par]+str(ii)].value
+            row["e"+par] = parinfo[parmap[par]+str(ii)].error
 
 
 regs = pyregion.open(regpath+'spectral_apertures.reg') + pyregion.open(regpath+'target_fields_8x8_gal.reg')
 with open(regpath+'spectral_ncomp.txt') as f:
     pars = eval(f.read())
 
-name_column = table.Column(data=[reg.attr[1]['text'] for reg in regs],
+name_column = table.Column(data=[reg.attr[1]['text'] 
+                                 for reg in regs 
+                                 for ii in range(pars[reg.attr[1]['text']]['ncomp'])],
                            name='Source_Name')
-lon_column = table.Column(data=[reg.coord_list[0] for reg in regs],
+comp_id_column = table.Column(data=[0]*name_column.size, name='ComponentID')
+lon_column = table.Column(data=[reg.coord_list[0]
+                                for reg in regs
+                                for ii in range(pars[reg.attr[1]['text']]['ncomp'])
+                               ],
                           name='GLON')
-lat_column = table.Column(data=[reg.coord_list[1] for reg in regs],
+lat_column = table.Column(data=[reg.coord_list[1] for reg in regs
+                                for ii in range(pars[reg.attr[1]['text']]['ncomp'])
+                               ],
                           name='GLAT')
-columns = [table.Column(name="{ee}{name}_{ii}".format(name=name,
-                                                      ii=ii,
-                                                      ee=ee),
+columns = [table.Column(name="{ee}{name}".format(name=name, ee=ee),
                         dtype='float',
-                        length=len(regs))
-           for ii in range(max([pars[p]['ncomp'] for p in pars]))
+                        length=name_column.size)
            for name in ['ampH2CO','ampCH3OH','width','center','h2coratio321303',
                         'h2coratio322321',
                         'density','column','temperature','denscenter','denswidth']
            for ee in ['','e']
           ]
-out_table = table.Table([name_column, lon_column, lat_column] + columns)
+out_table = table.Table([name_column, comp_id_column, lon_column, lat_column] +
+                        columns)
 
 # TODO: replace this with a permanent path
 column_image = fits.open('/Users/adam/work/gc/gcmosaic_column_conv36.fits')[0]
@@ -118,8 +126,9 @@ log.info("Herschel parameter extraction.")
 herschelok = np.isfinite(column_image.data) & np.isfinite(dusttem_image.data)
 for reg in ProgressBar(regs):
     mask = pyregion.ShapeList([reg]).get_mask(column_image) & herschelok
-    surfdens.append(column_image.data[mask].mean()*1e22)
-    dusttem.append(dusttem_image.data[mask].mean())
+    for ii in range(pars[reg.attr[1]['text']]['ncomp']):
+        surfdens.append(column_image.data[mask].mean()*1e22)
+        dusttem.append(dusttem_image.data[mask].mean())
 
 surfdens_column = table.Column(data=surfdens, dtype='float',
                                name='higalcolumndens')
@@ -133,8 +142,9 @@ xarr = pyspeckit.units.SpectroscopicAxis(cube.spectral_axis.value,
                                          refX_units='Hz')
 
 noiseokmask = np.isfinite(noise)
+row_number = 0
 
-for row_number,reg in enumerate(regs):
+for region_number,reg in enumerate(regs):
     name = reg.attr[1]['text']
     if name not in spectra:
         #sp = cube.get_apspec(reg.coord_list,coordsys='galactic',wunit='degree')
@@ -152,12 +162,12 @@ for row_number,reg in enumerate(regs):
         # Error is already computed above; this is an old hack
         #sp.error[:] = sp.stats((218e9,218.1e9))['std']
         spectra[name] = sp
-        sp.units = "$T_{MB}$ [K]"
+        sp.unit = "$T_{MB}$ [K]"
     else:
         sp = spectra[name]
 
     if 'Map' in name:
-        width_min,width_max = 1,25
+        width_min,width_max = 1,40
     else:
         width_min,width_max = 1,15
 
@@ -178,7 +188,9 @@ for row_number,reg in enumerate(regs):
                limits=[(0,1e5),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
               )
 
-    set_row(sp.specfit.parinfo, ncomp, out_table[row_number], parmap=parmap_simple2)
+
+    set_row(sp.specfit.parinfo, ncomp, out_table[row_number:row_number+ncomp],
+            parmap=parmap_simple2)
 
 
     sp.plotter()
@@ -210,7 +222,10 @@ for row_number,reg in enumerate(regs):
         sp.plotter.savefig(os.path.join(figurepath,
                                         "{0}_fit_h2co_mm_radex.pdf".format(spname)))
 
-        set_row(sp.specfit.parinfo, ncomp, out_table[row_number], parmap=parmap_radex)
+        set_row(sp.specfit.parinfo, ncomp,
+                out_table[row_number:row_number+ncomp], parmap=parmap_radex)
+
+    row_number = row_number + ncomp
 
     individual_fits=False
     if individual_fits:

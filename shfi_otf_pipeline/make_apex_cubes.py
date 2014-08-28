@@ -1822,7 +1822,7 @@ def doratio(h2copath=h2copath, maxratio=1):
     """
     ##### integrated #####
 
-    for smooth in ('_bl','_smooth_bl','_vsmooth_bl'):
+    for smooth in ('','_smooth','_vsmooth','_bl','_smooth_bl','_vsmooth_bl'):
         top = fits.getdata(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
         bottom = fits.getdata(h2copath+'APEX_H2CO_322_221{0}_CH3OHchomped_mask_integ.fits'.format(smooth))
         
@@ -1846,7 +1846,7 @@ def doratio(h2copath=h2copath, maxratio=1):
         f.writeto(h2copath+'H2CO_321220_to_303202{0}_integ.fits'.format(smooth),clobber=True)
 
     ##### cube #####
-    for smooth in ('_bl','_smooth_bl','_vsmooth_bl'):
+    for smooth in ('','_smooth','_vsmooth','_bl','_smooth_bl','_vsmooth_bl'):
         top = fits.getdata(h2copath+'APEX_H2CO_303_202{0}.fits'.format(smooth))
         bottom = fits.getdata(h2copath+'APEX_H2CO_322_221{0}_CH3OHchomped_masked.fits'.format(smooth))
         
@@ -2025,7 +2025,7 @@ def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
     import scipy.stats
 
     for suf_ in ('{0}','{0}_integ','_cube{0}'):
-        for smooth in ('_bl','_smooth_bl','_vsmooth_bl'):
+        for smooth in ('','_smooth','_vsmooth','_bl','_smooth_bl','_vsmooth_bl'):
 
             suf = suf_.format(smooth)
 

@@ -74,20 +74,20 @@ for row in fittable:
     log.info(row['Source_Name'])
     logh2column = np.log10(row['higalcolumndens'])
     elogh2column = 1.0
-    linewidth = row['width_0']
-    elinewidth = row['ewidth_0']
+    linewidth = row['width']
+    elinewidth = row['ewidth']
 
-    par1 = row['ampH2CO_0']
-    epar1 = row['eampH2CO_0']
-    par2 = row['ampH2CO_0']*row['h2coratio321303_0']
-    epar2 = row['ampH2CO_0']*row['eh2coratio321303_0']
+    par1 = row['ampH2CO']
+    epar1 = row['eampH2CO']
+    par2 = row['ampH2CO']*row['h2coratio321303']
+    epar2 = row['ampH2CO']*row['eh2coratio321303']
     #match,indbest,chi2b = grid_fitter.grid_2p_getmatch(par1, epar1, tline303,
     #                                                   par2, epar2, tline321)
-    ratio = row['h2coratio321303_0']
-    eratio = row['eh2coratio321303_0']
+    ratio = row['h2coratio321303']
+    eratio = row['eh2coratio321303']
     match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio, modelratio1)
-    ratio2 = row['h2coratio322321_0']
-    eratio2 = row['eh2coratio322321_0']
+    ratio2 = row['h2coratio322321']
+    eratio2 = row['eh2coratio322321']
     match2,indbest2,chi2r2 = grid_fitter.grid_getmatch(ratio2, eratio2, modelratio2)
 
     # We can impose a "loose" abundance constraint
@@ -301,7 +301,7 @@ for row in fittable:
         pl.contourf(xax, yax, chi2r.min(axis=axis), levels=chi2r.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
         pl.contour(xax, yax, chi2r2.min(axis=axis),
-                   levels=chi2r.min()+np.arange(nlevs),
+                   levels=chi2r2.min()+np.arange(nlevs),
                    cmap=pl.cm.bone)
         pl.xlabel(xlabel)
         pl.ylabel(ylabel)
