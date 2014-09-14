@@ -103,3 +103,9 @@ class paraH2COmodel(object):
         chi2_h2 = ((h2fromh2co-logh2column)/elogh2column)**2
 
         return chi2_h2
+
+    def chi2_abundance(self, logabundance, elogabundance):
+        model_logabundance = np.log10(10**self.columnarr / u.pc.to(u.cm) /
+                                      10**self.densityarr)
+        chi2X = ((model_logabundance-logabundance)/elogabundance)**2
+        return chi2X

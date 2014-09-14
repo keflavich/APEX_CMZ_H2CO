@@ -9,49 +9,15 @@ from paths import analysispath
 from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
                                texgrid322, taugrid322, hdr)
 
+from constrain_parameters import paraH2COmodel
 from h2co_modeling import grid_fitter
 from astropy import table
 from scipy.ndimage.interpolation import map_coordinates
 
 pl.rcParams['font.size'] = 16.0
 
-Tbackground=2.73
-tline303a = (1.0-np.exp(-np.array(taugrid303)))*(texgrid303-Tbackground)
-tline321a = (1.0-np.exp(-np.array(taugrid321)))*(texgrid321-Tbackground)
-tline322a = (1.0-np.exp(-np.array(taugrid322)))*(texgrid322-Tbackground)
-
-zinds,yinds,xinds = np.indices(tline303a.shape)
-upsample_factor = np.array([5,12.5,12.5], dtype='float')
-uzinds,uyinds,uxinds = upsinds = np.indices([x*us
-                                             for x,us in zip(tline303a.shape,
-                                                             upsample_factor)],
-                                           dtype='float')
-tline303 = map_coordinates(tline303a,
-                           upsinds/upsample_factor[:,None,None,None],
-                           mode='nearest')
-tline321 = map_coordinates(tline321a,
-                           upsinds/upsample_factor[:,None,None,None],
-                           mode='nearest')
-tline322 = map_coordinates(tline322a,
-                           upsinds/upsample_factor[:,None,None,None],
-                           mode='nearest')
-densityarr = ((uxinds + hdr['CRPIX1']-1)*hdr['CDELT1'] /
-              float(upsample_factor[2])+hdr['CRVAL1']) # log density
-columnarr  = ((uyinds + hdr['CRPIX2']-1)*hdr['CDELT2'] /
-              float(upsample_factor[1])+hdr['CRVAL2']) # log column
-temparr    = ((uzinds + hdr['CRPIX3']-1)*hdr['CDELT3'] /
-              float(upsample_factor[0])+hdr['CRVAL3']) # lin temperature
-drange = [densityarr.min(), densityarr.max()]
-crange = [columnarr.min(), columnarr.max()]
-trange = [temparr.min(), temparr.max()]
-darr = densityarr[0,0,:]
-carr = columnarr[0,:,0]
-tarr = temparr[:,0,0]
-
-# While the individual lines are subject to filling factor uncertainties, the
-# ratio is not.
-modelratio1 = tline321/tline303
-modelratio2 = tline322/tline321
+# mf means modelfitter
+mf = paraH2COmodel()
 
 fittable = table.Table.read(os.path.join(analysispath,
                                           "fitted_line_parameters.ipac"),
@@ -85,10 +51,10 @@ for row in fittable:
     #                                                   par2, epar2, tline321)
     ratio = row['h2coratio321303']
     eratio = row['eh2coratio321303']
-    match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio, modelratio1)
+    match,indbest,chi2r = mf.grid_getmatch_321to303(ratio, eratio)
     ratio2 = row['h2coratio322321']
     eratio2 = row['eh2coratio322321']
-    match2,indbest2,chi2r2 = grid_fitter.grid_getmatch(ratio2, eratio2, modelratio2)
+    match2,indbest2,chi2r2 = mf.grid_getmatch_322to321(ratio2, eratio2)
 
     # We can impose a "loose" abundance constraint
     # Given that we know the H2 density, and the line width is ~5-10 km/s,
@@ -97,14 +63,12 @@ for row in fittable:
     # Or, log(abundance) = log(1.2e9) +/- 1
     logabundance = np.log10(1.2e-9)
     elogabundance = 1.0
-    model_logabundance = np.log10(10**columnarr / u.pc.to(u.cm) / 10**densityarr)
-    chi2X = ((model_logabundance-logabundance)/elogabundance)**2
+    chi2X = mf.chi2_abundance(logabundance, elogabundance)
 
     # Combined abundance + total column constraint
     # N(H2CO) * dv * X = N(H2)
     # We are effectively ignoring errors in the linewidth here:
-    h2fromh2co = np.log10(10**columnarr * (np.sqrt(np.pi) * linewidth) / 10**logabundance)
-    chi2_h2 = ((h2fromh2co-logh2column)/elogh2column)**2
+    chi2_h2 = mf.chi2_column(logh2column, elogh2column, logabundance, linewidth)
 
     # Even though the lines are subject to filling-factor uncertainty, we can
     # set a *minimum* brightness in the models.  Given that we observe a line
@@ -112,8 +76,8 @@ for row in fittable:
     # definition
     # We therefore *increase* the chi^2 value wherever the model is fainter
     # than the line, enforcing a soft lower limit
-    chi2_1 = ((tline303 - par1)/epar1)**2 * (tline303 < par1)
-    chi2_2 = ((tline321 - par2)/epar2)**2 * (tline321 < par2)
+    chi2_1 = chi2_fillingfactor(par1, epar1, 303)
+    chi2_2 = chi2_fillingfactor(par2, epar2, 321)
     chi2_ff = chi2_1+chi2_2
     chi2b = chi2r + chi2_ff + chi2X + chi2_h2
     match = chi2b < 1
