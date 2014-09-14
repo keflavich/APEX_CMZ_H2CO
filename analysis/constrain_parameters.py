@@ -2,6 +2,8 @@
 Functions for fitting temperature (and density and column) from the line ratio
 plus whatever other constraints are available
 """
+import inspect
+
 import numpy as np
 from astropy import units as u
 from h2co_modeling import grid_fitter
@@ -74,12 +76,12 @@ class paraH2COmodel(object):
     def grid_getmatch_321to303(self, ratio, eratio):
             match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio,
                                                             self.modelratio1)
-            return match, indbest, chi2r
+            return chi2r
 
     def grid_getmatch_322to321(self, ratio, eratio):
             match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio,
                                                             self.modelratio2)
-            return match, indbest, chi2r
+            return chi2r
 
     def chi2_fillingfactor(self, tline, etline, lineid):
         """
@@ -109,3 +111,57 @@ class paraH2COmodel(object):
                                       10**self.densityarr)
         chi2X = ((model_logabundance-logabundance)/elogabundance)**2
         return chi2X
+
+    def set_constraints(self,
+                        taline303=None, etaline303=None,
+                        taline321=None, etaline321=None,
+                        taline322=None, etaline322=None,
+                        logabundance=None, elogabundance=None,
+                        logh2column=None, elogh2column=None,
+                        ratio303321=None, eratio303321=None,
+                        ratio321322=None, eratio321322=None,
+                        linewidth=None):
+
+        argspec=inspect.getargvalues(inspect.currentframe())
+        for arg in argspec.args:
+            if argspec.locals[arg] is not None:
+                setattr(self, arg, argspec.locals[arg])
+
+        self.chi2_X = (self.chi2_abundance(logabundance, elogabundance) 
+                       if not any(arg is None for arg in (logabundance,
+                                                          elogabundance))
+                       else 0)
+
+        self.chi2_h2 = (self.chi2_column(logh2column, elogh2column,
+                                         logabundance, linewidth) 
+                        if not
+                        any(arg is None for arg in (logabundance, logh2column,
+                                                      elogh2column, linewidth))
+                        else 0)
+
+        self.chi2_ff1 = (self.chi2_fillingfactor(taline303, etaline303, 303)
+                         if not any(arg is None for arg in (taline303,
+                                                            etaline303))
+                         else 0)
+
+
+        self.chi2_ff2 = (self.chi2_fillingfactor(taline321, etaline321, 321)
+                         if not any(arg is None for arg in (taline321,
+                                                            etaline321))
+                         else 0)
+
+        self.chi2_r303321 = (self.grid_getmatch_321to303(ratio303321,
+                                                         eratio303321)
+                             if not any(arg is None for arg in (ratio303321,
+                                                                eratio303321))
+                             else 0)
+
+        self.chi2_r321322 = (self.grid_getmatch_321to303(ratio321322,
+                                                         eratio321322)
+                             if not any(arg is None for arg in (ratio321322,
+                                                                eratio321322))
+                             else 0)
+
+        self.chi2 = (self.chi2_X + self.chi2_h2 + self.chi2_ff1 + self.chi2_ff2
+                     + self.chi2_r321322 + self.chi2_r303321)
+

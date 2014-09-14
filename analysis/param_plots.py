@@ -51,10 +51,8 @@ for row in fittable:
     #                                                   par2, epar2, tline321)
     ratio = row['h2coratio321303']
     eratio = row['eh2coratio321303']
-    match,indbest,chi2r = mf.grid_getmatch_321to303(ratio, eratio)
     ratio2 = row['h2coratio322321']
     eratio2 = row['eh2coratio322321']
-    match2,indbest2,chi2r2 = mf.grid_getmatch_322to321(ratio2, eratio2)
 
     # We can impose a "loose" abundance constraint
     # Given that we know the H2 density, and the line width is ~5-10 km/s,
@@ -63,12 +61,11 @@ for row in fittable:
     # Or, log(abundance) = log(1.2e9) +/- 1
     logabundance = np.log10(1.2e-9)
     elogabundance = 1.0
-    chi2X = mf.chi2_abundance(logabundance, elogabundance)
 
     # Combined abundance + total column constraint
     # N(H2CO) * dv * X = N(H2)
     # We are effectively ignoring errors in the linewidth here:
-    chi2_h2 = mf.chi2_column(logh2column, elogh2column, logabundance, linewidth)
+    # (noop - see chi2_h2)
 
     # Even though the lines are subject to filling-factor uncertainty, we can
     # set a *minimum* brightness in the models.  Given that we observe a line
@@ -76,10 +73,25 @@ for row in fittable:
     # definition
     # We therefore *increase* the chi^2 value wherever the model is fainter
     # than the line, enforcing a soft lower limit
-    chi2_1 = chi2_fillingfactor(par1, epar1, 303)
-    chi2_2 = chi2_fillingfactor(par2, epar2, 321)
+
+    mf.set_constraints(ratio303321=ratio, eratio303321=eratio,
+                       ratio321322=ratio2, eratio322=eratio2,
+                       logh2column=logh2column, elogh2column=elogh2column,
+                       logabundance=logabundance, elogabundance=elogabundance,
+                       taline303=par1, etaline303=epar1,
+                       taline321=par2, etaline321=epar2,
+                       linewidth=linewidth)
+
+
+    chi2r = mf.chi2_r303321
+    chi2r2 = mf.chi2_r321322
+    chi2_h2 = mf.chi2_h2
+    chi2X = mf.chi2_X
+    chi2_1 = mf.chi2_ff1
+    chi2_2 = mf.chi2_ff2
     chi2_ff = chi2_1+chi2_2
     chi2b = chi2r + chi2_ff + chi2X + chi2_h2
+
     match = chi2b < 1
     indbest,match = grid_fitter.getmatch(chi2b, match)
 
