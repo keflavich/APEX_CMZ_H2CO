@@ -5,7 +5,9 @@ plus whatever other constraints are available
 import inspect
 
 import numpy as np
+from scipy.ndimage.interpolation import map_coordinates
 from astropy import units as u
+
 from h2co_modeling import grid_fitter
 
 class paraH2COmodel(object):

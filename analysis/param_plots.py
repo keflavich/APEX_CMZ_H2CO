@@ -12,7 +12,6 @@ from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
 from constrain_parameters import paraH2COmodel
 from h2co_modeling import grid_fitter
 from astropy import table
-from scipy.ndimage.interpolation import map_coordinates
 
 pl.rcParams['font.size'] = 16.0
 
@@ -75,7 +74,7 @@ for row in fittable:
     # than the line, enforcing a soft lower limit
 
     mf.set_constraints(ratio303321=ratio, eratio303321=eratio,
-                       ratio321322=ratio2, eratio322=eratio2,
+                       ratio321322=ratio2, eratio321322=eratio2,
                        logh2column=logh2column, elogh2column=elogh2column,
                        logabundance=logabundance, elogabundance=elogabundance,
                        taline303=par1, etaline303=epar1,
@@ -101,67 +100,67 @@ for row in fittable:
     fig1 = pl.figure(1)
     fig1.clf()
 
-    vmin = np.max([tline303.min(), 0.1])
-    vmax = np.min([tline303.max(), par1+10])
+    vmin = np.max([mf.tline303.min(), 0.1])
+    vmax = np.min([mf.tline303.max(), par1+10])
     ax1 = pl.subplot(2,3,1)
-    im1 = pl.imshow(tline303[zz,:,:], cmap=pl.cm.bone_r, interpolation='spline36',
+    im1 = pl.imshow(mf.tline303[zz,:,:], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              extent=drange+crange, vmin=vmin, vmax=vmax)
-    pl.contour(darr, carr, chi2b[zz,:,:], levels=chi2b.min()+np.arange(nlevs))
+              extent=mf.drange+mf.crange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.darr, mf.carr, chi2b[zz,:,:], levels=chi2b.min()+np.arange(nlevs))
     pl.ylabel(column_label)
     pl.xlabel(density_label)
 
     ax2 = pl.subplot(2,3,2)
-    im2 = pl.imshow(tline303[:,yy,:], cmap=pl.cm.bone_r, interpolation='spline36',
+    im2 = pl.imshow(mf.tline303[:,yy,:], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              aspect=np.diff(drange)/np.diff(trange),
-              extent=drange+trange, vmin=vmin, vmax=vmax)
-    pl.contour(darr, tarr, chi2b[:,yy,:], levels=chi2b.min()+np.arange(nlevs))
+              aspect=np.diff(mf.drange)/np.diff(mf.trange),
+              extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.darr, mf.tarr, chi2b[:,yy,:], levels=chi2b.min()+np.arange(nlevs))
     pl.xlabel(density_label)
     pl.ylabel(temperature_label)
     #ax2.set_title("p-H$_2$CO $3_{0,3}-2_{0,2}$")
 
     ax3 = pl.subplot(2,3,3)
-    im3 = pl.imshow(tline303[:,:,xx], cmap=pl.cm.bone_r, interpolation='spline36',
+    im3 = pl.imshow(mf.tline303[:,:,xx], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              aspect=np.diff(crange)/np.diff(trange),
-              extent=crange+trange, vmin=vmin, vmax=vmax)
-    pl.contour(carr, tarr, chi2b[:,:,xx], levels=chi2b.min()+np.arange(nlevs))
+              aspect=np.diff(mf.crange)/np.diff(mf.trange),
+              extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.carr, mf.tarr, chi2b[:,:,xx], levels=chi2b.min()+np.arange(nlevs))
     pl.xlabel(column_label)
-    ax3.xaxis.set_ticks(np.arange(carr.min(), carr.max()))
+    ax3.xaxis.set_ticks(np.arange(mf.carr.min(), mf.carr.max()))
     pl.ylabel(temperature_label)
     cax = fig1.add_axes([0.91,0.55,0.02,0.35])
     cb = fig1.colorbar(mappable=im3, cax=cax, ax=ax2)
     cb.set_label("$T_B$ (p-H$_2$CO $3_{0,3}-2_{0,2}$)")
 
-    vmin = np.max([tline321.min(), 0.1])
-    vmax = np.min([tline321.max(), par2+10])
+    vmin = np.max([mf.tline321.min(), 0.1])
+    vmax = np.min([mf.tline321.max(), par2+10])
     ax4 = pl.subplot(2,3,4)
-    pl.imshow(tline321[zz,:,:], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline321[zz,:,:], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              extent=drange+crange, vmin=vmin, vmax=vmax)
-    pl.contour(darr, carr, chi2b[zz,:,:], levels=chi2b.min()+np.arange(nlevs))
+              extent=mf.drange+mf.crange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.darr, mf.carr, chi2b[zz,:,:], levels=chi2b.min()+np.arange(nlevs))
     pl.ylabel(column_label)
     pl.xlabel(density_label)
 
     ax5 = pl.subplot(2,3,5)
-    im5 = pl.imshow(tline321[:,yy,:], cmap=pl.cm.bone_r, interpolation='spline36',
+    im5 = pl.imshow(mf.tline321[:,yy,:], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              aspect=np.diff(drange)/np.diff(trange),
-              extent=drange+trange, vmin=vmin, vmax=vmax)
-    pl.contour(darr, tarr, chi2b[:,yy,:], levels=chi2b.min()+np.arange(nlevs))
+              aspect=np.diff(mf.drange)/np.diff(mf.trange),
+              extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.darr, mf.tarr, chi2b[:,yy,:], levels=chi2b.min()+np.arange(nlevs))
     pl.xlabel(density_label)
     pl.ylabel(temperature_label)
     #ax5.set_title("p-H$_2$CO $3_{2,1}-2_{2,0}$")
 
     ax6 = pl.subplot(2,3,6)
-    im6 = pl.imshow(tline321[:,:,xx], cmap=pl.cm.bone_r, interpolation='spline36',
+    im6 = pl.imshow(mf.tline321[:,:,xx], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              aspect=np.diff(crange)/np.diff(trange),
-              extent=crange+trange, vmin=vmin, vmax=vmax)
-    pl.contour(carr, tarr,  chi2b[:,:,xx], levels=chi2b.min()+np.arange(nlevs))
+              aspect=np.diff(mf.crange)/np.diff(mf.trange),
+              extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.carr, mf.tarr,  chi2b[:,:,xx], levels=chi2b.min()+np.arange(nlevs))
     pl.xlabel(column_label)
-    ax6.xaxis.set_ticks(np.arange(carr.min(), carr.max()))
+    ax6.xaxis.set_ticks(np.arange(mf.carr.min(), mf.carr.max()))
     pl.ylabel(temperature_label)
     cax = fig1.add_axes([0.91,0.1,0.02,0.35])
     cb = fig1.colorbar(mappable=im6, cax=cax, ax=ax5)
@@ -175,81 +174,81 @@ for row in fittable:
     fig2 = pl.figure(2)
     fig2.clf()
     ax1 = pl.subplot(2,3,1)
-    yi, xi = np.indices(tline303.shape[1:])
+    yi, xi = np.indices(mf.tline303.shape[1:])
     inds = [chi2b.argmin(axis=0), yi, xi]
     # The background from taking the min-chi^2 along each axis is too ugly and
     # hard to explain: revert to using a *slice* for a background but a chi^2
     # *projection* for the contours
     inds = [zz, slice(None), slice(None)]
-    pl.imshow(tline303[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline303[inds], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              extent=drange+crange, vmin=vmin, vmax=vmax)
-    pl.contour(darr, carr, chi2b.min(axis=0), levels=chi2b.min()+np.arange(nlevs))
+              extent=mf.drange+mf.crange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.darr, mf.carr, chi2b.min(axis=0), levels=chi2b.min()+np.arange(nlevs))
     pl.ylabel(column_label)
     pl.xlabel(density_label)
 
     ax2 = pl.subplot(2,3,2)
-    zi, xi = np.indices([tline303.shape[0], tline303.shape[2],])
+    zi, xi = np.indices([mf.tline303.shape[0], mf.tline303.shape[2],])
     inds = [zi, chi2b.argmin(axis=1), xi]
     inds = [slice(None), yy, slice(None)]
-    pl.imshow(tline303[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline303[inds], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              aspect=np.diff(drange)/np.diff(trange),
-              extent=drange+trange, vmin=vmin, vmax=vmax)
-    pl.contour(darr, tarr, chi2b.min(axis=1), levels=chi2b.min()+np.arange(nlevs))
+              aspect=np.diff(mf.drange)/np.diff(mf.trange),
+              extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.darr, mf.tarr, chi2b.min(axis=1), levels=chi2b.min()+np.arange(nlevs))
     pl.xlabel(density_label)
     pl.ylabel(temperature_label)
 
     ax3 = pl.subplot(2,3,3)
-    zi, yi = np.indices([tline303.shape[0], tline303.shape[2],])
+    zi, yi = np.indices([mf.tline303.shape[0], mf.tline303.shape[2],])
     inds = [zi, yi, chi2b.argmin(axis=2)]
     inds = [slice(None), slice(None), xx]
-    pl.imshow(tline303[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline303[inds], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              aspect=np.diff(crange)/np.diff(trange),
-              extent=crange+trange, vmin=vmin, vmax=vmax)
-    pl.contour(carr, tarr, chi2b.min(axis=2), levels=chi2b.min()+np.arange(nlevs))
+              aspect=np.diff(mf.crange)/np.diff(mf.trange),
+              extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.carr, mf.tarr, chi2b.min(axis=2), levels=chi2b.min()+np.arange(nlevs))
     pl.xlabel(column_label)
-    ax3.xaxis.set_ticks(np.arange(carr.min(), carr.max()))
+    ax3.xaxis.set_ticks(np.arange(mf.carr.min(), mf.carr.max()))
     pl.ylabel(temperature_label)
     cax = fig2.add_axes([0.91,0.55,0.02,0.35])
     cb = fig2.colorbar(mappable=im3, cax=cax, ax=ax2)
     cb.set_label("$T_B$ (p-H$_2$CO $3_{0,3}-2_{0,2}$)")
 
     ax4 = pl.subplot(2,3,4)
-    yi, xi = np.indices(tline303.shape[1:])
+    yi, xi = np.indices(mf.tline303.shape[1:])
     inds = [chi2b.argmin(axis=0), yi, xi]
     inds = [zz, slice(None), slice(None)]
-    pl.imshow(tline321[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline321[inds], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              extent=drange+crange, vmin=vmin, vmax=vmax)
-    pl.contour(darr, carr, chi2b.min(axis=0), levels=chi2b.min()+np.arange(nlevs))
+              extent=mf.drange+mf.crange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.darr, mf.carr, chi2b.min(axis=0), levels=chi2b.min()+np.arange(nlevs))
     pl.ylabel(column_label)
     pl.xlabel(density_label)
 
     ax5 = pl.subplot(2,3,5)
-    zi, xi = np.indices([tline303.shape[0], tline303.shape[2],])
+    zi, xi = np.indices([mf.tline303.shape[0], mf.tline303.shape[2],])
     inds = [zi, chi2b.argmin(axis=1), xi]
     inds = [slice(None), yy, slice(None)]
-    pl.imshow(tline321[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline321[inds], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              aspect=np.diff(drange)/np.diff(trange),
-              extent=drange+trange, vmin=vmin, vmax=vmax)
-    pl.contour(darr, tarr, chi2b.min(axis=1), levels=chi2b.min()+np.arange(nlevs))
+              aspect=np.diff(mf.drange)/np.diff(mf.trange),
+              extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.darr, mf.tarr, chi2b.min(axis=1), levels=chi2b.min()+np.arange(nlevs))
     pl.xlabel(density_label)
     pl.ylabel(temperature_label)
 
     ax6 = pl.subplot(2,3,6)
-    zi, yi = np.indices([tline303.shape[0], tline303.shape[2],])
+    zi, yi = np.indices([mf.tline303.shape[0], mf.tline303.shape[2],])
     inds = [zi, yi, chi2b.argmin(axis=2)]
     inds = [slice(None), slice(None), xx]
-    im6 = pl.imshow(tline321[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    im6 = pl.imshow(mf.tline321[inds], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
-              aspect=np.diff(crange)/np.diff(trange),
-              extent=crange+trange, vmin=vmin, vmax=vmax)
-    pl.contour(carr, tarr,  chi2b.min(axis=2), levels=chi2b.min()+np.arange(nlevs))
+              aspect=np.diff(mf.crange)/np.diff(mf.trange),
+              extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
+    pl.contour(mf.carr, mf.tarr,  chi2b.min(axis=2), levels=chi2b.min()+np.arange(nlevs))
     pl.xlabel(column_label)
-    ax6.xaxis.set_ticks(np.arange(carr.min(), carr.max()))
+    ax6.xaxis.set_ticks(np.arange(mf.carr.min(), mf.carr.max()))
     pl.ylabel(temperature_label)
     cax = fig2.add_axes([0.91,0.1,0.02,0.35])
     cb = fig2.colorbar(mappable=im6, cax=cax, ax=ax5)
@@ -261,8 +260,8 @@ for row in fittable:
     pl.savefig(paths.fpath('param_fits/{name}_h2coratio_minaxis.pdf'.format(name=row['Source_Name'])), bbox_inches='tight')
 
 
-    for xax,yax,xlabel,ylabel,axis,ptype in zip((darr,darr,carr),
-                                                (carr,tarr,tarr),
+    for xax,yax,xlabel,ylabel,axis,ptype in zip((mf.darr,mf.darr,mf.carr),
+                                                (mf.carr,mf.tarr,mf.tarr),
                                                 (density_label, density_label,
                                                  column_label), (column_label,
                                                                  temperature_label,
@@ -299,7 +298,7 @@ for row in fittable:
         pl.contourf(xax, yax, (chi2_ff.min(axis=axis)),
                     levels=chi2_ff.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
-        pl.contour(xax, yax, (tline303 < 10*par1).max(axis=axis), levels=[0.5], colors='k')
+        pl.contour(xax, yax, (mf.tline303 < 10*par1).max(axis=axis), levels=[0.5], colors='k')
         #pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis), levels=[0.5], colors='k')
         #pl.contour(xax, yax, (tline321 < 10*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
         #pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
@@ -307,10 +306,10 @@ for row in fittable:
         pl.ylabel(ylabel)
         pl.title("Line Brightness + $ff\leq1$")
 
-        if xax is carr:
+        if xax is mf.carr:
             for ss in range(1,5):
                 ax = pl.subplot(2,2,ss)
-                ax.xaxis.set_ticks(np.arange(carr.min(), carr.max()))
+                ax.xaxis.set_ticks(np.arange(mf.carr.min(), mf.carr.max()))
 
         pl.subplots_adjust(wspace=0.4, hspace=0.4)
         outf = paths.fpath('param_fits/{name}_{ptype}_parameter_constraints.pdf'.format(name=row['Source_Name'],
