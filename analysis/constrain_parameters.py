@@ -165,3 +165,25 @@ class paraH2COmodel(object):
         self.chi2 = (self.chi2_X + self.chi2_h2 + self.chi2_ff1 + self.chi2_ff2
                      + self.chi2_r321322 + self.chi2_r303321)
 
+    def get_parconstraints(self):
+        """
+        """
+        if not hasattr(self, 'chi2'):
+            raise AttributeError("Run set_constraints first")
+
+        row = {}
+
+        indbest = np.argmin(self.chi2)
+        deltachi2b = (self.chi2-self.chi2.min())
+        for parname,pararr in zip(('temperature','column','density'),
+                                  (self.temparr,self.columnarr,self.densityarr)):
+            row['{0}_chi2'.format(parname)] = pararr.flat[indbest]
+            OK = deltachi2b<1
+            if np.count_nonzero(OK) > 0:
+                row['{0:1.1s}min1sig_chi2'.format(parname)] = pararr[OK].min()
+                row['{0:1.1s}max1sig_chi2'.format(parname)] = pararr[OK].max()
+            else:
+                row['{0:1.1s}min1sig_chi2'.format(parname)] = np.nan
+                row['{0:1.1s}max1sig_chi2'.format(parname)] = np.nan
+
+        return row

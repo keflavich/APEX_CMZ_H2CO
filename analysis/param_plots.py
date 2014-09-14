@@ -317,19 +317,9 @@ for row in fittable:
                                                                                             ptype=ptype))
         pl.savefig(outf, bbox_inches='tight')
 
-    deltachi2b = (chi2b-chi2b.min())
-    for parname,pararr in zip(('temperature','column','density'),
-                              (temparr,columnarr,densityarr)):
-        row['{0}_chi2'.format(parname)] = pararr.flat[indbest]
-        OK = deltachi2b<1
-        if np.count_nonzero(OK) > 0:
-            row['{0:1.1s}min1sig_chi2'.format(parname)] = pararr[OK].min()
-            row['{0:1.1s}max1sig_chi2'.format(parname)] = pararr[OK].max()
-        else:
-            row['{0:1.1s}min1sig_chi2'.format(parname)] = np.nan
-            row['{0:1.1s}max1sig_chi2'.format(parname)] = np.nan
-
-
+    row_data = mf.get_parconstraints()
+    for key,value in row_data.iteritems():
+        row[key] = value
 
 fittable.write(os.path.join(analysispath,
                             'fitted_line_parameters_Chi2Constraints.ipac'),
