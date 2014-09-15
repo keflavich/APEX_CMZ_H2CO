@@ -1,7 +1,5 @@
 from spectral_cube import SpectralCube, BooleanArrayMask
 import numpy as np
-import FITS_tools
-from numpy.lib.stride_tricks import as_strided
 from astropy import wcs
 from astropy.io import fits
 from astropy import units as u
@@ -10,36 +8,29 @@ from astropy.utils.console import ProgressBar
 
 from paths import hpath
 from constrain_parameters import paraH2COmodel
+from masked_cubes import cube303m,cube321m,cube303,cube321
+from noise import noise, noise_cube
+from common_constants import logabundance,elogabundance
+from higal_gridded import column_regridded
 
 nsigma = 5 # start big to minimize # of failures
 
 mf = paraH2COmodel()
 
-cube303 = SpectralCube.read(hpath('APEX_H2CO_303_202.fits')).with_spectral_unit(u.km/u.s, velocity_convention='radio')
-cube321 = SpectralCube.read(hpath('APEX_H2CO_321_220.fits')).with_spectral_unit(u.km/u.s, velocity_convention='radio')
-mask = (fits.getdata(hpath('APEX_H2CO_303_202_mask.fits')).astype('bool') &
-        cube303.mask.include(cube303._data, cube303.wcs) &
-        cube321.mask.include(cube321._data, cube321.wcs))
-bmask = BooleanArrayMask(mask, cube303.wcs)
-cube303m = cube303.with_mask(bmask)
-cube321m = cube321.with_mask(bmask)
+#noise = fits.getdata(hpath('APEX_H2CO_303_202_noise.fits'))
+#noise = cube303[:50].std(axis=0).value
+#noise = fits.getdata(mpath('APEX_H2CO_merge_high_sub_noise.fits'))
+#nhits = nhits = fits.getdata(paths.mpath('APEX_H2CO_merge_high_nhits.fits'))
+#noise[nhits<20] = np.nan
 
-column_image = fits.open('/Users/adam/work/gc/gcmosaic_column_conv36.fits')[0]
-dusttem_image = fits.open('/Users/adam/work/gc/gcmosaic_temp_conv36.fits')[0]
-
-apex_header = cube303[0,:,:].hdu.header
-column_regridded = FITS_tools.hcongrid.hcongrid_hdu(column_image, apex_header)
-
-noise = fits.getdata(hpath('APEX_H2CO_303_202_noise.fits'))
-noise = cube303[:50].std(axis=0).value
-noise_flat = as_strided(noise, shape=mask.shape, strides=(0,)+noise.shape)[mask]
+noise_flat = noise_cube[mask]
 var_flat = noise_flat**2
 
-ratio303321 = (cube303m.flattened() / cube321m.flattened()).value
+ratio303321 = cube321m.flattened().value / cube303m.flattened().value
 eratio303321 = (ratio303321**2 * (var_flat/cube303m.flattened().value**2 + var_flat/cube321m.flattened().value**2))**0.5
 
 indices = np.where(mask)
-usable = (eratio303321*nsigma < ratio303321) & (eratio303321 > 0) & (ratio303321 > 0) & (noise_flat > 1e-10) & (noise_flat < 10) & (ratio < 100)
+usable = (eratio303321*nsigma < ratio303321) & (eratio303321 > 0) & (ratio303321 > 0) & (noise_flat > 1e-10) & (noise_flat < 10) & (ratio303321 < 100)
 ngood = np.count_nonzero(usable)
 usable_indices = [ind[usable] for ind in indices]
 uz,uy,ux = usable_indices
@@ -59,8 +50,6 @@ log.info("Out of {size} values, {ngood} are usable "
 tcube = np.empty_like(mask, dtype='float')
 tcube[:] = np.nan
 
-logabundance = np.log10(1.2e-9)
-elogabundance = 1.0
 elogh2column = elogabundance
 linewidth = 5 # this is ugly...
 
@@ -87,5 +76,8 @@ for ii,((z,y,x),rat,erat,col,ta303,ta321,err) in enumerate(zip(zip(*usable_indic
         log.info("T: [{tmin1sig_chi2:7.2f},{temperature_chi2:7.2f},{tmax1sig_chi2:7.2f}]  R={ratio303321:6.2f}+/-{eratio303321:6.2f}".format(**row_data))
     else:
         pb.update(ii)
+
+tCube = SpectralCube(tcube, cube303.wcs, mask=BooleanArrayMask(np.isfinite(tcube), wcs=cube303.wcs))
+tCube.write(hpath('chi2_temperature_cube.fits'), overwrite=True)
 
 print()
