@@ -1,13 +1,17 @@
 """
 Create an H2CO cloud catalog using dendrograms for further analysis using the temperature fitter
 """
+import time
+
+import numpy as np
+from astropy import log
+from astropy.io import fits
+
 from paths import hpath,mpath
 from astrodendro import Dendrogram
+from noise import noise, noise_cube
 
 def make_sncube(write=True):
-    noise = fits.getdata(mpath('APEX_H2CO_merge_high_sub_noise.fits'))
-    nhits = nhits = fits.getdata(mpath('APEX_H2CO_merge_high_nhits.fits'))
-    noise[nhits<20] = np.nan
 
     sncube = fits.getdata(hpath('APEX_H2CO_303_202.fits')) / noise
     ff = fits.open(hpath('APEX_H2CO_303_202.fits'))
@@ -33,6 +37,10 @@ def make_dend(sncube, view=True, write=True):
     return dend
 
 if __name__ == "__main__":
+    t0 = time.time()
     sncube = make_sncube()
+    t1 = time.time()
+    log.debug("S/N cubemaking took {0:0.1f} seconds".format(t1-t0))
     dend = make_dend(sncube)
-
+    t2 = time.time()
+    log.debug("Dendrogramming took {0:0.1f} seconds".format(t2-t1))

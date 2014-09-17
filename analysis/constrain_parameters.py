@@ -3,18 +3,24 @@ Functions for fitting temperature (and density and column) from the line ratio
 plus whatever other constraints are available
 """
 import inspect
+import time
 
 import numpy as np
 from scipy.ndimage.interpolation import map_coordinates
 from astropy import units as u
+from astropy import log
+import pylab as pl
 
 from h2co_modeling import grid_fitter
 
 class paraH2COmodel(object):
 
     def __init__(self, tbackground=2.73, gridsize=250):
+        t0 = time.time()
         from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
                                        texgrid322, taugrid322, hdr)
+        t1 = time.time()
+        log.debug("Loading grids took {0:0.1f} seconds".format(t1-t0))
 
         self.texgrid303 = texgrid303
         self.taugrid303 = taugrid303
@@ -66,6 +72,12 @@ class paraH2COmodel(object):
         self.darr = self.densityarr[0,0,:]
         self.carr = self.columnarr[0,:,0]
         self.tarr = self.temparr[:,0,0]
+        self.axes = {'dens': self.darr,
+                     'col': self.carr,
+                     'tem': self.tarr}
+        self.labels = {'dens': 'Density $n(\mathrm{H}_2)$ [log cm$^{-3}$]',
+                       'col': 'p-H$_2$CO [log cm$^{-2}$/(km s$^{-1}$ pc)]',
+                       'tem': 'Temperature (K)'}
 
         # While the individual lines are subject to filling factor uncertainties, the
         # ratio is not.
@@ -74,6 +86,10 @@ class paraH2COmodel(object):
 
         self.model_logabundance = np.log10(10**self.columnarr / u.pc.to(u.cm) /
                                            10**self.densityarr)
+
+        t2 = time.time()
+        log.debug("Grid initialization took {0:0.1f} seconds total,"
+                  " {1:0.1f} since loading grids.".format(t2-t0,t2-t1))
 
     def grid_getmatch_321to303(self, ratio, eratio):
             match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio,
@@ -188,4 +204,82 @@ class paraH2COmodel(object):
                 row['{0:1.1s}min1sig_chi2'.format(parname)] = np.nan
                 row['{0:1.1s}max1sig_chi2'.format(parname)] = np.nan
 
+        self._parconstraints = row
+
         return row
+
+    def parplot(self, par1='dens', par2='col', nlevs=5):
+
+        xax = self.axes[par1]
+        yax = self.axes[par2]
+        xlabel = self.labels[par1]
+        ylabel = self.labels[par2]
+        axis = {('dens','col'): 0,
+                ('dens','tem'): 1,
+                ('col','tem'): 2}[(par1,par2)]
+
+
+        pl.clf()
+        ax1 = pl.subplot(2,2,1)
+        pl.contourf(xax, yax, self.chi2_r303321.min(axis=axis),
+                    levels=self.chi2_r303321.min()+np.arange(nlevs), alpha=0.5)
+        pl.contour(xax, yax, self.chi2.min(axis=axis),
+                   levels=self.chi2.min()+np.arange(nlevs))
+        if self.chi2_r321322:
+            pl.contour(xax, yax, self.chi2_r321322.min(axis=axis),
+                       levels=self.chi2_r321322.min()+np.arange(nlevs),
+                       cmap=pl.cm.bone)
+        pl.xlabel(xlabel)
+        pl.ylabel(ylabel)
+        pl.title("Ratio $3_{0,3}-2_{0,2}/3_{2,1}-2_{2,0}$")
+
+        ax4 = pl.subplot(2,2,2)
+        pl.contourf(xax, yax, self.chi2_X.min(axis=axis),
+                    levels=self.chi2_X.min()+np.arange(nlevs), alpha=0.5)
+        pl.contour(xax, yax, self.chi2.min(axis=axis),
+                   levels=self.chi2.min()+np.arange(nlevs))
+        pl.ylabel(ylabel)
+        pl.xlabel(xlabel)
+        pl.title("log(p-H$_2$CO/H$_2$) "
+                 "$= {0:0.1f}\pm{1:0.1f}$".format(self.logabundance,
+                                                  self.elogabundance))
+
+        ax3 = pl.subplot(2,2,3)
+        pl.contourf(xax, yax, self.chi2_h2.min(axis=axis),
+                    levels=self.chi2_h2.min()+np.arange(nlevs), alpha=0.5)
+        pl.contour(xax, yax, self.chi2.min(axis=axis),
+                   levels=self.chi2.min()+np.arange(nlevs))
+        pl.xlabel(xlabel)
+        pl.ylabel(ylabel)
+        pl.title("Total log$(N(\\mathrm{{H}}_2)) "
+                 "= {0:0.1f}\pm{1:0.1f}$".format(self.logh2column,
+                                                 self.elogh2column))
+        ax5 = pl.subplot(2,2,4)
+        pl.contourf(xax, yax, (self.chi2_ff1.min(axis=axis)),
+                    levels=self.chi2_ff1.min()+np.arange(nlevs), alpha=0.5)
+        pl.contour(xax, yax, self.chi2.min(axis=axis),
+                   levels=self.chi2.min()+np.arange(nlevs))
+        pl.contour(xax, yax, (self.tline303 < 10*self.taline303).max(axis=axis),
+                   levels=[0.5], colors='k')
+        #pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis), levels=[0.5], colors='k')
+        #pl.contour(xax, yax, (tline321 < 10*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
+        #pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
+        pl.xlabel(xlabel)
+        pl.ylabel(ylabel)
+        pl.title("Line Brightness + $ff\leq1$")
+
+        if par1 == 'col':
+            for ss in range(1,5):
+                ax = pl.subplot(2,2,ss)
+                ax.xaxis.set_ticks(np.arange(self.carr.min(), self.carr.max()))
+
+        pl.subplots_adjust(wspace=0.4, hspace=0.4)
+
+    def denstemplot(self):
+        self.parplot('dens','tem')
+
+    def denscolplot(self):
+        self.parplot('dens','col')
+
+    def coltemplot(self):
+        self.parplot('col','tem')
