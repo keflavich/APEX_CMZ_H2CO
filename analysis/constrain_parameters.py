@@ -130,6 +130,34 @@ class paraH2COmodel(object):
         chi2X = ((model_logabundance-logabundance)/elogabundance)**2
         return chi2X
 
+    def list_parameters():
+        return ['taline303',  'etaline303', 'taline321',  'etaline321',
+                'taline322',  'etaline322', 'logabundance',  'elogabundance',
+                'logh2column',  'elogh2column', 'ratio303321',  'eratio303321',
+                'ratio321322',  'eratio321322', 'linewidth']
+
+    def set_constraints_fromrow(self, row, **kwargs):
+
+        mapping = {'e321':'etaline321',
+                   'Smean321':'taline321',
+                   'Smean303':'taline303',
+                   'er303321':'eratio303321',
+                   'eratio303321':'eratio303321',
+                   'e303':'etaline303',
+                   'r303321':'ratio303321',
+                   'ratio303321':'ratio303321',
+                   'r321303':'ratio303321',
+                   'er321303':'eratio303321',
+                   'logabundance':'logabundance',
+                   'elogabundance':'elogabundance',
+                   'logh2column':'logh2column',
+                   'elogh2column':'elogh2column',
+                  }
+        pars = {mapping[k]: row[k] for k in row.colnames if k in mapping}
+        pars.update(**kwargs)
+
+        self.set_constraints(**pars)
+
     def set_constraints(self,
                         taline303=None, etaline303=None,
                         taline321=None, etaline321=None,
@@ -204,6 +232,10 @@ class paraH2COmodel(object):
                 row['{0:1.1s}min1sig_chi2'.format(parname)] = np.nan
                 row['{0:1.1s}max1sig_chi2'.format(parname)] = np.nan
 
+        for parname in ('logh2column', 'elogh2column', 'logabundance',
+                        'elogabundance'):
+            row[parname] = getattr(self, parname)
+
         self._parconstraints = row
 
         return row
@@ -234,8 +266,9 @@ class paraH2COmodel(object):
         pl.title("Ratio $3_{0,3}-2_{0,2}/3_{2,1}-2_{2,0}$")
 
         ax4 = pl.subplot(2,2,2)
-        pl.contourf(xax, yax, self.chi2_X.min(axis=axis),
-                    levels=self.chi2_X.min()+np.arange(nlevs), alpha=0.5)
+        if hasattr(self.chi2_X, 'size'):
+            pl.contourf(xax, yax, self.chi2_X.min(axis=axis),
+                        levels=self.chi2_X.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
                    levels=self.chi2.min()+np.arange(nlevs))
         pl.ylabel(ylabel)
@@ -245,8 +278,9 @@ class paraH2COmodel(object):
                                                   self.elogabundance))
 
         ax3 = pl.subplot(2,2,3)
-        pl.contourf(xax, yax, self.chi2_h2.min(axis=axis),
-                    levels=self.chi2_h2.min()+np.arange(nlevs), alpha=0.5)
+        if hasattr(self.chi2_h2, 'size'):
+            pl.contourf(xax, yax, self.chi2_h2.min(axis=axis),
+                        levels=self.chi2_h2.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
                    levels=self.chi2.min()+np.arange(nlevs))
         pl.xlabel(xlabel)
@@ -255,8 +289,9 @@ class paraH2COmodel(object):
                  "= {0:0.1f}\pm{1:0.1f}$".format(self.logh2column,
                                                  self.elogh2column))
         ax5 = pl.subplot(2,2,4)
-        pl.contourf(xax, yax, (self.chi2_ff1.min(axis=axis)),
-                    levels=self.chi2_ff1.min()+np.arange(nlevs), alpha=0.5)
+        if hasattr(self.chi2_ff1, 'size'):
+            pl.contourf(xax, yax, (self.chi2_ff1.min(axis=axis)),
+                        levels=self.chi2_ff1.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
                    levels=self.chi2.min()+np.arange(nlevs))
         pl.contour(xax, yax, (self.tline303 < 10*self.taline303).max(axis=axis),

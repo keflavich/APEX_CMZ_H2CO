@@ -41,6 +41,8 @@ metadata['spatial_scale'] =  7.2 * u.arcsec
 metadata['beam_major'] =  30 * u.arcsec
 metadata['beam_minor'] =  30 * u.arcsec
 metadata['wavelength'] =  218.22*u.GHz
+metadata['velocity_scale'] = u.km/u.s
+metadata['wcs'] = cube303m.wcs
 
 keys = ['cmin1sig_chi2',
         'density_chi2',
@@ -52,7 +54,12 @@ keys = ['cmin1sig_chi2',
         'tmin1sig_chi2',
         'eratio303321',
         'dmax1sig_chi2',
-        'ratio303321',]
+        'ratio303321',
+        'logh2column',
+        'elogh2column',
+        'logabundance',
+        'elogabundance',
+       ]
 obs_keys = [
         'Stot303',
         'Stot321',
@@ -86,14 +93,14 @@ for ii,structure in enumerate(objects):
     Stot321 = c321.sum().value
     Smean303 = Stot303/npix
     Smean321 = Stot321/npix
-    r321303 = s321/s303
+    r321303 = Stot321/Stot303
 
     #error = (noise_cube[view][submask.include()]).sum() / submask.include().sum()**0.5
-    error = (noise_cube[mask.include()]).sum() / npix**0.5
+    var = ((noise_cube[mask.include()]**2).sum() / npix**2)
+    error = var**0.5
     if np.isnan(error):
         raise ValueError("error is nan: this is impossible by definition.")
-    var = error**2
-    er321303 = (r321303**2 * (var/s303**2 + var/s321**2))**0.5
+    er321303 = (r321303**2 * (var/Smean303**2 + var/Smean321**2))**0.5
 
     columns['Stot303'].append(Stot303)
     columns['Stot321'].append(Stot321)
@@ -106,10 +113,13 @@ for ii,structure in enumerate(objects):
     columns['er303321'].append(er321303)
 
     mask2d = mask.include().max(axis=0)[view[1:]]
-    logh2column = np.log10(column_regridded.data[view[1:]][mask2d].mean() * 1e22)
+    logh2column = np.log10(np.nanmean(column_regridded.data[view[1:]][mask2d]) * 1e22)
+    if np.isnan(logh2column):
+        log.info("Source #{0} has NaNs".format(ii))
+        logh2column = 24
     elogh2column = elogabundance
 
-    if r321303 < 0:
+    if r321303 < 0 or np.isnan(r321303):
         for k in columns:
             if k not in obs_keys:
                 columns[k].append(np.nan)
@@ -128,15 +138,34 @@ for ii,structure in enumerate(objects):
         for k in row_data:
             columns[k].append(row_data[k])
 
+    if len(set(len(c) for k,c in columns.iteritems())) != 1:
+        print("Columns are different lengths.  This is not allowed.")
+        import ipdb; ipdb.set_trace()
+
     if ii % 100 == 0 or ii < 50:
-        log.info("T: [{tmin1sig_chi2:7.2f},{temperature_chi2:7.2f},{tmax1sig_chi2:7.2f}]  R={ratio303321:6.2f}+/-{eratio303321:6.2f}".format(**row_data))
+        log.info("T: [{tmin1sig_chi2:7.2f},{temperature_chi2:7.2f},{tmax1sig_chi2:7.2f}]"
+                 "  R={ratio303321:8.4f}+/-{eratio303321:8.4f}"
+                 "  Smean303={Smean303:8.4f} +/- {e303:8.4f}"
+                 "  Stot303={Stot303:8.2e}  npix={npix:6d}"
+                 .format(Smean303=Smean303, Stot303=Stot303,
+                         npix=npix, e303=error, **row_data))
         pl.clf()
         mf.denstemplot()
+        pl.draw()
+        pl.show()
     else:
         pb.update(ii+1)
 
 for k in columns:
     if k not in catalog.keys():
         catalog.add_column(table.Column(name=k, data=columns[k]))
+
+for mid,lo,hi in (('temperature_chi2','tmin1sig_chi2','tmax1sig_chi2'),
+                  ('density_chi2','dmin1sig_chi2','dmax1sig_chi2'),
+                  ('column_chi2','cmin1sig_chi2','cmax1sig_chi2')):
+    catalog.add_column(table.Column(name='elo_'+mid[0],
+                                    data=catalog[mid]-catalog[lo]))
+    catalog.add_column(table.Column(name='ehi_'+mid[0],
+                                    data=catalog[hi]-catalog[mid]))
 
 catalog.write(hpath('PPV_H2CO_Temperature.ipac'), format='ascii.ipac')
