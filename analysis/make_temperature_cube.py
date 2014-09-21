@@ -55,9 +55,9 @@ linewidth = 5 # this is ugly...
 
 pb = ProgressBar(ngood)
 for ii,((z,y,x),rat,erat,col,ta303,ta321,err) in enumerate(zip(zip(*usable_indices),
-                                                           uratio303321, ueratio303321,
-                                                           column_flat, utline303,
-                                                           utline321, unoise)):
+                                                               uratio303321, ueratio303321,
+                                                               column_flat, utline303,
+                                                               utline321, unoise)):
     logh2column = np.log10(col)+22
 
     mf.set_constraints(ratio303321=rat, eratio303321=erat,

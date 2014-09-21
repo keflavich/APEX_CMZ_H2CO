@@ -880,7 +880,8 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                       scanblsub=scanblsub)
     if 'pcakwargs' in kwargs:
         headerpars.update(kwargs['pcakwargs'])
-    add_pipeline_parameters_to_file(cubefilename, 'generic', **headerpars)
+    if cubefilename is not None:
+        add_pipeline_parameters_to_file(cubefilename, 'generic', **headerpars)
                                     
 
     for dataset in all_data:
@@ -893,6 +894,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
             else:
                 make_blanks(all_gal_vect, hdrs[0], cubefilename, clobber=True,
                             pixsize=pixsize)
+            add_pipeline_parameters_to_file(cubefilename, 'generic', **headerpars)
 
         data = all_data[dataset]
         hdrs = all_hdrs[dataset]
@@ -2551,3 +2553,9 @@ def extract_co_subcubes(mergepath=april2014path):
                     os.path.join(mergepath,'APEX_C18O_2014_merge.fits'),
                     linefreq=219.56036*u.GHz, naxis3=500, vmin=-225*u.km/u.s,
                     vmax=275*u.km/u.s)
+    extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
+                    os.path.join(h2copath,'APEX_13CO_matched_H2CO.fits'),
+                    linefreq=220.39868*u.GHz,)
+    extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
+                    os.path.join(h2copath,'APEX_C18O_matched_H2CO.fits'),
+                    linefreq=219.56036*u.GHz,)

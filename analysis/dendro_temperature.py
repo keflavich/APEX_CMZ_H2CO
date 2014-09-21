@@ -17,6 +17,7 @@ from astrodendro import Dendrogram,ppv_catalog
 from paths import hpath,mpath
 from constrain_parameters import paraH2COmodel
 from masked_cubes import cube303m,cube321m
+from co_cubes import cube13co, cube18co
 from noise import noise, noise_cube
 from higal_gridded import column_regridded
 from common_constants import logabundance,elogabundance
@@ -70,6 +71,10 @@ obs_keys = [
         'e321',
         'r303321',
         'er303321',
+        '13cosum',
+        'c18osum',
+        '13comean',
+        'c18omean',
 ]
 columns = {k:[] for k in (keys+obs_keys)}
 
@@ -87,6 +92,8 @@ for ii,structure in enumerate(objects):
 
     c303 = cube303m[view].with_mask(submask)
     c321 = cube321m[view].with_mask(submask)
+    co13sum = cube13co.with_mask(mask).sum().value
+    co18sum = cube18co.with_mask(mask).sum().value
 
     npix = submask.include().sum()
     Stot303 = c303.sum().value
@@ -111,6 +118,10 @@ for ii,structure in enumerate(objects):
     columns['e321'].append(error)
     columns['r303321'].append(r321303)
     columns['er303321'].append(er321303)
+    columns['13cosum'].append(co13sum)
+    columns['c18osum'].append(co18sum)
+    columns['13comean'].append(co13sum/npix)
+    columns['c18omean'].append(co18sum/npix)
 
     mask2d = mask.include().max(axis=0)[view[1:]]
     logh2column = np.log10(np.nanmean(column_regridded.data[view[1:]][mask2d]) * 1e22)
