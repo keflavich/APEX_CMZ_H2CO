@@ -205,7 +205,8 @@ def load_dataset_for_debugging(lowhigh='low', downsample_factor=8,
 
     spectra,headers,indices = load_apex_cube(apex_filename,
                                              skip_data=skip_data,
-                                             downsample_factor=downsample_factor)
+                                             downsample_factor=downsample_factor,
+                                            )
     data, hdrs, gal = select_apex_data(spectra, headers, indices,
                                        sourcename=sourcename,
                                        shapeselect=shapeselect,
@@ -221,14 +222,12 @@ def get_sourcenames(headers):
     return list(set([h['SOURC'].strip() for h in headers]))
 
 def load_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
-                   skip_data=False, DEBUG=False, downsample_factor=None):
-    spectra,headers,indices = read_class.read_class(apex_filename, start=1024,
-                                                    DEBUG=DEBUG,
-                                                    skip_data=skip_data,
-                                                    downsample_factor=downsample_factor)
+                   skip_data=False, DEBUG=False, downsample_factor=None,
+                   memmap=False):
+    spectra,headers,indices = read_class.read_class(apex_filename,)
 
-    for h,i in zip(headers,indices):
-        h.update(i)
+    #for h,i in zip(headers,indices):
+    #    h.update(i)
 
     return spectra,headers,indices
 
@@ -821,6 +820,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                        kernel_fwhm=10/3600.,
                        pca_clean=False,
                        timewise_pca=True,
+                       memmap=True,
                        verbose=False, debug=False, **kwargs):
     """
     TODO: comment!
@@ -854,7 +854,7 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
 
         apex_filename = os.path.join(datapath,dataset+".apex")
 
-        spectra,headers,indices = load_apex_cube(apex_filename)
+        spectra,headers,indices = load_apex_cube(apex_filename, memmap=memmap)
         data,hdrs,gal = select_apex_data(spectra, headers, indices,
                                          sourcename=sourcename,
                                          shapeselect=shapeselect, xtel=xtel,
@@ -1613,6 +1613,7 @@ all_lines = {'H2CO_303_202':218.22219,
              'CH3OCHO_17_16':218.29789,
              'C18O':219.56036,
              '13CO':220.39868,
+             'CH3CN_12_11':220.63807,
              #'H2S 2(2,0)-2(1,1)': 216.71044, ??
              }
 bright_lines = {k:all_lines[k] for k in
@@ -1752,7 +1753,7 @@ def do_postprocessing():
     for line in lines218:
         if os.path.exists(mergepath+'APEX_{0}.fits'.format(line)):
             baseline_cube(mergepath+'APEX_{0}.fits'.format(line),
-                          maskfn=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
+                          maskfn=mergepath+'APEX_H2CO_303_202_mask.fits')
             baseline_cube(mergepath+'APEX_{0}_smooth.fits'.format(line),
                           maskfn=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
             baseline_cube(mergepath+'APEX_{0}_vsmooth.fits'.format(line),
@@ -1797,6 +1798,8 @@ def baseline_cube(cubefn, maskfn, order=5):
     f = fits.open(cubefn)
     cube = f[0].data
     mask = fits.getdata(maskfn).astype('bool')
+    if cube.shape != mask.shape:
+        raise ValueError("Cube and mask don't match.")
     t0 = time.time()
     log.info("Baselining cube {0} with order {1}...".format(cubefn, order))
     bc = baseline_cube(cube, order, cubemask=mask)
@@ -2161,6 +2164,51 @@ def identify_scans_fromcoords(gal):
     # 2 np.diffs -> +2 to index
     scans = 2+np.where(np.diff(np.sign(np.diff(gal.l.wrap_at(180*u.deg)))))[0]
     return scans
+
+def per_scan_fourier_clean(data, scans, mask_pixels=None,
+                           verbose=False, smoothing_width=10,
+                           automask=False, smooth_all=False,
+                           smoothing_kernel_size_scale=40,
+                           nsigma_ignore=1, return_mask=False):
+    """
+    An implementation of the Emerson 1988 prescription for "scan noise" removal
+    performed in "scan space" rather than map space.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        2D data, with time along axis 0 and frequency along axis 1
+    scans : np.ndarray
+        The endpoints of the scans.  Should not include 0 or naxis
+    verbose : bool
+        Print out simple stats about the fits
+    """
+    raise NotImplementedError("Work in progress - maybe a bad idea")
+    
+    # Create a new array for hosting the subtracted data
+    dsub = data*0
+
+    timeaxis = 0
+    freqaxis = 1
+
+    # Kernel must be ODD
+    kernel_size = smoothing_kernel_size_scale * smoothing_width
+    if kernel_size % 2 == 0:
+        kernel_size += 1
+
+    masklist = []
+
+    for ii,jj in zip([0]+scans.tolist(),
+                     scans.tolist()+[data.shape[timeaxis]]):
+        x = np.arange(jj-ii)
+
+        y = data[ii:jj,:]
+        fty = np.fft.fft(y,axis=0)
+        ftf = np.fft.fftfreq(x)
+        # The components to suppress should be decided in the map plane...
+
+    return dsub
+
 
 def subtract_scan_linear_fit(data, scans, mask_pixels=None,
                              verbose=False, smoothing_width=10,
@@ -2560,3 +2608,8 @@ def extract_co_subcubes(mergepath=april2014path):
     extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
                     os.path.join(h2copath,'APEX_C18O_matched_H2CO.fits'),
                     linefreq=219.56036*u.GHz,)
+
+def quick_extract_13cocube(fn):
+    if fits.getheader(fn)['NAXIS'] > 2:
+        cube = SpectralCube.read(fn).with_spectral_unit(u.km/u.s, rest_value=220.39868*u.GHz, velocity_convention='radio')
+        cube.spectral_slab(-200*u.km/u.s, 200*u.km/u.s).write(fn[:-5]+"_13COcube.fits")
