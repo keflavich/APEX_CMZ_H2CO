@@ -609,7 +609,8 @@ def make_blanks(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
     add_pipeline_header_data(flatheader)
 
     makecube.make_blank_images(cubefilename, cubeheader=cubeheader,
-                               flatheader=flatheader, clobber=clobber)
+                               flatheader=flatheader, clobber=clobber,
+                               dtype='float32')
 
 def make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
     """ complete freq covg """
@@ -654,7 +655,8 @@ def make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcs
     add_pipeline_header_data(flatheader)
 
     makecube.make_blank_images(cubefilename, flatheader=flatheader,
-                               cubeheader=cubeheader, clobber=clobber)
+                               cubeheader=cubeheader, clobber=clobber,
+                               dtype='float32')
 
 
 def make_blanks_merge(cubefilename, lowhigh='low', clobber=True,
@@ -694,7 +696,8 @@ def make_blanks_merge(cubefilename, lowhigh='low', clobber=True,
     add_pipeline_header_data(flatheader)
 
     makecube.make_blank_images(cubefilename, flatheader=flatheader,
-                               cubeheader=cubeheader, clobber=clobber)
+                               cubeheader=cubeheader, clobber=clobber,
+                               dtype='float32')
 
 def data_diagplot(data, dataset, ext='png', newfig=False,
                   max_size=1024, freq=None, scans=None,
