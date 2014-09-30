@@ -34,7 +34,8 @@ if 'dend' not in locals():
     dend = Dendrogram.load_from(hpath("DendroMask_H2CO303202_signal_to_noise.hdf5"))
     log.debug("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
 
-biggest_tree = dend[89]
+# For debugging, to make it faster
+# biggest_tree = dend[89]
 
 metadata = {}
 metadata['data_unit'] = u.K

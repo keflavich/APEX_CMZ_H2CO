@@ -13,8 +13,8 @@ from noise import noise, noise_cube
 
 def make_sncube(write=True):
 
-    sncube = fits.getdata(hpath('APEX_H2CO_303_202.fits')) / noise
-    ff = fits.open(hpath('APEX_H2CO_303_202.fits'))
+    sncube = fits.getdata(hpath('APEX_H2CO_303_202_bl.fits')) / noise
+    ff = fits.open(hpath('APEX_H2CO_303_202_bl.fits'))
     ff[0].data = sncube
 
     if write:
