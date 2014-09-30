@@ -269,12 +269,13 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
         galOK = True
 
     
-    if isinstance(sourcename, (list,tuple)):
-        sourceOK = np.array([h['SOURC'].strip() in sourcename for h in headers])
-    elif sourcename is not None:
-        sourceOK = np.array([h['SOURC'].strip()==sourcename for h in headers])
-    else:
-        sourceOK = True
+    sourceOK = True
+    #if isinstance(sourcename, (list,tuple)):
+    #    sourceOK = np.array([h['SOURC'].strip() in sourcename for h in headers])
+    #elif sourcename is not None:
+    #    sourceOK = np.array([h['SOURC'].strip()==sourcename for h in headers])
+    #else:
+    #    sourceOK = True
 
     if xscan is not None:
         xscanOK = np.array([h['XSCAN']==xscan for h in headers])
@@ -282,10 +283,11 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
         xscanOK = True
 
 
-    if xtel is not None:
-        xtelOK = np.array([h['XTEL'].strip()==xtel for h in headers])
-    else:
-        xtelOK = True
+    xtelOK = True
+    #if xtel is not None:
+    #    xtelOK = np.array([h['XTEL'].strip()==xtel for h in headers])
+    #else:
+    #    xtelOK = True
 
 
     if tsysrange is not None:
