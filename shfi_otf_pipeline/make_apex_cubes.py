@@ -204,9 +204,9 @@ def load_dataset_for_debugging(lowhigh='low', downsample_factor=8,
     apex_filename=datapath+dataset+".apex"
 
     spectra,headers,indices = load_apex_cube(apex_filename,
-                                             skip_data=skip_data,
                                              downsample_factor=downsample_factor,
-                                            )
+                                             xtel=xtel,
+                                             sourcename=sourcename)
     data, hdrs, gal = select_apex_data(spectra, headers, indices,
                                        sourcename=sourcename,
                                        shapeselect=shapeselect,
@@ -223,8 +223,12 @@ def get_sourcenames(headers):
 
 def load_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
                    skip_data=False, DEBUG=False, downsample_factor=None,
-                   memmap=False):
-    spectra,headers,indices = read_class.read_class(apex_filename,)
+                   sourcename=None, xtel=None,
+                   memmap=True):
+    spectra,headers,indices = read_class.read_class(apex_filename,
+                                                    downsample_factor=downsample_factor,
+                                                    sourcename=sourcename,
+                                                    xtel=xtel)
 
     #for h,i in zip(headers,indices):
     #    h.update(i)
@@ -857,7 +861,10 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
 
         apex_filename = os.path.join(datapath,dataset+".apex")
 
-        spectra,headers,indices = load_apex_cube(apex_filename, memmap=memmap)
+        spectra,headers,indices = load_apex_cube(apex_filename,
+                                                 downsample_factor=downsample_factor,
+                                                 xtel=xtel,
+                                                 sourcename=sourcename)
         data,hdrs,gal = select_apex_data(spectra, headers, indices,
                                          sourcename=sourcename,
                                          shapeselect=shapeselect, xtel=xtel,
@@ -980,7 +987,10 @@ def build_cube_ao(window, freq=False, mergefile=None,
 
         apex_filename = os.path.join(datapath,dataset+"_merge.apex")
 
-        spectra,headers,indices = load_apex_cube(apex_filename)
+        spectra,headers,indices = load_apex_cube(apex_filename,
+                                                 downsample_factor=downsample_factor,
+                                                 xtel=xtel,
+                                                 sourcename=sourcename)
         data,hdrs,gal = select_apex_data(spectra, headers, indices,
                                          sourcename='SGRA', shapeselect=4096,
                                          xtel=xtel,
@@ -1104,8 +1114,9 @@ def build_cube_2013(mergefile=None,
             apex_filename=datapath+dataset+".apex"
 
             spectra,headers,indices = load_apex_cube(apex_filename,
-                                                     skip_data=True,
-                                                     downsample_factor=downsample_factor)
+                                                     downsample_factor=downsample_factor,
+                                                     xtel=xtel,
+                                                     sourcename='SGRA')
             data, hdrs, gal = select_apex_data(spectra, headers, indices,
                                                sourcename='SGRA',
                                                shapeselect=32768/downsample_factor,
@@ -1138,9 +1149,10 @@ def build_cube_2013(mergefile=None,
 
         apex_filename=datapath+dataset+".apex"
 
-        spectra,headers,indices = load_apex_cube(apex_filename, skip_data=False,
+        spectra,headers,indices = load_apex_cube(apex_filename,
                                                  downsample_factor=downsample_factor,
-                                                 )
+                                                 xtel=xtel,
+                                                 sourcename='SGRA')
 
         if dataset == 'M-091.F-0019-2013-2013-06-13':
             tsysrange=[100,260]
@@ -1232,8 +1244,9 @@ def build_cube_2014(sourcename,
             log.info("".join(("Pre-Loading data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
 
             spectra,headers,indices = load_apex_cube(apex_filename,
-                                                     skip_data=True,
-                                                     downsample_factor=downsample_factor)
+                                                     downsample_factor=downsample_factor,
+                                                     xtel=xtel,
+                                                     sourcename=sourcename)
             data, hdrs, gal = select_apex_data(spectra, headers, indices,
                                                sourcename=sourcename,
                                                shapeselect=32768/downsample_factor,
@@ -1267,9 +1280,10 @@ def build_cube_2014(sourcename,
         
         log.info("".join(("Loading data for dataset ",dataset," in filename ",apex_filename,"  t=",str(time.time()-t0))))
 
-        spectra,headers,indices = load_apex_cube(apex_filename, skip_data=False,
+        spectra,headers,indices = load_apex_cube(apex_filename,
                                                  downsample_factor=downsample_factor,
-                                                 )
+                                                 xtel=xtel,
+                                                 sourcename=sourcename)
 
         #if dataset == 'M-091.F-0019-2013-2013-06-13':
         #    tsysrange=[100,260]
@@ -2153,8 +2167,8 @@ def get_info_2014(datapath='/Users/adam/work/h2co/apex/april2014/',
                   datasets=datasets_2014):
     info = {}
     for dataset in datasets:
-        spectra,headers,indices = load_apex_cube(apex_filename=os.path.join(datapath,dataset)+".apex",
-                                                 skip_data=True)
+        apex_filename=os.path.join(datapath,dataset)+".apex"
+        spectra,headers,indices = load_apex_cube(apex_filename)
         info[dataset] = set([h['OBJECT'] for h in headers])
         log.info("{0}:{1}".format(dataset, str(info[dataset])))
 
