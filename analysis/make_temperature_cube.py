@@ -8,7 +8,7 @@ from astropy.utils.console import ProgressBar
 
 from paths import hpath
 from constrain_parameters import paraH2COmodel
-from masked_cubes import cube303m,cube321m,cube303,cube321
+from masked_cubes import cube303m,cube321m,cube303,cube321,mask
 from noise import noise, noise_cube
 from common_constants import logabundance,elogabundance
 from higal_gridded import column_regridded
