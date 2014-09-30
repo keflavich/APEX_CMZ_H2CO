@@ -228,7 +228,7 @@ def load_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
     spectra,headers,indices = read_class.read_class(apex_filename,
                                                     downsample_factor=downsample_factor,
                                                     sourcename=sourcename,
-                                                    xtel=xtel)
+                                                    telescope=xtel)
 
     #for h,i in zip(headers,indices):
     #    h.update(i)
