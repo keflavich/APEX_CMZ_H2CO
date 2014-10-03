@@ -2178,21 +2178,22 @@ def do_2014(datasets=datasets_2014, scanblsub=False):
                             lowhigh='high')
 
 
-def do_2014_merge(datasets=datasets_2014):
+def do_2014_merge(datasets=datasets_2014,
+                  lowhigh=('low','high')):
     log.info("Starting merge")
-    for lowhigh in ('high','low',):
-        mergefile = 'APEX_H2CO_2014_merge_{0}'.format(lowhigh)
+    for lh in lowhigh:
+        mergefile = 'APEX_H2CO_2014_merge_{0}'.format(lh)
         log.info("Making blanks")
-        lowest_freq = 218.4e9 if lowhigh=='high' else 216.9e9
-        make_blanks_merge(os.path.join(mergepath,mergefile), lowhigh=lowhigh,
+        lowest_freq = 218.4e9 if lh=='high' else 216.9e9
+        make_blanks_merge(os.path.join(mergepath,mergefile), lowhigh=lh,
                           lowest_freq=lowest_freq, width=2.5*u.GHz)
         mapnames = ['MAP_{0:03d}'.format(ii) for ii in range(1,130)]
-        log.info("Building cubes: "+str(mapnames)+" "+lowhigh)
+        log.info("Building cubes: "+str(mapnames)+" "+lh)
         build_cube_2014(mapnames,
                         mergefile=mergefile,
                         outpath=mergepath,
                         datapath=april2014path,
-                        lowhigh=lowhigh,
+                        lowhigh=lh,
                         datasets=datasets)
 
 def get_info_2014(datapath='/Users/adam/work/h2co/apex/april2014/',
