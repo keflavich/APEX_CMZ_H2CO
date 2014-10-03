@@ -99,9 +99,15 @@ for ii,structure in enumerate(objects):
     npix = submask.include().sum()
     Stot303 = c303.sum().value
     Stot321 = c321.sum().value
+    if npix == 0:
+        raise ValueError("npix=0. This is impossible.")
     Smean303 = Stot303/npix
     Smean321 = Stot321/npix
-    r321303 = Stot321/Stot303
+    try:
+        r321303 = Stot321/Stot303
+    except ZeroDivisionError:
+        # py.FuckOff...
+        r321303 = np.nan
 
     #error = (noise_cube[view][submask.include()]).sum() / submask.include().sum()**0.5
     var = ((noise_cube[mask.include()]**2).sum() / npix**2)

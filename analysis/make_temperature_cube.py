@@ -1,3 +1,4 @@
+import os
 from spectral_cube import SpectralCube, BooleanArrayMask
 import numpy as np
 from astropy import wcs
@@ -47,8 +48,18 @@ log.info("Out of {size} values, {ngood} are usable "
                                              ngood=ngood,
                                              pct=100*ngood/float(ratio303321.size)))
 
-tcube = np.empty_like(mask, dtype='float')
-tcube[:] = np.nan
+log.info("Using temperature memmap.")
+if os.path.exists('temperature_memmap'):
+    mode = 'r+'
+else:
+    mode = 'w+'
+tcube = np.memmap('temperature_memmap', mode=mode, dtype='float32', shape=mask.shape)
+nfilled, nbad = np.count_nonzero(tcube), np.count_nonzero(np.isnan(tcube))
+log.info("There are {0} already-filled entries and {1} nan"
+         " entries.".format(nfilled,nbad))
+if nfilled + nbad == tcube.size:
+    log.warn("The temperature memmap is already full.  To recreate it,"
+             " delete the file then re-run this code.")
 
 elogh2column = elogabundance
 linewidth = 5 # this is ugly...
@@ -58,25 +69,30 @@ for ii,((z,y,x),rat,erat,col,ta303,ta321,err) in enumerate(zip(zip(*usable_indic
                                                                uratio303321, ueratio303321,
                                                                column_flat, utline303,
                                                                utline321, unoise)):
-    logh2column = np.log10(col)+22
+    if tcube[z,y,x] == 0:
+        logh2column = np.log10(col)+22
 
-    mf.set_constraints(ratio303321=rat, eratio303321=erat,
-                       #ratio321322=ratio2, eratio321322=eratio2,
-                       logh2column=logh2column, elogh2column=elogh2column,
-                       logabundance=logabundance, elogabundance=elogabundance,
-                       taline303=ta303.value, etaline303=err,
-                       taline321=ta321.value, etaline321=err,
-                       linewidth=linewidth)
-    row_data = mf.get_parconstraints()
-    tcube[z,y,x] = row_data['temperature_chi2']
-    row_data['ratio303321'] = rat
-    row_data['eratio303321'] = erat
+        mf.set_constraints(ratio303321=rat, eratio303321=erat,
+                           #ratio321322=ratio2, eratio321322=eratio2,
+                           logh2column=logh2column, elogh2column=elogh2column,
+                           logabundance=logabundance, elogabundance=elogabundance,
+                           taline303=ta303.value, etaline303=err,
+                           taline321=ta321.value, etaline321=err,
+                           linewidth=linewidth)
+        row_data = mf.get_parconstraints()
+        tcube[z,y,x] = row_data['temperature_chi2']
+        row_data['ratio303321'] = rat
+        row_data['eratio303321'] = erat
 
-    if ii % 100 == 0 or ii < 50:
-        log.info("T: [{tmin1sig_chi2:7.2f},{temperature_chi2:7.2f},{tmax1sig_chi2:7.2f}]  R={ratio303321:6.2f}+/-{eratio303321:6.2f}".format(**row_data))
+        if ii % 100 == 0 or ii < 50:
+            log.info("T: [{tmin1sig_chi2:7.2f},{temperature_chi2:7.2f},{tmax1sig_chi2:7.2f}]  R={ratio303321:6.2f}+/-{eratio303321:6.2f}".format(**row_data))
+        else:
+            pb.update(ii)
+        tcube.flush()
     else:
         pb.update(ii)
 
+tcube[tcube==0] = np.nan
 tCube = SpectralCube(tcube, cube303.wcs, mask=BooleanArrayMask(np.isfinite(tcube), wcs=cube303.wcs))
 tCube.write(hpath('chi2_temperature_cube.fits'), overwrite=True)
 

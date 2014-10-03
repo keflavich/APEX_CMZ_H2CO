@@ -28,6 +28,7 @@ from scipy import signal,interpolate
 import warnings
 import image_tools
 import spectral_cube
+from spectral_cube import SpectralCube,BooleanArrayMask
 
 datasets_ao = ['O-085.F-9311A-2010','E-085.B-0964A-2010']
 datasets_2013 = ['M-091.F-0019-2013-2013-06-08',
@@ -278,7 +279,7 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
     #    sourceOK = True
 
     if xscan is not None:
-        xscanOK = np.array([h['XSCAN']==xscan for h in headers])
+        xscanOK = np.array([h['SCAN']==xscan for h in headers])
     else:
         xscanOK = True
 
@@ -360,7 +361,7 @@ def process_data(data, gal, hdrs, dataset, scanblsub=False,
     if subspectralmeans:
         data = data - data.mean(axis=freqaxis)[:,None]
 
-    obsids = np.array([h['XSCAN'] for h in hdrs])
+    obsids = np.array([h['SCAN'] for h in hdrs])
 
     # for plotting and masking, determine frequency array
     freq = hdr_to_freq(hdrs[0])
@@ -477,7 +478,7 @@ def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
     if debug and log.level > 10:
         log.level = 10
 
-    log.info("Data shape: {}".format(data.shape))
+    log.info("Data shape: {}.  Next step is gridding.".format(data.shape))
     if data.ndim != 2:
         raise ValueError('Data shape is NOT ok.')
     if data.shape[0] != len(hdrs):
@@ -830,6 +831,9 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                        pca_clean=False,
                        timewise_pca=True,
                        memmap=True,
+                       mask_level_sigma=3,
+                       blsub=True,
+                       contsub=False,
                        verbose=False, debug=False, **kwargs):
     """
     TODO: comment!
@@ -895,12 +899,12 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
         headerpars.update(kwargs['pcakwargs'])
     if cubefilename is not None:
         add_pipeline_parameters_to_file(cubefilename, 'generic', **headerpars)
-                                    
 
     for dataset in all_data:
 
         if not mergefile:
             cubefilename = os.path.join(outpath, "{0}_{1}_cube".format(dataset,window))
+            log.debug("Creating blanks for {0}".format(cubefilename))
             if freq:
                 make_blanks_freq(all_gal_vect, hdrs[0], cubefilename,
                                  clobber=True, pixsize=pixsize)
@@ -908,6 +912,9 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                 make_blanks(all_gal_vect, hdrs[0], cubefilename, clobber=True,
                             pixsize=pixsize)
             add_pipeline_parameters_to_file(cubefilename, 'generic', **headerpars)
+
+        if 'raw' in cubefilename:
+            import ipdb; ipdb.set_trace()
 
         data = all_data[dataset]
         hdrs = all_hdrs[dataset]
@@ -925,28 +932,38 @@ def build_cube_generic(window, freq=True, mergefile=None, datapath='./',
                       kernel_fwhm=kernel_fwhm,
                       debug=debug)
 
-    log.info("Completed cubemaking.  Now doing 'continuum subtraction'"
-             "or cube-based spectral baselining")
-    cube = fits.open(cubefilename+'.fits', memmap=False)
-    cont = fits.getdata(cubefilename+'_continuum.fits')
-    data = cube[0].data
-    cube[0].data = data - cont
-    cube.writeto(cubefilename+'_sub.fits', clobber=True)
+        if not mergefile:
+            if contsub:
+                log.info("Continuum subtraction: {0}.".format(cubefilename))
+                contsub_cube(cubefilename)
+            elif blsub:
+                log.info("Baseline subtraction: {0}.".format(cubefilename))
+                baseline_cube(cubefilename+".fits",
+                              mask_level_sigma=mask_level_sigma)
 
+    if mergefile and contsub:
+        log.info("Completed cubemaking.  Continuum subtraction now.")
+        contsub_cube(cubefilename)
+    elif mergefile and blsub:
+        log.info("Completed cubemaking.  Baseline subtraction now.")
+        baseline_cube(cubefilename, mask_level_sigma=mask_level_sigma)
 
     # Downsample by some factor?
     if downsample_factor:
-        log.info("Downsampling "+cubefilename)
-        avg = FITS_tools.downsample.downsample_axis(cube[0].data, downsample_factor, 0)
-        cube[0].data = avg
-        cube[0].header['CDELT3'] *= downsample_factor
-        scalefactor = 1./downsample_factor
-        crpix3 = (cube[0].header['CRPIX3']-1)*scalefactor+0.5+scalefactor/2.
-        cube[0].header['CRPIX3'] = crpix3
-        cube.writeto(cubefilename+'_downsampled.fits', clobber=True)
+        downsample_cube(cubefilename, downsample_factor)
 
     log.info("Done with "+cubefilename)
 
+def downsample_cube(cubefilename, downsample_factor):
+    log.info("Downsampling "+cubefilename)
+    cube = fits.open(cubefilename+".fits")
+    avg = FITS_tools.downsample.downsample_axis(cube[0].data, downsample_factor, 0)
+    cube[0].data = avg
+    cube[0].header['CDELT3'] *= downsample_factor
+    scalefactor = 1./downsample_factor
+    crpix3 = (cube[0].header['CRPIX3']-1)*scalefactor+0.5+scalefactor/2.
+    cube[0].header['CRPIX3'] = crpix3
+    cube.writeto(cubefilename+'_downsampled.fits', clobber=True)
 
 def build_cube_ao(window, freq=False, mergefile=None,
                   mergefilename=None,
@@ -1812,13 +1829,26 @@ def do_postprocessing():
 
     do_temperature()
 
-def baseline_cube(cubefn, maskfn, order=5):
+def contsub_cube(cubefilename,):
+    cube = fits.open(cubefilename+'.fits', memmap=False)
+    cont = fits.getdata(cubefilename+'_continuum.fits')
+    data = cube[0].data
+    cube[0].data = data - cont
+    cube.writeto(cubefilename+'_sub.fits', clobber=True)
+
+def baseline_cube(cubefn, maskfn=None, mask_level=None,
+                  mask_level_sigma=None, order=5):
     from pyspeckit.cubes.cubes import baseline_cube
     f = fits.open(cubefn)
     cube = f[0].data
-    mask = fits.getdata(maskfn).astype('bool')
-    if cube.shape != mask.shape:
-        raise ValueError("Cube and mask don't match.")
+    if maskfn is not None:
+        mask = fits.getdata(maskfn).astype('bool')
+        if cube.shape != mask.shape:
+            raise ValueError("Cube and mask don't match.")
+    elif mask_level is not None:
+        mask = cube > mask_level
+    elif mask_level_sigma is not None:
+        mask = cube > cube.std(axis=0)*mask_level_sigma
     t0 = time.time()
     log.info("Baselining cube {0} with order {1}...".format(cubefn, order))
     bc = baseline_cube(cube, order, cubemask=mask)
@@ -2628,7 +2658,21 @@ def extract_co_subcubes(mergepath=april2014path):
                     os.path.join(h2copath,'APEX_C18O_matched_H2CO.fits'),
                     linefreq=219.56036*u.GHz,)
 
-def quick_extract_13cocube(fn):
+def quick_extract_13cocube(fn, snthreshold=3, overwrite=True, intrange=None):
     if fits.getheader(fn)['NAXIS'] > 2:
-        cube = SpectralCube.read(fn).with_spectral_unit(u.km/u.s, rest_value=220.39868*u.GHz, velocity_convention='radio')
-        cube.spectral_slab(-200*u.km/u.s, 200*u.km/u.s).write(fn[:-5]+"_13COcube.fits")
+        cube = SpectralCube.read(fn).with_spectral_unit(u.km/u.s,
+                                                        rest_value=220.39868*u.GHz,
+                                                        velocity_convention='radio')
+        cocube = cube.spectral_slab(-200*u.km/u.s, 200*u.km/u.s)
+        cocube.write(fn[:-5]+"_13COcube.fits", overwrite=overwrite)
+        noise = cube.std(axis=0)
+        noise.hdu.writeto(fn[:-5]+"_noise.fits", clobber=overwrite)
+        sn = cocube.filled_data[:]/noise
+        comask = cocube.with_mask(BooleanArrayMask(sn > snthreshold, wcs=cocube._wcs))
+        if intrange is None:
+            coint = comask.moment0()
+        else:
+            coint = comask.spectral_slab(intrange[0], intrange[1]).moment0()
+        coint.write(fn[:-5]+"_13COmaskintegrated.fits", overwrite=overwrite)
+        coint2 = cocube.spectral_slab(intrange[0], intrange[1]).moment0()
+        coint2.write(fn[:-5]+"_13COintegrated.fits", overwrite=overwrite)
