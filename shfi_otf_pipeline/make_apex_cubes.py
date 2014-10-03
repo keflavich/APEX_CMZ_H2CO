@@ -1403,8 +1403,10 @@ def make_high_mergecube(pca_clean={'2014':False,
     #        mergefile2 = 'APEX_H2CO_merge_high'
     #else:
     #    mergefile2 = 'APEX_H2CO_merge_high_nopca'
-    make_blanks_merge(os.path.join(mergepath,mergefile2), lowhigh='high',
-                      lowest_freq=218e9, width=1.0*u.GHz)
+
+    for suff in ("_2014_bscans", "_2014_lscans", "_2013","_ao"):
+        make_blanks_merge(os.path.join(mergepath,mergefile2+suff),
+                          lowhigh='high', lowest_freq=218e9, width=1.0*u.GHz)
 
     mapnames = ['MAP_{0:03d}'.format(ii) for ii in range(1,130)]
     log.info("Building cubes: "+str(mapnames))
