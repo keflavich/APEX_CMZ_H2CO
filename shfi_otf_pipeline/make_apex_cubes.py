@@ -197,7 +197,7 @@ def load_dataset_for_debugging(lowhigh='low', downsample_factor=8,
 
     if lowhigh not in ('low','high'):
         raise ValueError
-    if backend == 'xffts': 
+    if backend == 'xffts':
         xtel = 'AP-H201-X202' if lowhigh=='low' else 'AP-H201-X201'
     else:
         xtel = 'AP-H201-F101' if lowhigh == 'high' else 'AP-H201-F102'
@@ -226,15 +226,11 @@ def load_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
                    skip_data=False, DEBUG=False, downsample_factor=None,
                    sourcename=None, xtel=None,
                    memmap=True):
-    spectra,headers,indices = read_class.read_class(apex_filename,
-                                                    downsample_factor=downsample_factor,
-                                                    sourcename=sourcename,
-                                                    telescope=xtel)
+    found_data = read_class.read_class(apex_filename,
+                                       downsample_factor=downsample_factor,
+                                       sourcename=sourcename, telescope=xtel)
 
-    #for h,i in zip(headers,indices):
-    #    h.update(i)
-
-    return spectra,headers,indices
+    return found_data
 
 def add_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
                   cubefilename='APEX_H2CO_Ao', clobber=True,
@@ -269,7 +265,7 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
     else:
         galOK = True
 
-    
+
     sourceOK = True
     #if isinstance(sourcename, (list,tuple)):
     #    sourceOK = np.array([h['SOURC'].strip() in sourcename for h in headers])
@@ -375,7 +371,7 @@ def process_data(data, gal, hdrs, dataset, scanblsub=False,
         for ii,xscan in enumerate(np.unique(obsids)):
             match = obsids == xscan
             # maybe mask=mask_pix.max(axis=timeaxis), ?
-            #mask=mask_pix[ii], 
+            #mask=mask_pix[ii],
             data_diagplot(data[match], dataset+"_presub_obs%i" % xscan,
                           freq=freq, **kwargs)
 
@@ -411,7 +407,7 @@ def process_data(data, gal, hdrs, dataset, scanblsub=False,
             # DON'T remove the mean: that's dealt with in 'spectral baselining' in
             # a more conservative fashion
             dmean = dsub.mean(axis=0)
-            dsub = PCA_clean(dsub-dmean, 
+            dsub = PCA_clean(dsub-dmean,
                              diagplotfilename=os.path.join(diagplotdir,
                                                            dataset+"_pca_diagnostic.png"),
                              **pcakwargs) + dmean
@@ -739,7 +735,7 @@ def data_diagplot(data, dataset, ext='png', newfig=False,
         axis.figure.axes[5].set_xlabel("Frequency")
     else:
         axis.set_xlabel("Channel #")
-    
+
     axis.set_ylabel("Integration #")
 
     if scans is not None and len(scans) < 50:
@@ -1188,7 +1184,7 @@ def build_cube_2013(mergefile=None,
                                            xtel=xtel,
                                            rchanrange=None,
                                            skip_data=False)
-        
+
         data, gal, hdrs = process_data(data, gal, hdrs, dataset+"_"+xtel,
                                        scanblsub=scanblsub, verbose=verbose,
                                        timewise_pca=timewise_pca,
@@ -1230,6 +1226,7 @@ def build_cube_2014(sourcename,
                     pca_clean=False,
                     timewise_pca=False,
                     extra_suffix='',
+                    tsysrange=[100,325],
                     **kwargs
                     ):
     """
@@ -1240,7 +1237,7 @@ def build_cube_2014(sourcename,
     if mergefile:
         cubefilename=os.path.join(outpath,mergefile)
     elif isinstance(sourcename, str):
-        cubefilename=os.path.join(outpath, 
+        cubefilename=os.path.join(outpath,
                                   'APEX_H2CO_2014_%s_%s' % (sourcename, lowhigh))
     else:
         raise ValueError("Use a mergefile")
@@ -1262,10 +1259,16 @@ def build_cube_2014(sourcename,
 
             log.info("".join(("Pre-Loading data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
 
-            spectra,headers,indices = load_apex_cube(apex_filename,
-                                                     downsample_factor=downsample_factor,
-                                                     xtel=xtel,
-                                                     sourcename=sourcename)
+            found_data = load_apex_cube(apex_filename,
+                                        downsample_factor=downsample_factor,
+                                        xtel=xtel, sourcename=sourcename)
+            if found_data is None:
+                log.info("Skipping dataset {0} because it doesn't contain "
+                         "{1} or {2}".format(dataset, sourcename, xtel))
+                continue
+            else:
+                spectra,headers,indices = found_data
+
             data, hdrs, gal = select_apex_data(spectra, headers, indices,
                                                sourcename=sourcename,
                                                shapeselect=32768/downsample_factor,
@@ -1293,24 +1296,28 @@ def build_cube_2014(sourcename,
     add_pipeline_parameters_to_file(cubefilename, '2014', **headerpars)
 
     # need two loops to avoid loading too much stuff into memory
+    # (actually, we don't any more with memmaping)
     for dataset in datasets:
 
         apex_filename=datapath+dataset+".apex"
-        
-        log.info("".join(("Loading data for dataset ",dataset," in filename ",apex_filename,"  t=",str(time.time()-t0))))
 
-        spectra,headers,indices = load_apex_cube(apex_filename,
-                                                 downsample_factor=downsample_factor,
-                                                 xtel=xtel,
-                                                 sourcename=sourcename)
+        log.info("".join(("Loading data for dataset ",dataset," in filename ",
+                          apex_filename,"  t=",str(time.time()-t0))))
 
-        #if dataset == 'M-091.F-0019-2013-2013-06-13':
-        #    tsysrange=[100,260]
-        #else:
-        #    tsysrange=[100,325]
-        tsysrange=[100,325]
+        found_data = load_apex_cube(apex_filename,
+                                    downsample_factor=downsample_factor,
+                                    xtel=xtel, sourcename=sourcename)
 
-        log.info("".join(("Selecting data for dataset ",dataset," in filename ",apex_filename,"  t=",str(time.time()-t0))))
+        if found_data is None:
+            log.info("Skipping dataset {0} because it doesn't contain "
+                     "{1} or {2}".format(dataset, sourcename, xtel))
+            continue
+        else:
+            spectra,headers,indices = found_data
+
+        log.info("".join(("Selecting data for dataset ", dataset,
+                          " in filename ", apex_filename, "  t=",
+                          str(time.time()-t0))))
 
         data, hdrs, gal = select_apex_data(spectra, headers, indices,
                                            sourcename=sourcename,
@@ -1324,7 +1331,9 @@ def build_cube_2014(sourcename,
                                            rchanrange=None,
                                            skip_data=False)
 
-        log.info("".join(("Processing data for dataset ",dataset," in filename ",apex_filename,"  t=",str(time.time()-t0))))
+        log.info("".join(("Processing data for dataset ", dataset,
+                          " in filename ", apex_filename, "  t=",
+                          str(time.time()-t0))))
 
         data, gal, hdrs = process_data(data, gal, hdrs, os.path.join(outpath,
                                                                      dataset)+"_"+xtel,
@@ -1333,7 +1342,9 @@ def build_cube_2014(sourcename,
                                        pca_clean=pca_clean,
                                        **kwargs)
 
-        log.info("".join(("Adding data for dataset ",dataset," to filename ",cubefilename,"  t=",str(time.time()-t0))))
+        log.info("".join(("Adding data for dataset ", dataset,
+                          " to filename ", cubefilename, "  t=",
+                          str(time.time()-t0))))
 
         add_apex_data(data, hdrs, gal, cubefilename, retfreq=True,
                       kernel_fwhm=kernel_fwhm,
@@ -1341,7 +1352,9 @@ def build_cube_2014(sourcename,
                       # downsample factor for freqarr
                       )
         # FORCE cleanup
-        log.info("".join(("Clearing data for dataset ",dataset," to filename ",cubefilename,"  t=",str(time.time()-t0))))
+        log.info("".join(("Clearing data for dataset ", dataset,
+                          " to filename ", cubefilename, "  t=",
+                          str(time.time()-t0))))
         del data,hdrs,gal
 
     log.info("".join(("Continuum subtracting ",cubefilename)))
@@ -1626,7 +1639,7 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
 
         outheader['CDELT3'] = outheader['CDELT3'] * kw
         outheader['NAXIS3'] = outheader['NAXIS3'] / kw
-    
+
     # Now that we've written this out, we use interpolation to force the cube
     # onto a grid that starts at *exactly* -150 km/s
     newhdu = cube_regrid.regrid_cube_hdu(svcube.hdu, outheader, order=1, prefilter=False)
@@ -1634,7 +1647,7 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
 
     log.info("Completed cube extraction to {1} in {0} seconds.".format(time.time()-t0,
                                                                        outfilename))
-    
+
     return newhdu
 
 all_lines = {'H2CO_303_202':218.22219,
@@ -1837,7 +1850,12 @@ def contsub_cube(cubefilename,):
     cube.writeto(cubefilename+'_sub.fits', clobber=True)
 
 def baseline_cube(cubefn, maskfn=None, mask_level=None,
-                  mask_level_sigma=None, order=5):
+                  mask_level_sigma=None, order=5,
+                  polyspline='poly', splinesampling=100):
+    """
+    Baseline-subtract a data cube with polynomials or splines.
+    Can mask the cube first.
+    """
     from pyspeckit.cubes.cubes import baseline_cube
     f = fits.open(cubefn)
     cube = f[0].data
@@ -1851,10 +1869,15 @@ def baseline_cube(cubefn, maskfn=None, mask_level=None,
         mask = cube > cube.std(axis=0)*mask_level_sigma
     t0 = time.time()
     log.info("Baselining cube {0} with order {1}...".format(cubefn, order))
-    bc = baseline_cube(cube, order, cubemask=mask)
+    if polyspline == 'poly':
+        bc = baseline_cube(cube, polyorder=order, cubemask=mask)
+    elif polyspine == 'spline':
+        bc = baseline_cube(cube, splineorder=order,
+                           splinesampling=splinesampling, cubemask=mask)
     log.info("Baselining done ({0} seconds)".format(time.time()-t0))
     f[0].data = bc
     f.writeto(cubefn.replace(".fits","_bl.fits"), clobber=True)
+
 
 
 def do_everything_2013extrafreqs():
@@ -1869,65 +1892,65 @@ def do_everything_2013extrafreqs():
 
 def doratio(h2copath=h2copath, maxratio=1):
     """
-    I swapped top and bottom because that's what the models were set up for... 
+    I swapped top and bottom because that's what the models were set up for...
 
     maxratio : float
         0.64 is the highest physical value
-    
+
     """
     ##### integrated #####
 
     for smooth in ('','_smooth','_vsmooth','_bl','_smooth_bl','_vsmooth_bl'):
         top = fits.getdata(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
         bottom = fits.getdata(h2copath+'APEX_H2CO_322_221{0}_CH3OHchomped_mask_integ.fits'.format(smooth))
-        
+
         ratio = bottom/top
         ratio[ratio<0.0] = np.nan
         ratio[ratio>maxratio] = np.nan
-        
+
         f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
-        
+
         f[0].data = ratio
-        
+
         f.writeto(h2copath+'H2CO_322221_to_303202{0}_integ.fits'.format(smooth),clobber=True)
 
         bottom = fits.getdata(h2copath+'APEX_H2CO_321_220{0}_mask_integ.fits'.format(smooth))
         ratio = bottom/top
         ratio[ratio<0.0] = np.nan
         ratio[ratio>maxratio] = np.nan
-        
+
         f[0].data = ratio
-        
+
         f.writeto(h2copath+'H2CO_321220_to_303202{0}_integ.fits'.format(smooth),clobber=True)
 
     ##### cube #####
     for smooth in ('','_smooth','_vsmooth','_bl','_smooth_bl','_vsmooth_bl'):
         top = fits.getdata(h2copath+'APEX_H2CO_303_202{0}.fits'.format(smooth))
         bottom = fits.getdata(h2copath+'APEX_H2CO_322_221{0}_CH3OHchomped_masked.fits'.format(smooth))
-        
+
         ratio = bottom/top
         ratio[ratio<0.0] = np.nan
         ratio[ratio>maxratio] = np.nan
-        
+
         f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth))
-        
+
         # mask now!
         f[0].data = ratio * f[0].data.astype('bool')
-        
+
         f.writeto(h2copath+'H2CO_322221_to_303202_cube{0}.fits'.format(smooth),clobber=True)
 
         bottom = fits.getdata(h2copath+'APEX_H2CO_321_220{0}.fits'.format(smooth))
-        
+
         ratio = bottom/top
         ratio[ratio<0.0] = np.nan
         ratio[ratio>maxratio] = np.nan
-        
+
         #f = fits.open(h2copath+'APEX_H2CO_303_202{0}.fits'.format(smooth))
         f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth))
-        
+
         # mask out...
         f[0].data = ratio * f[0].data.astype('bool')
-        
+
         f.writeto(h2copath+'H2CO_321220_to_303202_cube{}.fits'.format(smooth),clobber=True)
 
 
@@ -2234,7 +2257,7 @@ def per_scan_fourier_clean(data, scans, mask_pixels=None,
         Print out simple stats about the fits
     """
     raise NotImplementedError("Work in progress - maybe a bad idea")
-    
+
     # Create a new array for hosting the subtracted data
     dsub = data*0
 
@@ -2304,7 +2327,7 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
     return_mask : bool
         Return an array of the mask used for each scan
     """
-    
+
     #dmeans = data[:,percentile*data.shape[1]:(1-percentile)*data.shape[1]].mean(axis=1)
 
     dsub = data*0
@@ -2351,7 +2374,7 @@ def subtract_scan_linear_fit(data, scans, mask_pixels=None,
         # Becomes set of equations y = m x + b  ||  y = X mb
         X = np.c_[x,np.ones(jj-ii)]
         mb = np.linalg.lstsq(X,y)[0]
-        
+
         if mask_pixels is not None:
             # Mask out the bad values, interpolate using a wide gaussian that
             # ignores nans
@@ -2440,7 +2463,7 @@ def efuncs(arr, neig=None, return_others=False, huge_limit=500):
         if np.abs(worst_diff) > 1e-4:
             log.warning("Actually, that's a pretty large error.  "
                         "You may be in trouble.")
-    
+
     # Changed from np.linalg.eig to scipy.linalg.eigh
     # and numpy.linalg.eigh, which both return values in
     # the opposite order from np.linalg.eig
@@ -2618,7 +2641,7 @@ def PCA_subtract(data, smoothing_scale=None, ncomponents=3):
                                               return_others=True)
     else:
         log.info("PCA cleaning an image with size {0}".format(data.shape))
-        
+
         efuncarr,covmat,evals,evects = efuncs(data.T,
                                               neig=ncomponents,
                                               huge_limit=1000,
