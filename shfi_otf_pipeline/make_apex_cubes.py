@@ -225,10 +225,11 @@ def get_sourcenames(headers):
 def load_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
                    skip_data=False, DEBUG=False, downsample_factor=None,
                    sourcename=None, xtel=None,
-                   memmap=True):
+                   memmap=True, **kwargs):
     found_data = read_class.read_class(apex_filename,
                                        downsample_factor=downsample_factor,
-                                       sourcename=sourcename, telescope=xtel)
+                                       sourcename=sourcename, telescope=xtel,
+                                       **kwargs)
 
     return found_data
 
@@ -1227,6 +1228,7 @@ def build_cube_2014(sourcename,
                     timewise_pca=False,
                     extra_suffix='',
                     tsysrange=[100,325],
+                    posang=None,
                     **kwargs
                     ):
     """
@@ -1257,11 +1259,14 @@ def build_cube_2014(sourcename,
 
             apex_filename=datapath+dataset+".apex"
 
-            log.info("".join(("Pre-Loading data for dataset ",dataset," to filename ",apex_filename,"  t=",str(time.time()-t0))))
+            log.info("".join(("Pre-Loading data for dataset ", dataset,
+                              " to filename ", apex_filename, "  t=",
+                              str(time.time()-t0))))
 
             found_data = load_apex_cube(apex_filename,
                                         downsample_factor=downsample_factor,
-                                        xtel=xtel, sourcename=sourcename)
+                                        xtel=xtel, sourcename=sourcename,
+                                        posang=posang)
             if found_data is None:
                 log.info("Skipping dataset {0} because it doesn't contain "
                          "{1} or {2}".format(dataset, sourcename, xtel))
@@ -1306,7 +1311,8 @@ def build_cube_2014(sourcename,
 
         found_data = load_apex_cube(apex_filename,
                                     downsample_factor=downsample_factor,
-                                    xtel=xtel, sourcename=sourcename)
+                                    xtel=xtel, sourcename=sourcename,
+                                    posang=posang)
 
         if found_data is None:
             log.info("Skipping dataset {0} because it doesn't contain "
@@ -1381,9 +1387,9 @@ def build_cube_2014(sourcename,
 
 
 
-def make_high_mergecube(pca_clean={'2014':True,
+def make_high_mergecube(pca_clean={'2014':False,
                                    '2013':False,
-                                   'ao':True},
+                                   'ao':False},
                         scanblsub={'2014':False, '2013':False, 'ao':False},
                         timewise_pca={'2014': True, '2013':False, 'ao':True},
                         mergefile2=None):
@@ -1404,7 +1410,18 @@ def make_high_mergecube(pca_clean={'2014':True,
     log.info("Building cubes: "+str(mapnames))
     # Frequency: (216.9, 219.4)
     build_cube_2014(mapnames,
-                    mergefile=mergefile2,
+                    mergefile=mergefile2+"_2014_bscans",
+                    posang=[140,160],
+                    outpath=mergepath,
+                    datapath=april2014path,
+                    lowhigh='low',
+                    pca_clean=pca_clean['2014'],
+                    timewise_pca=timewise_pca['2014'],
+                    scanblsub=scanblsub['2014'],
+                    datasets=datasets_2014)
+    build_cube_2014(mapnames,
+                    mergefile=mergefile2+"_2014_lscans",
+                    posang=[50,70],
                     outpath=mergepath,
                     datapath=april2014path,
                     lowhigh='low',
@@ -1417,19 +1434,36 @@ def make_high_mergecube(pca_clean={'2014':True,
     # ('ao', 'high'): (218.0, 219.0),
     build_cube_ao(window='high', mergefile=True, freq=True, outpath=mergepath,
                   pca_clean=pca_clean['ao'], timewise_pca=timewise_pca['ao'],
-                  mergefilename=os.path.join(mergepath, mergefile2),
+                  mergefilename=os.path.join(mergepath, mergefile2+"_ao"),
                   scanblsub=scanblsub['ao'],
                   datapath=aorawpath)
 
     log.info("Building 2013 cubes")
     # (2013, 'high'): (217.5, 220.0)
-    build_cube_2013(mergefile=mergefile2,
+    build_cube_2013(mergefile=mergefile2+"_2013",
                     outpath=mergepath,
                     datapath=june2013datapath,
                     lowhigh='high',
                     timewise_pca=timewise_pca['2013'],
                     pca_clean=pca_clean['2013'],
                     scanblsub=scanblsub['2013'])
+
+    from sdpy import plait
+
+    headers = [fits.getheader(os.path.join(mergepath, mergefile2+suff+".fits"))
+               for suff in ("_2014_bscans", "_2014_lscans", "_2013","_ao")]
+    header = headers[0]
+    for h in headers:
+        header.update(h)
+
+    cubes = [fits.getdata(os.path.join(mergepath, mergefile2+suff+".fits"))
+             for suff in ("_2014_bscans", "_2014_lscans", "_2013","_ao")]
+    angles = [0, 90, 58.6, 58.6]
+
+    cube_comb = plait.plait_cube(cubes, angles=angles, scale=3)
+
+    hdu = fits.PrimaryHDU(data=cube_comb, header=header)
+    hdu.writeto(os.path.join(mergepath, mergefile2+"_plait.fits"))
 
 
 
