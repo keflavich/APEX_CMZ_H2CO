@@ -1452,20 +1452,23 @@ def make_high_mergecube(pca_clean={'2014':False,
 
     from sdpy import plait
 
+    # plaiting doesn't work well for unequal weights or large swathes
+    # of missing data
+    plait_targets = ("_2014_bscans", "_2014_lscans",)# "_2013","_ao")
     headers = [fits.getheader(os.path.join(mergepath, mergefile2+suff+".fits"))
-               for suff in ("_2014_bscans", "_2014_lscans", "_2013","_ao")]
+               for suff in plait_targets]
     header = headers[0]
     for h in headers:
         header.update(h)
 
     cubes = [fits.getdata(os.path.join(mergepath, mergefile2+suff+".fits"))
-             for suff in ("_2014_bscans", "_2014_lscans", "_2013","_ao")]
-    angles = [0, 90, 58.6, 58.6]
+             for suff in plait_targets]
+    angles = [0, 90]#, 58.6, 58.6]
 
     cube_comb = plait.plait_cube(cubes, angles=angles, scale=3)
 
     hdu = fits.PrimaryHDU(data=cube_comb, header=header)
-    hdu.writeto(os.path.join(mergepath, mergefile2+"_plait.fits"))
+    hdu.writeto(os.path.join(mergepath, mergefile2+"_plait.fits"), clobber=True)
 
 
 
