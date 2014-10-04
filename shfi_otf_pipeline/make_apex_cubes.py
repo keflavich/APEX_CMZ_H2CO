@@ -1004,7 +1004,7 @@ def build_cube_ao(window, freq=False, mergefile=None,
         apex_filename = os.path.join(datapath,dataset+"_merge.apex")
 
         spectra,headers,indices = load_apex_cube(apex_filename,
-                                                 downsample_factor=downsample_factor,
+                                                 #downsample_factor=downsample_factor,
                                                  xtel=xtel,
                                                  sourcename=sourcename)
         data,hdrs,gal = select_apex_data(spectra, headers, indices,
