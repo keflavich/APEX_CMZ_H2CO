@@ -7,7 +7,7 @@ from astropy import coordinates
 from astropy import units as u
 from astropy import constants
 from .progressbar import ProgressBar
-from astropy.convolution import convolve, Gaussian1DKernel
+from astropy.convolution import convolve, Gaussian1DKernel, Gaussian2DKernel
 from sdpy import makecube
 from astropy.io import fits
 from FITS_tools import cube_regrid
@@ -1454,21 +1454,45 @@ def make_high_mergecube(pca_clean={'2014':False,
 
     # plaiting doesn't work well for unequal weights or large swathes
     # of missing data
-    plait_targets = ("_2014_bscans", "_2014_lscans",)# "_2013","_ao")
-    headers = [fits.getheader(os.path.join(mergepath, mergefile2+suff+".fits"))
+    all_targets = ("_2014_bscans", "_2014_lscans", "_2013","_ao")
+    plait_targets = all_targets[:2]
+
+    def fnify(suff, end='.fits'):
+        return os.path.join(mergepath, mergefile2+suff+end)
+
+    headers = [fits.getheader(fnify(suff))
                for suff in plait_targets]
     header = headers[0]
     for h in headers:
         header.update(h)
 
-    cubes = [fits.getdata(os.path.join(mergepath, mergefile2+suff+".fits"))
+    cubes = [fits.getdata(fnify(suff))
              for suff in plait_targets]
     angles = [0, 90]#, 58.6, 58.6]
 
     cube_comb = plait.plait_cube(cubes, angles=angles, scale=3)
 
     hdu = fits.PrimaryHDU(data=cube_comb, header=header)
-    hdu.writeto(os.path.join(mergepath, mergefile2+"_plait.fits"), clobber=True)
+    hdu.writeto(fnify("_plait"), clobber=True)
+    comb_weights = np.sum([fits.getdata(fnify(suff, '_nhits.fits'))
+                           for suff in plait_targets], axis=0)
+    whdu = fits.PrimaryHDU(data=comb_weights,
+                           header=fits.getheader(fnify(suff, '_nhits.fits')))
+    whdu.writeto(fnify('_nhits'), clobber=True)
+
+    data = [cube_comb] + [fits.getdata(fnify(suff))
+                          for suff in all_targets[2:]]
+    weights = ([comb_weights] +
+               [fits.getdata(fnify(suff, '_nhits.fits'))
+                for suff in all_targets[2:]])
+    total_stack = (np.sum([(d*w) for d,w in zip(data,weights)], axis=0) /
+                   np.sum(weights, axis=0))
+    for h in [fits.getheader(fnify(suff)) for suff in all_targets[2:]]:
+        header.update(h)
+    hdu = fits.PrimaryHDU(data=total_stack, header=header)
+    hdu.writeto(fnify('_plait_all'), clobber=True)
+
+ 
 
 
 
@@ -1505,22 +1529,24 @@ def make_low_mergecube(datasets_2014=datasets_2014, pca_clean=True,
 
 def integrate_slices_high(prefix='merged_datasets/APEX_H2CO_merge_high_sub'):
     ffile = fits.open(prefix+'.fits')
+    cd3 = (ffile[0].header['CD3_3'] if 'CD3_3' in ffile[0].header else
+           ffile[0].header['CDELT3']) / 1e3 # convert to km/s (I hope)
 
     integ1,hdr = cubes.integ(ffile, [235,344], average=np.nansum) # first H2CO line: blue
-    hdu1 = fits.PrimaryHDU(data=integ1, header=hdr)
+    hdu1 = fits.PrimaryHDU(data=integ1/cd3, header=hdr)
     hdu1.writeto(prefix+"_H2CO_303-202_blue.fits", clobber=True)
     integ2,hdr = cubes.integ(ffile, [161,235], average=np.nansum) # first H2CO line: red
-    hdu2 = fits.PrimaryHDU(data=integ2, header=hdr)
+    hdu2 = fits.PrimaryHDU(data=integ2/cd3, header=hdr)
     hdu2.writeto(prefix+"_H2CO_303-202_red.fits", clobber=True)
 
 
     integ4,hdr = cubes.integ(ffile, [161,344], average=np.nansum) # first H2CO line: red
-    hdu4 = fits.PrimaryHDU(data=integ4, header=hdr)
+    hdu4 = fits.PrimaryHDU(data=integ4/cd3, header=hdr)
     hdu4.writeto(prefix+"_H2CO_303-202.fits", clobber=True)
 
 
     integ3,hdr = cubes.integ(ffile, [513,615], average=np.nansum) # second H2CO line: blue
-    hdu3 = fits.PrimaryHDU(data=integ3, header=hdr)
+    hdu3 = fits.PrimaryHDU(data=integ3/cd3, header=hdr)
     hdu3.writeto(prefix+"_H2CO_322-221_blue.fits", clobber=True)
 
 def integrate_slices_low(prefix='merged_datasets/APEX_H2CO_merge_low_sub'):
@@ -1689,6 +1715,19 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
 
     return newhdu
 
+def make_smooth_noise(noisefilename, outfilename, kernelwidth=2, clobber=True):
+    data = fits.getdata(noisefilename)
+    kernel = Gaussian2DKernel(stddev=kernelwidth)
+    kernel.normalize('integral')
+    smdata = convolve(data, kernel)
+    kernel.normalize('peak')
+    npix = kernel.array.sum()
+
+    # Average down the noise by sqrt(npix)
+    hdu = fits.PrimaryHDU(data=smdata/npix**0.5,
+                          header=fits.getheader(noisefilename))
+    hdu.writeto(outfilename, clobber=clobber)
+
 all_lines = {'H2CO_303_202':218.22219,
              'H2CO_322_221':218.47563,
              'H2CO_321_220':218.76007,
@@ -1736,6 +1775,7 @@ def make_line_mask(freqarr, lines=bright_lines):
 
 
 def do_extract_subcubes(outdir=mergepath, merge_prefix='APEX_H2CO_merge',
+                        cubefilename=None,
                         frange=None, lines=all_lines):
 
     for line,freq in lines.iteritems():
@@ -1745,10 +1785,11 @@ def do_extract_subcubes(outdir=mergepath, merge_prefix='APEX_H2CO_merge',
                 continue
 
         log.info("Extracting {0}".format(line))
-        if freq < 218:
-            cubefilename = os.path.join(mergepath, merge_prefix+'_low_sub.fits')
-        else:
-            cubefilename = os.path.join(mergepath, merge_prefix+'_high_sub.fits')
+        if cubefilename is None:
+            if freq < 218:
+                cubefilename = os.path.join(mergepath, merge_prefix+'_low_sub.fits')
+            else:
+                cubefilename = os.path.join(mergepath, merge_prefix+'_high_sub.fits')
 
         header = fits.getheader(cubefilename)
         ww = wcs.WCS(header)
@@ -1781,33 +1822,40 @@ def do_everything(pca_clean={'2014':False, '2013':False, 'ao':False},
 
 def do_postprocessing():
     #make_low_mergecube() # there's only one really useful overlap region
-    os.chdir(mergepath)
+    #os.chdir(mergepath)
     # vsmoothds is made here:
-    os.system('./APEX_H2CO_merge_high_starlink_custom.sh')
-    os.chdir('../')
+    #os.system('./APEX_H2CO_merge_high_starlink_custom.sh')
+    #os.chdir('../')
+    # OLD: merge_prefix = 'APEX_H2CO_merge_high' # Oct 4, 2014
+    merge_prefix='APEX_H2CO_merge_high_plait_all'
     do_extract_subcubes(outdir=mergepath, frange=[218,219],
+                        cubefilename=os.path.join(mergepath, merge_prefix+".fits"),
                         lines=lines218)
-    compute_noise_high(mergepath+'APEX_H2CO_merge_high_sub', pixrange=[700,900])
-    compute_noise_high(mergepath+'APEX_H2CO_merge_high_smooth',[203,272])
-    compute_noise_high(mergepath+'APEX_H2CO_merge_high_vsmoothds',[203,272])
-    compute_noise_high(mergepath+'APEX_H2CO_303_202_vsmooth',[75,100])
+    compute_noise_high(mergepath+merge_prefix, pixrange=[700,900])
+    #compute_noise_high(mergepath+merge_prefix+'_smooth',[203,272])
+    #compute_noise_high(mergepath+'APEX_H2CO_merge_high_vsmoothds',[203,272])
+    #compute_noise_high(mergepath+'APEX_H2CO_303_202_vsmooth',[75,100])
     #compute_noise_low()
     signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202',
-                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_sub_noise.fits'),
+                              noise=fits.getdata(os.path.join(mergepath,
+                                                              'APEX_H2CO_merge_high_plait_all_noise.fits')),
                               sigmacut=2,
                               grow=2)
+    make_smooth_noise(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits',
+                      mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits',
+                      kernelwidth=2)
     signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_smooth',
-                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_smooth_noise.fits'),
+                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
                               sigmacut=2)
-    signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_vsmooth',
-                              noise=fits.getdata(mergepath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
-                              sigmacut=2)
+    #signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_vsmooth',
+    #                          noise=fits.getdata(mergepath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
+    #                          sigmacut=2)
     integrate_mask(mergepath+'APEX_H2CO_303_202',
                    mask=mergepath+'APEX_H2CO_303_202_mask.fits')
     integrate_mask(mergepath+'APEX_H2CO_303_202_smooth',
                    mask=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
-    integrate_mask(mergepath+'APEX_H2CO_303_202_vsmooth',
-                   mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
+    #integrate_mask(mergepath+'APEX_H2CO_303_202_vsmooth',
+    #               mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
     for fn in glob.glob(os.path.join(mergepath,'APEX_H2CO_30*fits')):
         try:
@@ -1817,7 +1865,7 @@ def do_postprocessing():
             log.debug("Skipped file {0} because it exists".format(fn))
 
     # Create a few integrated H2CO 303 maps
-    do_sncube_masking_hi()
+    integrate_slices_high(mergepath+'APEX_H2CO_303_202_snmasked')
 
     # Use spectral_cube to do a bunch of integrations
     # PATH SENSITIVE
@@ -1832,8 +1880,8 @@ def do_postprocessing():
                            mask=mergepath+'APEX_H2CO_303_202_mask.fits')
             integrate_mask(mergepath+'APEX_{0}_smooth'.format(line),
                            mask=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
-            integrate_mask(mergepath+'APEX_{0}_vsmooth'.format(line),
-                           mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
+            #integrate_mask(mergepath+'APEX_{0}_vsmooth'.format(line),
+            #               mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
             log.debug("Integrated masked file {0}".format(fn))
         else:
             log.debug("File {0} does not exist".format(fn))
@@ -1844,21 +1892,21 @@ def do_postprocessing():
                           maskfn=mergepath+'APEX_H2CO_303_202_mask.fits')
             baseline_cube(mergepath+'APEX_{0}_smooth.fits'.format(line),
                           maskfn=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
-            baseline_cube(mergepath+'APEX_{0}_vsmooth.fits'.format(line),
-                          maskfn=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
+            #baseline_cube(mergepath+'APEX_{0}_vsmooth.fits'.format(line),
+            #              maskfn=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
     #compute_noise_high(mergepath+'APEX_H2CO_303_202_bl',[350,400])
     #compute_noise_high(mergepath+'APEX_H2CO_303_202_smooth_bl',[175,200])
     #compute_noise_high(mergepath+'APEX_H2CO_303_202_vsmooth_bl',[80,100])
     signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_bl',
-                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_sub_noise.fits'),
+                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits'),
                               grow=2)
     signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_smooth_bl',
-                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_smooth_noise.fits'),
+                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
                               sigmacut=3)
-    signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_vsmooth_bl',
-                              noise=fits.getdata(mergepath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
-                              sigmacut=3)
+    #signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_vsmooth_bl',
+    #                          noise=fits.getdata(mergepath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
+    #                          sigmacut=3)
 
     for line in lines218:
         if os.path.exists(mergepath+'APEX_{0}_bl.fits'.format(line)):
@@ -1866,8 +1914,8 @@ def do_postprocessing():
                            mask=mergepath+'APEX_H2CO_303_202_mask.fits')
             integrate_mask(mergepath+'APEX_{0}_smooth_bl'.format(line),
                            mask=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
-            integrate_mask(mergepath+'APEX_{0}_vsmooth_bl'.format(line),
-                           mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
+            #integrate_mask(mergepath+'APEX_{0}_vsmooth_bl'.format(line),
+            #               mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
     do_mask_ch3oh()
 
