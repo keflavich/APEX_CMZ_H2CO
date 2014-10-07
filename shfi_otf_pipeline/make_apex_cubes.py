@@ -1248,6 +1248,7 @@ def build_cube_2014(sourcename,
 
     log.info("Building cubes for "+cubefilename)
 
+    assert lowhigh in ('low','high')
     xtel = 'AP-H201-X202' if lowhigh=='low' else 'AP-H201-X201'
 
     t0 = time.time()
@@ -1936,7 +1937,21 @@ def contsub_cube(cubefilename,):
     cube[0].data = data - cont
     cube.writeto(cubefilename+'_sub.fits', clobber=True)
 
-def baseline_cube(cubefn, maskfn=None, mask_level=None,
+def neighborly_masking(cube, sigma=1, roll=2):
+    """
+    Try masking 1-sigma points surrounded by 1-sigma points
+    """
+    noise = cube.std(axis=0)
+    mcube = cube > (noise*sigma)
+    mcube[:2,:,:] = mcube[-2:,:,:] = False
+    mcube2 = (mcube.astype('int16') + np.roll(mcube, 1, axis=0) +
+              np.roll(mcube, 2, axis=0) + np.roll(mcube, -1, axis=0) +
+              np.roll(mcube, -2, axis=0))
+    mask = mcube2 >= 3
+    return mask
+
+
+def baseline_cube(cubefn, mask=None, maskfn=None, mask_level=None,
                   mask_level_sigma=None, order=5,
                   polyspline='poly', splinesampling=100):
     """
@@ -1946,21 +1961,22 @@ def baseline_cube(cubefn, maskfn=None, mask_level=None,
     from pyspeckit.cubes.cubes import baseline_cube
     f = fits.open(cubefn)
     cube = f[0].data
-    if maskfn is not None:
-        mask = fits.getdata(maskfn).astype('bool')
-        if cube.shape != mask.shape:
-            raise ValueError("Cube and mask don't match.")
-    elif mask_level is not None:
-        mask = cube > mask_level
-    elif mask_level_sigma is not None:
-        mask = cube > cube.std(axis=0)*mask_level_sigma
+    if mask is None:
+        if maskfn is not None:
+            mask = fits.getdata(maskfn).astype('bool')
+            if cube.shape != mask.shape:
+                raise ValueError("Cube and mask don't match.")
+        elif mask_level is not None:
+            mask = cube > mask_level
+        elif mask_level_sigma is not None:
+            mask = cube > cube.std(axis=0)*mask_level_sigma
     t0 = time.time()
     log.info("Baselining cube {0} with order {1}...".format(cubefn, order))
     if polyspline == 'poly':
         bc = baseline_cube(cube, polyorder=order, cubemask=mask)
-    elif polyspine == 'spline':
+    elif polyspline == 'spline':
         bc = baseline_cube(cube, splineorder=order,
-                           splinesampling=splinesampling, cubemask=mask)
+                           sampling=splinesampling, cubemask=mask)
     log.info("Baselining done ({0} seconds)".format(time.time()-t0))
     f[0].data = bc
     f.writeto(cubefn.replace(".fits","_bl.fits"), clobber=True)
@@ -1987,7 +2003,7 @@ def doratio(h2copath=h2copath, maxratio=1):
     """
     ##### integrated #####
 
-    for smooth in ('','_smooth','_vsmooth','_bl','_smooth_bl','_vsmooth_bl'):
+    for smooth in ('','_smooth','_bl','_smooth_bl'):
         top = fits.getdata(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
         bottom = fits.getdata(h2copath+'APEX_H2CO_322_221{0}_CH3OHchomped_mask_integ.fits'.format(smooth))
 
@@ -2291,6 +2307,7 @@ def do_2014(datasets=datasets_2014, scanblsub=False):
 def do_2014_merge(datasets=datasets_2014,
                   lowhigh=('low','high')):
     log.info("Starting merge")
+    assert isinstance(lowhigh, (tuple,list))
     for lh in lowhigh:
         mergefile = 'APEX_H2CO_2014_merge_{0}'.format(lh)
         log.info("Making blanks")
