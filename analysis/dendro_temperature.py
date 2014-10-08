@@ -17,6 +17,7 @@ from astrodendro import Dendrogram,ppv_catalog
 from paths import hpath,mpath
 from constrain_parameters import paraH2COmodel
 from masked_cubes import cube303m,cube321m
+from masked_cubes import mask as cube_signal_mask
 from co_cubes import cube13co, cube18co
 from noise import noise, noise_cube
 from higal_gridded import column_regridded
@@ -81,20 +82,25 @@ columns = {k:[] for k in (keys+obs_keys)}
 
 log.debug("Initializing dendrogram temperature fitting loop")
 
+# Prepare an array to hold the fitted temperatures
+tcubedata = np.empty(cube303m.shape, dtype='float32')
+tcubedata[~cube_signal_mask] = np.nan
+
+
 #objects = biggest_tree.descendants
 objects = dend
 catalog = ppv_catalog(objects, metadata)
 pb = ProgressBar(len(objects))
 for ii,structure in enumerate(objects):
-    mask = BooleanArrayMask(structure.get_mask(), wcs=cube303m.wcs)
-    view = cube303m.subcube_slices_from_mask(mask)
-    submask = mask[view]
-    assert submask.include().sum() == mask.include().sum()
+    dend_obj_mask = BooleanArrayMask(structure.get_mask(), wcs=cube303m.wcs)
+    view = cube303m.subcube_slices_from_mask(dend_obj_mask)
+    submask = dend_obj_mask[view]
+    assert submask.include().sum() == dend_obj_mask.include().sum()
 
     c303 = cube303m[view].with_mask(submask)
     c321 = cube321m[view].with_mask(submask)
-    co13sum = cube13co.with_mask(mask).sum().value
-    co18sum = cube18co.with_mask(mask).sum().value
+    co13sum = cube13co.with_mask(dend_obj_mask).sum().value
+    co18sum = cube18co.with_mask(dend_obj_mask).sum().value
 
     npix = submask.include().sum()
     Stot303 = c303.sum().value
@@ -110,7 +116,7 @@ for ii,structure in enumerate(objects):
         r321303 = np.nan
 
     #error = (noise_cube[view][submask.include()]).sum() / submask.include().sum()**0.5
-    var = ((noise_cube[mask.include()]**2).sum() / npix**2)
+    var = ((noise_cube[dend_obj_mask.include()]**2).sum() / npix**2)
     error = var**0.5
     if np.isnan(error):
         raise ValueError("error is nan: this is impossible by definition.")
@@ -130,7 +136,7 @@ for ii,structure in enumerate(objects):
     columns['13comean'].append(co13sum/npix)
     columns['c18omean'].append(co18sum/npix)
 
-    mask2d = mask.include().max(axis=0)[view[1:]]
+    mask2d = dend_obj_mask.include().max(axis=0)[view[1:]]
     logh2column = np.log10(np.nanmean(column_regridded.data[view[1:]][mask2d]) * 1e22)
     if np.isnan(logh2column):
         log.info("Source #{0} has NaNs".format(ii))
@@ -155,6 +161,8 @@ for ii,structure in enumerate(objects):
 
         for k in row_data:
             columns[k].append(row_data[k])
+
+    tcubedata[dend_obj_mask.include()] = row_data['temperature_chi2']
 
     if len(set(len(c) for k,c in columns.iteritems())) != 1:
         print("Columns are different lengths.  This is not allowed.")
@@ -187,3 +195,10 @@ for mid,lo,hi in (('temperature_chi2','tmin1sig_chi2','tmax1sig_chi2'),
                                     data=catalog[hi]-catalog[mid]))
 
 catalog.write(hpath('PPV_H2CO_Temperature.ipac'), format='ascii.ipac')
+
+tcube = SpectralCube(data=tcubedata, wcs=cube303m.wcs,
+                     mask=cube303m.mask, meta={'unit':'K'},
+                     header=cube303m.header,
+                    )
+
+tcube.write(hpath('TemperatureCube_DendrogramObjects.fits'), overwrite=True)

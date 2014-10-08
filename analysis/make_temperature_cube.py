@@ -13,25 +13,19 @@ from masked_cubes import cube303m,cube321m,cube303,cube321,mask
 from noise import noise, noise_cube
 from common_constants import logabundance,elogabundance
 from higal_gridded import column_regridded
+from ratio_cubes import ratio303321, eratio303321, noise_flat
+
+log.warn("Extremely slow for a very small fraction of overall data."
+         "Try a different method: make_piecewise_temcube.py")
 
 nsigma = 5 # start big to minimize # of failures
 
 mf = paraH2COmodel()
 
-#noise = fits.getdata(hpath('APEX_H2CO_303_202_noise.fits'))
-#noise = cube303[:50].std(axis=0).value
-#noise = fits.getdata(mpath('APEX_H2CO_merge_high_sub_noise.fits'))
-#nhits = nhits = fits.getdata(paths.mpath('APEX_H2CO_merge_high_nhits.fits'))
-#noise[nhits<20] = np.nan
-
-noise_flat = noise_cube[mask]
-var_flat = noise_flat**2
-
-ratio303321 = cube321m.flattened().value / cube303m.flattened().value
-eratio303321 = (ratio303321**2 * (var_flat/cube303m.flattened().value**2 + var_flat/cube321m.flattened().value**2))**0.5
-
 indices = np.where(mask)
-usable = (eratio303321*nsigma < ratio303321) & (eratio303321 > 0) & (ratio303321 > 0) & (noise_flat > 1e-10) & (noise_flat < 10) & (ratio303321 < 100)
+usable = ((eratio303321*nsigma < ratio303321) & (eratio303321 > 0) &
+          (ratio303321 > 0) & (noise_flat > 1e-10) & (noise_flat < 10) &
+          (ratio303321 < 100))
 ngood = np.count_nonzero(usable)
 usable_indices = [ind[usable] for ind in indices]
 uz,uy,ux = usable_indices

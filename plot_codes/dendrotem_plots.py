@@ -1,9 +1,10 @@
 import numpy as np
 import pylab as pl
 
-from paths import hpath
-from astropy.table import Table
+from paths import hpath, apath
+from astropy.table import Table, Column
 from astropy import log
+from scipy.interpolate import PiecewisePolynomial
 
 catalog = Table.read(hpath('PPV_H2CO_Temperature.ipac'), format='ascii.ipac')
 
@@ -33,24 +34,29 @@ for mask,color,alpha in masks_colors:
     ax2.errorbar(catalog['ratio303321'][mask], catalog['temperature_chi2'][mask],
                  #yerr=[catalog['elo_t'][mask], catalog['ehi_t'][mask]],
                  #xerr=[catalog['eratio303321'][mask], catalog['eratio303321'][mask]],
-                 linestyle='none', capsize=0, alpha=alpha, marker='.', color=color, linewidth=0.3)
+                 linestyle='none', capsize=0, alpha=alpha, marker='.',
+                 color=color, linewidth=0.3)
     ax2.set_xlabel("Ratio 303/321")
     ax2.set_ylabel("Temperature")
     
 # Determine approximate best-fit
 sel = catalog['temperature_chi2'][ok] < 60
-fparslt60 = np.polyfit(catalog['ratio303321'][ok][sel], catalog['temperature_chi2'][ok][sel], 1)
+fparslt60 = np.polyfit(catalog['ratio303321'][ok][sel],
+                       catalog['temperature_chi2'][ok][sel], 2)
 p1 = np.polynomial.polynomial.Polynomial(fparslt60[::-1])
 
-sel = (catalog['temperature_chi2'][ok] > 60) & (catalog['temperature_chi2'][ok] < 150)
-fparsgt60 = np.polyfit(catalog['ratio303321'][ok][sel], catalog['temperature_chi2'][ok][sel], 2)
+sel = ((catalog['temperature_chi2'][ok] > 60) &
+       (catalog['temperature_chi2'][ok] < 150))
+fparsgt60 = np.polyfit(catalog['ratio303321'][ok][sel],
+                       catalog['temperature_chi2'][ok][sel], 2)
 p2 = np.polynomial.polynomial.Polynomial(fparsgt60[::-1])
 
-sel = (catalog['temperature_chi2'][ok] > 150) & (catalog['temperature_chi2'][ok] < 355)
-fparsgt150 = np.polyfit(catalog['ratio303321'][ok][sel], catalog['temperature_chi2'][ok][sel], 2)
+sel = ((catalog['temperature_chi2'][ok] > 150) &
+       (catalog['temperature_chi2'][ok] < 355))
+fparsgt150 = np.polyfit(catalog['ratio303321'][ok][sel],
+                        catalog['temperature_chi2'][ok][sel], 2)
 p3 = np.polynomial.polynomial.Polynomial(fparsgt150[::-1])
 
-from scipy.interpolate import PiecewisePolynomial
 root1 = np.polynomial.polynomial.polyroots((p1-p2).coef)
 root1 = root1[(root1>0) & (root1<0.6)][0]
 root2 = np.polynomial.polynomial.polyroots((p2-p3).coef)
@@ -62,6 +68,18 @@ func = lambda x: np.piecewise(x, [x<root1, (x>root1)&(x<root2), x>root2],
 log.info(" < {0}: {1}".format(root1, p1.coef))
 log.info(" [{0}, {1}]: {2}".format(root1, root2, p2.coef))
 log.info(" > {0}: {1}".format(root2, p3.coef))
+
+fit_table = Table(
+    [Column(name='MinBound', data=[0,root1,root2]),
+     Column(name='MaxBound', data=[root1,root2,0.6]),
+     Column(name='const',    data=[p.coef[0] if len(p.coef)>= 1 else 0
+                                   for p in (p1,p2,p3)]),
+     Column(name='xcoef',    data=[p.coef[1] if len(p.coef)>= 2 else 0
+                                   for p in (p1,p2,p3)]),
+     Column(name='x2coef',   data=[p.coef[2] if len(p.coef)>= 3 else 0
+                                   for p in (p1,p2,p3)]),
+    ])
+fit_table.write(apath('piecewise_tvsratio_fit.ipac'), format='ascii.ipac')
 
 x = np.linspace(0,0.6,100)
 pl.plot(x, func(x), 'k--')
@@ -80,7 +98,8 @@ for mask,color,alpha in masks_colors:
     ax4.errorbar(catalog['density_chi2'][mask], catalog['temperature_chi2'][mask],
                  #yerr=[catalog['elo_t'][mask], catalog['ehi_t'][mask]],
                  #xerr=[catalog['elo_d'][mask], catalog['ehi_d'][mask]],
-                 linestyle='none', capsize=0, alpha=alpha, marker='.', color=color, linewidth=0.1)
+                 linestyle='none', capsize=0, alpha=alpha, marker='.',
+                 color=color, linewidth=0.1)
     ax4.set_xlabel("Density")
     ax4.set_ylabel("Temperature")
 
