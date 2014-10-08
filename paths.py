@@ -7,6 +7,7 @@ june2013path = os.path.join(root, 'h2co/apex/june2013/')
 april2014path = os.path.join(root, 'h2co/apex/april2014/')
 h2copath = os.path.join(root, 'h2co/apex/h2co_cubes/')
 mergepath = os.path.join(root, 'h2co/apex/merged_datasets/')
+molcubepath = os.path.join(mergepath, 'molecule_cubes/')
 aorawpath = os.path.join(root, 'h2co/apex/2010_reduced/2010_raw/')
 aopath = os.path.join(root, 'h2co/apex/2010_reduced/')
 diagplotdir = os.path.join(root, 'h2co/apex/diagnostic_plots/')
@@ -42,3 +43,6 @@ def pcpath(x, plotcodepath=plotcodepath):
 
 def apath(x, analysispath=analysispath):
     return os.path.join(analysispath, x)
+
+def molpath(x, molcubepath=molcubepath):
+    return os.path.join(molcubepath,x)

@@ -30,6 +30,12 @@ import image_tools
 import spectral_cube
 from spectral_cube import SpectralCube,BooleanArrayMask
 
+# http://www.apex-telescope.org/heterodyne/shfi/calibration/calfactor/
+# Apparently all data taken on MPI and ESO time in the first half of 2014 were
+# off by 15-25%.  The data need to be multiplied by these factors.
+calibration_factors = {'2014/04/23-2014/06/13': 0.85,
+                       '2014/02/01-2014/04/23': 0.78,
+                      }
 datasets_ao = ['O-085.F-9311A-2010','E-085.B-0964A-2010']
 datasets_2013 = ['M-091.F-0019-2013-2013-06-08',
                  'M-091.F-0019-2013-2013-06-11',
@@ -97,9 +103,48 @@ june2013path = '/Users/adam/work/h2co/apex/june2013/'
 april2014path = '/Users/adam/work/h2co/apex/april2014/'
 h2copath = '/Users/adam/work/h2co/apex/h2co_cubes/'
 mergepath = '/Users/adam/work/h2co/apex/merged_datasets/'
+molpath = os.path.join(mergepath, 'molecule_cubes/')
 aorawpath = '/Users/adam/work/h2co/apex/2010_reduced/2010_raw/'
 aopath = '/Users/adam/work/h2co/apex/2010_reduced/'
 diagplotdir = '/Users/adam/work/h2co/apex/diagnostic_plots/'
+
+all_lines = {'H2CO_303_202':218.22219,
+             'H2CO_322_221':218.47563,
+             'H2CO_321_220':218.76007,
+             'SiO_54':217.10498,
+             'CH3OH_422_312':218.44005,
+             'CH3OH_514_422':216.9456,
+             'CH3OH_633_716':216.85786,
+             'HCCCH_65': 217.82215,
+             'HCCCH_65': 217.94004,
+             'OCS_18_17':218.90336,
+             'CH3OCHO_17_16':218.29789,
+             'C18O':219.56036,
+             '13CO':220.39868,
+             'CH3CN_12_11':220.63807,
+             #'H2S 2(2,0)-2(1,1)': 216.71044, ??
+             }
+bright_lines = {k:all_lines[k] for k in
+                ['H2CO_303_202', 'H2CO_322_221', 'H2CO_321_220', 'SiO_54',
+                 'CH3OH_422_312', 'CH3OH_514_422', 'CH3OH_633_716', 'C18O',
+                 '13CO']}
+bandwidths = {'H2CO_303_202':25,
+              'H2CO_322_221':25,
+              'H2CO_321_220':25,
+              'SiO_54':25,
+              'CH3OH_422_312':25,
+              'CH3OH_514_422':25,
+              'CH3OH_633_716':25,
+              'HCCCH_65': 25,
+              'OCS_18_17':25,
+              'CH3OCHO_17_16':25,
+              'C18O':75,
+              '13CO':75,
+              #'H2S 2(2,0)-2(1,1)': 216.71044, ??
+              }
+
+lines218 = {x:v for x,v in all_lines.iteritems()
+            if 'H2CO' in x or 'CH3OH_422_312' in x}
 
 
 def mkdir_p(path):
@@ -1451,6 +1496,16 @@ def make_high_mergecube(pca_clean={'2014':False,
                     pca_clean=pca_clean['2013'],
                     scanblsub=scanblsub['2013'])
 
+    do_plait_h2comerge(mergefile2=mergefile2)
+
+def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
+    """
+    doplait, not yoplait
+    (create the merged, plaited cube)
+
+    default is
+    do_plait(mergefile2='APEX_H2CO_merge_high')
+    """
     from sdpy import plait
 
     # plaiting doesn't work well for unequal weights or large swathes
@@ -1481,13 +1536,15 @@ def make_high_mergecube(pca_clean={'2014':False,
                            header=fits.getheader(fnify(suff, '_nhits.fits')))
     whdu.writeto(fnify('_nhits'), clobber=True)
 
-    data = [cube_comb] + [fits.getdata(fnify(suff))
+    data = [cube_comb] + [np.nan_to_num(fits.getdata(fnify(suff)))
                           for suff in all_targets[2:]]
     weights = ([comb_weights] +
                [fits.getdata(fnify(suff, '_nhits.fits'))
                 for suff in all_targets[2:]])
+    sweights = np.sum(weights, axis=0)
     total_stack = (np.sum([(d*w) for d,w in zip(data,weights)], axis=0) /
-                   np.sum(weights, axis=0))
+                   sweights)
+    total_stack[:,sweights<0.5] = np.nan
     for h in [fits.getheader(fnify(suff)) for suff in all_targets[2:]]:
         header.update(h)
     hdu = fits.PrimaryHDU(data=total_stack, header=header)
@@ -1725,46 +1782,9 @@ def make_smooth_noise(noisefilename, outfilename, kernelwidth=2, clobber=True):
     npix = kernel.array.sum()
 
     # Average down the noise by sqrt(npix)
-    hdu = fits.PrimaryHDU(data=smdata/npix**0.5,
+    hdu = fits.PrimaryHDU(data=(smdata/npix**0.5).astype(data.dtype),
                           header=fits.getheader(noisefilename))
     hdu.writeto(outfilename, clobber=clobber)
-
-all_lines = {'H2CO_303_202':218.22219,
-             'H2CO_322_221':218.47563,
-             'H2CO_321_220':218.76007,
-             'SiO_54':217.10498,
-             'CH3OH_422_312':218.44005,
-             'CH3OH_514_422':216.9456,
-             'CH3OH_633_716':216.85786,
-             'HCCCH_65': 217.82215,
-             'OCS_18_17':218.90336,
-             'CH3OCHO_17_16':218.29789,
-             'C18O':219.56036,
-             '13CO':220.39868,
-             'CH3CN_12_11':220.63807,
-             #'H2S 2(2,0)-2(1,1)': 216.71044, ??
-             }
-bright_lines = {k:all_lines[k] for k in
-                ['H2CO_303_202', 'H2CO_322_221', 'H2CO_321_220', 'SiO_54',
-                 'CH3OH_422_312', 'CH3OH_514_422', 'CH3OH_633_716', 'C18O',
-                 '13CO']}
-bandwidths = {'H2CO_303_202':25,
-              'H2CO_322_221':25,
-              'H2CO_321_220':25,
-              'SiO_54':25,
-              'CH3OH_422_312':25,
-              'CH3OH_514_422':25,
-              'CH3OH_633_716':25,
-              'HCCCH_65': 25,
-              'OCS_18_17':25,
-              'CH3OCHO_17_16':25,
-              'C18O':75,
-              '13CO':75,
-              #'H2S 2(2,0)-2(1,1)': 216.71044, ??
-              }
-
-lines218 = {x:v for x,v in all_lines.iteritems()
-            if 'H2CO' in x or 'CH3OH_422_312' in x}
 
 def make_line_mask(freqarr, lines=bright_lines):
     mask = np.ones(freqarr.size, dtype='bool')
@@ -1775,9 +1795,11 @@ def make_line_mask(freqarr, lines=bright_lines):
     return mask
 
 
-def do_extract_subcubes(outdir=mergepath, merge_prefix='APEX_H2CO_merge',
+def do_extract_subcubes(outdir=molpath, merge_prefix='APEX_H2CO_merge',
                         cubefilename=None,
-                        frange=None, lines=all_lines):
+                        frange=None, lines=all_lines,
+                        suffix="_sub",
+                        vsmooth=False):
 
     for line,freq in lines.iteritems():
         if frange is not None:
@@ -1788,9 +1810,11 @@ def do_extract_subcubes(outdir=mergepath, merge_prefix='APEX_H2CO_merge',
         log.info("Extracting {0}".format(line))
         if cubefilename is None:
             if freq < 218:
-                cubefilename = os.path.join(mergepath, merge_prefix+'_low_sub.fits')
+                cubefilename = os.path.join(mergepath,
+                                            merge_prefix+'_low{0}.fits'.format(suffix))
             else:
-                cubefilename = os.path.join(mergepath, merge_prefix+'_high_sub.fits')
+                cubefilename = os.path.join(mergepath,
+                                            merge_prefix+'_high{0}.fits'.format(suffix))
 
         header = fits.getheader(cubefilename)
         ww = wcs.WCS(header)
@@ -1801,9 +1825,10 @@ def do_extract_subcubes(outdir=mergepath, merge_prefix='APEX_H2CO_merge',
             extract_subcube(cubefilename,
                             os.path.join(outdir, 'APEX_{0}_smooth.fits').format(line),
                             linefreq=freq*u.GHz, smooth=True)
-            extract_subcube(cubefilename,
-                            os.path.join(outdir, 'APEX_{0}_vsmooth.fits').format(line),
-                            linefreq=freq*u.GHz, smooth=True, vsmooth=True)
+            if vsmooth:
+                extract_subcube(cubefilename,
+                                os.path.join(outdir, 'APEX_{0}_vsmooth.fits').format(line),
+                                linefreq=freq*u.GHz, smooth=True, vsmooth=True)
             extract_subcube(cubefilename,
                             os.path.join(outdir, 'APEX_{0}.fits').format(line),
                             linefreq=freq*u.GHz)
@@ -1829,15 +1854,18 @@ def do_postprocessing():
     #os.chdir('../')
     # OLD: merge_prefix = 'APEX_H2CO_merge_high' # Oct 4, 2014
     merge_prefix='APEX_H2CO_merge_high_plait_all'
-    do_extract_subcubes(outdir=mergepath, frange=[218,219],
+    do_extract_subcubes(outdir=molpath, frange=[218,219],
                         cubefilename=os.path.join(mergepath, merge_prefix+".fits"),
                         lines=lines218)
+    # Because I really want to see SiO...
+    do_extract_subcubes(lines={'SiO_54':217.10498},
+                        merge_prefix='APEX_H2CO_2014_merge', suffix="")
     compute_noise_high(mergepath+merge_prefix, pixrange=[700,900])
     #compute_noise_high(mergepath+merge_prefix+'_smooth',[203,272])
     #compute_noise_high(mergepath+'APEX_H2CO_merge_high_vsmoothds',[203,272])
     #compute_noise_high(mergepath+'APEX_H2CO_303_202_vsmooth',[75,100])
     #compute_noise_low()
-    signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202',
+    signal_to_noise_mask_cube(os.path.join(molpath,'APEX_H2CO_303_202'),
                               noise=fits.getdata(os.path.join(mergepath,
                                                               'APEX_H2CO_merge_high_plait_all_noise.fits')),
                               sigmacut=2,
@@ -1845,16 +1873,16 @@ def do_postprocessing():
     make_smooth_noise(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits',
                       mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits',
                       kernelwidth=2)
-    signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_smooth',
+    signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_smooth',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
                               sigmacut=2)
     #signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_vsmooth',
     #                          noise=fits.getdata(mergepath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
     #                          sigmacut=2)
-    integrate_mask(mergepath+'APEX_H2CO_303_202',
-                   mask=mergepath+'APEX_H2CO_303_202_mask.fits')
-    integrate_mask(mergepath+'APEX_H2CO_303_202_smooth',
-                   mask=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
+    integrate_mask(molpath+'APEX_H2CO_303_202',
+                   mask=molpath+'APEX_H2CO_303_202_mask.fits')
+    integrate_mask(molpath+'APEX_H2CO_303_202_smooth',
+                   mask=molpath+'APEX_H2CO_303_202_smooth_mask.fits')
     #integrate_mask(mergepath+'APEX_H2CO_303_202_vsmooth',
     #               mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
@@ -1866,7 +1894,7 @@ def do_postprocessing():
             log.debug("Skipped file {0} because it exists".format(fn))
 
     # Create a few integrated H2CO 303 maps
-    integrate_slices_high(mergepath+'APEX_H2CO_303_202_snmasked')
+    integrate_slices_high(molpath+'APEX_H2CO_303_202_snmasked')
 
     # Use spectral_cube to do a bunch of integrations
     # PATH SENSITIVE
@@ -1877,50 +1905,50 @@ def do_postprocessing():
     for line in lines218:
         fn = mergepath+'APEX_{0}.fits'.format(line)
         if os.path.exists(fn):
-            integrate_mask(mergepath+'APEX_{0}'.format(line),
-                           mask=mergepath+'APEX_H2CO_303_202_mask.fits')
-            integrate_mask(mergepath+'APEX_{0}_smooth'.format(line),
-                           mask=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
-            #integrate_mask(mergepath+'APEX_{0}_vsmooth'.format(line),
-            #               mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
+            integrate_mask(molpath+'APEX_{0}'.format(line),
+                           mask=molpath+'APEX_H2CO_303_202_mask.fits')
+            integrate_mask(molpath+'APEX_{0}_smooth'.format(line),
+                           mask=molpath+'APEX_H2CO_303_202_smooth_mask.fits')
+            #integrate_mask(molpath+'APEX_{0}_vsmooth'.format(line),
+            #               mask=molpath+'APEX_H2CO_303_202_vsmooth_mask.fits')
             log.debug("Integrated masked file {0}".format(fn))
         else:
             log.debug("File {0} does not exist".format(fn))
 
     for line in lines218:
-        if os.path.exists(mergepath+'APEX_{0}.fits'.format(line)):
-            baseline_cube(mergepath+'APEX_{0}.fits'.format(line),
-                          maskfn=mergepath+'APEX_H2CO_303_202_mask.fits')
-            baseline_cube(mergepath+'APEX_{0}_smooth.fits'.format(line),
-                          maskfn=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
-            #baseline_cube(mergepath+'APEX_{0}_vsmooth.fits'.format(line),
-            #              maskfn=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
+        if os.path.exists(molpath+'APEX_{0}.fits'.format(line)):
+            baseline_cube(molpath+'APEX_{0}.fits'.format(line),
+                          maskfn=molpath+'APEX_H2CO_303_202_mask.fits')
+            baseline_cube(molpath+'APEX_{0}_smooth.fits'.format(line),
+                          maskfn=molpath+'APEX_H2CO_303_202_smooth_mask.fits')
+            #baseline_cube(molpath+'APEX_{0}_vsmooth.fits'.format(line),
+            #              maskfn=molpath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
-    #compute_noise_high(mergepath+'APEX_H2CO_303_202_bl',[350,400])
-    #compute_noise_high(mergepath+'APEX_H2CO_303_202_smooth_bl',[175,200])
-    #compute_noise_high(mergepath+'APEX_H2CO_303_202_vsmooth_bl',[80,100])
-    signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_bl',
+    #compute_noise_high(molpath+'APEX_H2CO_303_202_bl',[350,400])
+    #compute_noise_high(molpath+'APEX_H2CO_303_202_smooth_bl',[175,200])
+    #compute_noise_high(molpath+'APEX_H2CO_303_202_vsmooth_bl',[80,100])
+    signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits'),
                               grow=2)
-    signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_smooth_bl',
+    signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_smooth_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
                               sigmacut=3)
-    #signal_to_noise_mask_cube(mergepath+'APEX_H2CO_303_202_vsmooth_bl',
-    #                          noise=fits.getdata(mergepath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
+    #signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_vsmooth_bl',
+    #                          noise=fits.getdata(molpath+'APEX_H2CO_303_202_vsmooth_noise.fits'),
     #                          sigmacut=3)
 
     for line in lines218:
-        if os.path.exists(mergepath+'APEX_{0}_bl.fits'.format(line)):
-            integrate_mask(mergepath+'APEX_{0}_bl'.format(line),
-                           mask=mergepath+'APEX_H2CO_303_202_mask.fits')
-            integrate_mask(mergepath+'APEX_{0}_smooth_bl'.format(line),
-                           mask=mergepath+'APEX_H2CO_303_202_smooth_mask.fits')
-            #integrate_mask(mergepath+'APEX_{0}_vsmooth_bl'.format(line),
-            #               mask=mergepath+'APEX_H2CO_303_202_vsmooth_mask.fits')
+        if os.path.exists(molpath+'APEX_{0}_bl.fits'.format(line)):
+            integrate_mask(molpath+'APEX_{0}_bl'.format(line),
+                           mask=molpath+'APEX_H2CO_303_202_mask.fits')
+            integrate_mask(molpath+'APEX_{0}_smooth_bl'.format(line),
+                           mask=molpath+'APEX_H2CO_303_202_smooth_mask.fits')
+            #integrate_mask(molpath+'APEX_{0}_vsmooth_bl'.format(line),
+            #               mask=molpath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
-    do_mask_ch3oh()
+    do_mask_ch3oh(dpath=molpath)
 
-    for fn in glob.glob(os.path.join(mergepath,'APEX_H2CO_3*fits')):
+    for fn in glob.glob(os.path.join(molpath,'APEX_H2CO_3*fits')):
         try:
             os.symlink(fn,
                        os.path.join(h2copath,os.path.split(fn)[-1]))
@@ -2027,7 +2055,7 @@ def doratio(h2copath=h2copath, maxratio=1):
         f.writeto(h2copath+'H2CO_321220_to_303202{0}_integ.fits'.format(smooth),clobber=True)
 
     ##### cube #####
-    for smooth in ('','_smooth','_vsmooth','_bl','_smooth_bl','_vsmooth_bl'):
+    for smooth in ('','_smooth','_bl','_smooth_bl'):
         top = fits.getdata(h2copath+'APEX_H2CO_303_202{0}.fits'.format(smooth))
         bottom = fits.getdata(h2copath+'APEX_H2CO_322_221{0}_CH3OHchomped_masked.fits'.format(smooth))
 
@@ -2206,7 +2234,7 @@ def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
     import scipy.stats
 
     for suf_ in ('{0}','{0}_integ','_cube{0}'):
-        for smooth in ('','_smooth','_vsmooth','_bl','_smooth_bl','_vsmooth_bl'):
+        for smooth in ('','_smooth','_bl','_smooth_bl'):
 
             suf = suf_.format(smooth)
 
@@ -2258,11 +2286,11 @@ def mask_out_ch3oh(smooth='_smooth', dpath=mergepath):
     log.info("CH3OH Masking: dv: {0} shift: {1} ".format(dv,shift))
 
     mask = fits.getdata(dpath+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth)).astype('bool')
-    log.info("Mask shape: {0}".format(mask.shape))
+    log.info("CH3OH Masking: Mask shape: {0}".format(mask.shape))
     newmask = mask*False
-    log.info("NewMask shape: {0}".format(newmask.shape))
+    log.info("CH3OH Masking: NewMask shape: {0}".format(newmask.shape))
     newmask[np.abs(shift):,:,:] = mask[:-np.abs(shift),:,:]
-    log.info("NewMask number of masked pixels: {0}".format(newmask.sum()))
+    log.info("CH3OH Masking: NewMask number of masked pixels: {0}".format(newmask.sum()))
     hdu.data[newmask] = np.nan
     hdu.writeto(dpath+'APEX_H2CO_322_221{0}_CH3OHchomped.fits'.format(smooth), clobber=True)
 
@@ -2272,18 +2300,20 @@ def mask_out_ch3oh(smooth='_smooth', dpath=mergepath):
     integrate_mask(dpath+'APEX_H2CO_322_221{0}_CH3OHchomped'.format(smooth),
                    mask=dpath+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth))
 
-def do_mask_ch3oh(dpath=mergepath):
+def do_mask_ch3oh(dpath=mergepath, vsmooth=False):
     mask_out_ch3oh('', dpath=dpath)
     # spatial smoothing = 2pix
     mask_out_ch3oh('_smooth', dpath=dpath)
-    # spatial smoothing = 4pix
-    mask_out_ch3oh('_vsmooth', dpath=dpath)
+    if vsmooth:
+        # spatial smoothing = 4pix
+        mask_out_ch3oh('_vsmooth', dpath=dpath)
 
     mask_out_ch3oh('_bl', dpath=dpath)
     # spatial smoothing = 2pix
     mask_out_ch3oh('_smooth_bl', dpath=dpath)
-    # spatial smoothing = 4pix
-    mask_out_ch3oh('_vsmooth_bl', dpath=dpath)
+    if vsmooth:
+        # spatial smoothing = 4pix
+        mask_out_ch3oh('_vsmooth_bl', dpath=dpath)
 
 def do_2014(datasets=datasets_2014, scanblsub=False):
     #datasets = ['E-093.C-0144A.2014APR02/E-093.C-0144A-2014-2014-04-01',
