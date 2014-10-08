@@ -39,3 +39,6 @@ dpath = hpath
 
 def pcpath(x, plotcodepath=plotcodepath):
     return os.path.join(plotcodepath, x)
+
+def apath(x, analysispath=analysispath):
+    return os.path.join(analysispath, x)

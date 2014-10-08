@@ -2307,7 +2307,11 @@ def do_2014(datasets=datasets_2014, scanblsub=False):
 def do_2014_merge(datasets=datasets_2014,
                   lowhigh=('low','high')):
     log.info("Starting merge")
-    assert isinstance(lowhigh, (tuple,list))
+    if not isinstance(lowhigh, (tuple,list)):
+        if isinstance(lowhigh, str):
+            lowhigh = (lowhigh,)
+        else:
+            raise ValueError("Invalid lowhigh.")
     for lh in lowhigh:
         mergefile = 'APEX_H2CO_2014_merge_{0}'.format(lh)
         log.info("Making blanks")
