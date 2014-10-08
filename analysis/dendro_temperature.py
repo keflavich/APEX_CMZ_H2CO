@@ -196,6 +196,9 @@ for mid,lo,hi in (('temperature_chi2','tmin1sig_chi2','tmax1sig_chi2'),
 
 catalog.write(hpath('PPV_H2CO_Temperature.ipac'), format='ascii.ipac')
 
+# Note that there are overlaps in the catalog, which means that ORDER MATTERS
+# in the above loop.  I haven't yet checked whether large scale overwrites
+# small or vice-versa; it may be that both views of the data are interesting.
 tcube = SpectralCube(data=tcubedata, wcs=cube303m.wcs,
                      mask=cube303m.mask, meta={'unit':'K'},
                      header=cube303m.header,
