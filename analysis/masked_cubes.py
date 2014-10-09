@@ -16,4 +16,13 @@ bmask = BooleanArrayMask(mask, cube303.wcs)
 cube303m = cube303.with_mask(bmask)
 cube321m = cube321.with_mask(bmask)
 
+cube303sm = SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_bl.fits')).with_spectral_unit(u.km/u.s, velocity_convention='radio')
+cube321sm = SpectralCube.read(hpath('APEX_H2CO_321_220_smooth_bl.fits')).with_spectral_unit(u.km/u.s, velocity_convention='radio')
+masksm = (fits.getdata(hpath('APEX_H2CO_303_202_smooth_bl_mask.fits')).astype('bool') &
+          cube303sm.mask.include(cube303sm._data, cube303sm.wcs) &
+          cube321sm.mask.include(cube321sm._data, cube321sm.wcs))
+bmasksm = BooleanArrayMask(masksm, cube303sm.wcs)
+cube303msm = cube303sm.with_mask(bmasksm)
+cube321msm = cube321sm.with_mask(bmasksm)
+
 log.debug("Masked cube creation took {0:0.1f} seconds".format(time.time()-t0))
