@@ -1764,6 +1764,8 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
 
         outheader['CDELT3'] = outheader['CDELT3'] * kw
         outheader['NAXIS3'] = outheader['NAXIS3'] / kw
+        crpix3 = (outheader['CRPIX3']-1)*(1./kw)+0.5+(1./kw)/2.
+        outheader['CRPIX3'] = crpix3
 
     # Now that we've written this out, we use interpolation to force the cube
     # onto a grid that starts at *exactly* -150 km/s
@@ -2821,6 +2823,12 @@ def extract_co_subcubes(mergepath=april2014path):
     extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
                     os.path.join(h2copath,'APEX_C18O_matched_H2CO.fits'),
                     linefreq=219.56036*u.GHz,)
+    extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
+                    os.path.join(h2copath,'APEX_13CO_matched_H2CO_smooth.fits'),
+                    linefreq=220.39868*u.GHz, smooth=True)
+    extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
+                    os.path.join(h2copath,'APEX_C18O_matched_H2CO_smooth.fits'),
+                    linefreq=219.56036*u.GHz, smooth=True)
 
 def quick_extract_13cocube(fn, snthreshold=3, overwrite=True, intrange=None):
     if fits.getheader(fn)['NAXIS'] > 2:

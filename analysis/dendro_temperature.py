@@ -18,8 +18,8 @@ from paths import hpath,mpath
 from constrain_parameters import paraH2COmodel
 from masked_cubes import cube303m,cube321m,cube303msm,cube321msm
 from masked_cubes import mask as cube_signal_mask
-from co_cubes import cube13co, cube18co
-from noise import noise, noise_cube
+from co_cubes import cube13co, cube18co, cube13cosm, cubec18osm
+from noise import noise, noise_cube, sm_noise_cube
 from higal_gridded import column_regridded
 from common_constants import logabundance,elogabundance
 
@@ -27,13 +27,6 @@ warnings.simplefilter('once')
 
 if 'mf' not in locals():
     mf = paraH2COmodel()
-
-# Can run dendro_mask first
-if 'dend' not in locals():
-    t0 = time.time()
-    log.debug("Loading dendrogram from file.")
-    dend = Dendrogram.load_from(hpath("DendroMask_H2CO303202_signal_to_noise.hdf5"))
-    log.debug("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
 
 # For debugging, to make it faster
 # biggest_tree = dend[89]
@@ -45,8 +38,13 @@ def get_root(structure):
     else:
         return get_root(structure.parent)
 
-def measure_dendrogram_properties(dend=dend, cube303=cube303m,
-                                  cube321=cube321m, suffix=""):
+def measure_dendrogram_properties(dend=None, cube303=cube303m,
+                                  cube321=cube321m, cube13co=cube13co,
+                                  cube18co=cube18co, noise_cube=noise_cube,
+                                  suffix=""):
+
+    assert (cube321.shape == cube303.shape == noise_cube.shape ==
+            cube13co.shape == cube18co.shape)
 
     metadata = {}
     metadata['data_unit'] = u.K
@@ -96,8 +94,11 @@ def measure_dendrogram_properties(dend=dend, cube303=cube303m,
 
     # Prepare an array to hold the fitted temperatures
     tcubedata = np.empty(cube303.shape, dtype='float32')
-    tcubedata[~cube_signal_mask] = np.nan
+    tcubedata[:] = np.nan
 
+    # FORCE wcs to match
+    cube13co._wcs = cube18co._wcs = cube303.wcs
+    cube13co.mask._wcs = cube18co.mask._wcs = cube303.wcs
 
     #objects = biggest_tree.descendants
     objects = dend
@@ -223,7 +224,24 @@ def measure_dendrogram_properties(dend=dend, cube303=cube303m,
     tcube.write(hpath('TemperatureCube_DendrogramObjects{0}.fits'.format(suffix)),
                 overwrite=True)
 
-measure_dendrogram_properties(dend=dend, cube303=cube303m, cube321=cube321m,
-                              suffix="")
-measure_dendrogram_properties(dend=dendsm, cube303=cube303msm,
-                              cube321=cube321msm, suffix="_smooth")
+if __name__ == "__main__":
+    # Can run dendro_mask first
+    if 'dend' not in locals():
+        t0 = time.time()
+        log.debug("Loading dendrogram from file.")
+        dend = Dendrogram.load_from(hpath("DendroMask_H2CO303202_signal_to_noise.hdf5"))
+        log.debug("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
+    measure_dendrogram_properties(dend=dend, cube303=cube303m, cube321=cube321m,
+                                  suffix="")
+
+
+    if 'dendsm' not in locals():
+        t0 = time.time()
+        log.debug("Loading dendrogram from file.")
+        dendsm = Dendrogram.load_from(hpath("DendroMask_H2CO303202_smooth_signal_to_noise.hdf5"))
+        log.debug("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
+    measure_dendrogram_properties(dend=dendsm, cube303=cube303msm,
+                                  cube321=cube321msm, cube13co=cube13cosm,
+                                  cube18co=cube18cosm,
+                                  noise_cube=sm_noise_cube,
+                                  suffix="_smooth")
