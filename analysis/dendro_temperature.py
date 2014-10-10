@@ -51,7 +51,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
     metadata['spatial_scale'] =  7.2 * u.arcsec
     metadata['beam_major'] =  30 * u.arcsec
     metadata['beam_minor'] =  30 * u.arcsec
-    metadata['wavelength'] =  218.22*u.GHz
+    metadata['wavelength'] =  218.22219*u.GHz
     metadata['velocity_scale'] = u.km/u.s
     metadata['wcs'] = cube303.wcs
 
@@ -179,23 +179,27 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
             for k in row_data:
                 columns[k].append(row_data[k])
 
-        tcubedata[dend_obj_mask.include()] = row_data['temperature_chi2']
+            tcubedata[dend_obj_mask.include()] = row_data['temperature_chi2']
 
         if len(set(len(c) for k,c in columns.iteritems())) != 1:
             print("Columns are different lengths.  This is not allowed.")
             import ipdb; ipdb.set_trace()
 
         if ii % 100 == 0 or ii < 50:
-            log.info("T: [{tmin1sig_chi2:7.2f},{temperature_chi2:7.2f},{tmax1sig_chi2:7.2f}]"
-                     "  R={ratio303321:8.4f}+/-{eratio303321:8.4f}"
-                     "  Smean303={Smean303:8.4f} +/- {e303:8.4f}"
-                     "  Stot303={Stot303:8.2e}  npix={npix:6d}"
-                     .format(Smean303=Smean303, Stot303=Stot303,
-                             npix=npix, e303=error, **row_data))
-            pl.clf()
-            mf.denstemplot()
-            pl.draw()
-            pl.show()
+            try:
+                log.info("T: [{tmin1sig_chi2:7.2f},{temperature_chi2:7.2f},{tmax1sig_chi2:7.2f}]"
+                         "  R={ratio303321:8.4f}+/-{eratio303321:8.4f}"
+                         "  Smean303={Smean303:8.4f} +/- {e303:8.4f}"
+                         "  Stot303={Stot303:8.2e}  npix={npix:6d}"
+                         .format(Smean303=Smean303, Stot303=Stot303,
+                                 npix=npix, e303=error, **row_data))
+
+                pl.clf()
+                mf.denstemplot()
+                pl.draw()
+                pl.show()
+            except:
+                pass
         else:
             pb.update(ii+1)
 
@@ -225,21 +229,11 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
                 overwrite=True)
 
 if __name__ == "__main__":
-    # Can run dendro_mask first
-    if 'dend' not in locals():
-        t0 = time.time()
-        log.debug("Loading dendrogram from file.")
-        dend = Dendrogram.load_from(hpath("DendroMask_H2CO303202_signal_to_noise.hdf5"))
-        log.debug("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
+    from dendrograms import dend,dendsm
     measure_dendrogram_properties(dend=dend, cube303=cube303m, cube321=cube321m,
                                   suffix="")
 
 
-    if 'dendsm' not in locals():
-        t0 = time.time()
-        log.debug("Loading dendrogram from file.")
-        dendsm = Dendrogram.load_from(hpath("DendroMask_H2CO303202_smooth_signal_to_noise.hdf5"))
-        log.debug("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
     measure_dendrogram_properties(dend=dendsm, cube303=cube303msm,
                                   cube321=cube321msm, cube13co=cube13cosm,
                                   cube18co=cube18cosm,

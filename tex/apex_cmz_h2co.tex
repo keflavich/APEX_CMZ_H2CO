@@ -48,6 +48,13 @@ These yield flux-calibrated spectra at each position with appropriate pointing
 information.  Typical flux calibration uncertainties are $\sim$ \todo{???} and
 pointing errors \todo{???} ($\sigma<2$\arcsec ?).
 
+There was a significant calibration error discovered at the APEX telescope during
+a large segment of the 2014 observing campaign
+(\url{http://www.apex-telescope.org/heterodyne/shfi/calibration/calfactor/}).
+The calibration errors were of order $\sim15-25\%$.  They were corrected after
+the fact, but the remaining calibration uncertainty
+is higher in this data, $\sim15\%$ total rather than the usual $\sim10\%$.
+
 \subsubsection{Flagging bad spectra}
 Spectra were removed if they showed excessive noise compared to the
 theoretically expectation given the measured system temperature.  As in
@@ -102,7 +109,7 @@ $\sim2.5\arcmin$ box around Sgr B2.
 
 \subsubsection{Mapmaking}
 The maps were made by computing an output grid in Galactic coordinates with
-10\arcsec pixels and adding each spectrum to the appropriate pixel\footnote{We
+7.2\arcsec pixels and adding each spectrum to the appropriate pixel\footnote{We
 use the term `pixel' to refer to a square data element projected on the sky
 with axes in Galactic coordinates.  The term `voxel' is used to indicate a cubic data
 element, with two axes in galactic coordinates and a third in frequency or
@@ -122,7 +129,7 @@ main beam efficiency is $\eta_{mb} = 0.75$ (gain $\sim39$
 Jy/K)\footnote{\url{http://www.apex-telescope.org/telescope/efficiency/}}.
 
 
-\section{Signal Extraction}
+\section{Signal Extraction for Integrated Maps}
 \label{sec:signal}
 We use the method described partially in \citet{Ao2013a} and more thoroughly in
 \citet{Dame2011b} to mask the data cubes at locations of significant signal in 
@@ -159,7 +166,7 @@ masking those out for each other line, then fitting a 5th-order polynomial to
 the remaining spectra over the velocity range -150 to 250 \kms and subtracting
 it.
 
-After performing this baselining, the signal was re-extracted
+After performing this baselining, the signal was re-extracted.
 
 \section{Ratio and Temperature Maps}
 \label{sec:h2co}
@@ -168,6 +175,13 @@ We created two independent ratio maps, \threeohthree/\threetwotwo and
 the same) can be used as a sanity check.  However, in many regions, especially
 those with the greatest signal, the \threetwotwo line is strongly affected by
 contamination from a \methanol line, so the ratio is not particularly reliable.
+
+Ratio maps are subject to dramatic uncertainties in the low signal-to-noise
+regime, which is inevitably reached in some parts of the map.  The error
+distribution on the ratio becomes non-Gaussian, approaching a pathological
+Cauchy distribution in which the mean becomes undefined as the mean of the
+individual values being compared approaches zero.  We therefore sought other
+means to create temperature maps.
 
 \subsection{Computing Temperature}
 \label{sec:h2cotemmap}
@@ -182,20 +196,24 @@ $X=10^{-8.5}$ at $N(\hh) = 3\ee{22}$ \persc, and a range of temperatures from
 the \texttt{pyradex} wrapper of
 RADEX\footnote{\url{https://github.com/keflavich/pyradex}}.
 
-The line brightnesses returned from RADEX were then divided to create ratios,
-and the grid inverted to allow interpolation of a measured ratio onto the input
-temperature grid.   This approach requires that the ratios be monotonic with
-temperature, which generally holds.  It also required us to \emph{a priori}
-select a density from the grid; we selected $n=10^4$ \percc.  The choice of
-density and assumed column density have only a minor effect on the derived
-temperature.  If the density is $n(\hh)\sim10^5$ \percc rather than $10^4$
-\percc, the kinetic temperature will be about 10\% lower than we report.  If
-the column is $N(\hh)=3\ee{23}$ \persc rather than $N(\hh)=3\ee{22}$ \persc, or
-correspondingly if the abundance is $10\times$ larger, then the temperature
-will be 10\% lower for $T>175$ K; below that temperature the difference is
-$<5\%$.  Therefore the systematic effects from the assumed density and
-temperature are relatively small.
+%This approach was abandoned; the more effective full-parameter space modeling
+%was adopted instead
+% The line brightnesses returned from RADEX were then divided to create ratios,
+% and the grid inverted to allow interpolation of a measured ratio onto the input
+% temperature grid.   This approach requires that the ratios be monotonic with
+% temperature, which generally holds.  It also required us to \emph{a priori}
+% select a density from the grid; we selected $n=10^4$ \percc.  The choice of
+% density and assumed column density have only a minor effect on the derived
+% temperature.  If the density is $n(\hh)\sim10^5$ \percc rather than $10^4$
+% \percc, the kinetic temperature will be about 10\% lower than we report.  If
+% the column is $N(\hh)=3\ee{23}$ \persc rather than $N(\hh)=3\ee{22}$ \persc, or
+% correspondingly if the abundance is $10\times$ larger, then the temperature
+% will be 10\% lower for $T>175$ K; below that temperature the difference is
+% $<5\%$.  Therefore the systematic effects from the assumed density and
+% temperature are relatively small.
 
+% NOTE: the baselines in The Brick are particularly nasty.  The most advanced
+% fitting techniques will be required to extract anything useful.
 \citet{Johnston2014a} noted a very high temperature peak, $T>320$K, using these
 lines of \formaldehyde toward The Brick, G0.253+0.015.  We measure similar line
 ratios toward The Brick, but on larger scales.  The interpretation of these
