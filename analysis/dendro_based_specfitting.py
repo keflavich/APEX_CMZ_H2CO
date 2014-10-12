@@ -1,8 +1,10 @@
 """
 Use dendrograms as seeds...
 """
+import os
 from astropy.table import Table
 from pyspeckit_fitting import simple_fitter, simple_fitter2
+from pyspeckit.parallel_map import parallel_map
 from full_cubes import pcube_merge_high, cube_merge_high
 from paths import mpath,hpath
 from dendrograms import dend,dendsm,catalog,catalog_sm
@@ -100,12 +102,13 @@ def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
                             (g[1]-15, g[1]+15),
                             (max(g[2]-5,1), g[2]+10),
                             (g[3]*0.1, g[3]/0.1),
-                            (0.3, 1.1), # physical limits
+                            (0.2, 1.4), # physical limits (0.3,1.1)
                             (g[4]*0.05, g[4]/0.05))
                  ]
         fittype = 'h2co_simple2'
         assert len(guesses) % 6 == 0
         assert len(limits) % 6 == 0
+        n = 6
     else:
         guesses = [p for g in guess if g[0]>0 and g[3]>0 for p in g]
         limits = [a
@@ -119,6 +122,14 @@ def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
         fittype = 'h2co_simple'
         assert len(guesses) % 5 == 0
         assert len(limits) % 5 == 0
+        n = 5
+
+    # Widths could be initialized out of range
+    for ii in range(2,len(guesses),n):
+        if guesses[ii] < limits[ii][0]:
+            guesses[ii] = 1.1
+        if guesses[ii] > limits[ii][1]:
+            guesses[ii] = limits[ii][1]*0.9
 
     if len(guesses) == 0:
         log.info("Position {0},{1} has no guesses.".format(position[0],
@@ -161,21 +172,60 @@ def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
     return sp
 
 def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
-                      order=1, second_ratio=False):
-    positions = get_all_indices(dendrogram)
+                      order=1, second_ratio=False, ncores=1, positions=None,
+                      outfilename=None):
+    if positions is None:
+        positions = get_all_indices(dendrogram)
 
-    def get_fitvals(p, plot=False, order=order, second_ratio=second_ratio):
+    if outfilename is not None:
+        fitted_positions,parvalues,parerrors = [],[],[]
+        if os.path.exists(outfilename):
+            with open(outfilename, 'r') as f:
+                for line in f.readlines():
+                    x,y,a,b = eval(line.strip())
+                    fitted_positions.append((x,y))
+                    parvalues.append(a)
+                    parerrors.append(b)
+        outfile = open(outfilename, 'a')
+    else:
+        fitted_positions = []
+        outfile = None
+
+    def get_fitvals(p, plot=False, order=order, second_ratio=second_ratio,
+                    outfile=outfile):
+        if tuple(p) in fitted_positions:
+            return
+
         result = fit_position(p, dendrogram=dendrogram, catalog=catalog,
                               pcube=pcube,
                               plot=False, order=order,
                               second_ratio=second_ratio)
-        if result is None:
-            return
-        return result.specfit.parinfo.values, result.specfit.parinfo.errors
 
-    results = [get_fitvals(p, plot=False, order=order,
-                           second_ratio=second_ratio)
-               for p in ProgressBar(positions)]
+        fitted_positions.append(tuple(p))
+        if result is None:
+            parvalues.append(None)
+            parerrors.append(None)
+            if outfile is not None:
+                outfile.write("{0}, {1}, {2}, {3}\n".format(p[0], p[1], None, None))
+                outfile.flush()
+            return
+        else:
+            parvalues.append(result.specfit.parinfo.values)
+            parerrors.append(result.specfit.parinfo.errors)
+            if outfile is not None:
+                outfile.write("{0}, {1}, {2}, {3}\n".format(p[0], p[1],
+                                                            result.specfit.parinfo.values,
+                                                            result.specfit.parinfo.errors))
+                outfile.flush()
+            return result.specfit.parinfo.values, result.specfit.parinfo.errors
+
+    if ncores == 1:
+        results = [get_fitvals(p, plot=False, order=order,
+                               second_ratio=second_ratio)
+                   for p in ProgressBar(positions)]
+    else:
+        results = parallel_map(get_fitvals, positions, numcores=ncores)
+
     bad_positions = [p for p,r in zip(positions,results) if r is None]
     positions2 = [p for p,r in zip(positions,results) if r is not None]
     results2 = [r for r in results if r is not None]
