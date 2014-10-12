@@ -1276,6 +1276,7 @@ def build_cube_2014(sourcename,
                     extra_suffix='',
                     tsysrange=[100,325],
                     posang=None,
+                    calibration_factors=calibration_factors,
                     **kwargs
                     ):
     """
@@ -1399,6 +1400,9 @@ def build_cube_2014(sourcename,
         log.info("".join(("Adding data for dataset ", dataset,
                           " to filename ", cubefilename, "  t=",
                           str(time.time()-t0))))
+
+        # TODO: parse date and determine whether a calibration factor needs to
+        # be applied
 
         add_apex_data(data, hdrs, gal, cubefilename, retfreq=True,
                       kernel_fwhm=kernel_fwhm,

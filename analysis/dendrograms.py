@@ -18,5 +18,5 @@ if 'dendsm' not in locals():
 
 catalog = Table.read(hpath('PPV_H2CO_Temperature.ipac'), format='ascii.ipac',
                      guess=False)
-#catalog_sm = Table.read(hpath('PPV_H2CO_Temperature_smooth.ipac'), format='ascii.ipac',
-#                     guess=False)
+catalog_sm = Table.read(hpath('PPV_H2CO_Temperature_smooth.ipac'), format='ascii.ipac',
+                     guess=False)

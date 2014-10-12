@@ -143,3 +143,40 @@ ax9.errorbar(fittable['higalcolumndens'][~maps],
 fig9.savefig(paths.fpath('chi2_temperature_vs_higalcolumn_fieldsandsources.pdf'),
                          bbox_inches='tight')
 
+fig10 = pl.figure(10)
+fig10.clf()
+ax10 = fig10.gca()
+ax10.errorbar(fittable['width'][maps]*(8*np.log(2))**0.5,
+             fittable['h2coratio321303'][maps],
+             yerr=fittable['eh2coratio321303'][maps],
+             linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
+ax10.set_xlabel("Line FWHM (km s$^{-1}$)")
+ax10.set_ylabel("Ratio 321/303")
+fig10.savefig(paths.fpath('ratio_vs_linewidth_byfield.pdf'),
+                         bbox_inches='tight')
+ax10.errorbar(fittable['width'][~maps]*(8*np.log(2))**0.5,
+              fittable['h2coratio321303'][~maps],
+              yerr=fittable['eh2coratio321303'][~maps],
+              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='b')
+fig10.savefig(paths.fpath('ratio_vs_linewidth_fieldsandsources.pdf'),
+                         bbox_inches='tight')
+
+
+fig11 = pl.figure(11)
+fig11.clf()
+ax11 = fig11.gca()
+ax11.errorbar(fittable['higaldusttem'][maps],
+             fittable['h2coratio321303'][maps],
+             yerr=fittable['eh2coratio321303'][maps],
+             linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
+ax11.set_xlabel("HiGal Fitted Temperature")
+ax11.set_ylabel("Ratio 321/303")
+fig11.savefig(paths.fpath('ratio_vs_higaltemperature_byfield.pdf'),
+                         bbox_inches='tight')
+ax11.errorbar(fittable['higaldusttem'][~maps],
+              fittable['h2coratio321303'][~maps],
+              yerr=fittable['eh2coratio321303'][~maps],
+              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='b')
+fig11.savefig(paths.fpath('ratio_vs_higaltemperature_fieldsandsources.pdf'),
+                         bbox_inches='tight')
+

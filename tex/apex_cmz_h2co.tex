@@ -214,6 +214,7 @@ RADEX\footnote{\url{https://github.com/keflavich/pyradex}}.
 
 % NOTE: the baselines in The Brick are particularly nasty.  The most advanced
 % fitting techniques will be required to extract anything useful.
+\todo{Move to discussion:}
 \citet{Johnston2014a} noted a very high temperature peak, $T>320$K, using these
 lines of \formaldehyde toward The Brick, G0.253+0.015.  We measure similar line
 ratios toward The Brick, but on larger scales.  The interpretation of these
@@ -256,7 +257,7 @@ toward lower signal-to-noise.
 \section{Line Modeling}
 \label{sec:linemodeling}
 In order to extract more detailed information about the gas properties and
-acquire a more detailed understanding of the uncertainties in the ratio-derived
+acquire an understanding of the uncertainties in the ratio-derived
 temperature map described above, we extracted spectra from individual regions
 with relatively high signal-to-noise and modeled them in further detail.
 
@@ -277,8 +278,8 @@ abundance $N(\para)/N(\hh) = X(\para) = 10^{9.08\pm1} = 1.2\ee{9} \times/\div
 10$, allowing for dramatic uncertainty in the \formaldehyde abundance
 \citep{Ginsburg2013a,Carey1998a,Wootten1978a,Mundy1987a}.  To constrain the
 total column density, we use the Herschel dust maps to derive an \hh column
-density, which has a nominal $\sim2-3\times$ uncertainty.  We treat the erro as
-$10\times$ to account for the abundance uncertainty again.
+density, which has a nominal $\sim2-3\times$ uncertainty.  We treat the error as
+$10\times$ to account for the abundance uncertainty.
 
 These constraints are shown projected onto the three planes of our fitted
 parameter space in the multi-paneled Figures
@@ -342,6 +343,24 @@ location of the best-fit parameter.  The colored contours show the allowed
 marginalized regions in each parameter space as described in the
 \ref{fig:Seecoltemconstraints} caption.}
 {fig:parsonbrightness}{0.5}{0}
+
+\section{Parameter Comparisons}
+In the selected regions we averaged to acquire higher signal-to-noise for more
+detailed modeling, we examined the correlation of various fitted parameters.
+
+The 1D line width of the gas should be tightly correlated with the 3D Mach
+number.  If turbulent heating is responsible for the observed gas temperatures,
+there should also be a correlation between the Mach number of the turbulence
+and the gas temperature.  However, Figure \ref{fig:temvsfwhm_regions} shows no
+such correlation.
+
+\Figure{figures/chi2_temperature_vs_linewidth_fieldsandsources}
+{The fitted temperature as described in Section \ref{sec:linemodeling} plotted against
+the fitted line width.  The blue symbols are compact `clump' sources and the red symbols
+are large-area square regions.  No trend between the line width and temperature
+is obvious.}
+{fig:temvsfwhm_regions}
+{0.5}{0}
 
 \section{Discussion of Heating Mechanisms}
 \citet{Ao2013a} examined four heating mechanisms in the inner $\sim 40$ pc,
