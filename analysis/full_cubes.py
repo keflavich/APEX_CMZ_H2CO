@@ -17,6 +17,13 @@ noise[nhits<20] = np.nan
 noise_cube = as_strided(noise, shape=cube_merge_high.shape,
                         strides=(0,)+noise.strides)
 
+cube_merge_high_sm = SpectralCube.read(mpath('APEX_H2CO_merge_high_plait_all_sm.fits'))
+noise_sm = fits.getdata(mpath('APEX_H2CO_merge_high_plait_all_smooth_noise.fits'))
+noise_cube_sm = as_strided(noise_sm, shape=cube_merge_high_sm.shape,
+                           strides=(0,)+noise_sm.strides)
+
+# Create a cutout of the cube covering the H2CO lines
+# it's barely worth it; cuts off 10% of pixels
 f1 = all_lines['H2CO_303_202']
 f2 = all_lines['H2CO_321_220']
 h2co_cube_merge_high = cube_merge_high.spectral_slab(f1*(1-(150*u.km/u.s/constants.c)),
@@ -24,6 +31,13 @@ h2co_cube_merge_high = cube_merge_high.spectral_slab(f1*(1-(150*u.km/u.s/constan
 h2co_noise_cube = noise_cube.spectral_slab(f1*(1-(150*u.km/u.s/constants.c)),
                                            f2*(1+(100*u.km/u.s/constants.c)))
 
+h2co_cube_merge_high_sm = cube_merge_high_sm.spectral_slab(f1*(1-(150*u.km/u.s/constants.c)),
+                                                           f2*(1+(100*u.km/u.s/constants.c)))
+h2co_noise_cube_sm = noise_cube_sm.spectral_slab(f1*(1-(150*u.km/u.s/constants.c)),
+                                                 f2*(1+(100*u.km/u.s/constants.c)))
+
+
+# Pyspeckit cube made from spectralcube
 pcube_merge_high = pyspeckit.Cube(cube=h2co_cube_merge_high._data,
                                   errorcube=h2co_noise_cube,
                                   header=h2co_cube_merge_high.header,
@@ -31,3 +45,11 @@ pcube_merge_high = pyspeckit.Cube(cube=h2co_cube_merge_high._data,
                                  )
 pcube_merge_high.xarr.refX = 218.22219
 pcube_merge_high.xarr.refX_units = 'GHz'
+
+pcube_merge_high_sm = pyspeckit.Cube(cube=h2co_cube_merge_high_sm._data,
+                                  errorcube=h2co_noise_cube_sm,
+                                  header=h2co_cube_merge_high_sm.header,
+                                  xarr=h2co_cube_merge_high_sm.spectral_axis,
+                                 )
+pcube_merge_high_sm.xarr.refX = 218.22219
+pcube_merge_high_sm.xarr.refX_units = 'GHz'

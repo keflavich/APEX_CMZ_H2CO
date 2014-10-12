@@ -5,7 +5,8 @@ import os
 from astropy.table import Table
 from pyspeckit_fitting import simple_fitter, simple_fitter2
 from pyspeckit.parallel_map import parallel_map
-from full_cubes import pcube_merge_high, cube_merge_high
+from full_cubes import (pcube_merge_high, cube_merge_high, pcube_merge_high_sm,
+                        cube_merge_high_sm)
 from paths import mpath,hpath
 from dendrograms import dend,dendsm,catalog,catalog_sm
 import numpy as np
@@ -232,7 +233,8 @@ def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
 
     return positions2,results2,bad_positions
 
-def pars_to_maps(positions, parvalues, shape=pcube_merge_high.cube.shape[1:]):
+def pars_to_maps(positions, parvalues, shape=pcube_merge_high.cube.shape[1:],
+                 celwcs=cube_merge_high.wcs.celestial, suffix=""):
 
     maxlen = max(len(r) for r in parvalues)
 
@@ -257,10 +259,38 @@ def pars_to_maps(positions, parvalues, shape=pcube_merge_high.cube.shape[1:]):
                     arr[p[1], p[0]] = r[ind]
             maps.append(arr)
             hdu = fits.PrimaryHDU(data=arr,
-                                  header=cube_merge_high.wcs.celestial.to_header())
-            hdu.writeto(hpath("pyspeckit_{0}{1}.fits".format(names[ii], jj)),
+                                  header=celwcs.to_header())
+            hdu.writeto(hpath("pyspeckit_{0}{1}{2}.fits".format(names[ii],
+                                                                jj,
+                                                                suffix)),
                         clobber=True)
 
     return maps
 
 
+if __name__ == "__main__":
+    # Smooth dendrograms, sharp image
+    (positions_sm1, results_sm1,
+     bad_positions_sm1) = fit_all_positions(dendrogram=dendsm,
+                                            catalog=catalog_sm,
+                                            second_ratio=True,
+                                            outfilename=hpath('pyspeckit_fits_densm.txt'),
+                                            ncores=8)
+    pars_to_maps(positions_sm1, results_sm1, suffix='_sm1')
+
+    # sharp both
+    (positions, results,
+     bad_positions) = fit_all_positions(dendrogram=dend, catalog=catalog,
+                                        second_ratio=True,
+                                        outfilename=hpath('pyspeckit_fits.txt'),
+                                        ncores=8)
+    pars_to_maps(positions, results, suffix='')
+
+    # smooth both
+    (positions_sm2, results_sm2,
+     bad_positions_sm2) = fit_all_positions(dendrogram=dend_sm, catalog=catalog_sm,
+                                            pcube=pcube_merge_high_sm,
+                                            second_ratio=True,
+                                            outfilename=hpath('pyspeckit_fits_smsm.txt'),
+                                            ncores=8)
+    pars_to_maps(positions_sm2, results_sm2, suffix='_sm2')

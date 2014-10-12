@@ -1556,6 +1556,26 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
     hdu = fits.PrimaryHDU(data=total_stack, header=header)
     hdu.writeto(fnify('_plait_all'), clobber=True)
 
+    # Smooth and downsample finally...
+    cube = spectral_cube.SpectralCube.read(fnify('_plait_all'))
+    outheader = cube.header.copy()
+    outheader['CRPIX3'] = 1
+    outheader['CRVAL3'] = 218e9
+    outheader['CUNIT3'] = 'Hz'
+    outheader['CDELT3'] = 1453333. # about 2km/s
+    outheader['NAXIS3'] = 1e9 / outheader['CDELT3'] # 688 pixels
+
+    cubesm = cube_regrid.spatial_smooth_cube(cube.filled_data[:], kw,
+                                             use_fft=False,
+                                             numcores=4)
+    cubesm = cube_regrid.spectral_smooth_cube(cubesm, 2,
+                                              use_fft=False,
+                                              numcores=4)
+    cube._data = cubesm
+
+    newhdu = cube_regrid.regrid_cube_hdu(cube.hdu, outheader, order=1,
+                                         prefilter=False)
+    newhdu.writeto(fnify('_plait_all_sm'), output_verify='fix', clobber=True)
  
 
 
