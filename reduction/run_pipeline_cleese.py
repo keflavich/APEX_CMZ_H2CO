@@ -3,8 +3,10 @@ from os.path import join
 from astropy import log
 import time
 import subprocess
+import paths
 
 root = '/scratch/aginsbur/apex/'
+paths.root = root
 rawpath = join(root,'raw/')
 reducedpath = join(root,'reduced/')
 make_apex_cubes.june2013datapath = rawpath
