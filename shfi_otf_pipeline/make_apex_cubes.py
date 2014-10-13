@@ -20,6 +20,7 @@ import FITS_tools
 import scipy.ndimage
 import scipy.linalg
 import time
+from astropy.time import Time
 import mpl_plot_templates
 import pylab as pl
 import os
@@ -36,8 +37,9 @@ from spectral_cube import SpectralCube,BooleanArrayMask
 # http://www.apex-telescope.org/heterodyne/shfi/calibration/calfactor/
 # Apparently all data taken on MPI and ESO time in the first half of 2014 were
 # off by 15-25%.  The data need to be multiplied by these factors.
-calibration_factors = {'2014/04/23-2014/06/13': 0.85,
-                       '2014/02/01-2014/04/23': 0.78,
+calibration_factors = {'2014-04-23:2014-06-13': (0.85/0.75)*0.78, #=0.884. Scaled.
+                       '2014-02-01:2014-04-23': 0.78,
+                       None: 1,
                       }
 datasets_ao = ['O-085.F-9311A-2010','E-085.B-0964A-2010']
 datasets_2013 = ['M-091.F-0019-2013-2013-06-08',
@@ -1406,10 +1408,13 @@ def build_cube_2014(sourcename,
 
         # TODO: parse date and determine whether a calibration factor needs to
         # be applied
+        obsdates = [h['DATEOBS'] for h in hdrs]
+        start,end = min(obsdates),max(obsdates)
+        calkey = cal_date_overlap([start,end])
+        calfactor = calibration_factors[calkey]
 
-        add_apex_data(data, hdrs, gal, cubefilename, retfreq=True,
-                      kernel_fwhm=kernel_fwhm,
-                      varweight=True,
+        add_apex_data(data*calfactor, hdrs, gal, cubefilename, retfreq=True,
+                      kernel_fwhm=kernel_fwhm, varweight=True,
                       # downsample factor for freqarr
                       )
         # FORCE cleanup
@@ -2876,3 +2881,9 @@ def quick_extract_13cocube(fn, snthreshold=3, overwrite=True, intrange=None):
         coint.write(fn[:-5]+"_13COmaskintegrated.fits", overwrite=overwrite)
         coint2 = cocube.spectral_slab(intrange[0], intrange[1]).moment0()
         coint2.write(fn[:-5]+"_13COintegrated.fits", overwrite=overwrite)
+
+def cal_date_overlap(dates1, calibration_factors=calibration_factors):
+    for k in calibration_factors:
+        d1,d2 = Time(k.split(":"))
+        if dates1[0] < d2 and dates1[1] > d1:
+            return k
