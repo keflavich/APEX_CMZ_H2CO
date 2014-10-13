@@ -1,4 +1,5 @@
 import os
+import socket
 
 if socket.gethostname() == 'cleese':
     root = '/scratch/aginsbur/apex/'
