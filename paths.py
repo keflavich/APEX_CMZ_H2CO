@@ -1,6 +1,9 @@
 import os
 
-root = os.path.expanduser('~/work')
+if socket.gethostname() == 'cleese':
+    root = '/scratch/aginsbur/apex/'
+else:
+    root = os.path.expanduser('~/work')
 
 june2013datapath = os.path.join(root, 'h2co/apex/june2013/raw/M-091.F-0019-2013/')
 june2013path = os.path.join(root, 'h2co/apex/june2013/')
