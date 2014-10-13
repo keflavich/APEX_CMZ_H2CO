@@ -13,6 +13,7 @@ import numpy as np
 from astropy.io import fits
 from astropy.utils.console import ProgressBar
 from astropy import log
+import multiprocessing
 
 def get_all_indices(dendrogram):
     inds = []
@@ -186,8 +187,10 @@ def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
         fitted_positions = []
         outfile = None
 
+    lock = multiprocessing.Lock()
+
     def get_fitvals(p, plot=False, order=order, second_ratio=second_ratio,
-                    outfile=outfile):
+                    outfile=outfile, lock=lock):
         if tuple(p) in fitted_positions:
             return
 
@@ -201,17 +204,19 @@ def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
             parvalues.append(None)
             parerrors.append(None)
             if outfile is not None:
-                outfile.write("{0}, {1}, {2}, {3}\n".format(p[0], p[1], None, None))
-                outfile.flush()
+                with lock:
+                    outfile.write("{0}, {1}, {2}, {3}\n".format(p[0], p[1], None, None))
+                    outfile.flush()
             return
         else:
             parvalues.append(result.specfit.parinfo.values)
             parerrors.append(result.specfit.parinfo.errors)
             if outfile is not None:
-                outfile.write("{0}, {1}, {2}, {3}\n".format(p[0], p[1],
-                                                            result.specfit.parinfo.values,
-                                                            result.specfit.parinfo.errors))
-                outfile.flush()
+                with lock:
+                    outfile.write("{0}, {1}, {2}, {3}\n".format(p[0], p[1],
+                                                                result.specfit.parinfo.values,
+                                                                result.specfit.parinfo.errors))
+                    outfile.flush()
             return result.specfit.parinfo.values, result.specfit.parinfo.errors
 
     if ncores == 1:
@@ -276,12 +281,12 @@ def read_pars(filename):
 
 def do_fitting(ncores=4):
     # Smooth dendrograms, sharp image
+    results = fit_all_positions(dendrogram=dendsm, catalog=catalog_sm,
+                                second_ratio=True,
+                                outfilename=hpath('pyspeckit_fits_densm.txt'),
+                                ncores=ncores)
     (positions_sm1, results_sm1,
-     bad_positions_sm1) = fit_all_positions(dendrogram=dendsm,
-                                            catalog=catalog_sm,
-                                            second_ratio=True,
-                                            outfilename=hpath('pyspeckit_fits_densm.txt'),
-                                            ncores=ncores)
+     bad_positions_sm1) = read_pars(hpath('pyspeckit_fits_densm.txt'))
     pars_to_maps(positions_sm1, results_sm1, suffix='_sm1')
 
     # sharp both
