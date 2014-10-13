@@ -6,7 +6,10 @@ from astropy import wcs
 from astropy import coordinates
 from astropy import units as u
 from astropy import constants
-from .progressbar import ProgressBar
+try:
+    from .progressbar import ProgressBar
+except:
+    from astropy.utils.console import ProgressBar
 from astropy.convolution import convolve, Gaussian1DKernel, Gaussian2DKernel
 from sdpy import makecube
 from astropy.io import fits
@@ -1565,7 +1568,8 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
     outheader['CDELT3'] = 1453333. # about 2km/s
     outheader['NAXIS3'] = 1e9 / outheader['CDELT3'] # 688 pixels
 
-    cubesm = cube_regrid.spatial_smooth_cube(cube.filled_data[:], kw,
+    # kw = 2 pix
+    cubesm = cube_regrid.spatial_smooth_cube(cube.filled_data[:], 2,
                                              use_fft=False,
                                              numcores=4)
     cubesm = cube_regrid.spectral_smooth_cube(cubesm, 2,

@@ -10,6 +10,7 @@ from full_cubes import (pcube_merge_high, cube_merge_high, pcube_merge_high_sm,
 from paths import mpath,hpath
 from dendrograms import dend,dendsm,catalog,catalog_sm
 import numpy as np
+from astropy.io import fits
 from astropy.utils.console import ProgressBar
 from astropy import log
 
@@ -179,14 +180,7 @@ def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
         positions = get_all_indices(dendrogram)
 
     if outfilename is not None:
-        fitted_positions,parvalues,parerrors = [],[],[]
-        if os.path.exists(outfilename):
-            with open(outfilename, 'r') as f:
-                for line in f.readlines():
-                    x,y,a,b = eval(line.strip())
-                    fitted_positions.append((x,y))
-                    parvalues.append(a)
-                    parerrors.append(b)
+        fitted_positions,parvalues,parerrors = read_pars(outfilename)
         outfile = open(outfilename, 'a')
     else:
         fitted_positions = []
@@ -236,7 +230,7 @@ def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
 def pars_to_maps(positions, parvalues, shape=pcube_merge_high.cube.shape[1:],
                  celwcs=cube_merge_high.wcs.celestial, suffix=""):
 
-    maxlen = max(len(r) for r in parvalues)
+    maxlen = max(len(r) for r in parvalues if r is not None)
 
     if maxlen % 6 == 0:
         names = ['AMPLITUDE', 'VELOCITY', 'WIDTH', 'RATIO321303X',
@@ -255,7 +249,9 @@ def pars_to_maps(positions, parvalues, shape=pcube_merge_high.cube.shape[1:],
             arr = np.zeros(shape)
             for p,r in zip(positions,parvalues):
                 ind = ii + jj*n
-                if len(r) > ind:
+                if r is None:
+                    continue
+                elif len(r) > ind:
                     arr[p[1], p[0]] = r[ind]
             maps.append(arr)
             hdu = fits.PrimaryHDU(data=arr,
@@ -267,6 +263,16 @@ def pars_to_maps(positions, parvalues, shape=pcube_merge_high.cube.shape[1:],
 
     return maps
 
+def read_pars(filename):
+    fitted_positions,parvalues,parerrors = [],[],[]
+    if os.path.exists(filename):
+        with open(filename, 'r') as f:
+            for line in f.readlines():
+                x,y,a,b = eval(line.strip())
+                fitted_positions.append((x,y))
+                parvalues.append(a)
+                parerrors.append(b)
+    return fitted_positions, parvalues, parerrors
 
 if __name__ == "__main__":
     # Smooth dendrograms, sharp image
