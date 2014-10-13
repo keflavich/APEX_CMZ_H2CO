@@ -274,14 +274,14 @@ def read_pars(filename):
                 parerrors.append(b)
     return fitted_positions, parvalues, parerrors
 
-if __name__ == "__main__":
+def do_fitting(ncores=4):
     # Smooth dendrograms, sharp image
     (positions_sm1, results_sm1,
      bad_positions_sm1) = fit_all_positions(dendrogram=dendsm,
                                             catalog=catalog_sm,
                                             second_ratio=True,
                                             outfilename=hpath('pyspeckit_fits_densm.txt'),
-                                            ncores=8)
+                                            ncores=ncores)
     pars_to_maps(positions_sm1, results_sm1, suffix='_sm1')
 
     # sharp both
@@ -289,7 +289,7 @@ if __name__ == "__main__":
      bad_positions) = fit_all_positions(dendrogram=dend, catalog=catalog,
                                         second_ratio=True,
                                         outfilename=hpath('pyspeckit_fits.txt'),
-                                        ncores=8)
+                                        ncores=ncores)
     pars_to_maps(positions, results, suffix='')
 
     # smooth both
@@ -298,5 +298,5 @@ if __name__ == "__main__":
                                             pcube=pcube_merge_high_sm,
                                             second_ratio=True,
                                             outfilename=hpath('pyspeckit_fits_smsm.txt'),
-                                            ncores=8)
+                                            ncores=ncores)
     pars_to_maps(positions_sm2, results_sm2, suffix='_sm2')
