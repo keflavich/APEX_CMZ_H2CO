@@ -182,7 +182,7 @@ def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
 
     if outfilename is not None:
         fitted_positions,parvalues,parerrors = read_pars(outfilename)
-        outfile = open(outfilename, 'a')
+        outfile = True
     else:
         fitted_positions = []
         outfile = None
@@ -205,18 +205,20 @@ def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
             parerrors.append(None)
             if outfile is not None:
                 with lock:
-                    outfile.write("{0}, {1}, {2}, {3}\n".format(p[0], p[1], None, None))
-                    outfile.flush()
+                    with open(outfilename, 'a') as outfile:
+                        outfile.write("{0}, {1}, {2}, {3}\n".format(p[0], p[1], None, None))
+                        outfile.flush()
             return
         else:
             parvalues.append(result.specfit.parinfo.values)
             parerrors.append(result.specfit.parinfo.errors)
             if outfile is not None:
                 with lock:
-                    outfile.write("{0}, {1}, {2}, {3}\n".format(p[0], p[1],
-                                                                result.specfit.parinfo.values,
-                                                                result.specfit.parinfo.errors))
-                    outfile.flush()
+                    with open(outfilename, 'a') as outfile:
+                        outfile.write("{0}, {1}, {2}, {3}\n".format(p[0], p[1],
+                                                                    result.specfit.parinfo.values,
+                                                                    result.specfit.parinfo.errors))
+                        outfile.flush()
             return result.specfit.parinfo.values, result.specfit.parinfo.errors
 
     if ncores == 1:
