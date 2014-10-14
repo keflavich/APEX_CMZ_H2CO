@@ -288,7 +288,7 @@ def read_pars(filename):
 def do_fitting(ncores=4):
 
     # smooth both
-    results3 = fit_all_positions(dendrogram=dend_sm, catalog=catalog_sm,
+    results3 = fit_all_positions(dendrogram=dendsm, catalog=catalog_sm,
                                             pcube=pcube_merge_high_sm,
                                             second_ratio=True,
                                             outfilename=hpath('pyspeckit_fits_smsm.txt'),
