@@ -297,6 +297,15 @@ def do_fitting(ncores=4):
      bad_positions_sm2) = read_pars(hpath('pyspeckit_fits_smsm.txt'))
     pars_to_maps(positions_sm2, results_sm2, suffix='_sm2')
 
+    # sharp both
+    results2 = fit_all_positions(dendrogram=dend, catalog=catalog,
+                                        second_ratio=True,
+                                        outfilename=hpath('pyspeckit_fits.txt'),
+                                        ncores=ncores)
+    (positions, results,
+     bad_positions) = read_pars(hpath('pyspeckit_fits.txt'))
+    pars_to_maps(positions, results, suffix='')
+
     # Smooth dendrograms, sharp image
     results = fit_all_positions(dendrogram=dendsm, catalog=catalog_sm,
                                 second_ratio=True,
@@ -306,11 +315,3 @@ def do_fitting(ncores=4):
      bad_positions_sm1) = read_pars(hpath('pyspeckit_fits_densm.txt'))
     pars_to_maps(positions_sm1, results_sm1, suffix='_sm1')
 
-    # sharp both
-    results2 = fit_all_positions(dendrogram=dend, catalog=catalog,
-                                        second_ratio=True,
-                                        outfilename=hpath('pyspeckit_fits.txt'),
-                                        ncores=ncores)
-    (positions, results,
-     bad_positions) = read_pars(hpath('pyspeckit_fits.txt'))
-    pars_to_maps(positions, results, suffix='')
