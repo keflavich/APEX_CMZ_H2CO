@@ -81,6 +81,10 @@ pcube_merge_high.Registry.add_fitter('h2co_simple', simple_fitter, 5,
                                      multisingle='multi')
 pcube_merge_high.Registry.add_fitter('h2co_simple2', simple_fitter2, 6,
                                      multisingle='multi')
+pcube_merge_high_sm.Registry.add_fitter('h2co_simple', simple_fitter, 5,
+                                     multisingle='multi')
+pcube_merge_high_sm.Registry.add_fitter('h2co_simple2', simple_fitter2, 6,
+                                     multisingle='multi')
 
 def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
                  catalog=catalog, plot=True, order=1, second_ratio=False,
