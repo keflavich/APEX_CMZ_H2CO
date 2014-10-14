@@ -154,6 +154,7 @@ def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
                limited=[(True,True)] * len(guesses),
                limits=limits,
                verbose=verbose,
+               renormalize=False,
               )
 
     assert len(guesses) % (5+second_ratio) == 0
@@ -171,6 +172,7 @@ def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
                limited=[(True,True)] * len(guesses),
                limits=limits,
                verbose=verbose,
+               renormalize=False,
               )
 
     assert len(guesses) % (5+second_ratio) == 0
