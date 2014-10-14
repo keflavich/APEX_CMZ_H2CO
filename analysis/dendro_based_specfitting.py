@@ -204,6 +204,7 @@ def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
         if tuple(p) in fitted_positions:
             return
 
+        log.debug("Fitting position {0}".format(p))
         result = fit_position(p, dendrogram=dendrogram, catalog=catalog,
                               pcube=pcube,
                               plot=False, order=order,
