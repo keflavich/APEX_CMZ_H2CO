@@ -190,7 +190,8 @@ def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
                       order=1, second_ratio=False, ncores=1, positions=None,
                       outfilename=None):
     if positions is None:
-        positions = get_all_indices(dendrogram)
+        # Reverse order: start from the smallest trees
+        positions = get_all_indices(dendrogram)[::-1]
 
     log.info("Fitting {0} positions.".format(len(positions)))
 

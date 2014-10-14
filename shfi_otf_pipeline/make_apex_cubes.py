@@ -299,6 +299,7 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
                      xscan=None,
                      xtel=None,
                      skip_data=False,
+                     dont_flag_sgrb2=True,
                      galactic_coordinate_range=[[-2,2],[-2,2]]):
 
     log.info("Determining RA/Dec")
@@ -339,10 +340,15 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
     #else:
     #    xtelOK = True
 
-
     if tsysrange is not None:
         tsys = np.array([h['TSYS'] for h in headers])
         tsysOK = (tsys>tsysrange[0]) & (tsys<tsysrange[1])
+        if dont_flag_sgrb2:
+            sgrb2 = ((gal.l.wrap_at(180*u.deg).deg > 0.64) &
+                     (gal.l.wrap_at(180*u.deg).deg<0.7) &
+                     (gal.b.deg>-0.06) &
+                     (gal.b.deg<-0.01))
+            tsysOK[sgrb2] = True
     else:
         tsysOK = True
 
@@ -478,9 +484,9 @@ def process_data(data, gal, hdrs, dataset, scanblsub=False,
 
     # SgrB2 has higher noise.  Don't flag it out.
     sgrb2 = ((gal.l.wrap_at(180*u.deg).deg > 0.64) &
-             (gal.l.wrap_at(180*u.deg).deg<0.68) &
-             (gal.b.deg>-0.05) &
-             (gal.b.deg<-0.001))
+             (gal.l.wrap_at(180*u.deg).deg<0.7) &
+             (gal.b.deg>-0.06) &
+             (gal.b.deg<-0.01))
     bad[sgrb2] = False
 
     # pre-flagging diagnostic
