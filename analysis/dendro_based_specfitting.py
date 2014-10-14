@@ -140,6 +140,10 @@ def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
         log.info("Guess was: {0}".format(guess))
         return
 
+    # Some positions have bad noise values; these are not worth wasting time on
+    if all(np.isnan(sp.error)):
+        return
+
     sp.specfit(fittype=fittype, multifit=True,
                guesses=guesses,
                limited=[(True,True)] * len(guesses),
@@ -282,6 +286,17 @@ def read_pars(filename):
     return fitted_positions, parvalues, parerrors
 
 def do_fitting(ncores=4):
+
+    # smooth both
+    results3 = fit_all_positions(dendrogram=dend_sm, catalog=catalog_sm,
+                                            pcube=pcube_merge_high_sm,
+                                            second_ratio=True,
+                                            outfilename=hpath('pyspeckit_fits_smsm.txt'),
+                                            ncores=ncores)
+    (positions_sm2, results_sm2,
+     bad_positions_sm2) = read_pars(hpath('pyspeckit_fits_smsm.txt'))
+    pars_to_maps(positions_sm2, results_sm2, suffix='_sm2')
+
     # Smooth dendrograms, sharp image
     results = fit_all_positions(dendrogram=dendsm, catalog=catalog_sm,
                                 second_ratio=True,
@@ -292,18 +307,10 @@ def do_fitting(ncores=4):
     pars_to_maps(positions_sm1, results_sm1, suffix='_sm1')
 
     # sharp both
-    (positions, results,
-     bad_positions) = fit_all_positions(dendrogram=dend, catalog=catalog,
+    results2 = fit_all_positions(dendrogram=dend, catalog=catalog,
                                         second_ratio=True,
                                         outfilename=hpath('pyspeckit_fits.txt'),
                                         ncores=ncores)
+    (positions, results,
+     bad_positions) = read_pars(hpath('pyspeckit_fits.txt'))
     pars_to_maps(positions, results, suffix='')
-
-    # smooth both
-    (positions_sm2, results_sm2,
-     bad_positions_sm2) = fit_all_positions(dendrogram=dend_sm, catalog=catalog_sm,
-                                            pcube=pcube_merge_high_sm,
-                                            second_ratio=True,
-                                            outfilename=hpath('pyspeckit_fits_smsm.txt'),
-                                            ncores=ncores)
-    pars_to_maps(positions_sm2, results_sm2, suffix='_sm2')

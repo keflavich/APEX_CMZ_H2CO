@@ -13,7 +13,7 @@ from astropy import units as u
 cube_merge_high = SpectralCube.read(mpath('APEX_H2CO_merge_high_plait_all.fits'))
 noise = fits.getdata(mpath('APEX_H2CO_merge_high_plait_all_noise.fits'))
 nhits = fits.getdata(mpath('APEX_H2CO_merge_high_nhits.fits'))
-noise[nhits<20] = np.nan
+noise[nhits<5] = np.nan
 noise_cube = as_strided(noise, shape=cube_merge_high.shape,
                         strides=(0,)+noise.strides)
 noise_spcube = SpectralCube(data=noise_cube, wcs=cube_merge_high.wcs)
