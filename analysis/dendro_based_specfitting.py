@@ -188,6 +188,8 @@ def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
     if positions is None:
         positions = get_all_indices(dendrogram)
 
+    log.info("Fitting {0} positions.".format(len(positions)))
+
     if outfilename is not None:
         fitted_positions,parvalues,parerrors = read_pars(outfilename)
         outfile = True
