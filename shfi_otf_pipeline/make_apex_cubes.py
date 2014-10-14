@@ -1655,7 +1655,8 @@ def integrate_slices_low(prefix='merged_datasets/APEX_H2CO_merge_low_sub'):
     hdu1 = fits.PrimaryHDU(data=integ1, header=hdr)
     hdu1.writeto(prefix+"_SiO5-4.fits", clobber=True)
 
-def integrate_mask(prefix, mask=h2copath+'APEX_H2CO_303_202_mask.fits'):
+def integrate_mask(prefix, mask=h2copath+'APEX_H2CO_303_202_mask.fits',
+                   maskpre=''):
     """
     Integrate a cube with name specified by 'prefix' using a specific mask
     """
@@ -1669,7 +1670,8 @@ def integrate_mask(prefix, mask=h2copath+'APEX_H2CO_303_202_mask.fits'):
     integ1,hdr = cubes.integ(ffile, [0,ffile[0].shape[0]], average=np.nansum)
     hdr['BUNIT'] = ('K km/s',"Integrated over masked region")
     hdu1 = fits.PrimaryHDU(data=integ1, header=hdr)
-    hdu1.writeto(prefix+"_mask_integ.fits", clobber=True)
+    hdu1.writeto("{0}_{1}mask_integ.fits".format(prefix, maskpre),
+                 clobber=True)
 
 def integrate_h2co_by_freq(filename):
     import spectral_cube
@@ -1843,40 +1845,60 @@ def do_extract_subcubes(outdir=molpath, merge_prefix='APEX_H2CO_merge',
                         frange=None, lines=all_lines,
                         suffix="_sub",
                         vsmooth=False):
+    """
+    Example:
+    do_extract_subcubes(outdir='/Volumes/passport/apex/merged_datasets/molecule_cubes',
+                        suffix='', merge_prefix='APEX_H2CO_2014_merge')
+    """
 
-    for line,freq in lines.iteritems():
-        if frange is not None:
-            if freq<frange[0] or freq>frange[1]:
-                log.info("Skipping line {0}".format(line))
-                continue
+    if cubefilename is None:
+        cubefilenames = [os.path.join(mergepath,
+                                      merge_prefix+'_low{0}.fits'.format(suffix)),
+                         os.path.join(mergepath,
+                                      merge_prefix+'_high{0}.fits'.format(suffix))]
+    else:
+        cubefilenames = [cubefilename]
 
-        log.info("Extracting {0}".format(line))
-        if cubefilename is None:
-            if freq < 218:
-                cubefilename = os.path.join(mergepath,
-                                            merge_prefix+'_low{0}.fits'.format(suffix))
-            else:
-                cubefilename = os.path.join(mergepath,
-                                            merge_prefix+'_high{0}.fits'.format(suffix))
+    # For each cube, (maybe) load it, check it, then move on
+    # (the previous method would only match things in the first cube selected...)
+    for cubefilename in cubefilenames:
+        for line,freq in lines.iteritems():
+            if frange is not None:
+                if freq<frange[0] or freq>frange[1]:
+                    log.info("Skipping line {0}".format(line))
+                    continue
 
-        header = fits.getheader(cubefilename)
-        ww = wcs.WCS(header)
-        wspec = ww.sub([wcs.WCSSUB_SPECTRAL])
-        nax = header['NAXIS%i' % (ww.wcs.spec+1)]
-        freqarr = wspec.wcs_pix2world(np.arange(nax),0)[0]
-        if freq*1e9 > freqarr.min() and freq*1e9 < freqarr.max():
-            extract_subcube(cubefilename,
-                            os.path.join(outdir, 'APEX_{0}_smooth.fits').format(line),
-                            linefreq=freq*u.GHz, smooth=True)
-            if vsmooth:
+            log.info("Extracting {0}".format(line))
+
+            header = fits.getheader(cubefilename)
+            ww = wcs.WCS(header)
+            wspec = ww.sub([wcs.WCSSUB_SPECTRAL])
+            nax = header['NAXIS%i' % (ww.wcs.spec+1)]
+            freqarr = wspec.wcs_pix2world(np.arange(nax),0)[0]
+            if freq*1e9 > freqarr.min() and freq*1e9 < freqarr.max():
                 extract_subcube(cubefilename,
-                                os.path.join(outdir, 'APEX_{0}_vsmooth.fits').format(line),
-                                linefreq=freq*u.GHz, smooth=True, vsmooth=True)
-            extract_subcube(cubefilename,
-                            os.path.join(outdir, 'APEX_{0}.fits').format(line),
-                            linefreq=freq*u.GHz)
-        else:
-            log.info("Skipping line {0}".format(line))
+                                os.path.join(outdir, 'APEX_{0}_smooth.fits').format(line),
+                                linefreq=freq*u.GHz, smooth=True)
+                if vsmooth:
+                    extract_subcube(cubefilename,
+                                    os.path.join(outdir, 'APEX_{0}_vsmooth.fits').format(line),
+                                    linefreq=freq*u.GHz, smooth=True, vsmooth=True)
+                extract_subcube(cubefilename,
+                                os.path.join(outdir, 'APEX_{0}.fits').format(line),
+                                linefreq=freq*u.GHz)
+                integrate_mask(os.path.join(outdir, 'APEX_{0}'.format(line)))
+                integrate_mask(os.path.join(outdir, 'APEX_{0}_smooth'.format(line)),
+                               mask=h2copath+'APEX_H2CO_303_202_smooth_mask.fits')
+                integrate_mask(os.path.join(outdir, 'APEX_{0}'.format(line)),
+                               mask=h2copath+'APEX_13CO_matched_H2CO_mask.fits',
+                               maskpre='13co',
+                              )
+                integrate_mask(os.path.join(outdir, 'APEX_{0}_smooth'.format(line)),
+                               mask=h2copath+'APEX_13CO_matched_H2CO_smooth_mask.fits',
+                               maskpre='13co',
+                              )
+            else:
+                log.info("Skipping line {0}".format(line))
 
 
 def do_everything(pca_clean={'2014':False, '2013':False, 'ao':False},
@@ -2869,6 +2891,13 @@ def extract_co_subcubes(mergepath=april2014path):
                     os.path.join(h2copath,'APEX_C18O_matched_H2CO_smooth.fits'),
                     linefreq=219.56036*u.GHz, smooth=True)
 
+    signal_to_noise_mask_cube(os.path.join(h2copath,'APEX_13CO_matched_H2CO_smooth'),
+                              noise=fits.getdata(os.path.join(mergepath,
+                                                              'APEX_H2CO_merge_high_plait_all_noise.fits')))
+    signal_to_noise_mask_cube(os.path.join(h2copath,'APEX_13CO_matched_H2CO'),
+                              noise=fits.getdata(os.path.join(mergepath,
+                                                              'APEX_H2CO_merge_high_plait_all_smooth_noise.fits')))
+
 def quick_extract_13cocube(fn, snthreshold=3, overwrite=True, intrange=None):
     if fits.getheader(fn)['NAXIS'] > 2:
         cube = SpectralCube.read(fn).with_spectral_unit(u.km/u.s,
@@ -2890,6 +2919,7 @@ def quick_extract_13cocube(fn, snthreshold=3, overwrite=True, intrange=None):
 
 def cal_date_overlap(dates1, calibration_factors=calibration_factors):
     for k in calibration_factors:
-        d1,d2 = Time(k.split(":"))
-        if dates1[0] < d2 and dates1[1] > d1:
-            return k
+        if k is not None:
+            d1,d2 = Time(k.split(":"))
+            if dates1[0] < d2 and dates1[1] > d1:
+                return k
