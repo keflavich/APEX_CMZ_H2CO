@@ -115,7 +115,8 @@ def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
         fittype = 'h2co_simple2'
         assert len(guesses) % 6 == 0
         assert len(limits) % 6 == 0
-        assert guesses[0] in [g[0] for g in guess]
+        if len(guesses) > 0:
+            assert guesses[0] in [g[0] for g in guess]
         n = 6
     else:
         guesses = [p for g in guess if g[0]>0 and g[3]>0 for p in g]
