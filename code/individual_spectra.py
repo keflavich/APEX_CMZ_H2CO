@@ -184,6 +184,7 @@ for region_number,reg in enumerate(regs):
     ncomp = pars[sp.specname]['ncomp']
     if ncomp == 0:
         log.info("Skipping {0} - no velocity components detected.".format(ncomp))
+        continue
     velos = pars[sp.specname]['velo']
     spname = sp.specname.replace(" ","_")
 

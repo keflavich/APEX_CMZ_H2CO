@@ -1916,7 +1916,7 @@ def do_everything(pca_clean={'2014':False, '2013':False, 'ao':False},
     do_postprocessing()
 
 
-def do_postprocessing():
+def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
     #make_low_mergecube() # there's only one really useful overlap region
     #os.chdir(mergepath)
     # vsmoothds is made here:
@@ -1925,7 +1925,8 @@ def do_postprocessing():
     # OLD: merge_prefix = 'APEX_H2CO_merge_high' # Oct 4, 2014
     merge_prefix='APEX_H2CO_merge_high_plait_all'
     do_extract_subcubes(outdir=molpath, frange=[218,219],
-                        cubefilename=os.path.join(mergepath, merge_prefix+".fits"),
+                        cubefilename=os.path.join(mergepath,
+                                                  merge_prefix+".fits"),
                         lines=lines218)
     # Because I really want to see SiO...
     do_extract_subcubes(lines={'SiO_54':217.10498},
