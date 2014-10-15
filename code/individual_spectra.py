@@ -3,7 +3,7 @@ import numpy as np
 import pyspeckit
 from astropy import table
 import spectral_cube
-from paths import h2copath, mergepath, figurepath, regpath, analysispath
+from paths import h2copath, mergepath, figurepath, regpath, analysispath, mpath, hpath
 import os
 from pyspeckit_fitting import simplemodel, simple_fitter, simple_fitter2
 try:
@@ -26,20 +26,20 @@ if 'cube' not in locals():
     # Use the individual spectral line cubes because they have been more
     # cleanly baselined
     # (unfortunately, this doesn't appar to work)
-    #h2co303 = pyspeckit.Cube(mpath('APEX_H2CO_303_202_bl.fits'))
-    #h2co322 = pyspeckit.Cube(mpath('APEX_H2CO_322_221_bl.fits'))
-    #h2co321 = pyspeckit.Cube(mpath('APEX_H2CO_321_220_bl.fits'))
+    #h2co303 = pyspeckit.Cube(hpath('APEX_H2CO_303_202_bl.fits'))
+    #h2co322 = pyspeckit.Cube(hpath('APEX_H2CO_322_221_bl.fits'))
+    #h2co321 = pyspeckit.Cube(hpath('APEX_H2CO_321_220_bl.fits'))
     #cube = pyspeckit.CubeStack([h2co303,h2co321,h2co322])
     #cube.xarr.refX = 218222190000.0
     #cube.xarr.refX_units = 'Hz'
     #cube = pyspeckit.Cube(os.path.join(mergepath, 'APEX_H2CO_merge_high_sub.fits'))
     etamb = 0.75 # http://www.apex-telescope.org/telescope/efficiency/
     #cube.cube /= etamb
-    noise = fits.getdata(mergepath+'APEX_H2CO_merge_high_sub_noise.fits') / etamb
-    noisehdr = fits.getheader(mergepath+'APEX_H2CO_merge_high_sub_noise.fits')
+    noise = fits.getdata(mpath('APEX_H2CO_merge_high_plait_all_noise.fits')) / etamb
+    noisehdr = fits.getheader(mpath('APEX_H2CO_merge_high_plait_all_noise.fits'))
     #errorcube = noise[None,:,:] * np.ones(cube.cube.shape)
 
-    cube = spectral_cube.SpectralCube.read(os.path.join(mergepath, 'APEX_H2CO_merge_high_sub.fits'))
+    cube = spectral_cube.SpectralCube.read(mpath('APEX_H2CO_merge_high_plait_all.fits'))
     cube._data /= etamb
 
     spectra = {}
@@ -60,16 +60,22 @@ if 'cube' not in locals():
 #    'brick2': {'ncomp': 2},
 #}
 parmap_simple = {'ampH2CO':'AMPLITUDE',
-          'ampCH3OH':'AMPCH3OH',
-          'width':'WIDTH',
-          'center':'VELOCITY',
-          'h2coratio':'RATIO',}
+                 'ampCH3OH':'AMPCH3OH',
+                 'width':'WIDTH',
+                 'center':'VELOCITY',
+                 'h2coratio':'RATIO',}
 parmap_simple2 = {'ampH2CO':'AMPLITUDE',
           'ampCH3OH':'AMPCH3OH',
           'width':'WIDTH',
           'center':'VELOCITY',
           'h2coratio321303':'RATIO321303X',
           'h2coratio322321':'RATIO322321X',}
+parmap_simple2_spline = {'spline_ampH2CO':'AMPLITUDE',
+                         'spline_ampCH3OH':'AMPCH3OH',
+                         'spline_width':'WIDTH',
+                         'spline_center':'VELOCITY',
+                         'spline_h2coratio321303':'RATIO321303X',
+                         'spline_h2coratio322321':'RATIO322321X',}
 parmap_radex = {
           'temperature':'TEMPERATURE',
           'density':'DENSITY',
@@ -108,9 +114,8 @@ lat_column = table.Column(data=[reg.coord_list[1] for reg in regs
 columns = [table.Column(name="{ee}{name}".format(name=name, ee=ee),
                         dtype='float',
                         length=name_column.size)
-           for name in ['ampH2CO','ampCH3OH','width','center','h2coratio321303',
-                        'h2coratio322321',
-                        'density','column','temperature','denscenter','denswidth']
+           for name in (parmap_simple2.keys() + parmap_radex.keys() +
+                        parmap_simple2_spline.keys())
            for ee in ['','e']
           ]
 out_table = table.Table([name_column, comp_id_column, lon_column, lat_column] +
@@ -146,6 +151,7 @@ row_number = 0
 
 for region_number,reg in enumerate(regs):
     name = reg.attr[1]['text']
+    log.info("Fitting {0}".format(name))
     if name not in spectra:
         #sp = cube.get_apspec(reg.coord_list,coordsys='galactic',wunit='degree')
         shape = pyregion.ShapeList([reg])
@@ -166,14 +172,14 @@ for region_number,reg in enumerate(regs):
     else:
         sp = spectra[name]
 
-    if 'Map' in name:
+    if 'Map' in name or 'box' in name:
         width_min,width_max = 1,40
     else:
         width_min,width_max = 1,15
 
 
     sp.plotter.autorefresh=False
-    sp.plotter()
+    sp.plotter(figure=1)
 
     ncomp = pars[sp.specname]['ncomp']
     velos = pars[sp.specname]['velo']
@@ -187,16 +193,62 @@ for region_number,reg in enumerate(regs):
                limited=[(True,True)] * 6,
                limits=[(0,1e5),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
               )
+    sp.baseline(excludefit=True, subtract=True, highlight_fitregion=True, order=1)
+
+    sp.plotter(clear=True)
+    sp.specfit(fittype='h2co_simple', multifit=True,
+               guesses=guesses_simple,
+               limited=[(True,True)] * 6,
+               limits=[(0,1e5),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
+              )
 
 
     set_row(sp.specfit.parinfo, ncomp, out_table[row_number:row_number+ncomp],
             parmap=parmap_simple2)
 
+    err = sp.error.mean()
 
     sp.plotter()
     sp.specfit.plot_fit(show_components=True)
+    sp.specfit.plotresiduals(axis=sp.plotter.axis, yoffset=-err*5, clear=False,
+                             color='#444444', label=False)
+    sp.plotter.axis.set_ylim(sp.plotter.ymin-err*5, sp.plotter.ymax)
     sp.plotter.savefig(os.path.join(figurepath,
-                                    "{0}_fit_4_lines_simple.pdf".format(spname)))
+                                    "simple/{0}_fit_4_lines_simple.pdf".format(spname)))
+    sp.write(mpath("spectra/{0}_spectrum.fits".format(spname)))
+
+    # This will mess things up for the radexfit (maybe in a good way) but *cannot*
+    # be done after the radexfit
+    # Set the spectrum to be the fit residualsa.  The linear baseline has
+    # already been subtracted from both the data and the residuals
+    linear_baseline = sp.baseline.basespec
+    sp.baseline.unsubtract()
+    sp.baseline.spectofit = sp.specfit.residuals
+    sp.baseline.includemask[:] = True # Select ALL residuals
+    sp.baseline.fit(spline=True, order=3, spline_sampling=50)
+    spline_baseline = sp.baseline.basespec
+    sp.data -= spline_baseline + linear_baseline
+    sp.baseline.subtracted = True
+    sp.error[:] = sp.stats((218.5e9,218.65e9))['std']
+    sp.specfit(fittype='h2co_simple', multifit=True,
+               guesses=guesses_simple,
+               limited=[(True,True)] * 6,
+               limits=[(0,1e5),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
+              )
+    sp.plotter()
+    sp.plotter.axis.plot(sp.xarr, spline_baseline+linear_baseline, color='orange',
+                         alpha=0.5, zorder=-1, linewidth=2)
+    sp.specfit.plot_fit(show_components=True)
+    sp.specfit.plotresiduals(axis=sp.plotter.axis, yoffset=-err*5, clear=False,
+                             color='#444444', label=False)
+    sp.plotter.axis.set_ylim(sp.plotter.ymin-err*5, sp.plotter.ymax)
+    sp.plotter.savefig(os.path.join(figurepath,
+                                    "simple/{0}_fit_4_lines_simple_splinebaselined.pdf".format(spname)))
+    set_row(sp.specfit.parinfo, ncomp, out_table[row_number:row_number+ncomp],
+            parmap=parmap_simple2_spline)
+
+
+    sp.write(mpath("spectra/{0}_spectrum_basesplined.fits".format(spname)))
 
     if radexfit:
         guesses = [x for ii in range(ncomp)
@@ -220,7 +272,7 @@ for region_number,reg in enumerate(regs):
                    fixed=[False,False,False,True,True]*ncomp,
                    quiet=False,)
         sp.plotter.savefig(os.path.join(figurepath,
-                                        "{0}_fit_h2co_mm_radex.pdf".format(spname)))
+                                        "radex/{0}_fit_h2co_mm_radex.pdf".format(spname)))
 
         set_row(sp.specfit.parinfo, ncomp,
                 out_table[row_number:row_number+ncomp], parmap=parmap_radex)
@@ -301,6 +353,8 @@ for region_number,reg in enumerate(regs):
                                   plotkwargs={'alpha':0.01})
 
         sp.plotter.refresh()
+
+
 
 out_table.write(os.path.join(analysispath,"fitted_line_parameters.ipac"),
                 format='ascii.ipac')

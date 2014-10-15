@@ -10,6 +10,8 @@ from ratio_cubes import ratio303321, eratio303321, noise_flat
 from masked_cubes import cube303m,cube321m,cube303,cube321,mask,cube303msm,cube321msm
 from astropy.utils.console import ProgressBar
 from astrodendro import Dendrogram,ppv_catalog
+from astropy.io import fits
+from dendrograms import dend, dendsm
 
 fit_table = Table.read(apath('piecewise_tvsratio_fit.ipac'), format='ascii.ipac')
 
@@ -33,25 +35,25 @@ assert tcube.header['CUNIT3'] == 'km s-1'
 
 tcube.write(hpath('TemperatureCube_PiecewiseFromRatio.fits'), overwrite=True)
 
-log.warn("This approach is far too noisy.  Need to do "
-         "something like Voronoi tesselation or at least "
-         "smoothing/downsampling to get adequate S/N.")
+# Do the integrated version
+for smooth in ('', '_smooth'):
+    top = hpath('APEX_H2CO_321_220{0}_bl_mask_integ.fits'.format(smooth))
+    bot = hpath('APEX_H2CO_303_202{0}_bl_mask_integ.fits'.format(smooth))
+    ff = fits.open(top)
+    rr = ff[0].data/fits.getdata(bot)
+    tem = pwtem(rr.ravel())
+    ff[0].data = tem.reshape(rr.shape)
+    ff.writeto(hpath('IntegratedRatioPiecewiseTemperature{0}_303to321.fits'.format(smooth)),
+               clobber=True)
 
 
 # Try the same thing but on the dendrogrammed data.  Basically, this is 
 # dendro_temperature but *much* faster
 
-for sm,cubeA,cubeB in zip(("","_smooth"),
-                          (cube303m,cube303msm),
-                          (cube321m,cube321msm)):
-    if sm == '': continue
-
-    # This takes soooo looooong
-    t0 = time.time()
-    log.debug("Loading dendrogram from file.")
-    maskpath = "DendroMask_H2CO303202{0}_signal_to_noise.hdf5".format(sm)
-    dend = Dendrogram.load_from(hpath(maskpath))
-    log.debug("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
+for sm,cubeA,cubeB,objects in zip(("","_smooth"),
+                                  (cube303m,cube303msm),
+                                  (cube321m,cube321msm),
+                                  (dend,dendsm),):
 
     # reset data
     tcubedata = np.empty(cubeA.shape)
@@ -59,7 +61,6 @@ for sm,cubeA,cubeB in zip(("","_smooth"),
     rcubedata = np.empty(cubeA.shape)
     rcubedata[:] = np.nan
 
-    objects = dend
     pb = ProgressBar(len(objects))
     for ii,structure in enumerate(objects):
         dend_obj_mask = BooleanArrayMask(structure.get_mask(), wcs=cubeA.wcs)

@@ -18,11 +18,17 @@ F.save(paths.fpath('coverage_on_herschel.png'),dpi=150)
 F.save(paths.fpath('coverage_on_herschel.pdf'),dpi=150)
 F.remove_layer('contour_set_1')
 F.show_contour(paths.molpath('APEX_H2CO_303_202_smooth_bl_mask_integ.fits'),
-               levels=[0.5,1,2], colors=['b'], convention='calabretta')
+               levels=[5,10,20,50], colors=['b'], convention='calabretta')
 F.save(paths.fpath('H2CO_on_herschel.png'),dpi=150)
 F.save(paths.fpath('H2CO_on_herschel.pdf'),dpi=150)
 F.remove_layer('contour_set_2')
 F.show_contour(paths.molpath('APEX_SiO_54_smooth_mask_integ.fits'),
-               levels=[0.5,1,2], colors=['b'], convention='calabretta')
+               levels=[2,5,10], colors=['g'], convention='calabretta')
 F.save(paths.fpath('SiO_on_herschel.png'),dpi=150)
 F.save(paths.fpath('SiO_on_herschel.pdf'),dpi=150)
+
+F.remove_layer('contour_set_3')
+F.show_contour(paths.molpath('APEX_13CO_smooth_mask_integ.fits'),
+               levels=[10,50,100,200], colors=['c'], convention='calabretta')
+F.save(paths.fpath('13CO_on_herschel.png'),dpi=150)
+F.save(paths.fpath('13CO_on_herschel.pdf'),dpi=150)

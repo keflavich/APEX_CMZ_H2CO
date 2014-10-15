@@ -18,7 +18,7 @@ from paths import hpath,mpath
 from constrain_parameters import paraH2COmodel
 from masked_cubes import cube303m,cube321m,cube303msm,cube321msm
 from masked_cubes import mask as cube_signal_mask
-from co_cubes import cube13co, cube18co, cube13cosm, cubec18osm
+from co_cubes import cube13co, cube18co, cube13cosm, cubeco18sm
 from noise import noise, noise_cube, sm_noise_cube
 from higal_gridded import column_regridded
 from common_constants import logabundance,elogabundance
@@ -228,12 +228,17 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
     tcube.write(hpath('TemperatureCube_DendrogramObjects{0}.fits'.format(suffix)),
                 overwrite=True)
 
-if __name__ == "__main__":
-    from dendrograms import dend,dendsm
+def do_dendro_temperatures_both():
+    do_dendro_temperatures_sharp()
+    do_dendro_temperatures_smooth()
+
+def do_dendro_temperatures_sharp():
+    from dendrograms import dend
     measure_dendrogram_properties(dend=dend, cube303=cube303m, cube321=cube321m,
                                   suffix="")
 
-
+def do_dendro_temperatures_smooth():
+    from dendrograms import dendsm
     measure_dendrogram_properties(dend=dendsm, cube303=cube303msm,
                                   cube321=cube321msm, cube13co=cube13cosm,
                                   cube18co=cube18cosm,

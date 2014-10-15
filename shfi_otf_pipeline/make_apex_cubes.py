@@ -1516,7 +1516,7 @@ def make_high_mergecube(pca_clean={'2014':False,
                     pca_clean=pca_clean['2013'],
                     scanblsub=scanblsub['2013'])
 
-    do_plait_h2comerge(mergefile2=mergefile2)
+    do_plait_h2comerge(mergepath=mergepath, mergefile2=mergefile2)
 
 def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
     """
@@ -1591,6 +1591,9 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
     newhdu = cube_regrid.regrid_cube_hdu(cube.hdu, outheader, order=1,
                                          prefilter=False)
     newhdu.writeto(fnify('_plait_all_sm'), output_verify='fix', clobber=True)
+
+    baseline_cube(fnify('_plait_all'), polyspline='spline', mask_level_sigma=5)
+    baseline_cube(fnify('_plait_all_sm'), polyspline='spline', mask_level_sigma=5)
  
 
 
@@ -1875,6 +1878,8 @@ def do_extract_subcubes(outdir=molpath, merge_prefix='APEX_H2CO_merge',
             wspec = ww.sub([wcs.WCSSUB_SPECTRAL])
             nax = header['NAXIS%i' % (ww.wcs.spec+1)]
             freqarr = wspec.wcs_pix2world(np.arange(nax),0)[0]
+            # Note that this leaves open the possibility of extracting incomplete
+            # cubes from the edges of the high/low cubes...
             if freq*1e9 > freqarr.min() and freq*1e9 < freqarr.max():
                 extract_subcube(cubefilename,
                                 os.path.join(outdir, 'APEX_{0}_smooth.fits').format(line),
@@ -1926,6 +1931,7 @@ def do_postprocessing():
     do_extract_subcubes(lines={'SiO_54':217.10498},
                         merge_prefix='APEX_H2CO_2014_merge', suffix="")
     compute_noise_high(mergepath+merge_prefix, pixrange=[700,900])
+    compute_noise_high(mergepath+merge_prefix+"_smooth", pixrange=[203,272])
     #compute_noise_high(mergepath+merge_prefix+'_smooth',[203,272])
     #compute_noise_high(mergepath+'APEX_H2CO_merge_high_vsmoothds',[203,272])
     #compute_noise_high(mergepath+'APEX_H2CO_303_202_vsmooth',[75,100])
@@ -1935,9 +1941,9 @@ def do_postprocessing():
                                                               'APEX_H2CO_merge_high_plait_all_noise.fits')),
                               sigmacut=2,
                               grow=2)
-    make_smooth_noise(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits',
-                      mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits',
-                      kernelwidth=2)
+    #make_smooth_noise(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits',
+    #                  mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits',
+    #                  kernelwidth=2)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_smooth',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
                               sigmacut=2)
@@ -2421,6 +2427,9 @@ def do_2014_merge(datasets=datasets_2014,
                         datapath=april2014path,
                         lowhigh=lh,
                         datasets=datasets)
+
+        baseline_cube(os.path.join(mergepath,mergefile+".fits"),
+                      polyspline='spline', mask_level_sigma=5)
 
 def get_info_2014(datapath='/Users/adam/work/h2co/apex/april2014/',
                   datasets=datasets_2014):
