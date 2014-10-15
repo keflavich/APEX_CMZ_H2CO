@@ -182,6 +182,8 @@ for region_number,reg in enumerate(regs):
     sp.plotter(figure=1)
 
     ncomp = pars[sp.specname]['ncomp']
+    if ncomp == 0:
+        log.info("Skipping {0} - no velocity components detected.".format(ncomp))
     velos = pars[sp.specname]['velo']
     spname = sp.specname.replace(" ","_")
 

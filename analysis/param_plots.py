@@ -1,3 +1,11 @@
+"""
+For each of the fitted spectra from individual_spectra.py, use the fitted ratio
+(and appropriate ancillary data, e.g. h2 column) to derive the best fit
+temperature, etc.
+
+Store them in an output table and plot by calling 
+execfile(paths.pcpath('parameter_comparisons.py'))
+"""
 import paths
 import os
 import pylab as pl
@@ -24,7 +32,10 @@ fittable = table.Table.read(os.path.join(analysispath,
 fittable.add_columns([table.Column(name=name, dtype='float', length=len(fittable))
                       for name in ['temperature_chi2','tmin1sig_chi2','tmax1sig_chi2',
                                    'column_chi2','cmin1sig_chi2','cmax1sig_chi2',
-                                   'density_chi2','dmin1sig_chi2','dmax1sig_chi2',]])
+                                   'density_chi2','dmin1sig_chi2','dmax1sig_chi2',
+                                   'logh2column','elogh2column',
+                                   'logabundance','elogabundance',
+                                  ]])
 
 if not os.path.exists(paths.fpath('param_fits')):
     os.makedirs(paths.fpath('param_fits'))
@@ -293,7 +304,7 @@ for row in fittable:
         pl.xlabel(xlabel)
         pl.ylabel(ylabel)
         pl.title("Total log$(N(\\mathrm{{H}}_2)) = {0:0.1f}\pm{1:0.1f}$".format(logh2column,
-                                                                                        elogh2column))
+                                                                                elogh2column))
         ax5 = pl.subplot(2,2,4)
         pl.contourf(xax, yax, (chi2_ff.min(axis=axis)),
                     levels=chi2_ff.min()+np.arange(nlevs), alpha=0.5)

@@ -50,23 +50,23 @@
  "G1.21+0.00box":      {'ncomp':1, 'velo':[85]}, # TODO-refit   
  "G0.85-0.04box":      {'ncomp':2, 'velo':[5,80]}, # TODO-refit   
  "G0.56-0.07box":      {'ncomp':2, 'velo':[85,60]}, # TODO-refit   
- "G0.36-0.08box":      {'ncomp':2, 'velo':[85,60]}, # TODO-refit   
+ "G0.36-0.08box":      {'ncomp':2, 'velo':[90,24]}, # TODO-refit   
  "Map_001 Off 2":      {'ncomp':1, 'velo':[15]},
  "Map_002 Off 2":      {'ncomp':2, 'velo':[10,30]},
  "Map_003 Off 2":      {'ncomp':2, 'velo':[13,80]},
  "Map_004 Off 2":      {'ncomp':2, 'velo':[93,38]},
- "Map_005 Off 2":      {'ncomp':2, 'velo':[56,59]},
+ "Map_005 Off 2":      {'ncomp':1, 'velo':[56]},
  "Map_006 Off 2":      {'ncomp':3, 'velo':[51,30,96]},
  "Map_007 Off 2":      {'ncomp':2, 'velo':[46, 63]},
  "Map_008 Off 2":      {'ncomp':2, 'velo':[34,50]},
- "Map_009 Off 3":      {'ncomp':2, 'velo':[9,9]},
+ "Map_009 Off 3":      {'ncomp':2, 'velo':[15,6]},
  "Map_010 Off 3":      {'ncomp':2, 'velo':[24,35]},
  "Map_011 Off 2":      {'ncomp':2, 'velo':[80,-13]},
  "Map_012 Off 2":      {'ncomp':2, 'velo':[2,40]},
  "Map_013 Off 2":      {'ncomp':1, 'velo':[57]},
  "Map_018 Off 3":      {'ncomp':2, 'velo':[-60,68]},
  "Map_019 Off 3":      {'ncomp':2, 'velo':[-30,-15]},
- "Map_020 Off 3":      {'ncomp':1, 'velo':[50]}, # no obvious detections
+ "Map_020 Off 3":      {'ncomp':0, 'velo':[50]}, # no obvious detections
  "Map_021 Off 3":      {'ncomp':1, 'velo':[-48]},
  "Map_022 Off 3":      {'ncomp':2, 'velo':[-58,-12]},
  "Map_023 Off 3":      {'ncomp':2, 'velo':[19,-82]},
@@ -91,6 +91,6 @@
  "Map_116 Off 1":      {'ncomp':1, 'velo':[66]},
  "Map_121 Off 1":      {'ncomp':2, 'velo':[88,40]},
  "Map_122 Off 1":      {'ncomp':2, 'velo':[101,9]},
- "Map_123 Off 1":      {'ncomp':3, 'velo':[73,100,30]},
+ "Map_123 Off 1":      {'ncomp':2, 'velo':[70, -6]},
  "Map_124 Off 1":      {'ncomp':1, 'velo':[77]},
 }
