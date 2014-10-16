@@ -293,11 +293,13 @@ for row in fittable:
         pl.clf()
         # chi2b = chi2r + chi2_1 + chi2_2 + chi2X + chi2_h2
         ax1 = pl.subplot(2,2,1)
-        pl.contourf(xax, yax, chi2r.min(axis=axis), levels=chi2r.min()+np.arange(nlevs), alpha=0.5)
+        if hasattr(chi2r, 'min'):
+            pl.contourf(xax, yax, chi2r.min(axis=axis), levels=chi2r.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
-        pl.contour(xax, yax, chi2r2.min(axis=axis),
-                   levels=chi2r2.min()+np.arange(nlevs),
-                   cmap=pl.cm.bone)
+        if hasattr(chi2r2, 'min'):
+            pl.contour(xax, yax, chi2r2.min(axis=axis),
+                       levels=chi2r2.min()+np.arange(nlevs),
+                       cmap=pl.cm.bone)
         pl.xlabel(xlabel)
         pl.ylabel(ylabel)
         pl.title("Ratio $3_{0,3}-2_{0,2}/3_{2,1}-2_{2,0}$")
@@ -337,9 +339,15 @@ for row in fittable:
                                                                                               num=num))
         pl.savefig(outf, bbox_inches='tight')
 
+    # IGNORE 321/322: it is generally not well constrained anyway
+    mf.chi2 -= mf.chi2_r321322
+
     row_data = mf.get_parconstraints()
     for key,value in row_data.iteritems():
         row[key] = value
+
+    #if row_data['temperature_chi2'] == 10:
+    #    import ipdb; ipdb.set_trace()
 
 fittable.write(os.path.join(analysispath,
                             'fitted_line_parameters_Chi2Constraints.ipac'),

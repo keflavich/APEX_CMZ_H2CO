@@ -201,12 +201,16 @@ class paraH2COmodel(object):
                              if not any(arg is None for arg in (ratio303321,
                                                                 eratio303321))
                              else 0)
+        if np.all(~np.isfinite(self.chi2_r303321)):
+            self.chi2_r303321 = 0
 
         self.chi2_r321322 = (self.grid_getmatch_321to303(ratio321322,
                                                          eratio321322)
                              if not any(arg is None for arg in (ratio321322,
                                                                 eratio321322))
                              else 0)
+        if np.all(~np.isfinite(self.chi2_r321322)):
+            self.chi2_r321322 = 0
 
         self.chi2 = (self.chi2_X + self.chi2_h2 + self.chi2_ff1 + self.chi2_ff2
                      + self.chi2_r321322 + self.chi2_r303321)
