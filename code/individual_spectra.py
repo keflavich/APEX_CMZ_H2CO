@@ -115,7 +115,9 @@ columns = [table.Column(name="{ee}{name}".format(name=name, ee=ee),
                         dtype='float',
                         length=name_column.size)
            for name in (parmap_simple2.keys() + parmap_radex.keys() +
-                        parmap_simple2_spline.keys())
+                        parmap_simple2_spline.keys() + ['boxwidth',
+                                                        'boxheight', 'radius',
+                                                        'area', 'posang'])
            for ee in ['','e']
           ]
 out_table = table.Table([name_column, comp_id_column, lon_column, lat_column] +
@@ -187,6 +189,18 @@ for region_number,reg in enumerate(regs):
         continue
     velos = pars[sp.specname]['velo']
     spname = sp.specname.replace(" ","_")
+
+    if reg.name == 'box':
+        out_table[row_number:row_number+ncomp]['width'] = reg.coord_list[2]
+        out_table[row_number:row_number+ncomp]['height'] = reg.coord_list[3]
+        out_table[row_number:row_number+ncomp]['area'] = reg.coord_list[2] * reg.coord_list[3]
+        out_table[row_number:row_number+ncomp]['posang'] = reg.coord_list[4]
+    elif reg.name == 'circle':
+        out_table[row_number:row_number+ncomp]['area'] = reg.coord_list[2]**2 * np.pi
+        out_table[row_number:row_number+ncomp]['radius'] = reg.coord_list[2]
+    else:
+        raise ValueError("Unsupported region.  Implement it if you want it.")
+
 
     sp.specfit.Registry.add_fitter('h2co_simple', simple_fitter2, 6, multisingle='multi')
     guesses_simple = [x for ii in range(ncomp) 

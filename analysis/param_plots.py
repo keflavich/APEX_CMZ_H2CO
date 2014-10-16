@@ -45,9 +45,16 @@ nlevs=5
 density_label = 'Density $n(\mathrm{H}_2)$ [log cm$^{-3}$]'
 column_label = 'p-H$_2$CO [log cm$^{-2}$/(km s$^{-1}$ pc)]'
 temperature_label = 'Temperature (K)'
+prevname = ''
+num = 0
 
 for row in fittable:
-    log.info(row['Source_Name'])
+    if row['Source_Name'] == prevname:
+        num += 1
+    else:
+        num = 0
+        prevname = row['Source_Name']
+    log.info("Fitting {0}_{1}".format(row['Source_Name'],num))
     logh2column = np.log10(row['higalcolumndens'])
     elogh2column = 1.0
     linewidth = row['width']
@@ -180,7 +187,8 @@ for row in fittable:
     pl.suptitle(row['Source_Name'])
     pl.subplots_adjust(wspace=0.33, hspace=0.22, left=0.1)
 
-    pl.savefig(paths.fpath('param_fits/{name}_h2coratio.pdf'.format(name=row['Source_Name'])), bbox_inches='tight')
+    pl.savefig(paths.fpath('param_fits/{name}_{num}_h2coratio.pdf'.format(name=row['Source_Name'],
+                                                                          num=num)), bbox_inches='tight')
 
     fig2 = pl.figure(2)
     fig2.clf()
@@ -268,7 +276,8 @@ for row in fittable:
     pl.suptitle(row['Source_Name'])
     pl.subplots_adjust(wspace=0.33, left=0.1, hspace=0.22)
 
-    pl.savefig(paths.fpath('param_fits/{name}_h2coratio_minaxis.pdf'.format(name=row['Source_Name'])), bbox_inches='tight')
+    pl.savefig(paths.fpath('param_fits/{name}_{num}_h2coratio_minaxis.pdf'.format(name=row['Source_Name'],
+                                                                                  num=num)), bbox_inches='tight')
 
 
     for xax,yax,xlabel,ylabel,axis,ptype in zip((mf.darr,mf.darr,mf.carr),
@@ -323,8 +332,9 @@ for row in fittable:
                 ax.xaxis.set_ticks(np.arange(mf.carr.min(), mf.carr.max()))
 
         pl.subplots_adjust(wspace=0.4, hspace=0.4)
-        outf = paths.fpath('param_fits/{name}_{ptype}_parameter_constraints.pdf'.format(name=row['Source_Name'],
-                                                                                            ptype=ptype))
+        outf = paths.fpath('param_fits/{name}_{ptype}_{num}_parameter_constraints.pdf'.format(name=row['Source_Name'],
+                                                                                              ptype=ptype,
+                                                                                              num=num))
         pl.savefig(outf, bbox_inches='tight')
 
     row_data = mf.get_parconstraints()

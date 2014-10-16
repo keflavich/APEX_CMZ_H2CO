@@ -180,3 +180,17 @@ ax11.errorbar(fittable['higaldusttem'][~maps],
 fig11.savefig(paths.fpath('ratio_vs_higaltemperature_fieldsandsources.pdf'),
                          bbox_inches='tight')
 
+
+fig12 = pl.figure(12)
+fig12.clf()
+ax = fig12.add_subplot(1,1,1)
+ax.errorbar(fittable['temperature_chi2'], fittable['temperature'],
+            yerr=fittable['etemperature'],
+            xerr=[fittable['temperature_chi2']-fittable['tmin1sig_chi2'],
+                  fittable['tmax1sig_chi2']-fittable['temperature_chi2']],
+            linestyle='none', marker='s', linewidth=1, alpha=0.5)
+ax.plot([0,300],[0,300],'k--',linewidth=2,alpha=0.5)
+ax.set_title("DEBUG: RADEX+pyspeckit-fitted temperature vs. $\\chi^2$ temperature")
+ax.set_xlabel("$\\chi^2$ Temperature")
+ax.set_ylabel("RADEX+pyspeckit Temperature")
+ax.axis([0,350,0,350])
