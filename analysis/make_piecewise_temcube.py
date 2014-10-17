@@ -12,16 +12,8 @@ from astropy.utils.console import ProgressBar
 from astrodendro import Dendrogram,ppv_catalog
 from astropy.io import fits
 from dendrograms import dend, dendsm
+from piecewise_rtotem import pwtem
 
-fit_table = Table.read(apath('piecewise_tvsratio_fit.ipac'), format='ascii.ipac')
-
-# Define a piecewise interpolated function...
-pwtem = lambda x: np.piecewise(x,
-                               [(x>r['MinBound']) & (x<r['MaxBound'])
-                                for r in fit_table],
-                               [Polynomial([r['const'], r['xcoef'], r['x2coef']])
-                                for r in fit_table] + [lambda y: np.nan]
-                               )
 
 tcubedata = np.empty(cube303m.shape)
 tcubedata[~mask] = np.nan

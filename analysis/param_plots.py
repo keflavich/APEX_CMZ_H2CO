@@ -115,20 +115,21 @@ for row in fittable:
     sh = match.shape
     (zz,yy,xx) = np.unravel_index(indbest, sh)
 
-    fig1 = pl.figure(1)
+    fig1 = pl.figure(1, figsize=(12,12))
     fig1.clf()
 
     vmin = np.max([mf.tline303.min(), 0.1])
     vmax = np.min([mf.tline303.max(), par1+10])
-    ax1 = pl.subplot(2,3,1)
+    ax1 = pl.subplot(3,3,1)
     im1 = pl.imshow(mf.tline303[zz,:,:], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               extent=mf.drange+mf.crange, vmin=vmin, vmax=vmax)
     pl.contour(mf.darr, mf.carr, chi2b[zz,:,:], levels=chi2b.min()+np.arange(nlevs))
-    pl.ylabel(column_label)
+    # only label middle row
+    #pl.ylabel(column_label)
     pl.xlabel(density_label)
 
-    ax2 = pl.subplot(2,3,2)
+    ax2 = pl.subplot(3,3,2)
     im2 = pl.imshow(mf.tline303[:,yy,:], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.drange)/np.diff(mf.trange),
@@ -138,7 +139,7 @@ for row in fittable:
     pl.ylabel(temperature_label)
     #ax2.set_title("p-H$_2$CO $3_{0,3}-2_{0,2}$")
 
-    ax3 = pl.subplot(2,3,3)
+    ax3 = pl.subplot(3,3,3)
     im3 = pl.imshow(mf.tline303[:,:,xx], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.crange)/np.diff(mf.trange),
@@ -147,13 +148,13 @@ for row in fittable:
     pl.xlabel(column_label)
     ax3.xaxis.set_ticks(np.arange(mf.carr.min(), mf.carr.max()))
     pl.ylabel(temperature_label)
-    cax = fig1.add_axes([0.91,0.55,0.02,0.35])
+    cax = fig1.add_axes([0.91,0.68,0.02,0.22])
     cb = fig1.colorbar(mappable=im3, cax=cax, ax=ax2)
     cb.set_label("$T_B$ (p-H$_2$CO $3_{0,3}-2_{0,2}$)")
 
     vmin = np.max([mf.tline321.min(), 0.1])
     vmax = np.min([mf.tline321.max(), par2+10])
-    ax4 = pl.subplot(2,3,4)
+    ax4 = pl.subplot(3,3,4)
     pl.imshow(mf.tline321[zz,:,:], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               extent=mf.drange+mf.crange, vmin=vmin, vmax=vmax)
@@ -161,7 +162,7 @@ for row in fittable:
     pl.ylabel(column_label)
     pl.xlabel(density_label)
 
-    ax5 = pl.subplot(2,3,5)
+    ax5 = pl.subplot(3,3,5)
     im5 = pl.imshow(mf.tline321[:,yy,:], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.drange)/np.diff(mf.trange),
@@ -171,7 +172,7 @@ for row in fittable:
     pl.ylabel(temperature_label)
     #ax5.set_title("p-H$_2$CO $3_{2,1}-2_{2,0}$")
 
-    ax6 = pl.subplot(2,3,6)
+    ax6 = pl.subplot(3,3,6)
     im6 = pl.imshow(mf.tline321[:,:,xx], cmap=pl.cm.bone_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.crange)/np.diff(mf.trange),
@@ -180,9 +181,47 @@ for row in fittable:
     pl.xlabel(column_label)
     ax6.xaxis.set_ticks(np.arange(mf.carr.min(), mf.carr.max()))
     pl.ylabel(temperature_label)
-    cax = fig1.add_axes([0.91,0.1,0.02,0.35])
+    cax = fig1.add_axes([0.91,0.40,0.02,0.22])
     cb = fig1.colorbar(mappable=im6, cax=cax, ax=ax5)
     cb.set_label("$T_B$ (p-H$_2$CO $3_{2,1}-2_{2,0}$)")
+
+    vminr = 0.05
+    vmaxr = 0.7
+    ax7 = pl.subplot(3,3,7)
+    im7 = ax7.imshow(mf.modelratio1[zz,:,:], cmap=pl.cm.bone_r,
+                     interpolation='spline36',
+                     #norm=pl.matplotlib.colors.LogNorm(),
+                     extent=mf.drange+mf.crange, vmin=vminr, vmax=vmaxr)
+    pl.contour(mf.darr, mf.carr, chi2b[zz,:,:], levels=chi2b.min()+np.arange(nlevs))
+    # only label middle row
+    #pl.ylabel(column_label)
+    pl.xlabel(density_label)
+
+    ax8 = pl.subplot(3,3,8)
+    im8 = ax8.imshow(mf.modelratio1[:,yy,:], cmap=pl.cm.bone_r,
+                     interpolation='spline36',
+                     #norm=pl.matplotlib.colors.LogNorm(),
+                      aspect=np.diff(mf.drange)/np.diff(mf.trange),
+                      extent=mf.drange+mf.trange, vmin=vminr, vmax=vmaxr)
+    pl.contour(mf.darr, mf.tarr, chi2b[:,yy,:], levels=chi2b.min()+np.arange(nlevs))
+    pl.xlabel(density_label)
+    pl.ylabel(temperature_label)
+    #ax2.set_title("p-H$_2$CO $3_{0,3}-2_{0,2}$")
+
+    ax9 = pl.subplot(3,3,9)
+    im9 = ax9.imshow(mf.modelratio1[:,:,xx], cmap=pl.cm.bone_r,
+                     interpolation='spline36',
+                     #norm=pl.matplotlib.colors.LogNorm(),
+                     aspect=np.diff(mf.crange)/np.diff(mf.trange),
+                     extent=mf.crange+mf.trange, vmin=vminr, vmax=vmaxr)
+    pl.contour(mf.carr, mf.tarr, chi2b[:,:,xx], levels=chi2b.min()+np.arange(nlevs))
+    pl.xlabel(column_label)
+    ax9.xaxis.set_ticks(np.arange(mf.carr.min(), mf.carr.max()))
+    pl.ylabel(temperature_label)
+    cax3 = fig1.add_axes([0.91,0.1,0.02,0.22])
+    cb = fig1.colorbar(mappable=im8, cax=cax3, ax=ax8)
+    cb.set_label("$3_{2,1}-2_{2,0}$ / $3_{0,3}-2_{0,2}$")
+
 
     pl.suptitle(row['Source_Name'])
     pl.subplots_adjust(wspace=0.33, hspace=0.22, left=0.1)

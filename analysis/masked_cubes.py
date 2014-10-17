@@ -25,4 +25,4 @@ bmasksm = BooleanArrayMask(masksm, cube303sm.wcs)
 cube303msm = cube303sm.with_mask(bmasksm)
 cube321msm = cube321sm.with_mask(bmasksm)
 
-log.debug("Masked cube creation took {0:0.1f} seconds".format(time.time()-t0))
+log.info("Masked cube creation took {0:0.1f} seconds".format(time.time()-t0))

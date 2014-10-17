@@ -2,15 +2,19 @@ import numpy as np
 import pylab as pl
 import matplotlib
 
-from paths import hpath, apath
+from paths import hpath, apath, fpath, pcpath
 from astropy.table import Table, Column
 from astropy import log
 from scipy.interpolate import PiecewisePolynomial
 
-from dendrograms import catalog, catalog_sm
+from dendrograms import catalog, catalog_sm, dend, dendsm
+
+matplotlib.rc_file(pcpath('pubfiguresrc'))
 
 
-for cat in (catalog,):
+for cat,dendro,smooth in zip((catalog,),
+                             (dend,),
+                             ('',)):
     for ii in range(1,14):
         pl.figure(ii)
         pl.clf()
@@ -45,6 +49,7 @@ for cat in (catalog,):
                      color=color, linewidth=0.3)
         ax2.set_xlabel("Ratio 303/321")
         ax2.set_ylabel("Temperature")
+    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}.pdf'.format(smooth)))
         
     if cat is catalog:
         # Determine approximate best-fit
@@ -92,12 +97,14 @@ for cat in (catalog,):
         fit_table.write(apath('piecewise_tvsratio_fit.ipac'), format='ascii.ipac')
 
         x = np.linspace(0,0.6,100)
-        ax2.plot(x, func(x), 'k-')
-        ax2.plot(x, p1(x), 'k--')
-        ax2.plot(x, p2(x), 'k:')
-        ax2.plot(x, p3(x), 'k-.')
+        ax2.plot(x, func(x), 'k-', alpha=0.5)
         ax2.set_xlim(0.,0.5)
         ax2.set_ylim(10.,350)
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature_piecewise{0}.pdf'.format(smooth)))
+        ax2.plot(x, p1(x), 'k--', alpha=0.5)
+        ax2.plot(x, p2(x), 'k:', alpha=0.5)
+        ax2.plot(x, p3(x), 'k-.', alpha=0.5)
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature_piecewise_pieces{0}.pdf'.format(smooth)))
 
     fig3, ax3 = pl.subplots(num=3)
     ax3.hist(sn[sn==sn], bins=50)
@@ -122,6 +129,7 @@ for cat in (catalog,):
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax5.set_xlabel("Galactic Longitude")
         ax5.set_ylabel("Temperature")
+    fig5.savefig(fpath('dendrotem/temperature_vs_longitude{0}.png'.format(smooth)))
 
     fig6, ax6 = pl.subplots(num=6)
     for mask,color,alpha in masks_colors:
@@ -180,6 +188,8 @@ for cat in (catalog,):
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax12.set_xlabel("RMS Velocity")
+        ax12.set_ylabel("Temperature (K)")
+    fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.png'.format(smooth)))
 
     fig13, ax13 = pl.subplots(num=13)
     lon=cat['x_cen']
@@ -210,12 +220,63 @@ for cat in (catalog,):
     cb13.set_label(r'Temperature')
 
 
-    for ii in range(1,14):
+    brick = dendro.structure_at([262/(2 if smooth else 1),143,725]).ancestor
+    sgra = dendro.structure_at([239/(2 if smooth else 1),97,907]).ancestor
+    brick_leaves = [obj for obj in brick.descendants if obj.is_leaf]
+    sgra_leaves = [obj for obj in sgra.descendants if obj.is_leaf]
+
+    fig14 = pl.figure(14)
+    fig14.clf()
+    ax14 = fig14.gca()
+    def dendroplot(axis=ax14, axname1='area_exact', axname2='ratio303321',
+                   leaves_list=[sgra_leaves],
+                   color_list=['#FF2222']):
+        for leaves, color in zip(leaves_list,color_list):
+            for leaf in leaves:
+                xax,yax = [catalog[leaf.idx][axname1]], [catalog[leaf.idx][axname2]]
+                obj = leaf.parent
+                while obj.parent:
+                    xax.append(catalog[obj.idx][axname1])
+                    yax.append(catalog[obj.idx][axname2])
+                    obj = obj.parent
+                if not np.any(np.isnan(yax)):
+                    axis.plot(xax, yax, alpha=0.5, label=leaf.idx, color=color, zorder=5)
+                signs = np.sign(np.diff(yax))
+                if np.all(signs==1) or np.all(signs==-1):
+                    axis.plot(xax, yax, alpha=0.25, linewidth=5, zorder=0, color='g')
+    dendroplot()
+    ax14.set_xscale('log')
+    ax14.set_xlabel("Area (square arcseconds)")
+    ax14.set_ylabel("Ratio 303/321")
+    fig14.savefig(fpath('dendrotem/sgra_ratio_vs_sizescale.png'))
+
+
+    fig15 = pl.figure(15)
+    fig15.clf()
+    ax15 = fig15.gca()
+    dendroplot(axis=ax15, axname2='Smean303')
+    ax15.set_xscale('log')
+    ax15.set_xlabel("Area (square arcseconds)")
+    ax15.set_ylabel(r"$\bar{S_\nu}(3_{03}-2_{02})$")
+
+
+
+
+    for ii in range(1,16):
         pl.figure(ii)
         if ii != 11:
             ax = pl.gca()
             ax.set_ylim(10, 125)
         pl.draw()
+
+    dview = dendro.viewer()
+    structure = dendro.structure_at([262/(2 if smooth else 1),143,725]).ancestor
+    dview.hub.select(1, structure)
+    dview.ax_image.axis((710,740,131,154))
+    dview.slice_slider.set_val(262/(2 if smooth else 1))
+    dview.fig.savefig(fpath('dendrotem/dendrogram_viewer_brick.png'))
+
+    
 
     pl.draw()
     pl.show()
