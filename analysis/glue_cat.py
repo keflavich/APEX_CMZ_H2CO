@@ -3,9 +3,7 @@ from glue.core.data_factories import astropy_tabular_data, load_data
 from glue.core.link_helpers import LinkSame, LinkTwoWay
 from glue.qt.glue_application import GlueApplication
 from glue.qt.widgets import ScatterWidget, ImageWidget
-from glue.qt.widgets.image_widget import (_slice_from_path, _slice_label,
-                                          _slice_index, StandaloneImageWidget,
-                                          PVSliceWidget)
+from glue.plugins.pv_slicer import PVSliceWidget
 from glue import qglue
 
 import matplotlib

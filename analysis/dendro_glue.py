@@ -12,9 +12,7 @@ from glue.core.link_helpers import LinkSame, LinkTwoWay
 from glue.qt.glue_application import GlueApplication
 from glue.qt.widgets import ScatterWidget, ImageWidget
 from glue.qt.widgets.dendro_widget import DendroWidget
-from glue.qt.widgets.image_widget import (_slice_from_path, _slice_label,
-                                          _slice_index, StandaloneImageWidget,
-                                          PVSliceWidget)
+from glue.qt.widgets.image_widget import StandaloneImageWidget
 from glue import qglue
 
 import matplotlib
@@ -24,7 +22,10 @@ from astropy import coordinates
 from astropy import wcs
 from astropy.table import Table
 from astropy.io import ascii
-from paths import mpath,apath,fpath,molpath,hpath
+try:
+    from paths import mpath,apath,fpath,molpath,hpath
+except Import Error:
+    hpath = lambda x:x
 
 
 #load 2 datasets from files
@@ -34,23 +35,35 @@ sncube.label='S/N Cube'
 cube = load_data(hpath('APEX_H2CO_303_202_bl.fits'))
 table = ascii.read(hpath('PPV_H2CO_Temperature.ipac'), format='ipac')
 
-catalog=Data()
+catalog=Data(parent=table['parent'], label='Fitted Catalog')
+#catalog=Data()
 for column_name in table.columns:
     cc = table[column_name]
     uu = cc.unit if hasattr(cc, 'unit') else cc.units
+    if cc.name == 'parent':
+        cc.name = 'cat_parent'
+        column_name = 'cat_parent'
+    elif cc.name == 'height':
+        cc.name = 'cat_height'
+        column_name = 'cat_height'
+    elif cc.name == 'peak':
+        cc.name = 'cat_peak'
+        column_name = 'cat_peak'
 
     nc = Component.autotyped(cc, units=uu)
     catalog.add_component(nc, column_name)
     #  if column_name != 'parent' else '_flarent_'
 
-catalog.label='Fitted Catalog'
-#catalog.id['parent'].label = 'parent_'
 
+catalog.join_on_key(dendro, '_idx', dendro.pixel_component_ids[0])
 dc = DataCollection(dendrogram)
 #dc = DataCollection([cube, dendrogram, catalog])
 #dc.merge(cube,sncube)
 #sncube.join_on_key(dendro, 'structure', dendro.pixel_component_ids[0])
-dc.merge(catalog, dendro)
+#dc.merge(catalog, dendro)
+
+# UNCOMMENT THIS LINE TO BREAK THE VIEWER
+#dc.append(catalog)
 
 app = GlueApplication(dc)
 
