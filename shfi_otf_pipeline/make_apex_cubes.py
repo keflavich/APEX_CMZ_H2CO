@@ -41,7 +41,7 @@ calibration_factors = {'2014-04-23:2014-06-13': (0.85/0.75)*0.78, #=0.884. Scale
                        '2014-02-01:2014-04-23': 0.78,
                        None: 1,
                       }
-datasets_ao = ['O-085.F-9311A-2010','E-085.B-0964A-2010']
+datasets_ao = ['O-085.F-9311A-2010_merge','E-085.B-0964A-2010_merge']
 datasets_2013 = ['M-091.F-0019-2013-2013-06-08',
                  'M-091.F-0019-2013-2013-06-11',
                  'M-091.F-0019-2013-2013-06-12',
@@ -274,7 +274,7 @@ def load_dataset_for_debugging(lowhigh='low', downsample_factor=8,
 def get_sourcenames(headers):
     return list(set([h['SOURC'].strip() for h in headers]))
 
-def load_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
+def load_apex_cube(apex_filename='data/E-085.B-0964A-2010.apex',
                    skip_data=False, DEBUG=False, downsample_factor=None,
                    sourcename=None, xtel=None,
                    memmap=True, **kwargs):
@@ -285,7 +285,7 @@ def load_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
 
     return found_data
 
-def add_apex_cube(apex_filename='data/E-085.B-0964A-2010_merge.apex',
+def add_apex_cube(apex_filename='data/E-085.B-0964A-2010.apex',
                   cubefilename='APEX_H2CO_Ao', clobber=True,
                   kernel_fwhm=10./3600., **kwargs):
     spectra,headers,indices = load_apex_cube(apex_filename)
@@ -514,6 +514,25 @@ def process_data(data, gal, hdrs, dataset, scanblsub=False,
                  dataset+"_obs%i" % xscan, freq=freq, mask=mask, **kwargs)
 
     return dsub,gal,hdrs
+
+def classheader_to_fitsheader(header, axisnumber=1):
+    header['CRPIX{0}'.format(axisnumber)] = header['RCHAN']
+    header['CRVAL{0}'.format(axisnumber)] = header['VOFF']
+    header['CDELT{0}'.format(axisnumber)] = header['VRES']
+    header['RESTFRQ'.format(axisnumber)] = header['RESTF']
+    header['CUNIT{0}'.format(axisnumber)] = 'km s-1'
+    hdr = fits.Header()
+    for k in header:
+        if k == 'DATEOBS':
+            hdr[k] = header[k].datetime.isoformat()
+        elif isinstance(header[k], (np.ndarray, list, tuple)):
+            for ii,val in enumerate(header[k]):
+                hdr[k[:7]+str(ii)] = val
+        else:
+            hdr[k[:8]] = header[k]
+    hdr['TREC'] = 0
+    hdr.insert(axisnumber+3, ('NAXIS{0}'.format(axisnumber), header['DATALEN']))
+    return hdr
 
 
 def hdr_to_freq(h):
@@ -1059,7 +1078,7 @@ def build_cube_ao(window, freq=False, mergefile=None,
     all_data,all_hdrs,all_gal = {},{},{}
     for dataset in datasets:
 
-        apex_filename = os.path.join(datapath,dataset+"_merge.apex")
+        apex_filename = os.path.join(datapath,dataset+".apex")
 
         spectra,headers,indices = load_apex_cube(apex_filename,
                                                  #downsample_factor=downsample_factor,
@@ -2878,6 +2897,128 @@ def PCA_subtract(data, smoothing_scale=None, ncomponents=3):
     dsub = data - to_subtract
 
     return dsub, efuncarr
+
+def _is_sci(source, sourcereg='MAP'):
+    return (((sourcereg in source)) and
+            ('SKY' not in source) and
+            ('TCAL' not in source) and
+            ('TREC' not in source) and
+            ('TSYS' not in source) and
+            ('HOT' not in source) and
+            ('COLD' not in source))
+
+def compute_and_save_pca_components(apex_filename, ncomponents=5,
+                                    suppress_endpoints=4, redo=True):
+    log.info("Starting {0}".format(apex_filename))
+
+    outdir = os.path.join(os.path.dirname(apex_filename),
+                          os.path.splitext(os.path.basename(apex_filename))[0])
+    if not os.path.isdir(outdir):
+        os.mkdir(outdir)
+    if not redo and all([os.path.exists(
+                         os.path.join(outdir,
+                                      'pca_component_{0}_els0.fits'.
+                                      format(ii)))
+                         for ii in range(ncomponents)]):
+        log.info("Skipping {0} because it's been done".format(apex_filename))
+        return
+    log.info("Outdir is {0}".format(outdir))
+
+    cl = read_class.ClassObject(apex_filename)
+
+    if 'M-093' in apex_filename or 'E-093' in apex_filename:
+        sourcereg = 'MAP'
+        line = 'shfi219ghz'
+    elif 'M-091' in apex_filename or 'O-085' in apex_filename:
+        sourcereg = 'SGRA'
+        line = 'H2CO(3-2)'
+    elif 'E-085' in apex_filename:
+        sourcereg = 'SGRA'
+        line = 'H2CO32'
+    else:
+        raise ValueError("Data selected is not from 2013 or 2014")
+    
+    for telescope in cl.getinfo()['tels']:
+        if 'PA' not in telescope:
+            selection = [x
+                         for source in cl.sources
+                         if _is_sci(source, sourcereg)
+                         for x in cl.select_spectra(telescope=telescope,
+                                                    line=line,
+                                                    source=source)]
+            mmdata,headers = zip(*cl.read_observations(selection, progressbar=True))
+            log.info("Converting data to an array by every 1000 elts"
+                     " out of {0} total (memory use should rise here)".
+                     format(len(mmdata)))
+            for jj in range(len(mmdata) / 1000 + 1): 
+                log.info('Elements {0}-{1}'.format(jj*1000,
+                                                   min((jj+1)*1000,
+                                                       len(mmdata))))
+                data = np.asarray(mmdata[jj*1000:(jj+1)*1000])
+                # Endpoints can be ~1e14
+                bad = abs(data) > 1e9
+                nbad = np.count_nonzero(bad)
+                if nbad > 0:
+                    log.info("Found {0} bad values".format(nbad))
+                    data[bad] = 0
+                log.info('Computing eigenfunctions (intensive step)')
+                efuncarr,covmat,evals,evects = efuncs(data.T,
+                                                      neig=ncomponents,
+                                                      huge_limit=1000,
+                                                      return_others=True)
+                log.info("Writing PCA components to disk.  This step should be fast.")
+                header = classheader_to_fitsheader(headers[0])
+                evals_norm = evals/evals.sum()
+                for ii in range(ncomponents):
+                    header['PCACOMP'] = ii
+                    header['EVAL'] = evals_norm[ii]
+                    hdu = fits.PrimaryHDU(data=efuncarr[:,ii], header=header)
+                    hdu.writeto(os.path.join(outdir,
+                                             'pca_component_{0}_els{1}.fits'.
+                                             format(ii,jj)),
+                                             clobber=True,
+                                             output_verify='fix')
+            # Re-do the correlations using those PCA components
+            data = np.array([fits.getdata(os.path.join(outdir,
+                                                       'pca_component_{0}_els{1}.fits'.
+                                                       format(ii,jj)))
+                             for ii in range(ncomponents)
+                             for jj in range(len(mmdata) / 1000 + 1)])
+            efuncarr,covmat,evals,evects = efuncs(data.T,
+                                                  neig=ncomponents,
+                                                  huge_limit=1000,
+                                                  return_others=True)
+            evals_norm = evals/evals.sum()
+            for ii in range(ncomponents):
+                header['PCACOMP'] = ii
+                header['EVAL'] = evals_norm[ii]
+                hdu = fits.PrimaryHDU(data=efuncarr[:,ii], header=header)
+                hdu.writeto(os.path.join(outdir,
+                                         'pca_component_{0}.fits'.
+                                         format(ii)),
+                                         clobber=True,
+                                         output_verify='fix')
+
+
+    log.info("Completed {0}".format(apex_filename))
+
+def do_all_pcacomponents(redo=True, **kwargs):
+    all_apexfiles = ([os.path.join(june2013datapath, k)+".apex"
+                      for k in datasets_2013] +
+                     [os.path.join(april2014path, k)+".apex"
+                      for k in datasets_2014] +
+                     [os.path.join(aorawpath, k)+".apex"
+                      for k in datasets_ao]
+                    )
+    for fn in all_apexfiles:
+        try:
+            compute_and_save_pca_components(fn, redo=redo, **kwargs)
+        except Exception as ex:
+            log.error("Error: {0}".format(ex))
+            print(ex)
+            continue
+
+
 
 def extract_co_subcubes(mergepath=april2014path):
     extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
