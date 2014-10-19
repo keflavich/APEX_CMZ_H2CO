@@ -531,7 +531,8 @@ def classheader_to_fitsheader(header, axisnumber=1):
         else:
             hdr[k[:8]] = header[k]
     hdr['TREC'] = 0
-    hdr.insert(axisnumber+3, ('NAXIS{0}'.format(axisnumber), header['DATALEN']))
+    #hdr.insert(axisnumber+2, ('NAXIS{0}'.format(axisnumber), header['DATALEN']))
+    #assert hdr.cards[3][0] == 'NAXIS1'
     return hdr
 
 
@@ -2915,28 +2916,37 @@ def compute_and_save_pca_components(apex_filename, ncomponents=5,
                           os.path.splitext(os.path.basename(apex_filename))[0])
     if not os.path.isdir(outdir):
         os.mkdir(outdir)
+
+    if 'M-093' in apex_filename or 'E-093' in apex_filename:
+        sourcereg = 'MAP'
+        line = 'shfi219ghz'
+        telescopes = ['AP-H201-X201', 'AP-H201-X202']
+    elif 'M-091' in apex_filename:
+        sourcereg = 'SGRA'
+        line = 'H2CO(3-2)'
+        telescopes = ['AP-H201-X201', 'AP-H201-X202']
+    elif 'O-085' in apex_filename:
+        sourcereg = 'SGRA'
+        line = 'H2CO(3-2)'
+        telescopes = ['AP-H201-F101', 'AP-H201-F102']
+    elif 'E-085' in apex_filename:
+        sourcereg = 'SGRA'
+        line = 'H2CO32'
+        telescopes = ['AP-H201-F101', 'AP-H201-F102']
+    else:
+        raise ValueError("Data selected is not from 2013 or 2014")
+
     if not redo and all([os.path.exists(
                          os.path.join(outdir,
-                                      'pca_component_{0}_els0.fits'.
-                                      format(ii)))
-                         for ii in range(ncomponents)]):
+                                      '{1}_pca_component_{0}_els0.fits'.
+                                      format(ii,tel)))
+                         for ii in range(ncomponents)
+                         for tel in telescopes]):
         log.info("Skipping {0} because it's been done".format(apex_filename))
         return
     log.info("Outdir is {0}".format(outdir))
 
     cl = read_class.ClassObject(apex_filename)
-
-    if 'M-093' in apex_filename or 'E-093' in apex_filename:
-        sourcereg = 'MAP'
-        line = 'shfi219ghz'
-    elif 'M-091' in apex_filename or 'O-085' in apex_filename:
-        sourcereg = 'SGRA'
-        line = 'H2CO(3-2)'
-    elif 'E-085' in apex_filename:
-        sourcereg = 'SGRA'
-        line = 'H2CO32'
-    else:
-        raise ValueError("Data selected is not from 2013 or 2014")
     
     for telescope in cl.getinfo()['tels']:
         if 'PA' not in telescope:
@@ -2974,14 +2984,15 @@ def compute_and_save_pca_components(apex_filename, ncomponents=5,
                     header['EVAL'] = evals_norm[ii]
                     hdu = fits.PrimaryHDU(data=efuncarr[:,ii], header=header)
                     hdu.writeto(os.path.join(outdir,
-                                             'pca_component_{0}_els{1}.fits'.
-                                             format(ii,jj)),
+                                             '{2}_pca_component_{0}_els{1}.fits'.
+                                             format(ii,jj,telescope)),
                                              clobber=True,
                                              output_verify='fix')
             # Re-do the correlations using those PCA components
+            log.info("Re-computing PCA using the sub-components.")
             data = np.array([fits.getdata(os.path.join(outdir,
-                                                       'pca_component_{0}_els{1}.fits'.
-                                                       format(ii,jj)))
+                                                       '{2}_pca_component_{0}_els{1}.fits'.
+                                                       format(ii,jj,telescope)))
                              for ii in range(ncomponents)
                              for jj in range(len(mmdata) / 1000 + 1)])
             efuncarr,covmat,evals,evects = efuncs(data.T,
@@ -2994,8 +3005,8 @@ def compute_and_save_pca_components(apex_filename, ncomponents=5,
                 header['EVAL'] = evals_norm[ii]
                 hdu = fits.PrimaryHDU(data=efuncarr[:,ii], header=header)
                 hdu.writeto(os.path.join(outdir,
-                                         'pca_component_{0}.fits'.
-                                         format(ii)),
+                                         '{1}_pca_component_{0}.fits'.
+                                         format(ii,telescope)),
                                          clobber=True,
                                          output_verify='fix')
 
@@ -3013,12 +3024,40 @@ def do_all_pcacomponents(redo=True, **kwargs):
     for fn in all_apexfiles:
         try:
             compute_and_save_pca_components(fn, redo=redo, **kwargs)
+            plot_pca_components(fn)
         except Exception as ex:
             log.error("Error: {0}".format(ex))
             print(ex)
             continue
 
+def plot_pca_components(apex_filename, ncomponents=3):
+    log.info("Plotting {0}".format(apex_filename))
+    outdir = os.path.join(os.path.dirname(apex_filename),
+                          os.path.splitext(os.path.basename(apex_filename))[0])
+    fig1 = pl.figure(1)
+    fig1.clf()
+    fig2 = pl.figure(2)
+    fig2.clf()
+    figs = [fig1,fig2]
+    for fglob in [os.path.join(outdir, '*_pca_component_{0}.fits'.format(ii))
+                  for ii in range(ncomponents)]:
+        files = glob.glob(fglob)
+        for jj,(fn,fig) in enumerate(zip(files,figs)):
+            data = fits.getdata(fn)
+            ax1 = fig.add_subplot(2,1,1)
+            ax1.plot(data, ',', label=str(jj))
 
+            ft = np.fft.fft(data)
+            ftf = np.fft.fftfreq(data.size)
+            ax2 = fig.add_subplot(2,1,2)
+            ax2.loglog(ftf[ftf>=0], abs(ft[ftf>=0]), label=str(jj), alpha=0.5)
+
+        fig1.savefig(files[0].replace(".fits",".png"))
+        fig2.savefig(files[1].replace(".fits",".png"))
+    log.info("Done plotting {0}".format(apex_filename))
+
+
+        
 
 def extract_co_subcubes(mergepath=april2014path):
     extract_subcube(os.path.join(mergepath,'APEX_H2CO_2014_merge_high.fits'),
