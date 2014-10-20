@@ -18,6 +18,7 @@ make_apex_cubes.mergepath = join(reducedpath, 'merged_datasets/')
 make_apex_cubes.aorawpath = rawpath
 make_apex_cubes.aopath = join(reducedpath, '2010_reduced/')
 make_apex_cubes.diagplotdir = join(root,'diagnostic_plots/')
+make_apex_cubes.molpath = os.path.join(mergepath, 'molecule_cubes/')
 
 try:
     label = "_v"+subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()

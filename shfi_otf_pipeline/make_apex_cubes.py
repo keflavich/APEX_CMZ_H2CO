@@ -2010,9 +2010,11 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
     for line in lines218:
         if os.path.exists(molpath+'APEX_{0}.fits'.format(line)):
             baseline_cube(molpath+'APEX_{0}.fits'.format(line),
-                          maskfn=molpath+'APEX_H2CO_303_202_mask.fits')
+                          maskfn=molpath+'APEX_H2CO_303_202_mask.fits',
+                          order=7)
             baseline_cube(molpath+'APEX_{0}_smooth.fits'.format(line),
-                          maskfn=molpath+'APEX_H2CO_303_202_smooth_mask.fits')
+                          maskfn=molpath+'APEX_H2CO_303_202_smooth_mask.fits',
+                          order=7)
             #baseline_cube(molpath+'APEX_{0}_vsmooth.fits'.format(line),
             #              maskfn=molpath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
@@ -2073,6 +2075,7 @@ def neighborly_masking(cube, sigma=1, roll=2):
 
 def baseline_cube(cubefn, mask=None, maskfn=None, mask_level=None,
                   mask_level_sigma=None, order=5,
+                  outfilename=None,
                   polyspline='poly', splinesampling=100):
     """
     Baseline-subtract a data cube with polynomials or splines.
@@ -2091,15 +2094,21 @@ def baseline_cube(cubefn, mask=None, maskfn=None, mask_level=None,
         elif mask_level_sigma is not None:
             mask = cube > cube.std(axis=0)*mask_level_sigma
     t0 = time.time()
-    log.info("Baselining cube {0} with order {1}...".format(cubefn, order))
     if polyspline == 'poly':
+        log.info("Baselining cube {0} with order {1}...".format(cubefn, order))
         bc = baseline_cube(cube, polyorder=order, cubemask=mask)
     elif polyspline == 'spline':
+        log.info("Baselining cube {0} with sample scale {1}...".format(cubefn,
+                                                                       splinesampling))
+        # Splines can't be pickled
         bc = baseline_cube(cube, splineorder=order,
-                           sampling=splinesampling, cubemask=mask)
+                           sampling=splinesampling, cubemask=mask,
+                           numcores=1)
     log.info("Baselining done ({0} seconds)".format(time.time()-t0))
     f[0].data = bc
-    f.writeto(cubefn.replace(".fits","_bl.fits"), clobber=True)
+    if outfilename is None:
+        outfilename = cubefn.replace(".fits","_bl.fits")
+    f.writeto(outfilename, clobber=True)
 
 
 
