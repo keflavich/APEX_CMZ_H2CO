@@ -1612,10 +1612,10 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
 
     newhdu = cube_regrid.regrid_cube_hdu(cube.hdu, outheader, order=1,
                                          prefilter=False)
-    newhdu.writeto(fnify('_plait_all_sm'), output_verify='fix', clobber=True)
+    newhdu.writeto(fnify('_plait_all_smooth'), output_verify='fix', clobber=True)
 
     baseline_cube(fnify('_plait_all'), polyspline='spline', mask_level_sigma=5)
-    baseline_cube(fnify('_plait_all_sm'), polyspline='spline', mask_level_sigma=5)
+    baseline_cube(fnify('_plait_all_smooth'), polyspline='spline', mask_level_sigma=5)
  
 
 
