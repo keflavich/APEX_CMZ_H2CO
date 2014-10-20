@@ -1867,8 +1867,14 @@ def do_extract_subcubes(outdir=molpath, merge_prefix='APEX_H2CO_merge',
                         cubefilename=None,
                         frange=None, lines=all_lines,
                         suffix="_sub",
-                        vsmooth=False):
+                        vsmooth=False,
+                        integrate=False):
     """
+    Parameters
+    ----------
+    integrate : bool
+        Integrate the extracted cube using a mask.  WARNING: doesn't check
+        if the mask exists!
     Example:
     do_extract_subcubes(outdir='/Volumes/passport/apex/merged_datasets/molecule_cubes',
                         suffix='', merge_prefix='APEX_H2CO_2014_merge')
@@ -1911,17 +1917,18 @@ def do_extract_subcubes(outdir=molpath, merge_prefix='APEX_H2CO_merge',
                 extract_subcube(cubefilename,
                                 os.path.join(outdir, 'APEX_{0}.fits').format(line),
                                 linefreq=freq*u.GHz)
-                integrate_mask(os.path.join(outdir, 'APEX_{0}'.format(line)))
-                integrate_mask(os.path.join(outdir, 'APEX_{0}_smooth'.format(line)),
-                               mask=h2copath+'APEX_H2CO_303_202_smooth_mask.fits')
-                integrate_mask(os.path.join(outdir, 'APEX_{0}'.format(line)),
-                               mask=h2copath+'APEX_13CO_matched_H2CO_mask.fits',
-                               maskpre='13co',
-                              )
-                integrate_mask(os.path.join(outdir, 'APEX_{0}_smooth'.format(line)),
-                               mask=h2copath+'APEX_13CO_matched_H2CO_smooth_mask.fits',
-                               maskpre='13co',
-                              )
+                if integrate:
+                    integrate_mask(os.path.join(outdir, 'APEX_{0}'.format(line)))
+                    integrate_mask(os.path.join(outdir, 'APEX_{0}_smooth'.format(line)),
+                                   mask=h2copath+'APEX_H2CO_303_202_smooth_mask.fits')
+                    integrate_mask(os.path.join(outdir, 'APEX_{0}'.format(line)),
+                                   mask=h2copath+'APEX_13CO_matched_H2CO_mask.fits',
+                                   maskpre='13co',
+                                  )
+                    integrate_mask(os.path.join(outdir, 'APEX_{0}_smooth'.format(line)),
+                                   mask=h2copath+'APEX_13CO_matched_H2CO_smooth_mask.fits',
+                                   maskpre='13co',
+                                  )
             else:
                 log.info("Skipping line {0}".format(line))
 
