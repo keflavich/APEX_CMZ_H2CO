@@ -1560,7 +1560,8 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
                for suff in plait_targets]
     header = headers[0]
     for h in headers:
-        header.update(h)
+        for k in h:
+            header[k] = h[k]
 
     cubes = [fits.getdata(fnify(suff))
              for suff in plait_targets]
@@ -1586,7 +1587,8 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
                    sweights)
     total_stack[:,sweights<0.5] = np.nan
     for h in [fits.getheader(fnify(suff)) for suff in all_targets[2:]]:
-        header.update(h)
+        for k in h:
+            header[k] = h[k]
     hdu = fits.PrimaryHDU(data=total_stack, header=header)
     hdu.writeto(fnify('_plait_all'), clobber=True)
 
@@ -1956,7 +1958,8 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
                                                   merge_prefix+".fits"),
                         lines=lines218)
     # Because I really want to see SiO...
-    do_extract_subcubes(lines={'SiO_54':217.10498},
+    do_extract_subcubes(outdir=molpath,
+                        lines={'SiO_54':217.10498},
                         merge_prefix='APEX_H2CO_2014_merge', suffix="")
     compute_noise_high(mergepath+merge_prefix, pixrange=[700,900])
     compute_noise_high(mergepath+merge_prefix+"_smooth", pixrange=[203,272])
