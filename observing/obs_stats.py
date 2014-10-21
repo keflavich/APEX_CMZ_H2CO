@@ -4,7 +4,7 @@ import pyregion
 import numpy as np
 from astropy import table
 
-noise_img = fits.open(mpath('APEX_H2CO_merge_high_sub_noise.fits'))[0]
+noise_img = fits.open(mpath('APEX_H2CO_merge_high_plait_all_noise.fits'))[0]
 nhits_img = fits.open(mpath('APEX_H2CO_merge_high_nhits.fits'))[0]
 
 map_regions = pyregion.open(rpath('target_fields_8x8.reg'))

@@ -5,6 +5,7 @@ Most Correlated Components
 from make_apex_cubes import june2013datapath, april2014path
 import numpy as np
 from astropy.io import fits
+import os
 import pylab as pl
 import paths
 import matplotlib
@@ -22,8 +23,14 @@ def something():
         ax = fig.gca()
         ax.loglog(ff[pos], abs(ft[pos]))
 
+def do_example_fsupp():
+    fn = os.path.join(june2013datapath,
+                      'M-091.F-0019-2013-2013-06-12/AP-H201-X202_pca_component_0.fits')
+    fourier_suppression(fn, vrange=[100,200], save=True, linecen=-1500.)
+    return fn
+
 def fourier_suppression(fn, withline=False, vrange=[100,'max'], linewidth=20.,
-                        save=False):
+                        linecen=250., save=False):
 
     e1 = fits.getdata(fn)
 
@@ -37,7 +44,7 @@ def fourier_suppression(fn, withline=False, vrange=[100,'max'], linewidth=20.,
     velo = vres * (np.arange(e1.size)+1-hdr['CRPIX1'])+hdr['CRVAL1']
 
     # Add a 20 km/s wide Gaussian line, see what happens to it
-    line = np.exp(-(velo+250.)**2/(linewidth**2*2.)) * 10
+    line = np.exp(-(velo+linecen)**2/(linewidth**2*2.)) * 10
     e2 = line+e1
 
     ft = np.fft.fft(e1)

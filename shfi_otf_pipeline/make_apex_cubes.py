@@ -153,6 +153,13 @@ bandwidths = {'H2CO_303_202':25,
 lines218 = {x:v for x,v in all_lines.iteritems()
             if 'H2CO' in x or 'CH3OH_422_312' in x}
 
+all_apexfiles = ([os.path.join(june2013datapath, k)+".apex"
+                  for k in datasets_2013] +
+                 [os.path.join(april2014path, k)+".apex"
+                  for k in datasets_2014] +
+                 [os.path.join(aorawpath, k)+".apex"
+                  for k in datasets_ao]
+                )
 
 def mkdir_p(path):
     """ http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python """
@@ -2060,7 +2067,8 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
         except OSError:
             log.debug("Skipped file {0} because it exists".format(fn))
 
-    do_temperature()
+    doratio(h2copath=h2copath)
+    do_temperature(ratio=False, h2copath=h2copath)
 
 def contsub_cube(cubefilename,):
     cube = fits.open(cubefilename+'.fits', memmap=False)
@@ -2331,11 +2339,12 @@ class TemperatureMapper(object):
 if 'tm' not in locals():
     tm = TemperatureMapper(trange=[10,300],ntemp=100)
 
-def do_temperature(ratio=True):
-    temperaturemap(tm, ratio=ratio)
-    temperaturemap(tm, ratio=False, Nnsuffix='_dens1e5_col3e22', density=1e5)
-    temperaturemap(tm, ratio=False, Nnsuffix='_dens1e4_col3e23', density=1e4,
-                   column=3e23)
+def do_temperature(ratio=True, h2copath=h2copath):
+    temperaturemap(tm, path=h2copath, ratio=ratio)
+    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e5_col3e22',
+                   density=1e5)
+    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4_col3e23',
+                   density=1e4, column=3e23)
 
 def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
                    **kwargs):
@@ -2927,14 +2936,7 @@ def _is_sci(source, sourcereg='MAP'):
             ('HOT' not in source) and
             ('COLD' not in source))
 
-def compute_and_save_pca_components(apex_filename, ncomponents=5,
-                                    suppress_endpoints=4, redo=True):
-    log.info("Starting {0}".format(apex_filename))
-
-    outdir = os.path.join(os.path.dirname(apex_filename),
-                          os.path.splitext(os.path.basename(apex_filename))[0])
-    if not os.path.isdir(outdir):
-        os.mkdir(outdir)
+def get_source_tel_line(apex_filename):
 
     if 'M-093' in apex_filename or 'E-093' in apex_filename:
         sourcereg = 'MAP'
@@ -2953,7 +2955,20 @@ def compute_and_save_pca_components(apex_filename, ncomponents=5,
         line = 'H2CO32'
         telescopes = ['AP-H201-F101', 'AP-H201-F102']
     else:
-        raise ValueError("Data selected is not from 2013 or 2014")
+        raise ValueError("Data selected is not from ao, 2013 or 2014")
+
+    return sourcereg,line,telescopes
+
+def compute_and_save_pca_components(apex_filename, ncomponents=5,
+                                    suppress_endpoints=4, redo=True):
+    log.info("Starting {0}".format(apex_filename))
+
+    outdir = os.path.join(os.path.dirname(apex_filename),
+                          os.path.splitext(os.path.basename(apex_filename))[0])
+    if not os.path.isdir(outdir):
+        os.mkdir(outdir)
+
+    sourcereg,line,telescopes = get_source_tel_line(apex_filename)
 
     if not redo and all([os.path.exists(
                          os.path.join(outdir,
@@ -3033,13 +3048,6 @@ def compute_and_save_pca_components(apex_filename, ncomponents=5,
     log.info("Completed {0}".format(apex_filename))
 
 def do_all_pcacomponents(redo=True, **kwargs):
-    all_apexfiles = ([os.path.join(june2013datapath, k)+".apex"
-                      for k in datasets_2013] +
-                     [os.path.join(april2014path, k)+".apex"
-                      for k in datasets_2014] +
-                     [os.path.join(aorawpath, k)+".apex"
-                      for k in datasets_ao]
-                    )
     for fn in all_apexfiles:
         try:
             compute_and_save_pca_components(fn, redo=redo, **kwargs)
