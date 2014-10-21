@@ -6,7 +6,7 @@ import copy
 from astropy import log
 from paths import h2copath, figurepath
 
-for smooth in ("","_smooth","_vsmooth"):
+for smooth in ("","_smooth",):#"_vsmooth"):
     fig = pl.figure(4, figsize=(12,6))
     fig.clf()
     F = aplpy.FITSFigure(h2copath+'H2CO_321220_to_303202{0}_bl_integ_temperature.fits'.format(smooth),

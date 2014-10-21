@@ -2247,9 +2247,9 @@ def ph2cogrid(ntemp=50, trange=[10,200], abundances=(10**-8.5,10**-9),
                       abundance=abundances[0],
                       collider_densities={'H2':density},
                       deltav=deltav,
-                      column=None,
+                      column=None,#Nh2[0]/abundances[0],
                       temperature=temperatures[0],
-                      h2column=Nh2[0])
+                      )
 
     Xarr = {}
     for abundance in abundances:
@@ -2289,10 +2289,10 @@ def ph2cogrid(ntemp=50, trange=[10,200], abundances=(10**-8.5,10**-9),
             ratio2 = {d:np.array(ratio2[d]) for d in densities}
 
             Xarr[abundance][h2column] = {'flux1':f1,
-                                    'flux2':f2,
-                                    'flux3':f3,
-                                    'ratio1':ratio1,
-                                    'ratio2':ratio2}
+                                         'flux2':f2,
+                                         'flux3':f3,
+                                         'ratio1':ratio1,
+                                         'ratio2':ratio2}
 
     return Xarr
 
@@ -2353,7 +2353,7 @@ def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
 
     import scipy.stats
 
-    for suf_ in ('{0}','{0}_integ','_cube{0}'):
+    for suf_ in ('{0}','{0}_integ'):#,'_cube{0}'):
         for smooth in ('','_smooth','_bl','_smooth_bl'):
 
             suf = suf_.format(smooth)
