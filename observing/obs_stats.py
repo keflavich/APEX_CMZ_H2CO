@@ -43,7 +43,9 @@ import pylab as pl
 pl.figure(1)
 pl.clf()
 pl.plot(tbl['nhits_mean'],tbl['noise_mean'],'.', zorder=5)
-pl.plot(np.arange(20,200), 0.75/np.sqrt(np.arange(20,200,dtype='float')), label='$1/\\sqrt{t}$', linewidth=2, alpha=0.5, color='k', zorder=-5)
+# Not clear if 0.75 is physical or a fit or what...
+pl.plot(np.arange(20,200), 0.75/np.sqrt(np.arange(20,200,dtype='float')),
+        label='$1/\\sqrt{t}$', linewidth=2, alpha=0.5, color='k', zorder=-5)
 pl.xlabel("Average number of 0.25s integrations per pixel")
 pl.ylabel("Noise per pixel in a 1 km/s bin (K)")
 pl.legend(loc='best')

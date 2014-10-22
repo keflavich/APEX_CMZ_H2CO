@@ -1631,7 +1631,7 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
     baseline_cube(fnify('_plait_all'), polyspline='spline', mask_level_sigma=5,
                   order=3)
     baseline_cube(fnify('_plait_all_smooth'), polyspline='spline',
-                  mask_level_sigma=6, order=3, splinesampling=25)
+                  mask_level_sigma=7, order=3, splinesampling=25)
  
 
 
