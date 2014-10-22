@@ -1628,8 +1628,10 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
                                          prefilter=False)
     newhdu.writeto(fnify('_plait_all_smooth'), output_verify='fix', clobber=True)
 
-    baseline_cube(fnify('_plait_all'), polyspline='spline', mask_level_sigma=5)
-    baseline_cube(fnify('_plait_all_smooth'), polyspline='spline', mask_level_sigma=5)
+    baseline_cube(fnify('_plait_all'), polyspline='spline', mask_level_sigma=5,
+                  order=3)
+    baseline_cube(fnify('_plait_all_smooth'), polyspline='spline',
+                  mask_level_sigma=5, order=3)
  
 
 
