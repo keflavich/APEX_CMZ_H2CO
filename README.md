@@ -1,6 +1,9 @@
 APEX_CMZ_H2CO
 =============
 
+[Data: On the Dataverse](http://thedata.harvard.edu/dvn/dv/APEX-CMZ-1mm/faces/study/StudyPage.xhtml?globalId=doi:10.7910/DVN/27601&versionNumber=1)
+(permissions required; e-mail adam.g.ginsburg@gmail.com)
+
 Observing scripts and logs from the 2013-2014 APEX survey of 218 GHz H2CO in
 the CMZ 
 
