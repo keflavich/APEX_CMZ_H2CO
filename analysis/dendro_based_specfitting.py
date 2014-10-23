@@ -1,5 +1,15 @@
 """
 Use dendrograms as seeds...
+
+This works, but it's not 100% reliable, which means it's going to be tough to
+analyze.  Also, it seems that there are some spectra that don't really want to
+fit.  You give 'em guesses, and they just sit there.  I've seen some really
+strange baseline solutions that are pretty much inexplicable (n'th order = 1st
+order always?).
+
+There may also be a problem with the parallelization; it is not clear that the
+fits are independent.
+
 """
 import os
 from astropy.table import Table
@@ -98,6 +108,7 @@ def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
     guess = get_guesses(branch_ids, catalog)
 
     sp = pcube.get_spectrum(position[0], position[1])
+    sp.specname = '{0},{1}'.format(*position)
 
     if second_ratio:
         guesses = [p
