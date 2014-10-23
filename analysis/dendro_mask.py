@@ -50,10 +50,10 @@ if __name__ == "__main__":
     log.info("Dendrogramming took {0:0.1f} seconds".format(t2-t1))
 
     t0 = time.time()
-    sncube = make_sncube(smooth=True)
+    sncube_sm = make_sncube(smooth=True)
     t1 = time.time()
     log.info("Smooth S/N cubemaking took {0:0.1f} seconds".format(t1-t0))
-    dend = make_dend(sncube,
-                     outfn="DendroMask_H2CO303202_smooth_signal_to_noise.hdf5")
+    dendsm = make_dend(sncube_sm,
+                       outfn="DendroMask_H2CO303202_smooth_signal_to_noise.hdf5")
     t2 = time.time()
     log.info("Smooth Dendrogramming took {0:0.1f} seconds".format(t2-t1))

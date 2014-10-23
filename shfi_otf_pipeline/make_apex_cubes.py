@@ -1624,8 +1624,9 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
                                               numcores=4)
     cube._data = cubesm
 
-    newhdu = cube_regrid.regrid_cube_hdu(cube.hdu, outheader, order=1,
-                                         prefilter=False)
+    hdu = cube.hdu
+    newhdu = cube_regrid.regrid_cube_hdu(hdu, outheader, order=1,
+                                         prefilter=True)
     newhdu.writeto(fnify('_plait_all_smooth'), output_verify='fix', clobber=True)
 
     baseline_cube(fnify('_plait_all'), polyspline='spline', mask_level_sigma=5,

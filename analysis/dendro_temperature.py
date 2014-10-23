@@ -18,7 +18,7 @@ from paths import hpath,mpath
 from constrain_parameters import paraH2COmodel
 from masked_cubes import cube303m,cube321m,cube303msm,cube321msm
 from masked_cubes import mask as cube_signal_mask
-from co_cubes import cube13co, cube18co, cube13cosm, cubeco18sm
+from co_cubes import cube13co, cube18co, cube13cosm, cube18cosm
 from noise import noise, noise_cube, sm_noise_cube
 from higal_gridded import column_regridded
 from common_constants import logabundance,elogabundance
