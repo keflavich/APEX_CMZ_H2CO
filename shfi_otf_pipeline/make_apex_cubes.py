@@ -1630,8 +1630,10 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
 
     baseline_cube(fnify('_plait_all'), polyspline='spline', mask_level_sigma=5,
                   order=3)
-    baseline_cube(fnify('_plait_all_smooth'), polyspline='spline',
-                  mask_level_sigma=7, order=3, splinesampling=25)
+    # Can't get this to work - apparently there are some entirely flagged-out
+    # data sets
+    #baseline_cube(fnify('_plait_all_smooth'), polyspline='spline',
+    #              mask_level_sigma=7, order=3, splinesampling=25)
  
 
 
@@ -2119,7 +2121,8 @@ def baseline_cube(cubefn, mask=None, maskfn=None, mask_level=None,
         elif mask_level is not None:
             mask = cube > mask_level
         elif mask_level_sigma is not None:
-            mask = cube > cube.std(axis=0)*mask_level_sigma
+            mask = ((cube-cube.mean(axis=0)) >
+                    (cube.std(axis=0)*mask_level_sigma))
     t0 = time.time()
     if polyspline == 'poly':
         log.info("Baselining cube {0} with order {1}...".format(cubefn, order))
