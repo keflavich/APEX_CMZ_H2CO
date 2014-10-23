@@ -7,8 +7,8 @@ import matplotlib
 cm = matplotlib.cm.RdYlBu_r
 cm.set_bad('#888888')
 
-for bl in ("_bl",):
-    for smooth in ("","_smooth","_vsmooth"):
+for bl in ("_bl",""):
+    for smooth in ("","_smooth",):#"_vsmooth"):
         ratio1 = 'H2CO_321220_to_303202{0}{1}_integ.fits'.format(smooth,bl)
         ratio2 = 'H2CO_322221_to_303202{0}{1}_integ.fits'.format(smooth,bl)
 

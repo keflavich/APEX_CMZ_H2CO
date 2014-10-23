@@ -38,6 +38,8 @@ for dt,dtn in zip((noise,nhits), ("noise","nhits")):
         tbl.add_column(col)
 
 tbl.write(opath('field_noise_stats.ipac'), format='ascii.ipac')
+tbl.sort('noise_mean')
+tbl[::-1].write(opath('field_noise_stats_sorted.ipac'), format='ascii.ipac')
 
 import pylab as pl
 pl.figure(1)
