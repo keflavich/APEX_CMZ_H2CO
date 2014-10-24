@@ -11,7 +11,7 @@ from astropy.io import ascii
 x,y = np.loadtxt(apath('orbit_K14.dat')).T
 table = ascii.read(apath('orbit_K14_2.dat'), format='basic', comment="#", guess=False) 
 coords = coordinates.SkyCoord(table['l']*u.deg, table['b']*u.deg, frame='galactic')
-P = pvextractor.Path(coords)
+P = pvextractor.Path(coords, width=120*u.arcsec)
 
 dl = (table['l'][1:]-table['l'][:-1])
 db = (table['b'][1:]-table['b'][:-1])
@@ -20,7 +20,7 @@ cdist = np.zeros(dist.size+1)
 cdist[1:] = dist.cumsum()
 
 
-molecules = ('13CO_2014_merge', 'C18O_2014_merge', 'H2CO_303_202', 'SiO_54')
+molecules = ('13CO_2014_merge', 'C18O_2014_merge', 'H2CO_303_202_bl', 'SiO_54_bl')
 
 filenames = [molpath('APEX_{0}.fits'.format(molecule))
             for molecule in molecules]
@@ -31,6 +31,7 @@ filenames.append(hpath('TemperatureCube_DendrogramObjects_Piecewise.fits'))
 filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_Piecewise.fits'))
 
 for molecule,fn in zip(molecules,filenames):
+    log.info(molecule)
     cube = spectral_cube.SpectralCube.read(fn)
 
     pv = pvextractor.extract_pv_slice(cube, P)
