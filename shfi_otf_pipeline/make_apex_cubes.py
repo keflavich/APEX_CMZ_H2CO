@@ -1622,19 +1622,20 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
     cubesm = cube_regrid.spectral_smooth_cube(cubesm, 2,
                                               use_fft=False,
                                               numcores=4)
-    cube._data = cubesm
 
-    hdu = cube.hdu
-    newhdu = cube_regrid.regrid_cube_hdu(hdu, outheader, order=1,
-                                         prefilter=True)
+    cubesm[cubesm==0] = np.nan
+    hdu = fits.PrimaryHDU(data=cubesm, header=cube.header)
+
+    newhdu = cube_regrid.regrid_cube_hdu(hdu, outheader, order=2,
+                                         prefilter=False)
     newhdu.writeto(fnify('_plait_all_smooth'), output_verify='fix', clobber=True)
 
     baseline_cube(fnify('_plait_all'), polyspline='spline', mask_level_sigma=5,
                   order=3)
     # Can't get this to work - apparently there are some entirely flagged-out
     # data sets
-    #baseline_cube(fnify('_plait_all_smooth'), polyspline='spline',
-    #              mask_level_sigma=7, order=3, splinesampling=25)
+    baseline_cube(fnify('_plait_all_smooth'), polyspline='spline',
+                  mask_level_sigma=5, order=3, splinesampling=50)
  
 
 
@@ -1957,11 +1958,12 @@ def do_extract_subcubes(outdir=molpath, merge_prefix='APEX_H2CO_merge',
 def do_everything(pca_clean={'2014':False, '2013':False, 'ao':False},
                   scanblsub={'2014':False, '2013':False, 'ao':False},
                   timewise_pca={'2014':True, '2013':False, 'ao':True},
-                  mergefile2='APEX_H2CO_merge_high'):
+                  mergefile2='APEX_H2CO_merge_high',
+                  mergepath=mergepath, molpath=molpath, h2copath=h2copath):
     make_high_mergecube(mergefile2=mergefile2, pca_clean=pca_clean,
                         scanblsub=scanblsub, timewise_pca=timewise_pca)
 
-    do_postprocessing()
+    do_postprocessing(mergepath=mergepath, molpath=molpath, h2copath=h2copath)
 
 
 def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):

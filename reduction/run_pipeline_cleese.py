@@ -28,6 +28,11 @@ except CalledProcessError:
 
 logfile = ("".join([time.strftime("apexcmzpipeline{0}_%y_%m_%d_%H:%M:%S"),".log"])).format(label)
 
+def do_everything():
+    make_apex_cubes.do_everything(mergepath=mergepath, h2copath=h2copath, molpath=molpath)
+def do_postprocessing():
+    make_apex_cubes.do_postprocessing(mergepath=mergepath, h2copath=h2copath, molpath=molpath)
+
 #with log.log_to_file(logfile.replace(".log","_do_everything_default.log")):
 #   make_apex_cubes.do_everything()
 
