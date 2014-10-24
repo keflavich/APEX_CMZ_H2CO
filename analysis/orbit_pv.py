@@ -7,6 +7,7 @@ from paths import mpath,apath,fpath,molpath,hpath
 from astropy import units as u
 from astropy import coordinates
 from astropy.io import ascii
+from astropy import log
 
 x,y = np.loadtxt(apath('orbit_K14.dat')).T
 table = ascii.read(apath('orbit_K14_2.dat'), format='basic', comment="#", guess=False) 

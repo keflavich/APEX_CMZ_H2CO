@@ -18,7 +18,7 @@ noise_cube = as_strided(noise, shape=cube_merge_high.shape,
                         strides=(0,)+noise.strides)
 noise_spcube = SpectralCube(data=noise_cube, wcs=cube_merge_high.wcs)
 
-cube_merge_high_sm = SpectralCube.read(mpath('APEX_H2CO_merge_high_plait_all_sm.fits'))
+cube_merge_high_sm = SpectralCube.read(mpath('APEX_H2CO_merge_high_plait_all_smooth.fits'))
 noise_sm = fits.getdata(mpath('APEX_H2CO_merge_high_plait_all_smooth_noise.fits'))
 noise_cube_sm = as_strided(noise_sm, shape=cube_merge_high_sm.shape,
                            strides=(0,)+noise_sm.strides)
