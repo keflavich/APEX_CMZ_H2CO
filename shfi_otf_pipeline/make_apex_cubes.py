@@ -306,7 +306,8 @@ def add_apex_cube(apex_filename='data/E-085.B-0964A-2010.apex',
 
     data, hdrs, gal = select_apex_data(spectra, headers, indices, **kwargs)
 
-    add_apex_data(data, hdrs, gal, cubefilename, kernel_fwhm=kernel_fwhm)
+    add_apex_data(data, hdrs, gal, cubefilename, kernel_fwhm=kernel_fwhm,
+                  varweight=True)
 
 def select_apex_data(spectra,headers,indices, sourcename=None,
                      shapeselect=None, tsysrange=None, rchanrange=None,
@@ -560,7 +561,7 @@ def hdr_to_velo(h):
     return veloarr
 
 def add_apex_data(data, hdrs, gal, cubefilename, noisecut=np.inf,
-                  retfreq=False, excludefitrange=None, varweight=False,
+                  retfreq=False, excludefitrange=None, varweight=True,
                   debug=False, kernel_fwhm=10./3600.):
 
 
@@ -1606,6 +1607,9 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
     hdu = fits.PrimaryHDU(data=total_stack, header=header)
     hdu.writeto(fnify('_plait_all'), clobber=True)
 
+    whdu = fits.PrimaryHDU(data=sweights, header=header)
+    whdu.writeto(fnify('_plait_all_nhits'), clobber=True)
+
     # Smooth and downsample finally...
     cube = spectral_cube.SpectralCube.read(fnify('_plait_all'))
     outheader = cube.header.copy()
@@ -1754,7 +1758,8 @@ def integrate_h2co_by_freq(filename):
         mom1.hdu.writeto(outfn.format(line=line, mom='mom1'),clobber=True)
         mom2.hdu.writeto(outfn.format(line=line, mom='mom2'),clobber=True)
 
-def compute_noise_high(prefix=mergepath+'APEX_H2CO_merge_high_sub',pixrange=[700,900]):
+def compute_noise_high(prefix=mergepath+'APEX_H2CO_merge_high_sub',
+                       pixrange=[700,900]):
     ffile = fits.open(prefix+'.fits')
 
     integ1,hdr = cubes.integ(ffile, pixrange, average=np.nanstd)
@@ -1982,8 +1987,8 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
     do_extract_subcubes(outdir=molpath,
                         lines={'SiO_54':217.10498},
                         merge_prefix='APEX_H2CO_2014_merge', suffix="")
-    compute_noise_high(mergepath+merge_prefix, pixrange=[700,900])
-    compute_noise_high(mergepath+merge_prefix+"_smooth", pixrange=[203,272])
+    compute_noise_high(prefix=mergepath+merge_prefix, pixrange=[700,900])
+    compute_noise_high(prefix=mergepath+merge_prefix+"_smooth", pixrange=[203,272])
     #compute_noise_high(mergepath+merge_prefix+'_smooth',[203,272])
     #compute_noise_high(mergepath+'APEX_H2CO_merge_high_vsmoothds',[203,272])
     #compute_noise_high(mergepath+'APEX_H2CO_303_202_vsmooth',[75,100])
