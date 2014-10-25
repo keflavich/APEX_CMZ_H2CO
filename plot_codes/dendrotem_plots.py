@@ -234,12 +234,17 @@ for cat,dendro,smooth in zip((catalog,),
         for leaves, color in zip(leaves_list,color_list):
             for leaf in leaves:
                 xax,yax = [catalog[leaf.idx][axname1]], [catalog[leaf.idx][axname2]]
+                axis.plot(xax, yax, 's', color=color)
                 obj = leaf.parent
                 while obj.parent:
                     xax.append(catalog[obj.idx][axname1])
                     yax.append(catalog[obj.idx][axname2])
                     obj = obj.parent
-                if not np.any(np.isnan(yax)):
+                if np.any(np.isnan(yax)):
+                    ok = ~np.isnan(yax)
+                    axis.plot(np.array(xax)[ok], np.array(yax)[ok], alpha=0.5,
+                              label=leaf.idx, color=color, zorder=5)
+                else:
                     axis.plot(xax, yax, alpha=0.5, label=leaf.idx, color=color, zorder=5)
                 signs = np.sign(np.diff(yax))
                 if np.all(signs==1) or np.all(signs==-1):
@@ -262,7 +267,7 @@ for cat,dendro,smooth in zip((catalog,),
 
 
 
-    for ii in range(1,16):
+    for ii in range(1,13):
         pl.figure(ii)
         if ii != 11:
             ax = pl.gca()

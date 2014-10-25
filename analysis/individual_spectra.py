@@ -18,6 +18,7 @@ from astropy import units as u
 from astropy import log
 from astropy.utils.console import ProgressBar
 import pylab as pl
+from higal_gridded import dusttem_image, column_image
 
 pl.ioff()
 
@@ -122,10 +123,6 @@ columns = [table.Column(name="{ee}{name}".format(name=name, ee=ee),
           ]
 out_table = table.Table([name_column, comp_id_column, lon_column, lat_column] +
                         columns)
-
-# TODO: replace this with a permanent path
-column_image = fits.open('/Users/adam/work/gc/gcmosaic_column_conv36.fits')[0]
-dusttem_image = fits.open('/Users/adam/work/gc/gcmosaic_temp_conv36.fits')[0]
 
 surfdens = []
 dusttem = []
