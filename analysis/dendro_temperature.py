@@ -16,7 +16,9 @@ from astrodendro import Dendrogram,ppv_catalog
 
 from paths import hpath,mpath
 from constrain_parameters import paraH2COmodel
-from masked_cubes import cube303m,cube321m,cube303msm,cube321msm
+from masked_cubes import (cube303m,cube321m,cube303msm,cube321msm,
+                          cube303,cube321,cube303sm,cube321sm,
+                          sncube)
 from masked_cubes import mask as cube_signal_mask
 from co_cubes import cube13co, cube18co, cube13cosm, cube18cosm
 from noise import noise, noise_cube, sm_noise_cube
@@ -38,10 +40,12 @@ def get_root(structure):
     else:
         return get_root(structure.parent)
 
-def measure_dendrogram_properties(dend=None, cube303=cube303m,
-                                  cube321=cube321m, cube13co=cube13co,
+def measure_dendrogram_properties(dend=None, cube303=cube303,
+                                  cube321=cube321, cube13co=cube13co,
                                   cube18co=cube18co, noise_cube=noise_cube,
-                                  suffix=""):
+                                  suffix="",
+                                  last_index=None,
+                                  write=True):
 
     assert (cube321.shape == cube303.shape == noise_cube.shape ==
             cube13co.shape == cube18co.shape)
@@ -85,8 +89,13 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
             'c18osum',
             '13comean',
             'c18omean',
+            's_ntotal',
+            'index',
             'parent',
             'root',
+            'lon',
+            'lat',
+            'vcen',
     ]
     columns = {k:[] for k in (keys+obs_keys)}
 
@@ -100,15 +109,21 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
     cube13co._wcs = cube18co._wcs = cube303.wcs
     cube13co.mask._wcs = cube18co.mask._wcs = cube303.wcs
 
-    #objects = biggest_tree.descendants
-    objects = dend
-    catalog = ppv_catalog(objects, metadata)
-    pb = ProgressBar(len(objects))
-    for ii,structure in enumerate(objects):
+    catalog = ppv_catalog(dend, metadata)
+    pb = ProgressBar(len(catalog))
+    for ii,row in enumerate(catalog):
+        structure = dend[row['_idx']]
+        assert structure.idx == row['_idx'] == ii
         dend_obj_mask = BooleanArrayMask(structure.get_mask(), wcs=cube303.wcs)
+        dend_inds = structure.indices()
+
         view = cube303.subcube_slices_from_mask(dend_obj_mask)
         submask = dend_obj_mask[view]
         assert submask.include().sum() == dend_obj_mask.include().sum()
+
+        sn = sncube[view].with_mask(submask)
+        sntot = sn.sum().value
+        np.testing.assert_almost_equal(sntot, structure.values().sum(), decimal=0)
 
         c303 = cube303[view].with_mask(submask)
         c321 = cube321[view].with_mask(submask)
@@ -118,25 +133,44 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
             raise TypeError(".sum() applied to an array has yielded a non scalar.")
 
         npix = submask.include().sum()
+        assert npix == structure.get_npix()
         Stot303 = c303.sum().value
+        if np.isnan(Stot303):
+            raise ValueError("NaN in cube.  This can't happen: the data from "
+                             "which the dendrogram was derived can't have "
+                             "NaN pixels.")
+
         Stot321 = c321.sum().value
         if npix == 0:
             raise ValueError("npix=0. This is impossible.")
         Smean303 = Stot303/npix
+        if Stot303 <= 0:
+            raise ValueError("The 303 flux is <=0.  This isn't possible because "
+                             "the dendrogram was derived from the 303 data with a "
+                             "non-zero threshold.")
+        if np.isnan(Stot321):
+            raise ValueError("NaN in 321 line")
         Smean321 = Stot321/npix
-        try:
-            r321303 = Stot321/Stot303
-        except ZeroDivisionError:
-            # py.FuckOff...
-            r321303 = np.nan
 
         #error = (noise_cube[view][submask.include()]).sum() / submask.include().sum()**0.5
         var = ((noise_cube[dend_obj_mask.include()]**2).sum() / npix**2)
         error = var**0.5
         if np.isnan(error):
             raise ValueError("error is nan: this is impossible by definition.")
-        er321303 = (r321303**2 * (var/Smean303**2 + var/Smean321**2))**0.5
 
+        if Stot321 < 0:
+            r321303 = error / Smean303
+            er321303 = (r321303**2 * (var/Smean303**2 + 1))**0.5
+        else:
+            r321303 = Stot321 / Stot303
+            er321303 = (r321303**2 * (var/Smean303**2 + var/Smean321**2))**0.5
+
+
+        for c in columns:
+            assert len(columns[c]) == ii
+
+        columns['index'].append(row['_idx'])
+        columns['s_ntotal'].append(sntot)
         columns['Stot303'].append(Stot303)
         columns['Stot321'].append(Stot321)
         columns['Smean303'].append(Smean303)
@@ -152,6 +186,14 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
         columns['c18omean'].append(co18sum/npix)
         columns['parent'].append(structure.parent.idx if structure.parent else -1)
         columns['root'].append(get_root(structure))
+        s303 = cube303._data[dend_inds]
+        x,y,z = cube303.world[dend_inds]
+        lon = (z*s303).sum()/s303.sum()
+        lat = (y*s303).sum()/s303.sum()
+        vel = (x*s303).sum()/s303.sum()
+        columns['lon'].append(lon.value)
+        columns['lat'].append(lat.value)
+        columns['vcen'].append(vel.value)
 
         mask2d = dend_obj_mask.include().max(axis=0)[view[1:]]
         logh2column = np.log10(np.nanmean(column_regridded.data[view[1:]][mask2d]) * 1e22)
@@ -161,10 +203,16 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
         elogh2column = elogabundance
 
         if r321303 < 0 or np.isnan(r321303):
-            for k in columns:
-                if k not in obs_keys:
-                    columns[k].append(np.nan)
+            raise ValueError("Ratio <0: This can't happen any more because "
+                             "if either num/denom is <0, an exception is "
+                             "raised earlier")
+            #for k in columns:
+            #    if k not in obs_keys:
+            #        columns[k].append(np.nan)
         else:
+            # Replace negatives for fitting
+            if Smean321 <= 0:
+                Smean321 = error
             mf.set_constraints(ratio303321=r321303, eratio303321=er321303,
                                #ratio321322=ratio2, eratio321322=eratio2,
                                logh2column=logh2column, elogh2column=elogh2column,
@@ -185,6 +233,9 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
             print("Columns are different lengths.  This is not allowed.")
             import ipdb; ipdb.set_trace()
 
+        for c in columns:
+            assert len(columns[c]) == ii+1
+
         if ii % 100 == 0 or ii < 50:
             try:
                 log.info("T: [{tmin1sig_chi2:7.2f},{temperature_chi2:7.2f},{tmax1sig_chi2:7.2f}]"
@@ -203,6 +254,12 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
         else:
             pb.update(ii+1)
 
+        if last_index is not None and ii >= last_index:
+            break
+
+    if last_index is not None:
+        catalog = catalog[:last_index+1]
+
     for k in columns:
         if k not in catalog.keys():
             catalog.add_column(table.Column(name=k, data=columns[k]))
@@ -215,7 +272,8 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
         catalog.add_column(table.Column(name='ehi_'+mid[0],
                                         data=catalog[hi]-catalog[mid]))
 
-    catalog.write(hpath('PPV_H2CO_Temperature{0}.ipac'.format(suffix)), format='ascii.ipac')
+    if write:
+        catalog.write(hpath('PPV_H2CO_Temperature{0}.ipac'.format(suffix)), format='ascii.ipac')
 
     # Note that there are overlaps in the catalog, which means that ORDER MATTERS
     # in the above loop.  I haven't yet checked whether large scale overwrites
@@ -225,8 +283,11 @@ def measure_dendrogram_properties(dend=None, cube303=cube303m,
                          header=cube303.header,
                         )
 
-    tcube.write(hpath('TemperatureCube_DendrogramObjects{0}.fits'.format(suffix)),
-                overwrite=True)
+    if write:
+        tcube.write(hpath('TemperatureCube_DendrogramObjects{0}.fits'.format(suffix)),
+                    overwrite=True)
+
+    return catalog, tcube
 
 def do_dendro_temperatures_both():
     do_dendro_temperatures_sharp()
@@ -234,13 +295,13 @@ def do_dendro_temperatures_both():
 
 def do_dendro_temperatures_sharp():
     from dendrograms import dend
-    measure_dendrogram_properties(dend=dend, cube303=cube303m, cube321=cube321m,
+    measure_dendrogram_properties(dend=dend, cube303=cube303, cube321=cube321,
                                   suffix="")
 
 def do_dendro_temperatures_smooth():
     from dendrograms import dendsm
-    measure_dendrogram_properties(dend=dendsm, cube303=cube303msm,
-                                  cube321=cube321msm, cube13co=cube13cosm,
+    measure_dendrogram_properties(dend=dendsm, cube303=cube303sm,
+                                  cube321=cube321sm, cube13co=cube13cosm,
                                   cube18co=cube18cosm,
                                   noise_cube=sm_noise_cube,
                                   suffix="_smooth")

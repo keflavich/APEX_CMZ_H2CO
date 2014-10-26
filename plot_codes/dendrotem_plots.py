@@ -22,13 +22,15 @@ for cat,dendro,smooth in zip((catalog,),
     sn = (cat['ratio303321']/cat['eratio303321'])
     sngt50 = sn > 50
     sn25_50 = (sn > 25) & (sn < 50)
-    ok = np.isfinite(sn) & (sn>5)
+    ok = np.isfinite(sn)
+    gt5 = (sn>5)
+    
 
     for ii in range(1,13): pl.figure(ii).clf()
 
-    masks_colors = zip((ok & ~sngt50 & ~sn25_50, sn25_50 & ok, sngt50 & ok, ),
-                       ('b','g','r'),
-                       (0.2,0.3,0.4),
+    masks_colors = zip((gt5 & ~sngt50 & ~sn25_50, sn25_50 & gt5, sngt50 & gt5, ok & ~gt5),
+                       ('b','g','r','k'),
+                       (0.2,0.3,0.4,0.1),
                       )
 
     fig1, ax1 = pl.subplots(num=1)
@@ -222,19 +224,25 @@ for cat,dendro,smooth in zip((catalog,),
 
     brick = dendro.structure_at([262/(2 if smooth else 1),143,725]).ancestor
     sgra = dendro.structure_at([239/(2 if smooth else 1),97,907]).ancestor
+    sgrb2 = dendro.structure_at([278/(2 if smooth else 1),117,522]).ancestor
     brick_leaves = [obj for obj in brick.descendants if obj.is_leaf]
     sgra_leaves = [obj for obj in sgra.descendants if obj.is_leaf]
+    sgrb2_leaves = [obj for obj in sgrb2.descendants if obj.is_leaf]
 
     fig14 = pl.figure(14)
     fig14.clf()
     ax14 = fig14.gca()
     def dendroplot(axis=ax14, axname1='area_exact', axname2='ratio303321',
                    leaves_list=[sgra_leaves],
-                   color_list=['#FF2222']):
+                   color_list=['#CC4444', '#4444CC', '#44CC44'],
+                   highlight_monotonic=True,
+                   marker='s',
+                   marker2=None,
+                   linestyle='-'):
         for leaves, color in zip(leaves_list,color_list):
             for leaf in leaves:
                 xax,yax = [catalog[leaf.idx][axname1]], [catalog[leaf.idx][axname2]]
-                axis.plot(xax, yax, 's', color=color)
+                axis.plot(xax, yax, marker, color=color)
                 obj = leaf.parent
                 while obj.parent:
                     xax.append(catalog[obj.idx][axname1])
@@ -243,12 +251,15 @@ for cat,dendro,smooth in zip((catalog,),
                 if np.any(np.isnan(yax)):
                     ok = ~np.isnan(yax)
                     axis.plot(np.array(xax)[ok], np.array(yax)[ok], alpha=0.5,
-                              label=leaf.idx, color=color, zorder=5)
+                              label=leaf.idx, color='b', zorder=5, linestyle=linestyle,
+                              marker=marker2)
                 else:
-                    axis.plot(xax, yax, alpha=0.5, label=leaf.idx, color=color, zorder=5)
-                signs = np.sign(np.diff(yax))
-                if np.all(signs==1) or np.all(signs==-1):
-                    axis.plot(xax, yax, alpha=0.25, linewidth=5, zorder=0, color='g')
+                    axis.plot(xax, yax, alpha=0.1, label=leaf.idx, color=color,
+                              zorder=5, linestyle=linestyle, marker=marker2)
+                if highlight_monotonic:
+                    signs = np.sign(np.diff(yax))
+                    if np.all(signs==1) or np.all(signs==-1):
+                        axis.plot(xax, yax, alpha=0.1, linewidth=5, zorder=0, color='g')
     dendroplot()
     ax14.set_xscale('log')
     ax14.set_xlabel("Area (square arcseconds)")
@@ -264,15 +275,57 @@ for cat,dendro,smooth in zip((catalog,),
     ax15.set_xlabel("Area (square arcseconds)")
     ax15.set_ylabel(r"$\bar{S_\nu}(3_{03}-2_{02})$")
 
+    fig16 = pl.figure(16)
+    fig16.clf()
+    ax16 = fig16.gca()
+    dendroplot(axis=ax16, axname2='Stot303')
+    ax16.set_xscale('log')
+    ax16.set_yscale('log')
+    ax16.set_xlabel("Area (square arcseconds)")
+    ax16.set_ylabel(r"$\Sigma S_\nu(3_{03}-2_{02})$")
 
+
+    fig17 = pl.figure(17)
+    fig17.clf()
+    ax17 = fig17.gca()
+    dendroplot(axis=ax17, axname2='temperature_chi2')
+    ax17.set_xscale('log')
+    ax17.set_xlabel("Area (square arcseconds)")
+    ax17.set_ylabel(r"Temperature (K)")
+
+    fig18 = pl.figure(18)
+    fig18.clf()
+    ax18 = fig18.gca()
+    dendroplot(leaves_list=[sgra_leaves, brick_leaves], axname2='temperature_chi2', axis=ax18)
+    ax18.set_xscale('log')
+    ax18.set_xlabel("Area (square arcseconds)")
+    ax18.set_ylabel("Ratio 303/321")
+    fig18.savefig(fpath('dendrotem/all_temperature_vs_sizescale.png'))
+
+    fig19 = pl.figure(19)
+    fig19.clf()
+    ax19 = fig19.gca()
+    ax19.errorbar(cat['Smean303'], cat['Smean321'],
+                    linestyle='none', capsize=0, alpha=0.2, marker='.', color='k')
+    dendroplot(leaves_list=[sgra_leaves, brick_leaves, sgrb2_leaves], axname1='Smean303',
+               axname2='Smean321', axis=ax19, highlight_monotonic=False, linestyle='none',
+               marker='.', marker2='.')
+    ax19.set_xlabel(r"$\bar{S}_\nu(3_{03}-2_{02})$")
+    ax19.set_ylabel(r"$\bar{S}_\nu(3_{21}-2_{20})$")
+    ax19.axis([0.1,2,0.01,1])
+    ax19.set_xscale('log')
+    ax19.set_yscale('log')
+    fig19.savefig(fpath('dendrotem/S303vsS321.png'))
 
 
     for ii in range(1,13):
         pl.figure(ii)
-        if ii != 11:
+        if ii not in (11,12,13,14,15):
             ax = pl.gca()
             ax.set_ylim(10, 125)
         pl.draw()
+
+    pl.close(20)
 
     dview = dendro.viewer()
     structure = dendro.structure_at([262/(2 if smooth else 1),143,725]).ancestor
