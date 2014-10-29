@@ -12,9 +12,9 @@ from dendrograms import catalog, catalog_sm, dend, dendsm
 matplotlib.rc_file(pcpath('pubfiguresrc'))
 
 
-for cat,dendro,smooth in zip((catalog,),
-                             (dend,),
-                             ('',)):
+for cat,dendro,smooth in zip((catalog,catalog_sm),
+                             (dend,dendsm),
+                             ('','_smooth')):
     for ii in range(1,14):
         pl.figure(ii)
         pl.clf()
@@ -49,7 +49,7 @@ for cat,dendro,smooth in zip((catalog,),
                      #xerr=[cat['eratio303321'][mask], cat['eratio303321'][mask]],
                      linestyle='none', capsize=0, alpha=alpha, marker='.',
                      color=color, linewidth=0.3)
-        ax2.set_xlabel("Ratio 303/321")
+        ax2.set_xlabel("Ratio 321/303")
         ax2.set_ylabel("Temperature")
     fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}.pdf'.format(smooth)))
         
@@ -263,7 +263,7 @@ for cat,dendro,smooth in zip((catalog,),
     dendroplot()
     ax14.set_xscale('log')
     ax14.set_xlabel("Area (square arcseconds)")
-    ax14.set_ylabel("Ratio 303/321")
+    ax14.set_ylabel("Ratio 321/303")
     fig14.savefig(fpath('dendrotem/sgra_ratio_vs_sizescale.png'))
 
 
@@ -299,7 +299,7 @@ for cat,dendro,smooth in zip((catalog,),
     dendroplot(leaves_list=[sgra_leaves, brick_leaves], axname2='temperature_chi2', axis=ax18)
     ax18.set_xscale('log')
     ax18.set_xlabel("Area (square arcseconds)")
-    ax18.set_ylabel("Ratio 303/321")
+    ax18.set_ylabel("Ratio 321/303")
     fig18.savefig(fpath('dendrotem/all_temperature_vs_sizescale.png'))
 
     fig19 = pl.figure(19)

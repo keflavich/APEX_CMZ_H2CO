@@ -84,7 +84,7 @@ def clean_catalog(catalog):
     bad = ((catalog['v_cen'] < -50) &
            (catalog['x_cen']>0) &
            (catalog['x_cen']<180))
-    raise # this is a bad idea
+    raise # this is a bad idea (makes catalog/dend disagree)
     return catalog[~bad]
 
 pcube_merge_high.Registry.add_fitter('h2co_simple', simple_fitter, 5,
@@ -97,8 +97,7 @@ pcube_merge_high_sm.Registry.add_fitter('h2co_simple2', simple_fitter2, 6,
                                      multisingle='multi')
 
 def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
-                 catalog=catalog, plot=True, order=1, second_ratio=False,
-                 verbose=False):
+                 catalog=catalog, **kwargs):
     branches = find_smallest_overlapping_branches(position, dendrogram)
     branch_ids = [l.idx for l in branches]
     if len(branch_ids) == 0:
@@ -109,6 +108,38 @@ def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
 
     sp = pcube.get_spectrum(position[0], position[1])
     sp.specname = '{0},{1}'.format(*position)
+
+    return fit_spectrum(sp, guess, **kwargs)
+
+def fit_object(obj, dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
+               **kwargs):
+
+    branches = find_smallest_overlapping_branches(position, dendrogram)
+    branch_ids = [l.idx for l in branches]
+    if len(branch_ids) == 0:
+        log.error("Invalid position given: {0}.  No branches found.".format(position))
+        raise
+        return
+    guess = get_guesses(branch_ids, catalog)
+
+    # This needs replacing...
+    # we want to extract the full spectrum...
+    dend_obj_mask = obj.get_mask()
+    all_pix = dend_obj_mask.max(axis=0)
+    ia,ib = np.where(all_pix)
+    view = slice(ia.min(), ib.max()), slice(ia.min(), ib.max())
+    weight = dend_obj_mask[view].sum(axis=0)
+    sp_data = (pcube_merge_high.cube[view] * weight).sum(axis=(1,2)) / weight.sum()
+
+    sp = pyspeckit.Spectrum(data=sp_data, xarr=pcube_merge_high.xarr)
+
+    return fit_specturm(sp, guess, **kwargs)
+
+def fit_spectrum(sp, guess, plot=True, order=1, second_ratio=False,
+                 verbose=False):
+    """
+    Quasi-automatic fit to a spectrum...
+    """
 
     if second_ratio:
         guesses = [p
@@ -152,8 +183,8 @@ def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
             guesses[ii] = limits[ii][1]*0.9
 
     if len(guesses) == 0:
-        log.info("Position {0},{1} has no guesses.".format(position[0],
-                                                           position[1]))
+        #log.info("Position {0},{1} has no guesses.".format(position[0],
+        #                                                   position[1]))
         log.info("Guess was: {0}".format(guess))
         return
 

@@ -27,5 +27,10 @@ cube321msm = cube321sm.with_mask(bmasksm)
 
 
 sncube = SpectralCube.read(hpath('APEX_H2CO_303_202_signal_to_noise_cube.fits'))
+sncube._wcs = cube303._wcs
+sncube.mask._wcs = cube303._wcs
+sncubesm = SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_signal_to_noise_cube.fits'))
+sncubesm._wcs = cube303sm._wcs
+sncubesm.mask._wcs = cube303sm._wcs
 
 log.info("Masked cube creation took {0:0.1f} seconds".format(time.time()-t0))

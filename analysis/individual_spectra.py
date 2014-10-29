@@ -19,31 +19,7 @@ from astropy import log
 from astropy.utils.console import ProgressBar
 import pylab as pl
 from higal_gridded import dusttem_image, column_image
-
-pl.ioff()
-
-
-if 'cube' not in locals():
-    # Use the individual spectral line cubes because they have been more
-    # cleanly baselined
-    # (unfortunately, this doesn't appar to work)
-    #h2co303 = pyspeckit.Cube(hpath('APEX_H2CO_303_202_bl.fits'))
-    #h2co322 = pyspeckit.Cube(hpath('APEX_H2CO_322_221_bl.fits'))
-    #h2co321 = pyspeckit.Cube(hpath('APEX_H2CO_321_220_bl.fits'))
-    #cube = pyspeckit.CubeStack([h2co303,h2co321,h2co322])
-    #cube.xarr.refX = 218222190000.0
-    #cube.xarr.refX_units = 'Hz'
-    #cube = pyspeckit.Cube(os.path.join(mergepath, 'APEX_H2CO_merge_high_sub.fits'))
-    etamb = 0.75 # http://www.apex-telescope.org/telescope/efficiency/
-    #cube.cube /= etamb
-    noise = fits.getdata(mpath('APEX_H2CO_merge_high_plait_all_noise.fits')) / etamb
-    noisehdr = fits.getheader(mpath('APEX_H2CO_merge_high_plait_all_noise.fits'))
-    #errorcube = noise[None,:,:] * np.ones(cube.cube.shape)
-
-    cube = spectral_cube.SpectralCube.read(mpath('APEX_H2CO_merge_high_plait_all.fits'))
-    cube._data /= etamb
-
-    spectra = {}
+import copy
 
 # Not necessary:
 #cube.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
@@ -60,6 +36,10 @@ if 'cube' not in locals():
 #    'brick1': {'ncomp': 1},
 #    'brick2': {'ncomp': 2},
 #}
+
+with open(regpath+'spectral_ncomp.txt') as f:
+    pars = eval(f.read())
+
 parmap_simple = {'ampH2CO':'AMPLITUDE',
                  'ampCH3OH':'AMPCH3OH',
                  'width':'WIDTH',
@@ -94,112 +74,26 @@ def set_row(parinfo, ncomp, rows, parmap):
             row["e"+par] = parinfo[parmap[par]+str(ii)].error
 
 
-regs = pyregion.open(regpath+'spectral_apertures.reg') + pyregion.open(regpath+'target_fields_8x8_gal.reg')
-with open(regpath+'spectral_ncomp.txt') as f:
-    pars = eval(f.read())
 
-name_column = table.Column(data=[reg.attr[1]['text'] 
-                                 for reg in regs 
-                                 for ii in range(pars[reg.attr[1]['text']]['ncomp'])],
-                           name='Source_Name')
-comp_id_column = table.Column(data=[0]*name_column.size, name='ComponentID')
-lon_column = table.Column(data=[reg.coord_list[0]
-                                for reg in regs
-                                for ii in range(pars[reg.attr[1]['text']]['ncomp'])
-                               ],
-                          name='GLON')
-lat_column = table.Column(data=[reg.coord_list[1] for reg in regs
-                                for ii in range(pars[reg.attr[1]['text']]['ncomp'])
-                               ],
-                          name='GLAT')
-columns = [table.Column(name="{ee}{name}".format(name=name, ee=ee),
-                        dtype='float',
-                        length=name_column.size)
-           for name in (parmap_simple2.keys() + parmap_radex.keys() +
-                        parmap_simple2_spline.keys() + ['boxwidth',
-                                                        'boxheight', 'radius',
-                                                        'area', 'posang'])
-           for ee in ['','e']
-          ]
-out_table = table.Table([name_column, comp_id_column, lon_column, lat_column] +
-                        columns)
+def fit_a_spectrum(sp, radexfit=False):
+    sp.plotter.autorefresh=False
+    sp.plotter(figure=1)
+    ncomp = pars[sp.specname]['ncomp']
+    if ncomp == 0:
+        log.info("Skipping {0} - no velocity components detected.".format(ncomp))
+        return
+    returns = [ncomp]
+    velos = pars[sp.specname]['velo']
+    spname = sp.specname.replace(" ","_")
 
-surfdens = []
-dusttem = []
-log.info("Herschel parameter extraction.")
-herschelok = np.isfinite(column_image.data) & np.isfinite(dusttem_image.data)
-for reg in ProgressBar(regs):
-    mask = pyregion.ShapeList([reg]).get_mask(column_image) & herschelok
-    for ii in range(pars[reg.attr[1]['text']]['ncomp']):
-        surfdens.append(column_image.data[mask].mean()*1e22)
-        dusttem.append(dusttem_image.data[mask].mean())
-
-surfdens_column = table.Column(data=surfdens, dtype='float',
-                               name='higalcolumndens')
-dusttem_column = table.Column(data=dusttem, dtype='float', name='higaldusttem')
-out_table.add_column(surfdens_column)
-out_table.add_column(dusttem_column)
-
-xarr = pyspeckit.units.SpectroscopicAxis(cube.spectral_axis.value,
-                                         unit=str(cube.spectral_axis.unit),
-                                         refX=cube.wcs.wcs.restfrq,
-                                         refX_units='Hz')
-
-noiseokmask = np.isfinite(noise)
-row_number = 0
-
-for region_number,reg in enumerate(regs):
-    name = reg.attr[1]['text']
-    log.info("Fitting {0}".format(name))
-    if name not in spectra:
-        #sp = cube.get_apspec(reg.coord_list,coordsys='galactic',wunit='degree')
-        shape = pyregion.ShapeList([reg])
-        mask = shape.get_mask(header=noisehdr, shape=noise.shape)
-        scube = cube.subcube_from_ds9region(shape)
-        data = scube.apply_numpy_function(np.nanmean, axis=(1,2))
-        error = ((noise[mask & noiseokmask]**2).sum()**0.5/np.count_nonzero(mask))
-        sp = pyspeckit.Spectrum(data=data,
-                                error=np.ones(data.size)*error,
-                                xarr=xarr, header=cube.wcs.to_header())
-        sp.header['ERROR'] = error
-        sp.error[:] = sp.stats((218.5e9,218.65e9))['std']
-        sp.specname = reg.attr[1]['text']
-        # Error is already computed above; this is an old hack
-        #sp.error[:] = sp.stats((218e9,218.1e9))['std']
-        spectra[name] = sp
-        sp.unit = "$T_{MB}$ [K]"
-    else:
-        sp = spectra[name]
-
-    if 'Map' in name or 'box' in name:
+    if 'Map' in sp.specname or 'box' in sp.specname:
         width_min,width_max = 1,40
     else:
         width_min,width_max = 1,15
 
 
-    sp.plotter.autorefresh=False
-    sp.plotter(figure=1)
-
-    ncomp = pars[sp.specname]['ncomp']
-    if ncomp == 0:
-        log.info("Skipping {0} - no velocity components detected.".format(ncomp))
-        continue
-    velos = pars[sp.specname]['velo']
-    spname = sp.specname.replace(" ","_")
-
-    if reg.name == 'box':
-        out_table[row_number:row_number+ncomp]['width'] = reg.coord_list[2]
-        out_table[row_number:row_number+ncomp]['height'] = reg.coord_list[3]
-        out_table[row_number:row_number+ncomp]['area'] = reg.coord_list[2] * reg.coord_list[3]
-        out_table[row_number:row_number+ncomp]['posang'] = reg.coord_list[4]
-    elif reg.name == 'circle':
-        out_table[row_number:row_number+ncomp]['area'] = reg.coord_list[2]**2 * np.pi
-        out_table[row_number:row_number+ncomp]['radius'] = reg.coord_list[2]
-    else:
-        raise ValueError("Unsupported region.  Implement it if you want it.")
-
-
-    sp.specfit.Registry.add_fitter('h2co_simple', simple_fitter2, 6, multisingle='multi')
+    sp.specfit.Registry.add_fitter('h2co_simple', simple_fitter2, 6,
+                                   multisingle='multi')
     guesses_simple = [x for ii in range(ncomp) 
                       for x in (sp.data.max(),velos[ii],5,0.5,1.0,sp.data.max())]
     sp.specfit(fittype='h2co_simple', multifit=True,
@@ -216,9 +110,7 @@ for region_number,reg in enumerate(regs):
                limits=[(0,1e5),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
               )
 
-
-    set_row(sp.specfit.parinfo, ncomp, out_table[row_number:row_number+ncomp],
-            parmap=parmap_simple2)
+    returns.append(copy.copy(sp.specfit.parinfo))
 
     err = sp.error.mean()
 
@@ -258,9 +150,8 @@ for region_number,reg in enumerate(regs):
     sp.plotter.axis.set_ylim(sp.plotter.ymin-err*5, sp.plotter.ymax)
     sp.plotter.savefig(os.path.join(figurepath,
                                     "simple/{0}_fit_4_lines_simple_splinebaselined.pdf".format(spname)))
-    set_row(sp.specfit.parinfo, ncomp, out_table[row_number:row_number+ncomp],
-            parmap=parmap_simple2_spline)
 
+    returns.append(copy.copy(sp.specfit.parinfo))
 
     sp.write(mpath("spectra/{0}_spectrum_basesplined.fits".format(spname)))
 
@@ -288,87 +179,158 @@ for region_number,reg in enumerate(regs):
         sp.plotter.savefig(os.path.join(figurepath,
                                         "radex/{0}_fit_h2co_mm_radex.pdf".format(spname)))
 
-        set_row(sp.specfit.parinfo, ncomp,
-                out_table[row_number:row_number+ncomp], parmap=parmap_radex)
+        returns.append(copy.copy(sp.specfit.parinfo))
 
-    row_number = row_number + ncomp
+    return returns
 
-    individual_fits=False
-    if individual_fits:
-        flux = 3.6 # Jy
-        col_per_jy = 2e22 # cm^-2
-        dvdpc = 5.0 # km/s/pc
-        logX = -8.3
-        logcol = np.log10(flux*col_per_jy/dvdpc) + logX
+# Use the individual spectral line cubes because they have been more
+# cleanly baselined
+# (unfortunately, this doesn't appar to work)
+#h2co303 = pyspeckit.Cube(hpath('APEX_H2CO_303_202_bl.fits'))
+#h2co322 = pyspeckit.Cube(hpath('APEX_H2CO_322_221_bl.fits'))
+#h2co321 = pyspeckit.Cube(hpath('APEX_H2CO_321_220_bl.fits'))
+#cube = pyspeckit.CubeStack([h2co303,h2co321,h2co322])
+#cube.xarr.refX = 218222190000.0
+#cube.xarr.refX_units = 'Hz'
+#cube = pyspeckit.Cube(os.path.join(mergepath, 'APEX_H2CO_merge_high_sub.fits'))
+etamb = 0.75 # http://www.apex-telescope.org/telescope/efficiency/
+#cube.cube /= etamb
+noise = fits.getdata(mpath('APEX_H2CO_merge_high_plait_all_noise.fits')) / etamb
+noisehdr = fits.getheader(mpath('APEX_H2CO_merge_high_plait_all_noise.fits'))
+#errorcube = noise[None,:,:] * np.ones(cube.cube.shape)
 
-        spectra['WarmSpot'].specfit(fittype='h2co_mm_radex', multifit=True,
-                                    guesses=[100,logcol,4.5,35,3.0],
-                                    limits=[(20,200),(11,15),(3,5.5),(-105,105),(1,5)],
-                                    limited=[(True,True)]*5,
-                                    fixed=[False,True,True,False,False],
-                                    quiet=False,)
+cube = spectral_cube.SpectralCube.read(mpath('APEX_H2CO_merge_high_plait_all.fits'))
+cube._data /= etamb
 
-        spectra['WarmSpot'].specfit(fittype='h2co_mm_radex', multifit=True,
-                                    guesses=[100,logcol+np.log10(2/3.),4.5,27,3.0]+[100,logcol+np.log10(1.0/3.),4.5,53,3.0],
-                                    limits=[(20,200),(11,15),(3,5.5),(-105,105),(1,8)]+[(20,200),(11,15),(3,5.5),(-105,105),(1,6)],
-                                    limited=[(True,True)]*10,
-                                    fixed=[False,True,True,False,False]*2,
-                                    quiet=False,)
+noiseokmask = np.isfinite(noise)
 
-        flux = 5.0
-        logX = -8.5
-        logcol = np.log10(flux*col_per_jy/dvdpc / 2.) + logX
+def load_spectra(regs, cube):
 
-        spectra['Brick SW'].specfit(fittype='h2co_mm_radex', multifit=True,
-                                    guesses=[133,12.94,5.977,37.17,9.88],
-                                    limits=[(20,200),(11,15),(3,6.5),(-105,105),(1,15)],
-                                    limited=[(True,True)]*5,
-                                    #fixed=[False,False,True,False,False],
-                                    fixed=[False,True,True,False,False])
+    spectra = {}
 
-        spectra['50kmsColdExtension'].specfit(fittype='h2co_mm_radex', multifit=True,
-                                    guesses=[33,12.94,4.0,24.4,7],
-                                    limits=[(20,200),(11,15),(3,6.5),(-105,105),(1,15)],
-                                    limited=[(True,True)]*5,
-                                    #fixed=[False,False,True,False,False],
-                                    fixed=[False,False,True,False,False])
-
-        #spectra['Sgr B2 SW'].specfit(fittype='h2co_mm_radex', multifit=True,
-        #                            guesses=[125,14.14,4.0,47.72,5.66]+[125,14.14,4.0,55.72,5.66],
-        #                            limits=[(20,200),(11,15),(3,6.5),(-105,105),(1,15)]*2,
-        #                            limited=[(True,True)]*5*2,
-        #                            #fixed=[False,False,True,False,False],
-        #                            fixed=[False,False,True,True,True]+[False,False,True,False,False])
+    xarr = pyspeckit.units.SpectroscopicAxis(cube.spectral_axis.value,
+                                             unit=str(cube.spectral_axis.unit),
+                                             refX=cube.wcs.wcs.restfrq,
+                                             refX_units='Hz')
 
 
+    for region_number,reg in enumerate(regs):
+        name = reg.attr[1]['text']
+        log.info("Loading {0}".format(name))
+        if name not in spectra:
+            #sp = cube.get_apspec(reg.coord_list,coordsys='galactic',wunit='degree')
+            shape = pyregion.ShapeList([reg])
+            mask = shape.get_mask(header=noisehdr, shape=noise.shape)
+            scube = cube.subcube_from_ds9region(shape)
+            data = scube.apply_numpy_function(np.nanmean, axis=(1,2))
+            error = ((noise[mask & noiseokmask]**2).sum()**0.5/np.count_nonzero(mask))
+            sp = pyspeckit.Spectrum(data=data,
+                                    error=np.ones(data.size)*error,
+                                    xarr=xarr, header=cube.wcs.to_header())
+            sp.header['ERROR'] = error
+            sp.error[:] = sp.stats((218.5e9,218.65e9))['std']
+            sp.specname = reg.attr[1]['text']
+            # Error is already computed above; this is an old hack
+            #sp.error[:] = sp.stats((218e9,218.1e9))['std']
+            spectra[name] = sp
+            sp.unit = "$T_{MB}$ [K]"
+        else:
+            sp = spectra[name]
 
-    dopymc = False
-    if dopymc:
-        import agpy
+    return spectra
 
-        sp = spectra['20 kms']
-        # SHOULD BE 
-        spmc = sp.specfit.get_pymc(use_fitted_values=True, db='hdf5', dbname='h2co_mm_fit_20kmsCld.hdf5')
-        #spmc = sp.specfit.fitter.get_pymc(sp.xarr, sp.data, sp.error,
-        #                                  use_fitted_values=True, db='hdf5',
-        #                                  dbname='h2co_mm_fit_20kmsCld.hdf5')
-        spmc.sample(100000)
-        agpy.pymc_plotting.hist2d(spmc, 'TEMPERATURE0', 'DENSITY0', doerrellipse=False, clear=True, bins=50, fignum=4)
-        agpy.pymc_plotting.hist2d(spmc, 'TEMPERATURE0', 'COLUMN0', doerrellipse=False, clear=True, bins=50,fignum=5)
-        agpy.pymc_plotting.hist2d(spmc, 'DENSITY0', 'COLUMN0', doerrellipse=False, clear=True, bins=50,fignum=6)
+if __name__ == "__main__":
+
+    pl.ioff()
+
+    radexfit=False # not super useful...
+
+    regs = (pyregion.open(regpath+'spectral_apertures.reg') +
+            pyregion.open(regpath+'target_fields_8x8_gal.reg'))
+
+    name_column = table.Column(data=[reg.attr[1]['text'] 
+                                     for reg in regs 
+                                     for ii in range(pars[reg.attr[1]['text']]['ncomp'])],
+                               name='Source_Name')
+    comp_id_column = table.Column(data=[0]*name_column.size, name='ComponentID')
+    lon_column = table.Column(data=[reg.coord_list[0]
+                                    for reg in regs
+                                    for ii in range(pars[reg.attr[1]['text']]['ncomp'])
+                                   ],
+                              name='GLON')
+    lat_column = table.Column(data=[reg.coord_list[1] for reg in regs
+                                    for ii in range(pars[reg.attr[1]['text']]['ncomp'])
+                                   ],
+                              name='GLAT')
+    columns = [table.Column(name="{ee}{name}".format(name=name, ee=ee),
+                            dtype='float',
+                            length=name_column.size)
+               for name in (parmap_simple2.keys() + parmap_radex.keys() +
+                            parmap_simple2_spline.keys() + ['boxwidth',
+                                                            'boxheight', 'radius',
+                                                            'area', 'posang'])
+               for ee in ['','e']
+              ]
+    out_table = table.Table([name_column, comp_id_column, lon_column, lat_column] +
+                            columns)
+
+    surfdens = []
+    dusttem = []
+    log.info("Herschel parameter extraction.")
+    herschelok = np.isfinite(column_image.data) & np.isfinite(dusttem_image.data)
+    for reg in ProgressBar(regs):
+        mask = pyregion.ShapeList([reg]).get_mask(column_image) & herschelok
+        for ii in range(pars[reg.attr[1]['text']]['ncomp']):
+            surfdens.append(column_image.data[mask].mean()*1e22)
+            dusttem.append(dusttem_image.data[mask].mean())
+
+    surfdens_column = table.Column(data=surfdens, dtype='float',
+                                   name='higalcolumndens')
+    dusttem_column = table.Column(data=dusttem, dtype='float', name='higaldusttem')
+    out_table.add_column(surfdens_column)
+    out_table.add_column(dusttem_column)
+
+    row_number = 0
+
+    spectra = load_spectra(regs, cube)
+
+    for region_number,reg in enumerate(regs):
+        name = reg.attr[1]['text']
+        sp = spectra[name]
+        log.info("Fitting {0}".format(name))
+
+        returns = fit_a_spectrum(sp, radexfit=radexfit)
+
+        if returns is None:
+            continue
+        elif radexfit:
+            ncomp, pinf1, pinf2, pinf3 = returns
+        else:
+            ncomp, pinf1, pinf2 = returns
+
+        if reg.name == 'box':
+            out_table[row_number:row_number+ncomp]['width'] = reg.coord_list[2]
+            out_table[row_number:row_number+ncomp]['height'] = reg.coord_list[3]
+            out_table[row_number:row_number+ncomp]['area'] = reg.coord_list[2] * reg.coord_list[3]
+            out_table[row_number:row_number+ncomp]['posang'] = reg.coord_list[4]
+        elif reg.name == 'circle':
+            out_table[row_number:row_number+ncomp]['area'] = reg.coord_list[2]**2 * np.pi
+            out_table[row_number:row_number+ncomp]['radius'] = reg.coord_list[2]
+        else:
+            raise ValueError("Unsupported region.  Implement it if you want it.")
 
 
-        pars = dict([(k,spmc.trace(k)[-50:]) for k in sp.specfit.parinfo.keys()])
-        sp.plotter.autorefresh=False
-        for ii in xrange(0,50):
-            sp.specfit.plot_model([pars[k][ii] for k in sp.specfit.parinfo.keys()],
-                                  clear=False,
-                                  composite_fit_color='r',
-                                  plotkwargs={'alpha':0.01})
+        set_row(pinf1, ncomp, out_table[row_number:row_number+ncomp],
+                parmap=parmap_simple2)
+        set_row(pinf2, ncomp, out_table[row_number:row_number+ncomp],
+                parmap=parmap_simple2_spline)
+        if radexfit:
+            set_row(pinf3, ncomp,
+                    out_table[row_number:row_number+ncomp], parmap=parmap_radex)
 
-        sp.plotter.refresh()
+        row_number = row_number + ncomp
 
 
 
-out_table.write(os.path.join(analysispath,"fitted_line_parameters.ipac"),
-                format='ascii.ipac')
+    out_table.write(os.path.join(analysispath,"fitted_line_parameters.ipac"),
+                    format='ascii.ipac')

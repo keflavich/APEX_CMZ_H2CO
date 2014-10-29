@@ -24,7 +24,7 @@ from astropy.table import Table
 from astropy.io import ascii
 try:
     from paths import mpath,apath,fpath,molpath,hpath
-except Import Error:
+except ImportError:
     hpath = lambda x:x
 
 
@@ -63,7 +63,7 @@ dc = DataCollection(dendrogram)
 #dc.merge(catalog, dendro)
 
 # UNCOMMENT THIS LINE TO BREAK THE VIEWER
-#dc.append(catalog)
+dc.append(catalog)
 
 app = GlueApplication(dc)
 
@@ -71,21 +71,21 @@ cube_viewer = app.new_data_viewer(ImageWidget)
 cube_viewer.add_data(sncube)
 
 # link positional information
-#dc.add_link(LinkSame(sncube.id['structure'], catalog.id['_idx']))
+dc.add_link(LinkSame(sncube.id['structure'], catalog.id['_idx']))
 #dc.add_link(LinkSame(image.id['World y: DEC--TAN'], catalog.id['DEJ2000']))
 
-#dc.add_link(LinkSame(cube.id['Galactic Longitude'], catalog.id['x_cen']))
-#dc.add_link(LinkSame(cube.id['Galactic Latitude'], catalog.id['y_cen']))
+dc.add_link(LinkSame(cube.id['Galactic Longitude'], catalog.id['x_cen']))
+dc.add_link(LinkSame(cube.id['Galactic Latitude'], catalog.id['y_cen']))
 
 def ms_to_kms(x): return x/1e3
 def kms_to_ms(x): return x*1e3
 
-#dc.add_link(LinkTwoWay(cube.id['Vrad'], catalog.id['v_cen'], ms_to_kms, kms_to_ms))
+dc.add_link(LinkTwoWay(cube.id['Vrad'], catalog.id['v_cen'], ms_to_kms, kms_to_ms))
 
-#scatter = app.new_data_viewer(ScatterWidget)
-#scatter.add_data(catalog)
-#scatter.yatt = catalog.id['temperature_chi2']
-#scatter.xatt = catalog.id['r303321']
+scatter = app.new_data_viewer(ScatterWidget)
+scatter.add_data(catalog)
+scatter.yatt = catalog.id['temperature_chi2']
+scatter.xatt = catalog.id['r303321']
 
 dendview = app.new_data_viewer(DendroWidget)
 dendview.add_data(dendro)
