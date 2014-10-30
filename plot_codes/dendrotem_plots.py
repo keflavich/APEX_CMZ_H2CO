@@ -12,9 +12,9 @@ from dendrograms import catalog, catalog_sm, dend, dendsm
 matplotlib.rc_file(pcpath('pubfiguresrc'))
 
 
-for cat,dendro,smooth in zip((catalog,catalog_sm),
-                             (dend,dendsm),
-                             ('','_smooth')):
+for cat,dendro,smooth in zip((catalog,),#,catalog_sm),
+                             (dend,),#,dendsm),
+                             ('',)):#,'_smooth')):
     for ii in range(1,14):
         pl.figure(ii)
         pl.clf()
@@ -317,6 +317,25 @@ for cat,dendro,smooth in zip((catalog,catalog_sm),
     ax19.set_yscale('log')
     fig19.savefig(fpath('dendrotem/S303vsS321.png'))
 
+    fig20 = pl.figure(20)
+    fig20.clf()
+    ax20 = fig20.gca()
+    dendroplot(leaves_list=[sgra_leaves, brick_leaves, sgrb2_leaves], axname1='area_exact',
+               axname2='v_cen', axis=ax20, highlight_monotonic=False,)
+    ax20.set_ylabel(r"$v_{cen}$")
+    ax20.set_xlabel(r"Area")
+    ax20.set_xscale('log')
+
+
+    fig21 = pl.figure(21)
+    fig21.clf()
+    ax21 = fig21.gca()
+    dendroplot(leaves_list=[sgra_leaves, brick_leaves, sgrb2_leaves], axname1='area_exact',
+               axname2='v_rms', axis=ax21, highlight_monotonic=False,)
+    ax21.set_ylabel(r"$v_{rms}=\sigma_v$")
+    ax21.set_xlabel(r"Area")
+    ax21.set_xscale('log')
+
 
     for ii in range(1,13):
         pl.figure(ii)
@@ -325,7 +344,7 @@ for cat,dendro,smooth in zip((catalog,catalog_sm),
             ax.set_ylim(10, 125)
         pl.draw()
 
-    pl.close(20)
+    pl.close(22)
 
     dview = dendro.viewer()
     structure = dendro.structure_at([262/(2 if smooth else 1),143,725]).ancestor

@@ -23,7 +23,18 @@ import numpy as np
 from astropy.io import fits
 from astropy.utils.console import ProgressBar
 from astropy import log
+from agpy.mad import MAD
 import multiprocessing
+import pyspeckit
+
+def unique_indices(xyinds):
+    raise NotImplementedError("This approach fails because it sorts *BOTH* axes independently")
+    assert xyinds.shape[1] == 2
+    xyinds.sort(axis=0)
+    d = np.diff(xyinds, axis=0)
+    ok = np.sum(d, axis=1) > 0
+    inds = np.concatenate([[xyinds[0]], xyinds[1:,:][ok,:]])
+    return inds
 
 def get_all_indices(dendrogram):
     inds = []
@@ -32,50 +43,160 @@ def get_all_indices(dendrogram):
             inds.append(structure.indices())
     allzinds,allyinds,allxinds = [np.concatenate(ii)
                                   for ii in zip(*inds)]
-    unique_inds = set(zip(allxinds, allyinds))
+    unique_inds = set(zip(allyinds, allxinds))
     return np.array(list(unique_inds))
 
-def match_position(position, structure):
-    x,y = position
-    return (x in structure.indices()[2] and y in structure.indices()[1])
+def match_position(position, structure, **kwargs):
+    if hasattr(position,'ndim') and position.ndim == 2:
+        return overlaps_positions(position, structure, **kwargs)
+    y,x = position
+    #return (x,y) in zip(*structure.indices()[1:])
+    #return (x in structure.indices()[2] and y in structure.indices()[1])
+    inds = structure.indices()
+    return np.count_nonzero((x == inds[2]) & (y == inds[1])) > 0
 
-def smallest_match(position, structure):
+def overlaps_positions(positions, structure, pxmin=None, pxmax=None,
+                       pymin=None, pymax=None):
+    if pymin is None or pxmin is None:
+        pymin,pxmin = np.array(positions).min(axis=1)
+    if pymax is None or pxmax is None:
+        pymax,pxmax = np.array(positions).max(axis=1)
+
+    inds = structure.indices()
+    xmin,xmax = inds[2].min(),inds[2].max()
+    ymin,ymax = inds[1].min(),inds[1].max()
+
+    if pxmax < xmin:
+        log.debug("pxmax < xmin: {0},{1}".format(pxmax,xmin))
+        return False
+    if pxmin > xmax:
+        log.debug("pxmin > xmax: {0},{1}".format(pxmin,xmax))
+        return False
+    if pymax < ymin:
+        log.debug("pymax < ymin: {0},{1}".format(pymax,ymin))
+        return False
+    if pymin > ymax:
+        log.debug("pymin > ymax: {0},{1}".format(pymin,ymax))
+        return False
+
+    for y,x in positions.T:
+        if np.count_nonzero((x == inds[2]) & (y == inds[1])) > 0:
+            return True
+
+    return False
+
+
+
+def smallest_match(position, structure, **kwargs):
     """
     Given a position and a structure in which at least one structure in the
     tree contains a match, return the smallest structure that matches that
-    position
+    spatial position
     """
-    if match_position(position, structure):
-        if structure.children:
+    print(structure)
+    if match_position(position, structure, **kwargs):
+        if structure.is_leaf:
+            return structure
+        else:
             c1 = smallest_match(position, structure.children[0])
             if c1 is not structure:
                 return c1
             return smallest_match(position, structure.children[1])
-        else:
-            return structure
     else:
         return structure.parent
 
+def all_matches(position, structure, **kwargs):
+    """
+    Given a position and a structure in which at least one structure in the
+    tree contains a match, return all structures that overlap with that
+    spatial position
+    """
+    if match_position(position, structure, **kwargs):
+        if structure.children:
+            return all_matches(position, structure.children[0]) +\
+                   all_matches(position, structure.children[1]) +\
+                   [structure]
+        else:
+            return [structure]
+    else:
+        return []
+
+def excise_parents(structure_list):
+    to_remove = []
+    for obj in structure_list:
+        while obj.parent in structure_list:
+            to_remove.append(obj.parent)
+            obj = obj.parent
+    return [obj for obj in structure_list if obj not in to_remove]
+
+def excise_parents_of_object(structure_list, obj):
+    to_remove = []
+    while obj.parent in structure_list:
+        to_remove.append(obj.parent)
+        obj = obj.parent
+    return [obj for obj in structure_list if obj not in to_remove]
+
+def excise_children(structure_list):
+    to_remove = []
+    for obj in structure_list:
+        if obj.parent in structure_list:
+            to_remove.append(obj)
+    return [obj for obj in structure_list if obj not in to_remove]
+
+def find_overlapping_trunks(position, dendrogram, **kwargs):
+    return [d for d in dendrogram.trunk
+            if d.parent is None and match_position(position, d, **kwargs)]
+
 def find_smallest_overlapping_branches(position, dendrogram):
-    matched_roots = [d
-                      for d in dendrogram.trunk
-                      if d.parent is None and
-                      match_position(position, d)
-                     ]
-    matched_branches = [smallest_match(position, d) for d in matched_roots]
+    if hasattr(position,'ndim') and position.ndim == 2:
+        pymin,pxmin = np.array(position).min(axis=1)
+        pymax,pxmax = np.array(position).max(axis=1)
+    else:
+        pymin,pymax = position[0],position[0]
+        pxmin,pxmax = position[0],position[0]
+    matched_roots = find_overlapping_trunks(position, dendrogram, pxmin=pxmin,
+                                            pxmax=pxmax, pymin=pymin,
+                                            pymax=pymax)
+    matched_branches = [smallest_match(position, d, pxmin=pxmin, pxmax=pxmax,
+                                       pymin=pymin, pymax=pymax)
+                        for d in matched_roots]
     return matched_branches
 
-def get_guesses(index, catalog):
+def find_all_overlapping_branches(position, dendrogram):
+    matched_roots = find_overlapping_trunks(position, dendrogram)
+    matched_branches = [a
+                        for d in matched_roots
+                        for a in all_matches(position, d) 
+                       ]
+    return matched_branches
+
+def get_guesses(index, catalog, max_comp=3):
+    """
+    put the guesses into flat format and limit their numbers
+    """
     amp,vc,vsig,r = catalog['Smean303', 'v_cen', 'v_rms',
                             'r303321'][index].columns.values()
+    keep_velo = (vc/1e3 > -50) & (vsig < 10) & (vsig > 1)
+    if np.count_nonzero(keep_velo) > max_comp:
+        # Also exclude small objects when there are many overlaps
+        big_objs = catalog[index]['npix'] > 100
+        # but only if excluding them isn't overly restrictive
+        if np.count_nonzero(big_objs & keep_velo) >= max_comp:
+            keep_velo &= big_objs
+    keep_inds = np.argsort(amp[keep_velo])[-max_comp:]
+    log.debug('Kept {0}, amps {1}'.format(np.array(index)[keep_velo][keep_inds],
+                                          np.array(amp)[keep_velo][keep_inds]))
+    amp,vc,vsig,r = [a[keep_velo][keep_inds] for a in (amp,vc,vsig,r)]
     glon = [xc - 360 if xc > 180 else xc
             for xc in catalog['x_cen']]
     # TODO: make sure the velocity units remain consistent
     # The logic here is to filter out things at vlsr<-50 km/s that are not in Sgr C;
     # these are mostly other lines in Sgr B2
-    return [pars for pars,glon in zip(zip(*[x.data for x in [amp,vc/1e3,vsig,r,amp]]),
+    result = [pars for pars,glon in zip(zip(*[x.data for x in [amp,vc/1e3,vsig,r,amp]]),
                                       glon)
             if glon < 0 or (glon > 0 and pars[1] > -50)]
+
+    return result
 
 def clean_catalog(catalog):
     """
@@ -106,37 +227,60 @@ def fit_position(position, dendrogram=dend, pcube=pcube_merge_high,
         return
     guess = get_guesses(branch_ids, catalog)
 
-    sp = pcube.get_spectrum(position[0], position[1])
-    sp.specname = '{0},{1}'.format(*position)
+    sp = pcube.get_spectrum(position[1], position[0])
+    sp.specname = '{1},{0}'.format(*position)
 
     return fit_spectrum(sp, guess, **kwargs)
 
 def fit_object(obj, dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
                **kwargs):
 
-    branches = find_smallest_overlapping_branches(position, dendrogram)
+    xyinds = np.array(obj.indices()[1:])
+    mean_position = xyinds.mean(axis=1).astype('int')
+    u_positions = np.array(list(set(zip(*xyinds))))
+    if mean_position not in u_positions:
+        raise NotImplementedError("Find the nearest pixel that IS in the inds...")
+    assert match_position(mean_position, obj)
+
+    log.info("Locating overlapping branches....")
+    all_branches = find_all_overlapping_branches(u_positions.T, dendrogram)
+    branches = excise_children(excise_parents_of_object(all_branches, obj))
     branch_ids = [l.idx for l in branches]
     if len(branch_ids) == 0:
-        log.error("Invalid position given: {0}.  No branches found.".format(position))
+        log.error("Invalid position given: {0}.  No branches"
+                  " found.".format(mean_position))
         raise
         return
+    log.info("Found overlapping branches {0}".format(branch_ids))
     guess = get_guesses(branch_ids, catalog)
+    log.debug("Guess: {0}".format(guess))
+    if len(guess) > 20:
+        raise ValueError("Too many guesses.  Too many components.")
 
     # This needs replacing...
     # we want to extract the full spectrum...
     dend_obj_mask = obj.get_mask()
     all_pix = dend_obj_mask.max(axis=0)
     ia,ib = np.where(all_pix)
-    view = slice(ia.min(), ib.max()), slice(ia.min(), ib.max())
+    view = slice(None), slice(ia.min(), ia.max()), slice(ib.min(), ib.max())
     weight = dend_obj_mask[view].sum(axis=0)
-    sp_data = (pcube_merge_high.cube[view] * weight).sum(axis=(1,2)) / weight.sum()
+    assert weight.sum() > 0
+    sp_data = np.nansum(pcube_merge_high.cube[view] * weight, axis=(1,2)) / weight.sum()
 
-    sp = pyspeckit.Spectrum(data=sp_data, xarr=pcube_merge_high.xarr)
+    sp = pyspeckit.Spectrum(data=sp_data, xarr=pcube_merge_high.xarr.as_unit('GHz'),
+                            error=np.zeros_like(sp_data)+MAD(sp_data))
+    sp.specname = "ID{0}_{1},{2}".format(obj.idx, mean_position[1], mean_position[0])
+    sp.Registry.add_fitter('h2co_simple', simple_fitter, 5,
+                           multisingle='multi')
+    sp.Registry.add_fitter('h2co_simple2', simple_fitter2, 6,
+                           multisingle='multi')
 
-    return fit_specturm(sp, guess, **kwargs)
+    log.info("Spectrum loaded, now fitting.")
+
+    return fit_spectrum(sp, guess, **kwargs)
 
 def fit_spectrum(sp, guess, plot=True, order=1, second_ratio=False,
-                 verbose=False):
+                 verbose=False, **kwargs):
     """
     Quasi-automatic fit to a spectrum...
     """
@@ -198,6 +342,7 @@ def fit_spectrum(sp, guess, plot=True, order=1, second_ratio=False,
                limits=limits,
                verbose=verbose,
                renormalize=False,
+               **kwargs
               )
 
     assert len(guesses) % (5+second_ratio) == 0
@@ -206,9 +351,9 @@ def fit_spectrum(sp, guess, plot=True, order=1, second_ratio=False,
     if plot:
         sp.plotter()
         sp.specfit.plot_fit()
-        sp.baseline(excludefit=True, subtract=False, highlight_fitregion=True, order=order)
+        sp.baseline(excludefit=True, subtract=True, highlight_fitregion=True, order=order)
     else:
-        sp.baseline(excludefit=True, subtract=False, order=order, verbose=verbose)
+        sp.baseline(excludefit=True, subtract=True, order=order, verbose=verbose)
         
     sp.specfit(fittype=fittype, multifit=True,
                guesses=guesses,
@@ -216,6 +361,7 @@ def fit_spectrum(sp, guess, plot=True, order=1, second_ratio=False,
                limits=limits,
                verbose=verbose,
                renormalize=False,
+               **kwargs
               )
 
     assert len(guesses) % (5+second_ratio) == 0
@@ -223,8 +369,8 @@ def fit_spectrum(sp, guess, plot=True, order=1, second_ratio=False,
 
     if plot:
         sp.plotter()
-        sp.specfit.plot_fit()
-        sp.baseline.plot_baseline()
+        sp.specfit.plot_fit(show_components=True)
+        #sp.baseline.plot_baseline()
 
     return sp
 
@@ -233,6 +379,7 @@ def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
                       outfilename=None):
     if positions is None:
         # Reverse order: start from the smallest trees
+        # Positions are y,x
         positions = get_all_indices(dendrogram)[::-1]
 
     log.info("Fitting {0} positions.".format(len(positions)))

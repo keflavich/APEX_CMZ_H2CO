@@ -34,6 +34,9 @@ dendro,sncube = dendrogram
 sncube.label='S/N Cube'
 cube = load_data(hpath('APEX_H2CO_303_202_bl.fits'))
 table = ascii.read(hpath('PPV_H2CO_Temperature.ipac'), format='ipac')
+table['glon'] = table['lon'] - 360*(table['lon'] > 180)
+table['xpix'] = table['x_cen'] # Glue "eats" these
+table['ypix'] = table['y_cen'] # Glue "eats" these
 
 catalog=Data(parent=table['parent'], label='Fitted Catalog')
 #catalog=Data()
