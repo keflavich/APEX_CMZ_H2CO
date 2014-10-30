@@ -11,10 +11,9 @@ from dendrograms import catalog, catalog_sm, dend, dendsm
 
 matplotlib.rc_file(pcpath('pubfiguresrc'))
 
+zipped = zip((catalog,catalog_sm), (dend,dendsm), ('','_smooth'))
 
-for cat,dendro,smooth in zip((catalog,),#,catalog_sm),
-                             (dend,),#,dendsm),
-                             ('',)):#,'_smooth')):
+for cat,dendro,smooth in zipped[:1]:
     for ii in range(1,14):
         pl.figure(ii)
         pl.clf()
@@ -241,12 +240,12 @@ for cat,dendro,smooth in zip((catalog,),#,catalog_sm),
                    linestyle='-'):
         for leaves, color in zip(leaves_list,color_list):
             for leaf in leaves:
-                xax,yax = [catalog[leaf.idx][axname1]], [catalog[leaf.idx][axname2]]
+                xax,yax = [cat[leaf.idx][axname1]], [cat[leaf.idx][axname2]]
                 axis.plot(xax, yax, marker, color=color)
                 obj = leaf.parent
                 while obj.parent:
-                    xax.append(catalog[obj.idx][axname1])
-                    yax.append(catalog[obj.idx][axname2])
+                    xax.append(cat[obj.idx][axname1])
+                    yax.append(cat[obj.idx][axname2])
                     obj = obj.parent
                 if np.any(np.isnan(yax)):
                     ok = ~np.isnan(yax)
@@ -299,7 +298,7 @@ for cat,dendro,smooth in zip((catalog,),#,catalog_sm),
     dendroplot(leaves_list=[sgra_leaves, brick_leaves], axname2='temperature_chi2', axis=ax18)
     ax18.set_xscale('log')
     ax18.set_xlabel("Area (square arcseconds)")
-    ax18.set_ylabel("Ratio 321/303")
+    ax18.set_ylabel("Temperature (K)")
     fig18.savefig(fpath('dendrotem/all_temperature_vs_sizescale.png'))
 
     fig19 = pl.figure(19)
@@ -325,6 +324,7 @@ for cat,dendro,smooth in zip((catalog,),#,catalog_sm),
     ax20.set_ylabel(r"$v_{cen}$")
     ax20.set_xlabel(r"Area")
     ax20.set_xscale('log')
+    fig20.savefig(fpath('dendrotem/vlsr_vs_area.png'))
 
 
     fig21 = pl.figure(21)

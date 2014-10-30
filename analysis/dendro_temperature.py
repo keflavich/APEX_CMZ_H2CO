@@ -190,7 +190,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         columns['root'].append(get_root(structure))
         s303 = cube303._data[dend_inds]
         x,y,z = cube303.world[dend_inds]
-        lon = ((z-(360*(z>180)))*s303).sum()/s303.sum()
+        lon = ((z.value-(360*(z.value>180)))*s303).sum()/s303.sum()
         lat = (y*s303).sum()/s303.sum()
         vel = (x*s303).sum()/s303.sum()
         columns['lon'].append(lon.value)

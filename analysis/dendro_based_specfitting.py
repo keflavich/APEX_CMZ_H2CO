@@ -17,7 +17,7 @@ from pyspeckit_fitting import simple_fitter, simple_fitter2
 from pyspeckit.parallel_map import parallel_map
 from full_cubes import (pcube_merge_high, cube_merge_high, pcube_merge_high_sm,
                         cube_merge_high_sm)
-from paths import mpath,hpath
+from paths import mpath,hpath,fpath
 from dendrograms import dend,dendsm,catalog,catalog_sm
 import numpy as np
 from astropy.io import fits
@@ -176,7 +176,7 @@ def get_guesses(index, catalog, max_comp=3):
     """
     amp,vc,vsig,r = catalog['Smean303', 'v_cen', 'v_rms',
                             'r303321'][index].columns.values()
-    keep_velo = (vc/1e3 > -50) & (vsig < 10) & (vsig > 1)
+    keep_velo = (vsig < 10) & (vsig > 1)
     if np.count_nonzero(keep_velo) > max_comp:
         # Also exclude small objects when there are many overlaps
         big_objs = catalog[index]['npix'] > 100
@@ -192,9 +192,10 @@ def get_guesses(index, catalog, max_comp=3):
     # TODO: make sure the velocity units remain consistent
     # The logic here is to filter out things at vlsr<-50 km/s that are not in Sgr C;
     # these are mostly other lines in Sgr B2
-    result = [pars for pars,glon in zip(zip(*[x.data for x in [amp,vc/1e3,vsig,r,amp]]),
+    result = [pars
+              for pars,glon in zip(zip(*[x.data for x in [amp,vc/1e3,vsig,r,amp]]),
                                       glon)
-            if glon < 0 or (glon > 0 and pars[1] > -50)]
+             ]
 
     return result
 
@@ -238,14 +239,14 @@ def fit_object(obj, dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
     xyinds = np.array(obj.indices()[1:])
     mean_position = xyinds.mean(axis=1).astype('int')
     u_positions = np.array(list(set(zip(*xyinds))))
-    if mean_position not in u_positions:
-        raise NotImplementedError("Find the nearest pixel that IS in the inds...")
-    assert match_position(mean_position, obj)
+    #if mean_position not in u_positions:
+    #    raise NotImplementedError("Find the nearest pixel that IS in the inds...")
+    #assert match_position(mean_position, obj)
 
-    log.info("Locating overlapping branches....")
+    log.debug("Locating overlapping branches....")
     all_branches = find_all_overlapping_branches(u_positions.T, dendrogram)
     branches = excise_children(excise_parents_of_object(all_branches, obj))
-    branch_ids = [l.idx for l in branches]
+    branch_ids = [l.idx for l in branches if not l.bad]
     if len(branch_ids) == 0:
         log.error("Invalid position given: {0}.  No branches"
                   " found.".format(mean_position))
@@ -253,7 +254,7 @@ def fit_object(obj, dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
         return
     log.info("Found overlapping branches {0}".format(branch_ids))
     guess = get_guesses(branch_ids, catalog)
-    log.debug("Guess: {0}".format(guess))
+    log.info("Guess: {0}".format(guess))
     if len(guess) > 20:
         raise ValueError("Too many guesses.  Too many components.")
 
@@ -268,18 +269,20 @@ def fit_object(obj, dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
     sp_data = np.nansum(pcube_merge_high.cube[view] * weight, axis=(1,2)) / weight.sum()
 
     sp = pyspeckit.Spectrum(data=sp_data, xarr=pcube_merge_high.xarr.as_unit('GHz'),
-                            error=np.zeros_like(sp_data)+MAD(sp_data))
+                            error=np.zeros_like(sp_data)+MAD(sp_data),
+                            header=fits.Header())
     sp.specname = "ID{0}_{1},{2}".format(obj.idx, mean_position[1], mean_position[0])
     sp.Registry.add_fitter('h2co_simple', simple_fitter, 5,
                            multisingle='multi')
     sp.Registry.add_fitter('h2co_simple2', simple_fitter2, 6,
                            multisingle='multi')
 
-    log.info("Spectrum loaded, now fitting.")
+    log.debug("Spectrum loaded, now fitting.")
 
     return fit_spectrum(sp, guess, **kwargs)
 
 def fit_spectrum(sp, guess, plot=True, order=1, second_ratio=False,
+                 fig=pl.figure(1),
                  verbose=False, **kwargs):
     """
     Quasi-automatic fit to a spectrum...
@@ -329,7 +332,7 @@ def fit_spectrum(sp, guess, plot=True, order=1, second_ratio=False,
     if len(guesses) == 0:
         #log.info("Position {0},{1} has no guesses.".format(position[0],
         #                                                   position[1]))
-        log.info("Guess was: {0}".format(guess))
+        log.debug("Guess was: {0}".format(guess))
         return
 
     # Some positions have bad noise values; these are not worth wasting time on
@@ -349,7 +352,7 @@ def fit_spectrum(sp, guess, plot=True, order=1, second_ratio=False,
     assert len(sp.specfit.parinfo) % (5+second_ratio) == 0
 
     if plot:
-        sp.plotter()
+        sp.plotter(figure=fig)
         sp.specfit.plot_fit()
         sp.baseline(excludefit=True, subtract=True, highlight_fitregion=True, order=order)
     else:
@@ -368,11 +371,34 @@ def fit_spectrum(sp, guess, plot=True, order=1, second_ratio=False,
     assert len(sp.specfit.parinfo) % (5+second_ratio) == 0
 
     if plot:
-        sp.plotter()
+        sp.plotter(figure=fig)
         sp.specfit.plot_fit(show_components=True)
         #sp.baseline.plot_baseline()
 
     return sp
+
+def fit_all_objects(dend=dend, **kwargs):
+    fits = {}
+
+    for obj in dend:
+        if obj.bad:
+            log.info("Skipping object {0} because it is HC3N or other.".format(obj.idx))
+            continue
+        log.info("Operating on object {0}".format(obj.idx))
+        try:
+            sp = fit_object(obj, plot=False, **kwargs)
+        except ValueError as ex:
+            log.info("Exception for {0}: {1}".format(obj.idx, ex.message))
+            continue
+        if sp is None:
+            log.info("No result for {0}".format(obj.idx))
+            continue
+        sp.plotter(figure=pl.figure(1))
+        sp.specfit.plot_fit(show_components=True)
+        sp.plotter.savefig(fpath('dendro/dendro_fit_obj{0:04d}.png'.format(obj.idx)))
+        fits[obj.idx] = sp.specfit.parinfo
+
+    return fits
 
 def fit_all_positions(dendrogram=dend, pcube=pcube_merge_high, catalog=catalog,
                       order=1, second_ratio=False, ncores=1, positions=None,

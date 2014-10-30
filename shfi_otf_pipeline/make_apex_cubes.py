@@ -33,6 +33,7 @@ import warnings
 import image_tools
 import spectral_cube
 from spectral_cube import SpectralCube,BooleanArrayMask
+from agpy import mad
 
 # http://www.apex-telescope.org/heterodyne/shfi/calibration/calfactor/
 # Apparently all data taken on MPI and ESO time in the first half of 2014 were
@@ -1762,7 +1763,7 @@ def compute_noise_high(prefix=mergepath+'APEX_H2CO_merge_high_sub',
                        pixrange=[700,900]):
     ffile = fits.open(prefix+'.fits')
 
-    integ1,hdr = cubes.integ(ffile, pixrange, average=np.nanstd)
+    integ1,hdr = cubes.integ(ffile, pixrange, average=mad.bottleneck_MAD)
     hdu1 = fits.PrimaryHDU(data=integ1, header=hdr)
     hdu1.writeto(prefix+"_noise.fits", clobber=True)
 
@@ -1988,7 +1989,7 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
                         lines={'SiO_54':217.10498},
                         merge_prefix='APEX_H2CO_2014_merge', suffix="")
     compute_noise_high(prefix=mergepath+merge_prefix, pixrange=[700,900])
-    compute_noise_high(prefix=mergepath+merge_prefix+"_smooth", pixrange=[203,272])
+    compute_noise_high(prefix=mergepath+merge_prefix+"_smooth", pixrange=[320,400])
     #compute_noise_high(mergepath+merge_prefix+'_smooth',[203,272])
     #compute_noise_high(mergepath+'APEX_H2CO_merge_high_vsmoothds',[203,272])
     #compute_noise_high(mergepath+'APEX_H2CO_303_202_vsmooth',[75,100])
