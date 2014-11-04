@@ -9,7 +9,7 @@ from astropy.io import fits
 
 from paths import hpath,mpath
 from astrodendro import Dendrogram
-from noise import noise, noise_cube, sm_noise
+from noise import noise, noise_cube, sm_noise, cube303nm, cube303nmsm
 import masked_cubes
 
 def make_sncube(write=True, smooth=False):
@@ -42,17 +42,20 @@ def make_sn_dend(sncube, view=True, write=True,
     return dend
 
 def make_dend(cube, noise, view=True, write=True,
+              min_npix=100,
               outfn="DendroMask_H2CO303202.hdf5"):
 
     # Use a little sigma-rejection to get a decently robust noise estimate
     noise_std = noise[noise==noise].std()
     noise_mean = noise[noise==noise].mean()
     err_estimate = noise[(noise > (noise_mean-noise_std)) &
-                         (noise < (noise_mean+noise_std))].std()
+                         (noise < (noise_mean+noise_std))].mean()
 
-    dend = Dendrogram.compute(cube, min_value=3*err_estimate,
-                              min_delta=2*err_estimate, min_npix=50,
-                              verbose=True)
+    dend = Dendrogram.compute(cube.filled_data[:].value,
+                              min_value=3*err_estimate,
+                              min_delta=2*err_estimate,
+                              min_npix=min_npix,
+                              verbose=True, wcs=cube.wcs)
 
     if view:
         dend.viewer
@@ -67,15 +70,19 @@ if __name__ == "__main__":
     #sncube = make_sncube()
     t1 = time.time()
     #log.info("S/N cubemaking took {0:0.1f} seconds".format(t1-t0))
-    dend = make_dend(masked_cubes.cube303, noise)
+    dend = make_dend(cube303nm, noise)
     t2 = time.time()
-    log.info("Dendrogramming took {0:0.1f} seconds".format(t2-t1))
+    log.info("Dendrogramming {1} objects took {0:0.1f} seconds".format(t2-t1,
+                                                                       len(dend)))
 
     #t0 = time.time()
     #sncube_sm = make_sncube(smooth=True)
     t1 = time.time()
     #log.info("Smooth S/N cubemaking took {0:0.1f} seconds".format(t1-t0))
-    dendsm = make_dend(masked_cubes.cube303sm, sm_noise,
+    # I think the noise is higher than reported in the noise mask by some fraction;
+    # there are "chunks" at the top of the map that are no good.
+    dendsm = make_dend(cube303nmsm, sm_noise*1.5, min_npix=200,
                        outfn="DendroMask_H2CO303202_smooth.hdf5")
     t2 = time.time()
-    log.info("Smooth Dendrogramming took {0:0.1f} seconds".format(t2-t1))
+    log.info("Smooth Dendrogramming {1} objects"
+             " took {0:0.1f} seconds".format(t2-t1, len(dendsm)))

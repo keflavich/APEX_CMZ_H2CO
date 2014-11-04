@@ -129,32 +129,6 @@ main beam efficiency is $\eta_{mb} = 0.75$ (gain $\sim39$
 Jy/K)\footnote{\url{http://www.apex-telescope.org/telescope/efficiency/}}.
 
 
-\section{Signal Extraction for Integrated Maps}
-\label{sec:signal}
-We use the method described partially in \citet{Ao2013a} and more thoroughly in
-\citet{Dame2011b} to mask the data cubes at locations of significant signal in 
-the brightest line. 
-A noise map was created by computing the sample standard deviation over a
-200-pixel range in which no signal was identified.
-We use the \formaldehyde \threeohthree line to create the mask by
-the following procedure:
-
-\begin{enumerate}
-    \item Smooth the data with a gaussian of width 2 pixels in each direction
-        (spatial and spectral)
-    \item Identify all pixels with brightness $T_A > 3\sigma$, where the noise
-        map was \emph{not} smoothed
-    \item Grow the mask from the previous step by 1 pixel in each direction
-        (this is known in image processing as binary dilation)
-\end{enumerate}
-
-The \formaldehyde \threeohthree mask was then applied to the \threetwoone and
-\threetwotwo cubes, and all three cubes were integrated.  There is some overlap
-between the \methanol \fourtwotwo line and the \formaldehyde \threetwotwo
-line in PPV space, so we shifted the \formaldehyde mask to the velocity of the
-\methanol line in the \formaldehyde \threetwotwo cube and excluded any pixels
-expected to have signal.  There were XXX voxels excluded in this fashion.
-
 
 \subsection{Baselining}
 \label{sec:baseline}
@@ -182,6 +156,33 @@ distribution on the ratio becomes non-Gaussian, approaching a pathological
 Cauchy distribution in which the mean becomes undefined as the mean of the
 individual values being compared approaches zero.  We therefore sought other
 means to create temperature maps.
+
+\section{Signal Extraction}
+\label{sec:signal}
+We use the method described partially in \citet{Ao2013a} and more thoroughly in
+\citet{Dame2011b} to mask the data cubes at locations of significant signal in 
+the brightest line. 
+A noise map was created by computing the sample standard deviation over a
+200-pixel range in which no signal was identified.
+We use the \formaldehyde \threeohthree line to create the mask by
+the following procedure:
+
+\begin{enumerate}
+    \item Smooth the data with a gaussian of width 2 pixels in each direction
+        (spatial and spectral)
+    \item Identify all pixels with brightness $T_A > 3\sigma$, where the noise
+        map was \emph{not} smoothed
+    \item Grow the mask from the previous step by 1 pixel in each direction
+        (this is known in image processing as binary dilation)
+\end{enumerate}
+
+The \formaldehyde \threeohthree mask was then applied to the \threetwoone and
+\threetwotwo cubes, and all three cubes were integrated.  There is some overlap
+between the \methanol \fourtwotwo line and the \formaldehyde \threetwotwo
+line in PPV space, so we shifted the \formaldehyde mask to the velocity of the
+\methanol line in the \formaldehyde \threetwotwo cube and excluded any pixels
+expected to have signal.
+
 
 \subsection{Computing Temperature}
 \label{sec:h2cotemmap}
@@ -228,6 +229,7 @@ with the observed large extent of the emission unless it is also extremely
 patchy.  That remains a possibility if we are observing massive, dense clouds
 with relatively uniformly turbulent properties.
 
+% figure_ratio_maps
 \FigureTwoAA
 {figures/big_H2CO_322221_to_303202_smooth_bl_integ.pdf}
 {figures/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
@@ -263,7 +265,8 @@ with relatively high signal-to-noise and modeled them in further detail.
 
 The RADEX grids described above were used, but with finer spacing in density,
 column density, and temperature.  We then upsampled the grids by spline
-interpolating between grid points to acquire a high-resolution ($250^3$) grid
+interpolating between grid points to acquire a high-resolution ($T\times n
+\times N = 250\times100\times100$) grid
 covering $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N <
 10^{15.1}$ \persc\perkmspc.
 

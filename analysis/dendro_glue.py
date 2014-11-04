@@ -29,7 +29,7 @@ except ImportError:
 
 
 #load 2 datasets from files
-dendrogram = load_dendro(hpath('DendroMask_H2CO303202_signal_to_noise.hdf5'))
+dendrogram = load_dendro(hpath('DendroMask_H2CO303202.hdf5'))
 dendro,sncube = dendrogram
 sncube.label='S/N Cube'
 cube = load_data(hpath('APEX_H2CO_303_202_bl.fits'))

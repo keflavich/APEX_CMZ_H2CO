@@ -13,7 +13,7 @@ matplotlib.rc_file(pcpath('pubfiguresrc'))
 
 zipped = zip((catalog,catalog_sm), (dend,dendsm), ('','_smooth'))
 
-for cat,dendro,smooth in zipped[:1]:
+for cat,dendro,smooth in zipped:
     for ii in range(1,14):
         pl.figure(ii)
         pl.clf()
@@ -241,7 +241,7 @@ for cat,dendro,smooth in zipped[:1]:
         for leaves, color in zip(leaves_list,color_list):
             for leaf in leaves:
                 xax,yax = [cat[leaf.idx][axname1]], [cat[leaf.idx][axname2]]
-                axis.plot(xax, yax, marker, color=color)
+                axis.plot(xax, yax, marker, color=color, markeredgecolor='none', alpha=0.5)
                 obj = leaf.parent
                 while obj.parent:
                     xax.append(cat[obj.idx][axname1])
@@ -263,7 +263,7 @@ for cat,dendro,smooth in zipped[:1]:
     ax14.set_xscale('log')
     ax14.set_xlabel("Area (square arcseconds)")
     ax14.set_ylabel("Ratio 321/303")
-    fig14.savefig(fpath('dendrotem/sgra_ratio_vs_sizescale.png'))
+    fig14.savefig(fpath('dendrotem/sgra_ratio_vs_sizescale{0}.png'.format(smooth)))
 
 
     fig15 = pl.figure(15)
@@ -273,6 +273,7 @@ for cat,dendro,smooth in zipped[:1]:
     ax15.set_xscale('log')
     ax15.set_xlabel("Area (square arcseconds)")
     ax15.set_ylabel(r"$\bar{S_\nu}(3_{03}-2_{02})$")
+    fig15.savefig(fpath('dendrotem/flux303mean_vs_area{0}.png'.format(smooth)))
 
     fig16 = pl.figure(16)
     fig16.clf()
@@ -282,15 +283,25 @@ for cat,dendro,smooth in zipped[:1]:
     ax16.set_yscale('log')
     ax16.set_xlabel("Area (square arcseconds)")
     ax16.set_ylabel(r"$\Sigma S_\nu(3_{03}-2_{02})$")
+    fig16.savefig(fpath('dendrotem/flux303sum_vs_area{0}.png'.format(smooth)))
 
 
     fig17 = pl.figure(17)
     fig17.clf()
     ax17 = fig17.gca()
-    dendroplot(axis=ax17, axname2='temperature_chi2')
+    dendroplot(axis=ax17, axname2='temperature_chi2', leaves_list=[sgra_leaves,sgrb2_leaves])
     ax17.set_xscale('log')
     ax17.set_xlabel("Area (square arcseconds)")
     ax17.set_ylabel(r"Temperature (K)")
+    fig17.savefig(fpath('dendrotem/temperature_vs_area{0}.png'.format(smooth)))
+
+    fig17.clf()
+    ax17 = fig17.gca()
+    dendroplot(axis=ax17, axname1='Smean303', axname2='temperature_chi2', leaves_list=[sgra_leaves,sgrb2_leaves])
+    ax17.set_xscale('log')
+    ax17.set_xlabel(r"$\bar{S_\nu}(3_{03}-2_{02})$")
+    ax17.set_ylabel(r"Temperature (K)")
+    fig17.savefig(fpath('dendrotem/temperature_vs_flux{0}.png'.format(smooth)))
 
     fig18 = pl.figure(18)
     fig18.clf()
@@ -299,7 +310,7 @@ for cat,dendro,smooth in zipped[:1]:
     ax18.set_xscale('log')
     ax18.set_xlabel("Area (square arcseconds)")
     ax18.set_ylabel("Temperature (K)")
-    fig18.savefig(fpath('dendrotem/all_temperature_vs_sizescale.png'))
+    fig18.savefig(fpath('dendrotem/all_temperature_vs_sizescale{0}.png'.format(smooth)))
 
     fig19 = pl.figure(19)
     fig19.clf()
@@ -314,7 +325,7 @@ for cat,dendro,smooth in zipped[:1]:
     ax19.axis([0.1,2,0.01,1])
     ax19.set_xscale('log')
     ax19.set_yscale('log')
-    fig19.savefig(fpath('dendrotem/S303vsS321.png'))
+    fig19.savefig(fpath('dendrotem/S303vsS321{0}.png'.format(smooth)))
 
     fig20 = pl.figure(20)
     fig20.clf()
@@ -324,7 +335,7 @@ for cat,dendro,smooth in zipped[:1]:
     ax20.set_ylabel(r"$v_{cen}$")
     ax20.set_xlabel(r"Area")
     ax20.set_xscale('log')
-    fig20.savefig(fpath('dendrotem/vlsr_vs_area.png'))
+    fig20.savefig(fpath('dendrotem/vlsr_vs_area{0}.png'.format(smooth)))
 
 
     fig21 = pl.figure(21)
@@ -335,6 +346,7 @@ for cat,dendro,smooth in zipped[:1]:
     ax21.set_ylabel(r"$v_{rms}=\sigma_v$")
     ax21.set_xlabel(r"Area")
     ax21.set_xscale('log')
+    fig21.savefig(fpath('dendrotem/vrms_vs_area{0}.png'.format(smooth)))
 
 
     for ii in range(1,13):
@@ -351,7 +363,7 @@ for cat,dendro,smooth in zipped[:1]:
     dview.hub.select(1, structure)
     dview.ax_image.axis((710,740,131,154))
     dview.slice_slider.set_val(262/(2 if smooth else 1))
-    dview.fig.savefig(fpath('dendrotem/dendrogram_viewer_brick.png'))
+    dview.fig.savefig(fpath('dendrotem/dendrogram_viewer_brick{0}.png'.format(smooth)))
 
     
 

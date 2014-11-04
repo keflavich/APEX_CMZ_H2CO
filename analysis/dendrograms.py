@@ -9,14 +9,14 @@ import flag_other_lines
 if 'dend' not in locals():
     t0 = time.time()
     log.info("Loading dendrogram from file.")
-    dend = Dendrogram.load_from(hpath("DendroMask_H2CO303202_signal_to_noise.hdf5"))
+    dend = Dendrogram.load_from(hpath("DendroMask_H2CO303202.hdf5"))
     log.info("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
     dend.wcs = cube303.wcs
 
 if 'dendsm' not in locals():
     t0 = time.time()
     log.info("Loading dendrogram from file.")
-    dendsm = Dendrogram.load_from(hpath("DendroMask_H2CO303202_smooth_signal_to_noise.hdf5"))
+    dendsm = Dendrogram.load_from(hpath("DendroMask_H2CO303202_smooth.hdf5"))
     log.info("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
     dendsm.wcs = cube303sm.wcs
 

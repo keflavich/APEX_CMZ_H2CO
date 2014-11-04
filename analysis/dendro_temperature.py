@@ -46,6 +46,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                                   sncube=sncube,
                                   suffix="",
                                   last_index=None,
+                                  plot_some=True,
                                   write=True):
 
     assert (cube321.shape == cube303.shape == noise_cube.shape ==
@@ -119,9 +120,12 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         dend_obj_mask = BooleanArrayMask(structure.get_mask(), wcs=cube303.wcs)
         dend_inds = structure.indices()
 
-        view = cube303.subcube_slices_from_mask(dend_obj_mask)
+        view = (slice(dend_inds[0].min(), dend_inds[0].max()+1),
+                slice(dend_inds[1].min(), dend_inds[1].max()+1),
+                slice(dend_inds[2].min(), dend_inds[2].max()+1),)
+        #view2 = cube303.subcube_slices_from_mask(dend_obj_mask)
         submask = dend_obj_mask[view]
-        assert submask.include().sum() == dend_obj_mask.include().sum()
+        #assert np.count_nonzero(submask.include()) == np.count_nonzero(dend_obj_mask.include())
 
         sn = sncube[view].with_mask(submask)
         sntot = sn.sum().value
@@ -129,8 +133,8 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
 
         c303 = cube303[view].with_mask(submask)
         c321 = cube321[view].with_mask(submask)
-        co13sum = cube13co.with_mask(dend_obj_mask).sum().value
-        co18sum = cube18co.with_mask(dend_obj_mask).sum().value
+        co13sum = cube13co[view].with_mask(submask).sum().value
+        co18sum = cube18co[view].with_mask(submask).sum().value
         if hasattr(co13sum,'__len__'):
             raise TypeError(".sum() applied to an array has yielded a non scalar.")
 
@@ -193,7 +197,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         lon = ((z.value-(360*(z.value>180)))*s303).sum()/s303.sum()
         lat = (y*s303).sum()/s303.sum()
         vel = (x*s303).sum()/s303.sum()
-        columns['lon'].append(lon.value)
+        columns['lon'].append(lon)
         columns['lat'].append(lat.value)
         columns['vcen'].append(vel.value)
 
@@ -238,7 +242,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         for c in columns:
             assert len(columns[c]) == ii+1
 
-        if ii % 100 == 0 or ii < 50:
+        if plot_some and (ii % 100 == 0 or ii < 50):
             try:
                 log.info("T: [{tmin1sig_chi2:7.2f},{temperature_chi2:7.2f},{tmax1sig_chi2:7.2f}]"
                          "  R={ratio303321:8.4f}+/-{eratio303321:8.4f}"

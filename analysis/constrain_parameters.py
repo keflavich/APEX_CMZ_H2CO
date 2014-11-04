@@ -15,7 +15,7 @@ from h2co_modeling import grid_fitter
 
 class paraH2COmodel(object):
 
-    def __init__(self, tbackground=2.73, gridsize=250):
+    def __init__(self, tbackground=2.73, gridsize=[250.,100.,100.]):
         t0 = time.time()
         from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
                                        texgrid322, taugrid322, hdr)
@@ -39,9 +39,10 @@ class paraH2COmodel(object):
                           (self.texgrid322-self.Tbackground))
 
         zinds,yinds,xinds = np.indices(self.tline303a.shape)
-        upsample_factor = np.array([250./self.tline303a.shape[0],
-                                    250./self.tline303a.shape[1],
-                                    250./self.tline303a.shape[2]], dtype='float')
+        upsample_factor = np.array([gridsize[0]/self.tline303a.shape[0], # temperature
+                                    gridsize[1]/self.tline303a.shape[1], # column
+                                    gridsize[2]/self.tline303a.shape[2]], # density
+                                   dtype='float')
         uzinds,uyinds,uxinds = upsinds = np.indices([x*us
                                                      for x,us in zip(self.tline303a.shape,
                                                                      upsample_factor)],
@@ -118,15 +119,13 @@ class paraH2COmodel(object):
 
     def chi2_column(self, logh2column, elogh2column, h2coabundance, linewidth):
 
-        h2fromh2co = np.log10(10**self.columnarr * (np.sqrt(np.pi) * linewidth)
-                              / 10**h2coabundance)
+        h2fromh2co = self.columnarr + np.log10(np.sqrt(np.pi) * linewidth) - h2coabundance
         chi2_h2 = ((h2fromh2co-logh2column)/elogh2column)**2
 
         return chi2_h2
 
     def chi2_abundance(self, logabundance, elogabundance):
-        model_logabundance = np.log10(10**self.columnarr / u.pc.to(u.cm) /
-                                      10**self.densityarr)
+        model_logabundance = self.columnarr - np.log10(u.pc.to(u.cm)) - self.densityarr
         chi2X = ((model_logabundance-logabundance)/elogabundance)**2
         return chi2X
 

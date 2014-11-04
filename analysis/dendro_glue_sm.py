@@ -29,7 +29,7 @@ except ImportError:
 
 
 #load 2 datasets from files
-dendrogram = load_dendro(hpath('DendroMask_H2CO303202_smooth_signal_to_noise.hdf5'))
+dendrogram = load_dendro(hpath('DendroMask_H2CO303202_smooth.hdf5'))
 dendro,sncube = dendrogram
 sncube.label='S/N Cube'
 cube = load_data(hpath('APEX_H2CO_303_202_smooth_bl.fits'))
@@ -88,7 +88,7 @@ dc.add_link(LinkTwoWay(cube.id['Vrad'], catalog.id['v_cen'], ms_to_kms, kms_to_m
 scatter = app.new_data_viewer(ScatterWidget)
 scatter.add_data(catalog)
 scatter.yatt = catalog.id['temperature_chi2']
-scatter.xatt = catalog.id['r303321']
+scatter.xatt = catalog.id['area_exact']
 
 dendview = app.new_data_viewer(DendroWidget)
 dendview.add_data(dendro)
