@@ -79,6 +79,7 @@ for (cubehi,cubelo),sn,smooth in zip(((cube303m,cube321m),
         tproj = np.copy(proj)
         tproj[np.isfinite(proj)] = pwtem(proj[np.isfinite(proj)].value)
         hdu = fits.PrimaryHDU(tproj, projhi.hdu.header)
+        fig.clf()
         F = aplpy.FITSFigure(hdu,
                              convention='calabretta',
                              figure=fig)

@@ -43,6 +43,7 @@ for molecule,fn in zip(molecules[-1:],filenames[-1:]):
     F = aplpy.FITSFigure(pv, figure=fig1)
     if 'Temperature' in fn:
         F.show_colorscale(aspect=5)
+        # This is where it fails...
         #F.add_colorbar()
         #divider = make_axes_locatable(F._ax1)
         #cax = divider.append_axes("right", size="5%", pad=0.05)
