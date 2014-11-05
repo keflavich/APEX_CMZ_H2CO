@@ -34,3 +34,9 @@ Pipeline
 
 An [example run of the pipeline](https://rawgit.com/keflavich/63b33d71a109e294bc4c/raw/835dec4970db738b2fb68e9070084c4180dd1053/ExampleAPEXMappingReduction.html)
 is hosted on [gist](https://gist.github.com/keflavich/63b33d71a109e294bc4c).
+
+
+Badges
+======
+[![DOI](https://zenodo.org/badge/3821/keflavich/APEX_CMZ_H2CO.png)](http://dx.doi.org/10.5281/zenodo.12585)
+
