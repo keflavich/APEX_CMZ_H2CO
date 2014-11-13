@@ -185,7 +185,7 @@ expected to have signal.
 
 
 \subsection{Computing Temperature}
-\label{sec:h2cotemmap}
+\label{sec:formaldehydetemmap}
 \todo{Different grids have been used at different stages.  The specific numbers
 will need to be updated.}
 We use RADEX \citet{van-Der-Tak2007a} to create a model grid for the
@@ -248,7 +248,7 @@ which.}
 \Figure{figures/big_lores_smooth_tmap_withcontours.pdf}
 {A temperature map derived from the \threetwoone/\threeohthree ratio map shown
 in Figure \ref{fig:ratiomaps} using the method described in Section
-\ref{sec:h2cotemmap}.  Regions of lower signal-to-noise, and therefore less
+\ref{sec:formaldehydetemmap}.  Regions of lower signal-to-noise, and therefore less
 reliable temperature, are grayed out with a filter that gets more opaque
 toward lower signal-to-noise.
 %The contours correspond to the integrated \threeohthree
@@ -289,32 +289,33 @@ parameter space in the multi-paneled Figures
 \ref{fig:coltemconstraints}-\ref{fig:parsonbrightness}.  The fitted parameters
 displayed in Figure \ref{fig:parsonbrightness} are the amplitude of the
 \formaldehyde \threeohthree line, the centroid velocity, the line width
-($\sigma$, not FWHM), the ratio $R1 = \Rone$,
-the ratio $R2 = \Rtwo$, and the amplitude of
+($\sigma$, not FWHM), the ratio $R_1 = \Rone$,
+the ratio $R_2 = \Rtwo$, and the amplitude of
 the \methanol \fourtwotwo line.
 
-While $R2$ can, in some cases, provide significant constraints on various
+While $R_2$ can, in some cases, provide significant constraints on various
 parameters, we do not use it in general because of the ambiguity imposed by the
 overlap with the \methanol \fourtwotwo line.
 
-\Figure{figures/d:G0.38+0.04_fit_4_lines_simple.pdf}
+\Figure{figures/simple/d:G0.38+0.04_fit_4_lines_simple.pdf}
 {Fitted spectrum of ``cloud d".  The fitted parameters and their corresponding
 errors are shown in the legend.  The parameters are the amplitude of the
 \formaldehyde \threeohthree line, the centroid velocity, the line width
-($\sigma$, not FWHM), the ratio $R1 = \Rone$,
-the ratio $R2 = \Rtwo$, and the amplitude of
+($\sigma$, not FWHM), the ratio $R_1 = \Rone$,
+the ratio $R_2 = \Rtwo$, and the amplitude of
 the \methanol \fourtwotwo line.  }
 {fig:clouddspec}{0.5}{0}
-\Figure{figures/param_fits/d:G0.38+0.04_col_tem_parameter_constraints.pdf}
-{The parameter constraints projected (marginalized) onto the temperature/column
-density plane.\newline
+
+\Figure{figures/param_fits/d:G0.38+0.04_col_tem_0_parameter_constraints.pdf}
+{The parameter constraints for ``cloud d'' (Figure \ref{fig:clouddspec})
+projected (marginalized) onto the temperature/column density plane.\newline
 (top left) Constraints imposed by the measured ratio \Rone are shown in filled contours,
 with blue corresponding to $\Delta\chi^2 < 1$, cyan $1 < \Delta\chi^2 < 2$,
 yellow $2 < \Delta\chi^2 < 3$, and red $3 < \Delta\chi^2 < 4$.  The solid
 contours show the joint constraints imposed by including restrictions on the
 total column density, filling factor, and abundance, following the same color
 scheme.  The solid grayscale contours show the constraints imposed by
-$R2=\Rtwo$, from black ($\Delta\chi^2 < 1$) to white.  In this case, $R2$
+$R_2=\Rtwo$, from black ($\Delta\chi^2 < 1$) to white.  In this case, $R_2$
 imposes only a weak lower limit on column. \newline
 (top right) The same colorscheme as before, showing the constraints imposed by
 assuming the abundance of \para relative to \hh is as labeled.  In this case,
@@ -328,23 +329,26 @@ uncertainty.  \newline
 by forcing the filling factor of the line emission to be $ff < 1$.
 }
 {fig:coltemconstraints}{0.5}{0}
-\Figure{figures/param_fits/d:G0.38+0.04_dens_col_parameter_constraints.pdf}
+
+\Figure{figures/param_fits/d:G0.38+0.04_dens_col_0_parameter_constraints.pdf}
 {The constraints in density-column parameter space.
 See Figure \ref{fig:coltemconstraints} for details.  In the bottom-right panel, the
 solid line shows the contour corresponding to $ff(\threeohthree)=0.1$ in
 black.}
 {fig:denscolconstraints}{0.5}{0}
-\Figure{figures/param_fits/d:G0.38+0.04_dens_tem_parameter_constraints.pdf}
+
+\Figure{figures/param_fits/d:G0.38+0.04_dens_tem_0_parameter_constraints.pdf}
 {The constraints in density-temperature parameter space.
 See Figure \ref{fig:coltemconstraints} for details.}
 {fig:denstemconstraints}{0.5}{0}
-\Figure{figures/param_fits/d:G0.38+0.04_h2coratio_minaxis.pdf}
+
+\Figure{figures/param_fits/d:G0.38+0.04_0_h2coratio_minaxis.pdf}
 {The line brightness of \para \threeohthree (top row) and \para \threetwoone
 (bottom row) in the three different projections of parameter space.  The
 grayscale images correspond to a slice through the parameter spaces at the
 location of the best-fit parameter.  The colored contours show the allowed
 marginalized regions in each parameter space as described in the
-\ref{fig:Seecoltemconstraints} caption.}
+\ref{fig:coltemconstraints} caption.}
 {fig:parsonbrightness}{0.5}{0}
 
 \section{Parameter Comparisons}

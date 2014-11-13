@@ -34,6 +34,9 @@ import image_tools
 import spectral_cube
 from spectral_cube import SpectralCube,BooleanArrayMask
 from agpy import mad
+import matplotlib
+import paths
+matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 # http://www.apex-telescope.org/heterodyne/shfi/calibration/calfactor/
 # Apparently all data taken on MPI and ESO time in the first half of 2014 were
@@ -1217,6 +1220,11 @@ def build_cube_2013(mergefile=None,
 
     xtel = 'AP-H201-X202' if lowhigh=='low' else 'AP-H201-X201'
 
+    # Flag out the central pixel: it is terrible.
+    flag_array = np.zeros(32768, dtype='bool')
+    flag_array[16384] = True
+    flag_array[-1] = True
+
     if not mergefile:
         # Need two loops.  First one is just to determine map extent.
         all_gal = {}
@@ -1227,6 +1235,7 @@ def build_cube_2013(mergefile=None,
             spectra,headers,indices = load_apex_cube(apex_filename,
                                                      downsample_factor=downsample_factor,
                                                      xtel=xtel,
+                                                     flag_array=flag_array,
                                                      sourcename='SGRA')
             data, hdrs, gal = select_apex_data(spectra, headers, indices,
                                                sourcename='SGRA',
@@ -1349,6 +1358,11 @@ def build_cube_2014(sourcename,
 
     t0 = time.time()
 
+    # Flag out the central pixel: it is terrible.
+    flag_array = np.zeros(32768, dtype='bool')
+    flag_array[16384] = True
+    flag_array[-1] = True
+
     if not mergefile:
         # Need two loops.  First one is just to determine map extent.
         all_gal = {}
@@ -1363,6 +1377,7 @@ def build_cube_2014(sourcename,
             found_data = load_apex_cube(apex_filename,
                                         downsample_factor=downsample_factor,
                                         xtel=xtel, sourcename=sourcename,
+                                        flag_array=flag_array,
                                         posang=posang)
             if found_data is None:
                 log.info("Skipping dataset {0} because it doesn't contain "
@@ -2881,6 +2896,94 @@ def plot_pca_components(apex_filename, ncomponents=3):
     log.info("Done plotting {0}".format(apex_filename))
 
 
+
+def extract_mean_abs_spectra(apex_filename):
+
+    outdir = os.path.join(os.path.dirname(apex_filename),
+                          os.path.splitext(os.path.basename(apex_filename))[0])
+    if not os.path.isdir(outdir):
+        os.mkdir(outdir)
+
+    sourcereg,line,telescopes = get_source_tel_line(apex_filename)
+    cl = read_class.ClassObject(apex_filename)
+
+    for telescope in cl.getinfo()['tels']:
+        if 'PA' not in telescope:
+            selection = [x
+                         for source in cl.sources
+                         if _is_sci(source, sourcereg)
+                         for x in cl.select_spectra(telescope=telescope,
+                                                    line=line,
+                                                    source=source)]
+            # Only do first 10000
+            # 1e4 * 2**15 * 4 = 1.31 GB
+            mmdata,headers = zip(*cl.read_observations(selection[:10000], progressbar=True))
+
+            header = classheader_to_fitsheader(headers[0])
+            header['LINE1'] = 'mean(abs)'
+            header['LINE2'] = 'std(abs)'
+            del headers
+
+            data = np.abs(np.array(mmdata, dtype='float32'))
+            del mmdata
+
+            dft = np.fft.fft(data, axis=1)
+            dftmeanabs = np.abs(dft).mean(axis=0).astype('float32')
+            del dft
+
+            absdata = np.abs(data).astype('float32')
+            del data
+
+            meanabs = (absdata).mean(axis=0).astype('float32')
+            stdabs = (absdata).std(axis=0).astype('float32')
+
+            darr = np.array([meanabs,stdabs,dftmeanabs])
+            assert darr.shape == (3, meanabs.size)
+
+            hdu = fits.PrimaryHDU(data=darr, header=header)
+            hdu.writeto(os.path.join(outdir,
+                                     '{0}_meanabsspec.fits'.format(telescope)),
+                                     clobber=True,
+                                     output_verify='fix')
+
+def plot_mean_abs_spectrum(apex_filename, ncomponents=3):
+    log.info("Plotting {0}".format(apex_filename))
+    basename = os.path.splitext(os.path.basename(apex_filename))[0]
+    outdir = os.path.join(os.path.dirname(apex_filename), basename)
+    fig1 = pl.figure(1)
+    fig1.clf()
+    pl.title(basename)
+    fig2 = pl.figure(2)
+    fig2.clf()
+    figs = [fig1,fig2]
+    fglob = os.path.join(outdir, '*_meanabsspec.fits')
+    files = glob.glob(fglob)
+    for jj,(fn,fig) in enumerate(zip(files,figs)):
+        mspec, sspec, ftabs = fits.getdata(fn)
+        ax1 = fig.add_subplot(2,1,1)
+        ax1.plot(mspec-np.median(mspec), ',', label=str(jj))
+        mmad = mad.MAD(mspec)
+        ax1.set_ylim(mmad*-10, mmad*10)
+        ax1.set_title(basename)
+
+        ft = np.fft.fft(mspec)
+        ftf = np.fft.fftfreq(mspec.size)
+        ax2 = fig.add_subplot(2,1,2)
+        ax2.loglog(ftf[ftf>=0], abs(ft[ftf>=0]), label=str(jj), alpha=0.5)
+        ax2.loglog(ftf[ftf>=0], abs(ftabs[ftf>=0]), alpha=0.5)
+        ax2.set_xlim(ftf.min(), ftf.max())
+
+        fig.savefig(fn.replace(".fits",".png"), bbox_inches='tight')
+    log.info("Done plotting {0}".format(apex_filename))
+
+def do_all_meanabsspectra(**kwargs):
+    for fn in all_apexfiles:
+        extract_mean_abs_spectra(fn, **kwargs)
+        plot_mean_abs_spectrum(fn)
+        #except Exception as ex:
+        #    log.error("Error: {0}".format(ex))
+        #    print(ex)
+        #    continue
         
 
 def extract_co_subcubes(mergepath=april2014path):
@@ -2937,3 +3040,4 @@ def cal_date_overlap(dates1, calibration_factors=calibration_factors):
             d1,d2 = Time(k.split(":"))
             if dates1[0] < d2 and dates1[1] > d1:
                 return k
+

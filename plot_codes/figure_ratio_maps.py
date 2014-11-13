@@ -17,7 +17,7 @@ pl.ioff()
 cm = matplotlib.cm.RdYlBu_r
 cm.set_bad('#888888')
 
-vcuts = np.arange(-60,121,20)
+vcuts = np.arange(-60,141,20)
 
 fig = pl.figure(1, figsize=(14,6))
 for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),

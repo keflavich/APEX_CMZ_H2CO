@@ -6,7 +6,7 @@ from pyspeckit.spectrum import models
 from pyspeckit.spectrum.models.model import SpectralModel
 import FITS_tools
 from paths import h2copath, mergepath, figurepath, gpath
-from shfi_otf_pipeline.make_apex_cubes import tm
+from make_ratiotem_cubesims import tm
 import os
 
 try:

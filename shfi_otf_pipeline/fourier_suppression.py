@@ -2,7 +2,8 @@ import numpy as np
 import os
 from astropy.convolution import convolve, convolve_fft, Gaussian1DKernel
 
-def suppress_frange(data, frange, convinterp=True, width=2, convolve_with_fft=False):
+def suppress_frange(data, frange, convinterp=True, width=2,
+                    convolve_with_fft=False, kernscale=12):
     """
     Given a spectrum, interpolate across a specified frequency range.
     Frequency is in 1/pixel units.
@@ -18,6 +19,8 @@ def suppress_frange(data, frange, convinterp=True, width=2, convolve_with_fft=Fa
         interpolation (which can be unstable)
     width : int
         Width of the convolution kernel
+    kernscale : int
+        An even integer.  The size of the kernel will be (width*kernscale)+1
     convolve_with_fft : bool
         Use `astropy.convolution.convolve` or `astropy.convolution.convolve_fft`.
         For 1D arrays like this, convolve is generally faster.
@@ -25,6 +28,9 @@ def suppress_frange(data, frange, convinterp=True, width=2, convolve_with_fft=Fa
 
     ft = np.fft.fft(data)
     freq = np.fft.fftfreq(data.size)
+
+    if frange[0] > frange[1]:
+        raise ValueError("Frequency range should be [lower,upper] but {0} > {1}".format(*frange))
 
     lmask = (abs(freq) < frange[1])
     umask = (abs(freq) > frange[0])
@@ -42,7 +48,9 @@ def suppress_frange(data, frange, convinterp=True, width=2, convolve_with_fft=Fa
     if convinterp:
         mdata = ft.copy()
         mdata[mask] = np.nan
-        kernel = Gaussian1DKernel(width, x_size=width*8+1)
+        kernel = Gaussian1DKernel(width, x_size=width*kernscale+1)
+        if kernel.shape[0] < mask.sum() / 2:
+            raise ValueError("Kernel is too small.  Increase width.")
         kernel.normalize()
         if convolve_with_fft:
             amp = convolve_fft(np.abs(mdata), kernel, interpolate_nan=True)
@@ -63,4 +71,8 @@ def suppress_frange(data, frange, convinterp=True, width=2, convolve_with_fft=Fa
                                       [fff.imag[startpt],fff.imag[endpt]])
             fff[mm] = (realdata+1j*imagdata)[::order]
 
-    return np.fft.ifft(ft).real
+    result = np.fft.ifft(ft).real
+    if np.any(np.isnan(result)):
+        raise ValueError("Result is NaN.")
+
+    return result

@@ -30,27 +30,70 @@ def spline_removal(fn, linecen=1500, linewidth=20, lineamp=10):
     sp2.baseline(spline=True, subtract=False, spline_sampling=500, order=3)
     return sp,sp2
 
-def do_example_fsupp(interpolate=False, vrange=[100,300]):
+def suppress_frange(data, frange, convinterp=True, width=1):
+    """
+    Given a spectrum, interpolate across a specified frequency range.
+    Frequency is in 1/pixel units.
+    """
+
+    ft = np.fft.fft(data)
+    freq = np.fft.fftfreq(data.size)
+
+    lmask = (abs(freq) < frange[1])
+    umask = (abs(freq) > frange[0])
+    mask = lmask & umask
+
+    # Select one side of the data
+    midpt = len(mask)/2
+    whmask, = np.where(mask)
+    startpt = whmask[whmask<midpt][0] - 1
+    endpt = whmask[whmask<midpt][-1] + 1
+
+    if endpt >= len(mask):
+        endpt = len(mask)-1
+
+    if convinterp:
+        mdata = ft.copy()
+        mdata[mask] = np.nan
+        kernel = Gaussian1DKernel(width, x_size=width*8+1)
+        amp = convolve(np.abs(mdata), kernel, boundary='extend')
+        phase = convolve(np.angle(mdata), kernel, boundary='extend')
+        interpdata = (np.cos(phase)*amp+1j*np.sin(phase)*amp)[mask]
+        ft[mask] = interpdata
+    else:
+        for order,compare in zip((-1,1),(np.less,np.greater_equal)):
+            mm = mask & compare(np.arange(len(mask), dtype='int'), midpt)
+            realdata = np.interp(np.arange(startpt+1, endpt),
+                                      [startpt,endpt],
+                                      [fff.real[startpt],fff.real[endpt]])
+            imagdata = np.interp(np.arange(startpt+1, endpt),
+                                      [startpt,endpt],
+                                      [fff.imag[startpt],fff.imag[endpt]])
+            fff[mm] = (realdata+1j*imagdata)[::order]
+
+    return np.fft.ifft(ft).real
+
+def do_example_fsupp(interpolate=False, vrange=[100,300], **kwargs):
     """
     Run a specific example on a specific extracted PCA component
     """
     fn = os.path.join(june2013datapath,
                       'M-091.F-0019-2013-2013-06-12/AP-H201-X202_pca_component_0.fits')
-    fourier_suppression(fn, vrange=vrange, save=True, linecen=-1500.,
-                        interpolate=interpolate)
+    ff = fits.open(fn)
+    e1, hdr = ff[0].data, ff[0].header
+    fourier_suppression(e1, hdr, vrange=vrange, save=True, linecen=-1500.,
+                        interpolate=interpolate, **kwargs)
     return fn
 
-def fourier_suppression(fn, withline=False, vrange=[100,'max'], linewidth=20.,
+def fourier_suppression(e1, hdr, withline=False, vrange=[100,'max'], linewidth=20.,
                         linecen=250., save=False, suppression_factor=3,
-                        interpolate=False, convinterp=True):
+                        amplitude=10,
+                        interpolate=False, convinterp=True, smooth_width=2):
     """
     Given a spectrum (fn), suppress a velocity range `vrange` by dividing it by
     some factor.  Then plot...
     """
 
-    e1 = fits.getdata(fn)
-
-    hdr = fits.getheader(fn)
     vres = hdr['CDELT1']
     ff = np.fft.fftfreq(e1.size)
 
@@ -60,7 +103,7 @@ def fourier_suppression(fn, withline=False, vrange=[100,'max'], linewidth=20.,
     velo = vres * (np.arange(e1.size)+1-hdr['CRPIX1'])+hdr['CRVAL1']
 
     # Add a 20 km/s wide Gaussian line, see what happens to it
-    line = np.exp(-(velo+linecen)**2/(linewidth**2*2.)) * 10
+    line = np.exp(-(velo+linecen)**2/(linewidth**2*2.)) * amplitude
     e2 = line+e1
 
     ft = np.fft.fft(e1)
@@ -95,8 +138,8 @@ def fourier_suppression(fn, withline=False, vrange=[100,'max'], linewidth=20.,
                 #realdata = convolve(mdata.real, Gaussian1DKernel(1, x_size=51), boundary='extend')
                 #imagdata = convolve(mdata.imag, Gaussian1DKernel(1, x_size=51), boundary='extend')
                 #interpdata = (realdata[mask]+1j*imagdata[mask]) 
-                amp = convolve(np.abs(mdata), Gaussian1DKernel(1, x_size=51), boundary='extend')
-                phase = convolve(np.angle(mdata), Gaussian1DKernel(1, x_size=51), boundary='extend')
+                amp = convolve(np.abs(mdata), Gaussian1DKernel(smooth_width, x_size=51), boundary='extend')
+                phase = convolve(np.angle(mdata), Gaussian1DKernel(smooth_width, x_size=51), boundary='extend')
                 interpdata = (np.cos(phase)*amp+1j*np.sin(phase)*amp)[mask]
                 #pl.figure(5)
                 #pl.clf()
@@ -199,3 +242,4 @@ def fourier_suppression(fn, withline=False, vrange=[100,'max'], linewidth=20.,
 
     pl.draw()
     pl.show()
+

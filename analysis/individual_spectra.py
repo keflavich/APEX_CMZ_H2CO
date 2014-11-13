@@ -142,7 +142,7 @@ def fit_a_spectrum(sp, radexfit=False):
                limits=[(0,1e5),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
               )
     sp.plotter()
-    sp.plotter.axis.plot(sp.xarr, spline_baseline+linear_baseline, color='orange',
+    sp.plotter.axis.plot(sp.xarr, spline_baseline+linear_baseline-err*5, color='orange',
                          alpha=0.5, zorder=-1, linewidth=2)
     sp.specfit.plot_fit(show_components=True)
     sp.specfit.plotresiduals(axis=sp.plotter.axis, yoffset=-err*5, clear=False,
