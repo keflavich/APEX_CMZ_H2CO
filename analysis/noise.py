@@ -9,10 +9,13 @@ from astropy import log
 
 t0 = time.time()
 
-noise = fits.getdata(mpath('APEX_H2CO_merge_high_plait_all_noise.fits'))
+noise_fn = mpath('APEX_H2CO_merge_high_plait_all_noise.fits')
+
+noise = fits.getdata(noise_fn)
 nhits = fits.getdata(mpath('APEX_H2CO_merge_high_nhits.fits'))
 noise[nhits<20] = np.nan
 noise_cube = as_strided(noise, shape=cube303m.shape, strides=(0,)+noise.strides)
+noisehdr = fits.getheader(noise_fn)
 
 sm_noise = fits.getdata(mpath('APEX_H2CO_merge_high_plait_all_smooth_noise.fits'))
 sm_noise[nhits<20] = np.nan

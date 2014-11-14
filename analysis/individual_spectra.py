@@ -21,21 +21,13 @@ import pylab as pl
 from higal_gridded import dusttem_image, column_image
 import copy
 
-# Not necessary:
-#cube.Registry.add_fitter('h2co_mm_radex', h2co_radex_fitter, 5,
-#                         multisingle='multi')
-#cube.Registry.add_fitter('h2co_simple', simple_fitter, 4, multisingle='multi')
+from full_cubes import cube_merge_high as cube
+from noise import noise, noisehdr
+noiseokmask = np.isfinite(noise)
 
-#spectra = {
-#        'brick1': cube.get_apspec((0.2426,0.0081,30), coordsys='galactic', wunit='arcsec'),
-#        'brick2': cube.get_apspec((0.2583,0.0181,30), coordsys='galactic', wunit='arcsec'),
-#        '20kms': cube.get_apspec((3.59977500e+02,  -6.25e-02, 30), coordsys='galactic', wunit='arcsec'),
-#    }
-#
-#pars = {
-#    'brick1': {'ncomp': 1},
-#    'brick2': {'ncomp': 2},
-#}
+etamb = 0.75 # http://www.apex-telescope.org/telescope/efficiency/
+cube._data /= etamb
+noise /= etamb
 
 with open(regpath+'spectral_ncomp.txt') as f:
     pars = eval(f.read())
@@ -75,7 +67,7 @@ def set_row(parinfo, ncomp, rows, parmap):
 
 
 
-def fit_a_spectrum(sp, radexfit=False):
+def fit_a_spectrum(sp, radexfit=False, write=True):
     sp.plotter.autorefresh=False
     sp.plotter(figure=1)
     ncomp = pars[sp.specname]['ncomp']
@@ -121,7 +113,8 @@ def fit_a_spectrum(sp, radexfit=False):
     sp.plotter.axis.set_ylim(sp.plotter.ymin-err*5, sp.plotter.ymax)
     sp.plotter.savefig(os.path.join(figurepath,
                                     "simple/{0}_fit_4_lines_simple.pdf".format(spname)))
-    sp.write(mpath("spectra/{0}_spectrum.fits".format(spname)))
+    if write:
+        sp.write(mpath("spectra/{0}_spectrum.fits".format(spname)))
 
     # This will mess things up for the radexfit (maybe in a good way) but *cannot*
     # be done after the radexfit
@@ -153,7 +146,8 @@ def fit_a_spectrum(sp, radexfit=False):
 
     returns.append(copy.copy(sp.specfit.parinfo))
 
-    sp.write(mpath("spectra/{0}_spectrum_basesplined.fits".format(spname)))
+    if write:
+        sp.write(mpath("spectra/{0}_spectrum_basesplined.fits".format(spname)))
 
     if radexfit:
         guesses = [x for ii in range(ncomp)
@@ -193,16 +187,8 @@ def fit_a_spectrum(sp, radexfit=False):
 #cube.xarr.refX = 218222190000.0
 #cube.xarr.refX_units = 'Hz'
 #cube = pyspeckit.Cube(os.path.join(mergepath, 'APEX_H2CO_merge_high_sub.fits'))
-etamb = 0.75 # http://www.apex-telescope.org/telescope/efficiency/
 #cube.cube /= etamb
-noise = fits.getdata(mpath('APEX_H2CO_merge_high_plait_all_noise.fits')) / etamb
-noisehdr = fits.getheader(mpath('APEX_H2CO_merge_high_plait_all_noise.fits'))
 #errorcube = noise[None,:,:] * np.ones(cube.cube.shape)
-
-cube = spectral_cube.SpectralCube.read(mpath('APEX_H2CO_merge_high_plait_all.fits'))
-cube._data /= etamb
-
-noiseokmask = np.isfinite(noise)
 
 def load_spectra(regs, cube):
 
