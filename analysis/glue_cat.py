@@ -59,46 +59,55 @@ cube_viewer.add_data(cube)
 #cube_viewer.add_subset(subset_tem_gt_60)
 #cube_viewer.add_data(catalog)
 
-table = ascii.read(apath('orbit_K14_2.dat'), format='basic', comment="#", guess=False) 
-coords = coordinates.SkyCoord(table['l']*u.deg, table['b']*u.deg, frame='galactic')
-P = pvextractor.Path(coords, width=120*u.arcsec)
-
-x, y = [np.round(_x).astype(int) for _x in P.sample_points(1, wcs=cube.data.coords.wcs)]
 
 ax = cube_viewer.axes
 ax.set_axis_bgcolor('black')
-#ax.plot(table['l'], table['b'], 'r-', linewidth=2, alpha=0.5)
-#ax.plot(x, y, 'r-', linewidth=2, alpha=0.5)
-patches = P.to_patches(1, ec='red', fc='none',
-                       #transform=ax.transData,
-                       clip_on=True, #clip_box=ax.bbox,
-                       wcs=cube.data.coords.wcs)
-for patch in patches:
-    patch.set_linewidth(0.5)
-    patch.set_alpha(0.5)
-    patch.zorder = 50
-patchcoll = matplotlib.collections.PatchCollection(patches, match_original=True)
-patchcoll.zorder=10
-ax.add_collection(patchcoll)
-ax.axis([x.min(),x.max(),y.min(),y.max()])
 
-pv = pvextractor.extract_pv_slice(cube.data['PRIMARY'], P, wcs=cube.data.coords.wcs)
-pvwidget = PVSliceWidget(image=pv.data, x=x, y=y,# wcs=wcs.WCS(pv.header),
-                         image_widget=cube_viewer, interpolation='nearest')
-pv_viewer = app.add_widget(pvwidget, label="Orbit PV Slice")
-ax2 = pvwidget.axes
+do_pv_diagram=False
+if do_pv_diagram:
+    table = ascii.read(apath('orbit_K14_2.dat'), format='basic', comment="#", guess=False) 
+    coords = coordinates.SkyCoord(table['l']*u.deg, table['b']*u.deg, frame='galactic')
+    P = pvextractor.Path(coords, width=120*u.arcsec)
 
-dl = (table['l'][1:]-table['l'][:-1])
-db = (table['b'][1:]-table['b'][:-1])
-dist = (dl**2+db**2)**0.5
-cdist = np.zeros(dist.size+1) * u.deg
-cdist[1:] = dist.cumsum() * u.deg
-#pixscale = ((x[1]-x[0])**2+(y[1]-y[0])**2)**0.5
-pixscale = wcs.utils.celestial_pixel_scale(cube.data.coords.wcs)
-spwcs = cube.data.coords.wcs.sub([wcs.WCSSUB_SPECTRAL])
-spax = spwcs.wcs_world2pix(table["v'los"]*1e3, 0)[0]
-ax2.plot(cdist/pixscale, spax, 'r-', linewidth=2, alpha=0.5)
-ax2.set_axis_bgcolor('black')
+    x, y = [np.round(_x).astype(int) for _x in P.sample_points(1, wcs=cube.data.coords.wcs)]
+
+    #ax.plot(table['l'], table['b'], 'r-', linewidth=2, alpha=0.5)
+    #ax.plot(x, y, 'r-', linewidth=2, alpha=0.5)
+    patches = P.to_patches(1, ec='red', fc='none',
+                           #transform=ax.transData,
+                           clip_on=True, #clip_box=ax.bbox,
+                           wcs=cube.data.coords.wcs)
+    for patch in patches:
+        patch.set_linewidth(0.5)
+        patch.set_alpha(0.5)
+        patch.zorder = 50
+    patchcoll = matplotlib.collections.PatchCollection(patches, match_original=True)
+    patchcoll.zorder=10
+    ax.add_collection(patchcoll)
+    ax.axis([x.min(),x.max(),y.min(),y.max()])
+
+    pv = pvextractor.extract_pv_slice(cube.data['PRIMARY'], P, wcs=cube.data.coords.wcs)
+    pvwidget = PVSliceWidget(image=pv.data, wcs=wcs.WCS(pv.header),
+                             image_client=cube_viewer, 
+                             x=x, y=y,
+                             interpolation='nearest')
+    pv_viewer = app.add_widget(pvwidget, label="Orbit PV Slice")
+    ax2 = pvwidget.axes
+
+    dl = (table['l'][1:]-table['l'][:-1])
+    db = (table['b'][1:]-table['b'][:-1])
+    dist = (dl**2+db**2)**0.5
+    cdist = np.zeros(dist.size+1) * u.deg
+    cdist[1:] = dist.cumsum() * u.deg
+    #pixscale = ((x[1]-x[0])**2+(y[1]-y[0])**2)**0.5
+    pixscale = wcs.utils.celestial_pixel_scale(cube.data.coords.wcs)
+    spwcs = cube.data.coords.wcs.sub([wcs.WCSSUB_SPECTRAL])
+    spax = spwcs.wcs_world2pix(table["v'los"]*1e3, 0)[0]
+    ax2.plot(cdist/pixscale, spax, 'r-', linewidth=2, alpha=0.5)
+    ax2.set_axis_bgcolor('black')
+
+    # SERIOUSLY, DO IT
+    ax.axis([x.min(),x.max(),y.min(),y.max()])
 
 dc.new_subset_group(label='T < 60', subset_state=subset_tem_lt_60)
 dc.new_subset_group(label='T > 60', subset_state=subset_tem_gt_60)
@@ -110,7 +119,5 @@ dc.subset_groups[1].style.markersize=15
 dc.subset_groups[1].style.marker='*'
 dc.subset_groups[1].style.color='orange'
 
-# SERIOUSLY, DO IT
-ax.axis([x.min(),x.max(),y.min(),y.max()])
 
 app.start()

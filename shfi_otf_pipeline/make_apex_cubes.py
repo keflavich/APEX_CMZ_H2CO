@@ -1784,7 +1784,8 @@ def compute_noise_high(prefix=mergepath+'APEX_H2CO_merge_high_sub',
         integ1,hdr = cubes.integ(ffile, pixrange, average=mad.bottleneck_MAD)
     except:
         integ1,hdr = cubes.integ(ffile, pixrange, average=mad.MAD)
-    hdu1 = fits.PrimaryHDU(data=integ1, header=hdr)
+    integ1.fill_value = np.nan
+    hdu1 = fits.PrimaryHDU(data=integ1.filled(), header=hdr)
     hdu1.writeto(prefix+"_noise.fits", clobber=True)
 
 def compute_noise_low(prefix=mergepath+'APEX_H2CO_merge_low_sub',pixrange=[512,675]):
