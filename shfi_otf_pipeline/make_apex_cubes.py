@@ -1269,6 +1269,7 @@ def build_cube_2013(mergefile=None,
         spectra,headers,indices = load_apex_cube(apex_filename,
                                                  downsample_factor=downsample_factor,
                                                  xtel=xtel,
+                                                 flag_array=flag_array,
                                                  sourcename='SGRA')
 
         if dataset == 'M-091.F-0019-2013-2013-06-13':
@@ -1421,6 +1422,7 @@ def build_cube_2014(sourcename,
         found_data = load_apex_cube(apex_filename,
                                     downsample_factor=downsample_factor,
                                     xtel=xtel, sourcename=sourcename,
+                                    flag_array=flag_array,
                                     posang=posang)
 
         if found_data is None:
