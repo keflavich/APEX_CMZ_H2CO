@@ -304,16 +304,6 @@ def load_apex_cube(apex_filename='data/E-085.B-0964A-2010.apex',
 
     return found_data
 
-def add_apex_cube(apex_filename='data/E-085.B-0964A-2010.apex',
-                  cubefilename='APEX_H2CO_Ao', clobber=True,
-                  kernel_fwhm=10./3600., **kwargs):
-    spectra,headers,indices = load_apex_cube(apex_filename)
-
-    data, hdrs, gal = select_apex_data(spectra, headers, indices, **kwargs)
-
-    add_apex_data(data, hdrs, gal, cubefilename, kernel_fwhm=kernel_fwhm,
-                  varweight=True)
-
 def select_apex_data(spectra,headers,indices, sourcename=None,
                      shapeselect=None, tsysrange=None, rchanrange=None,
                      xscan=None,
@@ -1209,7 +1199,14 @@ def build_cube_2013(mergefile=None,
                     timewise_pca=False, # 2013 data can't handle cleaning.
                     pca_clean=False, # 2013 data can't handle cleaning.  =(
                     extra_suffix="",
+                    noisefactor=1.0,
                     verbose=True, **kwargs):
+    """
+    Notes:
+        noisefactor set to 1.0 on Nov 15 because there is no data below that value
+        and only 18 above that value in one data set.  The noise is lower than the
+        theoretical value for some reason.
+    """
     if mergefile:
         cubefilename=os.path.join(outpath,mergefile)
     else:
