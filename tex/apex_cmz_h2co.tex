@@ -500,6 +500,32 @@ shock can provide a temperature of 65 K
     \item pyradex \url{https://github.com/keflavich/pyradex}
 \end{itemize}
 
+\appendix{Baseline Removal}
+The baselines in our SHFI-1 data were particularly problematic, more than is
+usual in modern heterodyne obervations.  The baselines can broadly be described
+as smoothly varying ripples on the scale of $\sim1/10$ the spectral window,
+plus more rapidly varying ripples on 20-40 \kms scales.  In principle, this is
+a straightforward problem of identifying the fourier components associated with
+each of these scales and subtracting them.
+
+In practice, we discovered that it was not possible to remove the dominant
+baseline structure on either scale without significantly affecting the
+underlying spectral data.  We simulated a variety of fourier-space suppression
+approaches by adding synthetic signal to baseline spectra extracted from the
+first few PCA components of the real spectra.
+
+The PCA extraction approach is able to pull out the dominant baseline
+components very effectively, but it inevitably includes significant signal in
+the top few most correlated components, especially for the strong \formaldehyde
+and \thirteenco lines.  We therefore abandoned it for the final data reduction.
+
+%\Figure{figures/M-091.F-0019-2013-2013-06-08_PCA_high_diagnostic.png}
+%{The first 3 eigenspectra from an observation taken on June 8, 2013.  These
+%show the baselines that are removed by PCA cleaning.  They do not include any
+%signal from the spectral lines.  \todo{This will be
+%replaced with a higher-quality figure}}
+%{fig:eigenspectra}{0.5}{0}
+
 
 \input{solobib}
 \end{document}

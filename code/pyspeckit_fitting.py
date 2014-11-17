@@ -12,13 +12,13 @@ import os
 try:
     # create the Formaldehyde Radex fitter
     # This step cannot be easily generalized: the user needs to read in their own grids
-    texgrid303 = fits.getdata(gpath('pH2CO_303_tex_5kms.fits'))
-    taugrid303 = fits.getdata(gpath('pH2CO_303_tau_5kms.fits'))
-    texgrid321 = fits.getdata(gpath('pH2CO_321_tex_5kms.fits'))
-    taugrid321 = fits.getdata(gpath('pH2CO_321_tau_5kms.fits'))
-    texgrid322 = fits.getdata(gpath('pH2CO_322_tex_5kms.fits'))
-    taugrid322 = fits.getdata(gpath('pH2CO_322_tau_5kms.fits'))
-    hdr = hdrb = fits.getheader(gpath('pH2CO_303_tex_5kms.fits'))
+    texgrid303 = fits.getdata(gpath('fjdu_pH2CO_303_tex_5kms.fits'))
+    taugrid303 = fits.getdata(gpath('fjdu_pH2CO_303_tau_5kms.fits'))
+    texgrid321 = fits.getdata(gpath('fjdu_pH2CO_321_tex_5kms.fits'))
+    taugrid321 = fits.getdata(gpath('fjdu_pH2CO_321_tau_5kms.fits'))
+    texgrid322 = fits.getdata(gpath('fjdu_pH2CO_322_tex_5kms.fits'))
+    taugrid322 = fits.getdata(gpath('fjdu_pH2CO_322_tau_5kms.fits'))
+    hdr = hdrb = fits.getheader(gpath('fjdu_pH2CO_303_tex_5kms.fits'))
 
     # # this deserves a lot of explanation:
     # # models.formaldehyde.formaldehyde_radex is the MODEL that we are going to fit
