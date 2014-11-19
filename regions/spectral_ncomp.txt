@@ -80,7 +80,7 @@
  "Map_031 Off 1":      {'ncomp':1, 'velo':[50,7]},
  "Map_032 Off 1":      {'ncomp':1, 'velo':[55]},
  "Map_055 Off 3":      {'ncomp':2, 'velo':[15,25]},
- "Map_056 Off 3":      {'ncomp':1, 'velo':[50,-16]},
+ "Map_056 Off 3":      {'ncomp':2, 'velo':[50,-16]},
  "Map_057 Off 2":      {'ncomp':2, 'velo':[44,24]},
  "Map_058 Off 2":      {'ncomp':2, 'velo':[84,27]},
  "Map_117 Off 1":      {'ncomp':2, 'velo':[71,32]},

@@ -62,14 +62,14 @@ for row in fittable:
 
     par1 = row['ampH2CO']
     epar1 = row['eampH2CO']
-    par2 = row['ampH2CO']*row['h2coratio321303']
-    epar2 = row['ampH2CO']*row['eh2coratio321303']
+    par2 = row['ampH2CO']*row['spline_h2coratio321303']
+    epar2 = row['ampH2CO']*row['espline_h2coratio321303']
     #match,indbest,chi2b = grid_fitter.grid_2p_getmatch(par1, epar1, tline303,
     #                                                   par2, epar2, tline321)
-    ratio = row['h2coratio321303']
-    eratio = row['eh2coratio321303']
-    ratio2 = row['h2coratio322321']
-    eratio2 = row['eh2coratio322321']
+    ratio = row['spline_h2coratio321303']
+    eratio = row['espline_h2coratio321303']
+    ratio2 = row['spline_h2coratio322321']
+    eratio2 = row['espline_h2coratio322321']
 
     # We can impose a "loose" abundance constraint
     # Given that we know the H2 density, and the line width is ~5-10 km/s,

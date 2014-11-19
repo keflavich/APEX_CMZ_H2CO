@@ -66,6 +66,10 @@ def set_row(parinfo, ncomp, rows, parmap):
             row["e"+par] = parinfo[parmap[par]+str(ii)].error
 
 
+font_sizes = {1: 20,
+              2: 15,
+              3: 11,
+              4: 8}
 
 def fit_a_spectrum(sp, radexfit=False, write=True):
     sp.plotter.autorefresh=False
@@ -108,6 +112,7 @@ def fit_a_spectrum(sp, radexfit=False, write=True):
 
     sp.plotter()
     sp.specfit.plot_fit(show_components=True)
+    sp.specfit.annotate(fontsize=font_sizes[ncomp])
     sp.specfit.plotresiduals(axis=sp.plotter.axis, yoffset=-err*5, clear=False,
                              color='#444444', label=False)
     sp.plotter.axis.set_ylim(sp.plotter.ymin-err*5, sp.plotter.ymax)
@@ -138,6 +143,7 @@ def fit_a_spectrum(sp, radexfit=False, write=True):
     sp.plotter.axis.plot(sp.xarr, spline_baseline+linear_baseline-err*5, color='orange',
                          alpha=0.5, zorder=-1, linewidth=2)
     sp.specfit.plot_fit(show_components=True)
+    sp.specfit.annotate(fontsize=font_sizes[ncomp])
     sp.specfit.plotresiduals(axis=sp.plotter.axis, yoffset=-err*5, clear=False,
                              color='#444444', label=False)
     sp.plotter.axis.set_ylim(sp.plotter.ymin-err*5, sp.plotter.ymax)
