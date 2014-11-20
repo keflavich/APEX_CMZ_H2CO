@@ -95,7 +95,7 @@ def fit_a_spectrum(sp, radexfit=False, write=True):
     sp.specfit(fittype='h2co_simple', multifit=True,
                guesses=guesses_simple,
                limited=[(True,True)] * 6,
-               limits=[(0,1e5),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
+               limits=[(0,20),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
               )
     sp.baseline(excludefit=True, subtract=True, highlight_fitregion=True, order=1)
 
@@ -103,7 +103,7 @@ def fit_a_spectrum(sp, radexfit=False, write=True):
     sp.specfit(fittype='h2co_simple', multifit=True,
                guesses=guesses_simple,
                limited=[(True,True)] * 6,
-               limits=[(0,1e5),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
+               limits=[(0,20),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
               )
 
     returns.append(copy.copy(sp.specfit.parinfo))

@@ -2,7 +2,7 @@
  "Brick NE":           {'ncomp':2, 'velo':[38,16]},
  "50kms A":            {'ncomp':1, 'velo':[53],},
  "Sgr A":              {'ncomp':2, 'velo':[40,50],},
- "20 kms":             {'ncomp':2, 'velo':[20,15],},
+ "20 kms":             {'ncomp':1, 'velo':[20],},
  "Sgr B2 SW":          {'ncomp':3, 'velo':[48,58,80]},
  "Sgr B2 NE":          {'ncomp':3, 'velo':[58,73,65]},
  "WarmSpot":           {'ncomp':3, 'velo':[28,52,80]},
