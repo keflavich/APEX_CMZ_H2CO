@@ -192,6 +192,15 @@ for cat,dendro,smooth in zipped:
         ax12.set_ylabel("Temperature (K)")
     fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.png'.format(smooth)))
 
+    #fig22, ax22 = pl.subplots(num=22)
+    #for mask,color,alpha in masks_colors:
+    #    ax22.errorbar(cat['higal_dusttem'][mask], cat['temperature_chi2'][mask],
+    #                #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
+    #                linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
+    #    ax22.set_xlabel("HiGal Dust Temperature")
+    #    ax22.set_ylabel("Temperature (K)")
+    #fig22.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.png'.format(smooth)))
+
     fig13, ax13 = pl.subplots(num=13)
     lon=cat['x_cen']
     lon[lon>180] -= 360
@@ -356,7 +365,7 @@ for cat,dendro,smooth in zipped:
             ax.set_ylim(10, 125)
         pl.draw()
 
-    pl.close(22)
+    pl.close(23)
 
     dview = dendro.viewer()
     structure = dendro.structure_at([262/(2 if smooth else 1),143,725]).ancestor

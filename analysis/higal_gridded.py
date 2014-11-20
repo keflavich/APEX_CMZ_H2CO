@@ -25,3 +25,4 @@ dusttem_image.data[whnan] = dusttem_conv[whnan]
 
 apex_header = cube303[0,:,:].hdu.header
 column_regridded = FITS_tools.hcongrid.hcongrid_hdu(column_image, apex_header)
+dusttem_regridded = FITS_tools.hcongrid.hcongrid_hdu(dusttem_image, apex_header)

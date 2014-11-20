@@ -22,7 +22,7 @@ from masked_cubes import (cube303m,cube321m,cube303msm,cube321msm,
 from masked_cubes import mask as cube_signal_mask
 from co_cubes import cube13co, cube18co, cube13cosm, cube18cosm
 from noise import noise, noise_cube, sm_noise_cube
-from higal_gridded import column_regridded
+from higal_gridded import column_regridded, dusttem_regridded
 from common_constants import logabundance,elogabundance
 
 warnings.simplefilter('once')
@@ -77,6 +77,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             'elogh2column',
             'logabundance',
             'elogabundance',
+            'higaldusttem',
            ]
     obs_keys = [
             'Stot303',
@@ -207,6 +208,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             log.info("Source #{0} has NaNs".format(ii))
             logh2column = 24
         elogh2column = elogabundance
+        columns['higaldusttem'] = np.nanmean(dusttem_regridded.data[view[1:]][mask2d])
 
         if r321303 < 0 or np.isnan(r321303):
             raise ValueError("Ratio <0: This can't happen any more because "
