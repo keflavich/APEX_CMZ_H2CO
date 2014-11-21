@@ -47,6 +47,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                                   suffix="",
                                   last_index=None,
                                   plot_some=True,
+                                  line='303',
                                   write=True):
 
     assert (cube321.shape == cube303.shape == noise_cube.shape ==
@@ -77,7 +78,6 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             'elogh2column',
             'logabundance',
             'elogabundance',
-            'higaldusttem',
            ]
     obs_keys = [
             'Stot303',
@@ -100,6 +100,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             'lon',
             'lat',
             'vcen',
+            'higaldusttem',
     ]
     columns = {k:[] for k in (keys+obs_keys)}
 
@@ -110,8 +111,17 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
     tcubedata[:] = np.nan
 
     # FORCE wcs to match
+    # (technically should reproject here)
     cube13co._wcs = cube18co._wcs = cube303.wcs
     cube13co.mask._wcs = cube18co.mask._wcs = cube303.wcs
+
+    if line == '303':
+        maincube = cube303
+    elif line == '321':
+        maincube = cube321
+    else:
+        raise ValueError("Unrecognized line: {0}".format(line))
+
 
     catalog = ppv_catalog(dend, metadata)
     pb = ProgressBar(len(catalog))
@@ -151,9 +161,16 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         if npix == 0:
             raise ValueError("npix=0. This is impossible.")
         Smean303 = Stot303/npix
-        if Stot303 <= 0:
+        if Stot303 <= 0 and line=='303':
             raise ValueError("The 303 flux is <=0.  This isn't possible because "
                              "the dendrogram was derived from the 303 data with a "
+                             "non-zero threshold.")
+        elif Stot303 <= 0 and line=='321':
+            Stot303 = 0
+            Smean303 = 0
+        elif Stot321 <= 0 and line=='321':
+            raise ValueError("The 321 flux is <=0.  This isn't possible because "
+                             "the dendrogram was derived from the 321 data with a "
                              "non-zero threshold.")
         if np.isnan(Stot321):
             raise ValueError("NaN in 321 line")
@@ -165,7 +182,10 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         if np.isnan(error):
             raise ValueError("error is nan: this is impossible by definition.")
 
-        if Stot321 < 0:
+        if line == '321' and Stot303 == 0:
+            r321303 = np.nan
+            er321303 = np.nan
+        elif Stot321 < 0:
             r321303 = error / Smean303
             er321303 = (r321303**2 * (var/Smean303**2 + 1))**0.5
         else:
@@ -193,11 +213,11 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         columns['c18omean'].append(co18sum/npix)
         columns['parent'].append(structure.parent.idx if structure.parent else -1)
         columns['root'].append(get_root(structure))
-        s303 = cube303._data[dend_inds]
-        x,y,z = cube303.world[dend_inds]
-        lon = ((z.value-(360*(z.value>180)))*s303).sum()/s303.sum()
-        lat = (y*s303).sum()/s303.sum()
-        vel = (x*s303).sum()/s303.sum()
+        s_main = maincube._data[dend_inds]
+        x,y,z = maincube.world[dend_inds]
+        lon = ((z.value-(360*(z.value>180)))*s_main).sum()/s_main.sum()
+        lat = (y*s_main).sum()/s_main.sum()
+        vel = (x*s_main).sum()/s_main.sum()
         columns['lon'].append(lon)
         columns['lat'].append(lat.value)
         columns['vcen'].append(vel.value)
@@ -208,15 +228,18 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             log.info("Source #{0} has NaNs".format(ii))
             logh2column = 24
         elogh2column = elogabundance
-        columns['higaldusttem'] = np.nanmean(dusttem_regridded.data[view[1:]][mask2d])
+        columns['higaldusttem'].append(np.nanmean(dusttem_regridded.data[view[1:]][mask2d]))
 
-        if r321303 < 0 or np.isnan(r321303):
+        if (r321303 < 0 or np.isnan(r321303)) and line != '321':
             raise ValueError("Ratio <0: This can't happen any more because "
                              "if either num/denom is <0, an exception is "
                              "raised earlier")
             #for k in columns:
             #    if k not in obs_keys:
             #        columns[k].append(np.nan)
+        elif (r321303 < 0 or np.isnan(r321303)) and line == '321':
+            for k in keys:
+                columns[k].append(np.nan)
         else:
             # Replace negatives for fitting
             if Smean321 <= 0:
@@ -315,3 +338,39 @@ def do_dendro_temperatures_smooth():
                                   noise_cube=sm_noise_cube,
                                   sncube=sncubesm,
                                   suffix="_smooth")
+
+def do_321_dendro_temperatures_sharp():
+    from dendrograms import dend321
+    catalog, tcube = measure_dendrogram_properties(dend=dend321,
+                                                   cube303=cube303,
+                                                   cube321=cube321,
+                                                   sncube=sncube, suffix="",
+                                                   line='321',
+                                                   write=False)
+    catalog.write(hpath('PPV_H2CO_Temperature_321selected.ipac'), format='ascii.ipac')
+    tcube.write(hpath('TemperatureCube_Dendrogram321Objects.fits'), overwrite=True)
+
+    return catalog,tcube
+
+def do_321_dendro_temperatures_smooth():
+    from dendrograms import dend321sm
+    assert sncubesm._wcs is cube303sm._wcs
+    catalog, tcube = measure_dendrogram_properties(dend=dend321sm,
+                                                   cube303=cube303sm,
+                                                   cube321=cube321sm,
+                                                   cube13co=cube13cosm,
+                                                   cube18co=cube18cosm,
+                                                   noise_cube=sm_noise_cube,
+                                                   sncube=sncubesm,
+                                                   suffix="_smooth",
+                                                   line='321',
+                                                   write=False)
+
+    catalog.write(hpath('PPV_H2CO_Temperature_321selected_smooth.ipac'), format='ascii.ipac')
+    tcube.write(hpath('TemperatureCube_Dendrogram321Objects_smooth.fits'), overwrite=True)
+
+    return catalog, tcube
+
+def do_321_dendro_temperatures_both():
+    do_321_dendro_temperatures_sharp()
+    do_321_dendro_temperatures_smooth()

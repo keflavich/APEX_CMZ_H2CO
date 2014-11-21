@@ -1803,19 +1803,44 @@ def compute_noise_extras(prefix=june2013path+'APEX_H2CO_2013_%s_sub',
     hdu1 = fits.PrimaryHDU(data=integ1, header=hdr)
     hdu1.writeto(prefix+"_noise.fits", clobber=True)
 
-def signal_to_noise_mask_cube(prefix, noise=None, kernelsize=[2,2,2], grow=1,
-                              sigmacut=3):
+def signal_to_noise_mask_cube(prefix=None, cube=None, noise=None,
+                              kernelsize=[2,2,2], grow=1, sigmacut=3):
     """
-    It's not clear that this has anything to do with moments...
-    (this was called moment_mask_cube in the past, which I think is just wrong)
+    Generate a signal-to-noise mask and use it to select the detected pixels in
+    a cube.
+
+    The algorithm finds all pixels in a smoothed version of the cube with
+    values >``sigmacut``*noise.  It then grows that mask by ``grow`` pixels in
+    each direction.
+
+    Parameters
+    ----------
+    prefix : str
+        The prefix for the FITS input and output files
+    cube : np.ndarray
+        Alternative to prefix: can pass in a cube directly
+    noise : np.ndarray
+        an array that is broadcastable to the cube shape
+    kernelsize : (int,int,int)
+        A length-3 list or tuple specifying the size of the kernel to smooth
+        the cube with.
+    grow : int
+        The number of pixels to grow the mask in each direction
+    sigmacut : float
+        The significance level of the pixels to include
     """
-    ffile = fits.open(prefix+'.fits')
-    cube = ffile[0].data
-    if noise is None:
-        noise = fits.getdata(prefix+'_noise.fits')
+    if prefix is not None:
+        ffile = fits.open(prefix+'.fits')
+        cube = ffile[0].data
+
+        if noise is None:
+            noise = fits.getdata(prefix+'_noise.fits')
+        log.info("Initiating cube smooth of {0}.".format(prefix))
+    elif None in (cube,noise):
+        raise ValueError("Must specify cube and noise if you do not "
+                         "specify a prefix")
 
     t0 = time.time()
-    log.info("Initiating cube smooth of {0}.".format(prefix))
     smcube = cube_regrid.gsmooth_cube(cube, kernelsize, use_fft=False,
                                       kernelsize_mult=3)
     log.info("Completed cube smooth in %i seconds" % (time.time()-t0))
@@ -1823,7 +1848,11 @@ def signal_to_noise_mask_cube(prefix, noise=None, kernelsize=[2,2,2], grow=1,
 
     mask_grow = scipy.ndimage.morphology.binary_dilation(mask, iterations=grow)
 
-    ffile[0].data[True-mask_grow] = np.nan
+    cube[~mask_grow] = np.nan
+    if prefix is not None:
+        return cube, mask_grow
+
+    ffile[0].data = cube
     ffile[0].writeto(prefix+"_snmasked.fits", clobber=True)
 
     ffile[0].data = mask_grow.astype('int')

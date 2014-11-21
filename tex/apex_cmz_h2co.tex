@@ -515,11 +515,15 @@ shock can provide a temperature of 65 K
 
 \appendix{Baseline Removal}
 The baselines in our SHFI-1 data were particularly problematic, more than is
-usual in modern heterodyne obervations.  The baselines can broadly be described
-as smoothly varying ripples on the scale of $\sim1/10$ the spectral window,
-plus more rapidly varying ripples on 20-40 \kms scales.  In principle, this is
-a straightforward problem of identifying the fourier components associated with
-each of these scales and subtracting them.
+usual in modern heterodyne obervations.  The 218 GHz window we have observed is
+particularly sensitive to resonances within the SHFI-1 receiver that vary on
+$<1$ minute timescales; our off-position calibrations were performed about once
+per minute and therefore were not rapid enough to mitigate this problem
+completely.  The baselines can broadly be described as smoothly varying ripples
+on the scale of $\sim1/10$ the spectral window, plus more rapidly varying
+ripples on 20-40 \kms scales.  In principle, this is a straightforward problem
+of identifying the fourier components associated with each of these scales and
+subtracting them.
 
 In practice, we discovered that it was not possible to remove the dominant
 baseline structure on either scale without significantly affecting the
@@ -531,6 +535,9 @@ The PCA extraction approach is able to pull out the dominant baseline
 components very effectively, but it inevitably includes significant signal in
 the top few most correlated components, especially for the strong \formaldehyde
 and \thirteenco lines.  We therefore abandoned it for the final data reduction.
+
+For reference, we show an example spectrum that we believe to consist entirely
+of baseline ripples.
 
 %\Figure{figures/M-091.F-0019-2013-2013-06-08_PCA_high_diagnostic.png}
 %{The first 3 eigenspectra from an observation taken on June 8, 2013.  These

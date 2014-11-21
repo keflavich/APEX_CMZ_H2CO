@@ -1,4 +1,5 @@
-from masked_cubes import cube303,cube303sm,cube303m,cube321m,cube303msm,cube321msm
+from masked_cubes import (cube303, cube303sm, cube303m, cube321m, cube303msm,
+                          cube321msm, cube321, cube321sm)
 from spectral_cube import SpectralCube,BooleanArrayMask
 from astropy.io import fits
 from numpy.lib.stride_tricks import as_strided
@@ -28,5 +29,10 @@ cube303nm = cube303.with_mask(BooleanArrayMask(np.isfinite(noise),
                                                cube303.wcs))
 cube303nmsm = cube303sm.with_mask(BooleanArrayMask(np.isfinite(sm_noise),
                                                    cube303sm.wcs))
+
+cube321nm = cube321.with_mask(BooleanArrayMask(np.isfinite(noise),
+                                               cube321.wcs))
+cube321nmsm = cube321sm.with_mask(BooleanArrayMask(np.isfinite(sm_noise),
+                                                   cube321sm.wcs))
 
 log.debug("Noise creation took {0:0.1f} seconds".format(time.time()-t0))

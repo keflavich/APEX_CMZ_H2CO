@@ -60,7 +60,7 @@ def make_fourier_spectra(dataset, maps, tels=['AP-H201-X202', 'AP-H201-X201']):
 
             fig = pl.figure(1)
             fig.clf()
-            ax = fig.gca()
+            ax = fig.add_subplot(2,1,1)
             ax2 = ax.twiny()
             def tick_function(X):
                 V = abs(fvr/(X/ftf[1])/2.)
@@ -68,6 +68,7 @@ def make_fourier_spectra(dataset, maps, tels=['AP-H201-X202', 'AP-H201-X201']):
 
             pl.loglog(ftf, np.abs(ft1), 'k', alpha=0.5)
             pl.loglog(ftf, np.abs(ft2), 'r', alpha=0.5)
+            pl.loglog(ftf, np.abs(ft1)-np.abs(ft2), 'g', alpha=0.8, linewidth=0.5)
 
             tick_locs = np.logspace(-np.log10(ftf.size/2.), np.log10(0.5), 7)
             ax2.set_xticks(tick_locs)
@@ -83,6 +84,16 @@ def make_fourier_spectra(dataset, maps, tels=['AP-H201-X202', 'AP-H201-X201']):
             ax.set_xlim(ftf[1], ftf[ftf.size/2-1])
             pl.xlim(ftf[1], ftf[ftf.size/2-1])
             assert ax.get_xlim() == (ftf[1], ftf[ftf.size/2-1])
+
+            ax3 = fig.add_subplot(2,1,2)
+            diff = sp-spff
+            diff.specname = ''
+            diff.baseline(order=0)
+            stats = diff.stats()
+            diff.plotter(axis=ax3, ymin=-stats['std']*5, ymax=stats['std']*5,
+                         linestyle='none', marker=',')
+
+            ax2.set_xlabel("{0} Velocity Scale (km/s)".format(sp.specname))
 
             pl.savefig(paths.dpath('field_spectra/'
                                    "{name}_{window}_{date}_psds.png".format(name=map,
