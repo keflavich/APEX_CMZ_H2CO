@@ -7,11 +7,14 @@ from astropy.table import Table, Column
 from astropy import log
 from scipy.interpolate import PiecewisePolynomial
 
-from dendrograms import catalog, catalog_sm, dend, dendsm
+from dendrograms import (catalog, catalog_sm, dend, dendsm, dend321, dend321sm,
+                         catalog321, catalog321_sm)
 
 matplotlib.rc_file(pcpath('pubfiguresrc'))
 
-zipped = zip((catalog,catalog_sm), (dend,dendsm), ('','_smooth'))
+zipped = zip((catalog,catalog_sm,catalog321,catalog321_sm),
+             (dend,dendsm,dend321,dend321sm),
+             ('','_smooth','_321ssel','_321sel_smooth'))
 
 for cat,dendro,smooth in zipped:
     for ii in range(1,14):
@@ -21,7 +24,7 @@ for cat,dendro,smooth in zipped:
     sn = (cat['ratio303321']/cat['eratio303321'])
     sngt50 = sn > 50
     sn25_50 = (sn > 25) & (sn < 50)
-    ok = np.isfinite(sn)
+    ok = np.isfinite(sn) & (cat['Stot321'] < cat['Stot303'])
     gt5 = (sn>5)
     
 
@@ -239,9 +242,13 @@ for cat,dendro,smooth in zipped:
     cb13.set_label(r'Temperature')
 
 
-    brick = dendro.structure_at([262/(2 if smooth else 1),143,725]).ancestor
-    sgra = dendro.structure_at([239/(2 if smooth else 1),97,907]).ancestor
-    sgrb2 = dendro.structure_at([278/(2 if smooth else 1),117,522]).ancestor
+    try:
+        brick = dendro.structure_at([262/(2 if 'smooth' in smooth else 1),143,725]).ancestor
+        sgra = dendro.structure_at([239/(2 if 'smooth' in smooth else 1),97,907]).ancestor
+        sgrb2 = dendro.structure_at([278/(2 if 'smooth' in smooth else 1),117,522]).ancestor
+    except AttributeError:
+        log.warning("Failed to find one of the sources.")
+        continue
     brick_leaves = [obj for obj in brick.descendants if obj.is_leaf]
     sgra_leaves = [obj for obj in sgra.descendants if obj.is_leaf]
     sgrb2_leaves = [obj for obj in sgrb2.descendants if obj.is_leaf]
@@ -377,10 +384,10 @@ for cat,dendro,smooth in zipped:
     pl.close(23)
 
     dview = dendro.viewer()
-    structure = dendro.structure_at([262/(2 if smooth else 1),143,725]).ancestor
+    structure = dendro.structure_at([262/(2 if 'smooth' in smooth else 1),143,725]).ancestor
     dview.hub.select(1, structure)
     dview.ax_image.axis((710,740,131,154))
-    dview.slice_slider.set_val(262/(2 if smooth else 1))
+    dview.slice_slider.set_val(262/(2 if 'smooth' in smooth else 1))
     dview.fig.savefig(fpath('dendrotem/dendrogram_viewer_brick{0}.png'.format(smooth)))
 
     

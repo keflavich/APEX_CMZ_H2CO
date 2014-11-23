@@ -106,10 +106,6 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
 
     log.debug("Initializing dendrogram temperature fitting loop")
 
-    # Prepare an array to hold the fitted temperatures
-    tcubedata = np.empty(cube303.shape, dtype='float32')
-    tcubedata[:] = np.nan
-
     # FORCE wcs to match
     # (technically should reproject here)
     cube13co._wcs = cube18co._wcs = cube303.wcs
@@ -121,6 +117,11 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         maincube = cube321
     else:
         raise ValueError("Unrecognized line: {0}".format(line))
+
+    # Prepare an array to hold the fitted temperatures
+    tcubedata = np.empty(maincube.shape, dtype='float32')
+    tcubedata[:] = np.nan
+
 
 
     catalog = ppv_catalog(dend, metadata)

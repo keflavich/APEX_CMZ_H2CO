@@ -54,6 +54,8 @@ def make_sn_dend(sncube, view=True, write=True,
 
 def make_dend(cube, noise, view=True, write=True,
               min_npix=100,
+              min_nsig_value=3,
+              min_nsig_delta=2,
               outfn="DendroMask_H2CO303202.hdf5"):
 
     # Use a little sigma-rejection to get a decently robust noise estimate
@@ -64,8 +66,8 @@ def make_dend(cube, noise, view=True, write=True,
     bad_noise = np.isnan(noise)
 
     dend = Dendrogram.compute(cube.filled_data[:].value,
-                              min_value=3*err_estimate,
-                              min_delta=2*err_estimate,
+                              min_value=min_nsig_value*err_estimate,
+                              min_delta=min_nsig_delta*err_estimate,
                               min_npix=min_npix,
                               verbose=True, wcs=cube.wcs)
 
@@ -104,6 +106,7 @@ def make_dend_321():
 
     #sncube = make_sncube(line='321_220')
     dend321 = make_dend(cube321nm, noise, min_npix=50,
+                        min_nsig_value=2,
                         outfn='DendroMask_H2CO321220.hdf5')
     t3 = time.time()
     log.info("Dendrogramming {1} objects in 321-220"
@@ -111,6 +114,7 @@ def make_dend_321():
 
     #sncube = make_sncube(line='321_220', smooth=True)
     dend321sm = make_dend(cube321nmsm, sm_noise, min_npix=100,
+                          min_nsig_value=2,
                           outfn='DendroMask_H2CO321220sm.hdf5')
     t4 = time.time()
     log.info("Smooth Dendrogramming {1} objects in 321-220"

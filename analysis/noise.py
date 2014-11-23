@@ -25,14 +25,24 @@ sm_noise_cube = as_strided(sm_noise, shape=cube303msm.shape,
 
 # Cubes masked with noise cube == OK
 # (can I make this lazier?)
-cube303nm = cube303.with_mask(BooleanArrayMask(np.isfinite(noise),
+noisefinite = np.isfinite(noise) # stride length changes for bools?
+sm_noisefinite = np.isfinite(sm_noise)
+cube303nm = cube303.with_mask(BooleanArrayMask(as_strided(noisefinite,
+                                                          shape=cube303.shape,
+                                                          strides=(0,)+noisefinite.strides),
                                                cube303.wcs))
-cube303nmsm = cube303sm.with_mask(BooleanArrayMask(np.isfinite(sm_noise),
+cube303nmsm = cube303sm.with_mask(BooleanArrayMask(as_strided(sm_noisefinite,
+                                                          shape=cube303sm.shape,
+                                                          strides=(0,)+sm_noisefinite.strides),
                                                    cube303sm.wcs))
 
-cube321nm = cube321.with_mask(BooleanArrayMask(np.isfinite(noise),
+cube321nm = cube321.with_mask(BooleanArrayMask(as_strided(noisefinite,
+                                                          shape=cube321.shape,
+                                                          strides=(0,)+noisefinite.strides),
                                                cube321.wcs))
-cube321nmsm = cube321sm.with_mask(BooleanArrayMask(np.isfinite(sm_noise),
+cube321nmsm = cube321sm.with_mask(BooleanArrayMask(as_strided(sm_noisefinite,
+                                                          shape=cube321sm.shape,
+                                                          strides=(0,)+sm_noisefinite.strides),
                                                    cube321sm.wcs))
 
 log.debug("Noise creation took {0:0.1f} seconds".format(time.time()-t0))

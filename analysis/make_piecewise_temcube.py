@@ -6,8 +6,8 @@ from astropy import log
 from spectral_cube import SpectralCube, BooleanArrayMask
 from paths import hpath, apath
 from astropy.table import Table, Column
-from ratio_cubes import ratio303321, eratio303321, noise_flat
-from masked_cubes import cube303m,cube321m,cube303,cube321,mask,cube303msm,cube321msm
+from ratio_cubes import ratio303321, eratio303321, noise_flat, mask
+from masked_cubes import cube303m,cube321m,cube303,cube321,cube303msm,cube321msm
 from astropy.utils.console import ProgressBar
 from astrodendro import Dendrogram,ppv_catalog
 from astropy.io import fits

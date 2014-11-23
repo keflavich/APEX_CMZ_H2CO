@@ -381,6 +381,13 @@ the spline fit used to iteratively remove baseline ripples from the residual.}
 {fig:twospectra_hotcold}{1}{3in}
 
 \section{Discussion}
+\subsection{Variation with Spatial Scale}
+For any given cloud, the ratio \Rone varies with the spatial averaging scale.
+For example, around `The Brick', the ratio decreases from $\sim0.55$ at the
+position $\ell=0.237$, $b=0.008$ within a single spectrum to $\sim0.33$ when
+averaged over a radius $\sim70\arcsec$.
+
+
 \subsection{Disagreement between gas and dust temperatures}
 The gas and dust temperatures throughout the CMZ continue to disagree far from
 the central $\sim30$ pc previously shown in \citet{Ao2013a}.
@@ -537,7 +544,22 @@ the top few most correlated components, especially for the strong \formaldehyde
 and \thirteenco lines.  We therefore abandoned it for the final data reduction.
 
 For reference, we show an example spectrum that we believe to consist entirely
-of baseline ripples.
+of baseline ripples in Figure \ref{fig:badbaselines}.
+
+\Figure{figures/worst_baselines_map001_withsynth}
+{An example showing some of the worst baselines observed.  The plotted spectrum
+is from an observation on April 2, 2014, showing the average of the 5\% worst
+spectra.  The blue curve shows a $\sigma=5$ \kms (FWHM$=11.75$ \kms) line centered
+at the 0 \kms position of \para \threeohthree,
+illustrating that the baseline `ripples' have widths comparable to the observed
+lines.  While we selected the worst 5\% in this case, nearly all spectra are
+affected by these sorts of baselines, and the shape and amplitude varies
+dramatically and unpredictably.  The variation, unpredictable though it is,
+works in our favor as it averages out over multiple independent observations.
+The 218 GHz region shown here is also the worst-affected; the 220 GHz range
+that includes the \thirteenco lines generally exhibits smoother and
+lower-amplitude baseline spectra.}
+{fig:badbaselines}{0.6}{0}
 
 %\Figure{figures/M-091.F-0019-2013-2013-06-08_PCA_high_diagnostic.png}
 %{The first 3 eigenspectra from an observation taken on June 8, 2013.  These
