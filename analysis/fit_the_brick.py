@@ -57,62 +57,12 @@ def do_pyspeck_fits_2comp():
     pcube2 = remove_bad_pars(brick_pcube.parcube, brick_pcube.errcube, 6,
                              min_nsig=4)
 
-def multiscale_fit(offset_scale=0.3):
-    centerx,centery = 21,10
-    lat,lon = b303m.world[0,centery,centerx][1:]
-    print "Center=",lon,lat
-
-    brick_pcube.plot_spectrum(centerx, centery)
-    brick_pcube.baseline(xtype='pixel', exclude=[236,323, 539,654, 972,1049,
-                                                 1180,1238], order=0, xmin=0,
-                         xmax=len(brick_pcube.data), subtract=True,
-                         selectregion=True, reset_selection=False,
-                         annotate=False)
-    brick_pcube.specfit(fittype='h2co_simple', multifit=True,
-                      guesses=[0.84,37.9,6.5,0.5,0.8,1.0],
-                      limited=[(True,True)] * 6,
-                      limits=[(0,20),(-105,125),(1,40),(0,1),(0.3,1.1),(0,1e5)],
-                     )
-    brick_pcube.specfit.plotresiduals(axis=brick_pcube.plotter.axis,
-                                      yoffset=-brick_pcube.specfit.parinfo[0].value*offset_scale, clear=False,
-                                      color='#444444', label=False)
-    brick_pcube.plotter.axis.set_ylim(-3*brick_pcube.specfit.residuals.std()-brick_pcube.specfit.parinfo[0].value*offset_scale,
-                                      brick_pcube.plotter.axis.get_ylim()[1])
-    brick_pcube.plotter.savefig(paths.fpath('brick_examples/brick_sw_specfit_r0.pdf'))
-    r1 = [brick_pcube.specfit.parinfo[3].value]
-    er1 = [brick_pcube.specfit.parinfo[3].error]
-
-    for radius in (2,3,4,5,6,7,8,9):
-        brick_pcube.plot_apspec([centerx, centery, radius], wunit='pixel')
-        brick_pcube.baseline(xtype='pixel', exclude=[236,323, 539,654, 972,1049,
-                                                     1180,1238], order=0, xmin=0,
-                             xmax=len(brick_pcube.data), subtract=True,
-                             selectregion=True, reset_selection=False,
-                             annotate=False)
-        brick_pcube.specfit(fittype='h2co_simple', multifit=True,
-                          guesses=[0.84,37.9,6.5,0.5,0.8,1.0],
-                          limited=[(True,True)] * 6,
-                          limits=[(0,20),(-105,125),(1,40),(0,1),(0.3,1.1),(0,1e5)],
-                         )
-        brick_pcube.specfit.plotresiduals(axis=brick_pcube.plotter.axis,
-                                          yoffset=-brick_pcube.specfit.parinfo[0].value*offset_scale, clear=False,
-                                          color='#444444', label=False)
-        brick_pcube.plotter.axis.set_ylim(-3*brick_pcube.specfit.residuals.std()-brick_pcube.specfit.parinfo[0].value*offset_scale,
-                                          brick_pcube.plotter.axis.get_ylim()[1])
-        brick_pcube.plotter.savefig(paths.fpath('brick_examples/'
-                                                'brick_sw_specfit_r{0}.pdf'.format(radius)))
-        r1.append(brick_pcube.specfit.parinfo[3].value)
-        er1.append(brick_pcube.specfit.parinfo[3].error)
-
-    pl.figure(2)
-    pl.clf()
-    pl.errorbar(np.arange(1,10)*7.2, r1, yerr=er1, linestyle='none', marker='s', color='k')
-    pl.xlim(0.5*7.2,9.5*7.2)
-    pl.xlabel("Aperture Radius (arcseconds)")
-    pl.ylabel("Ratio $3_{2,1}-2_{2,0} / 3_{0,3} - 2_{0,2}$")
-    pl.savefig(paths.fpath('brick_examples/ratio_vs_scale.pdf'))
-
-    return r1,er1
+def multiscale_fit_brick(pcube=brick_pcube, centerx=21, centery=10,
+                         offset_scale=0.3, savedir='brick_examples',
+                         savepre='brick_sw_specfit', **kwargs):
+    return multiscale_fit(pcube=pcube, centerx=centerx, centery=centery,
+                          offset_scale=offset_scale, savedir=savedir,
+                          savepre=savepre, **kwargs)
 
 def remove_bad_pars(parcube, errcube, npars, min_nsig=3):
     """
