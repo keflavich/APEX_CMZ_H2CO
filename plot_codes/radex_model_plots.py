@@ -2,20 +2,29 @@ import numpy as np
 import pylab as pl
 import paths
 import pyradex
+import pyradex.fjdu
 import warnings
 warnings.filterwarnings('once')
+from matplotlib.lines import Line2D
 import matplotlib
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 pl.ion()
 
 
+FF = pyradex.fjdu.Fjdu(species='ph2co-h2',
+                   column=1e14,
+                   temperature=50,
+                   escapeProbGeom='lvg',
+                   deltav=5,
+                   collider_densities={'oH2':1e3, 'pH2':1e4})
 RR = pyradex.Radex(species='ph2co-h2',
                    column=1e14,
                    temperature=50,
                    escapeProbGeom='lvg',
+                   deltav=5,
                    collider_densities={'oH2':1e3, 'pH2':1e4})
 
-drange1 = np.logspace(1,8)
+drange1 = np.logspace(1,8,100)
 fortho = 0.1
 
 fig1 = pl.figure(1)
@@ -36,9 +45,12 @@ for column, linestyle in zip((1e13,1e14,1e15),
                      linestyle=linestyle,
                      color=color,
                     )
-ax1.set_xlabel("Density ($n(H_2)$ cm$^{-3}$)")
+ax1.set_xlabel("Density ($n(\\mathrm{H}_2)$ cm$^{-3}$)")
 ax1.legend((ax1.lines[-3], ax1.lines[-2], ax1.lines[-1],
-            ax1.lines[0], ax1.lines[3], ax1.lines[6]),
+            Line2D([0], [0], linestyle=':', color='k', linewidth=2), 
+            Line2D([0], [0], linestyle='--', color='k', linewidth=2), 
+            Line2D([0], [0], linestyle='-', color='k', linewidth=2), 
+           ),
            ('$20$ K','$50$ K', '$100$ K',
             '$10^{13}$ cm$^{-2}$',
             '$10^{14}$ cm$^{-2}$',
@@ -48,10 +60,10 @@ ax1.legend((ax1.lines[-3], ax1.lines[-2], ax1.lines[-1],
 
 fig1.savefig(paths.fpath('radex_ratio_lines_vs_density.pdf'), bbox_inches='tight')
 
-crange1 = np.logspace(10,16)
+crange1 = np.logspace(12,16.5,100)
 fortho = 0.1
 
-fig2 = pl.figure(1)
+fig2 = pl.figure(2)
 fig2.clf()
 ax2 = fig2.gca()
 for density, linestyle in zip((1e3,1e5,1e7),
@@ -69,9 +81,12 @@ for density, linestyle in zip((1e3,1e5,1e7),
                      linestyle=linestyle,
                      color=color,
                     )
-ax2.set_xlabel("Column ($N(H_2)$ cm$^{-2}$)")
+ax2.set_xlabel("Column ($N(\\mathrm{H}_2)$ cm$^{-2}$)")
 ax2.legend((ax2.lines[-3], ax2.lines[-2], ax2.lines[-1],
-            ax2.lines[0], ax2.lines[3], ax2.lines[6]),
+            Line2D([0], [0], linestyle=':', color='k', linewidth=2), 
+            Line2D([0], [0], linestyle='--', color='k', linewidth=2), 
+            Line2D([0], [0], linestyle='-', color='k', linewidth=2), 
+           ),
            ('$20$ K','$50$ K', '$100$ K',
             '$10^{3}$ cm$^{-3}$',
             '$10^{5}$ cm$^{-3}$',

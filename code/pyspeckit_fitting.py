@@ -114,7 +114,7 @@ if __name__ == "__main__":
 
     if 'cube' not in locals():
         cube = pyspeckit.Cube(mergepath+'APEX_H2CO_merge_high_vsmoothds.fits')
-        etamb = 0.75 # http://www.apex-telescope.org/telescope/efficiency/
+        etamb = 0.67 # http://www.apex-telescope.org/telescope/efficiency/ then from class's ruze from Katharina's #'s
         cube.cube /= etamb
         noise = fits.getdata(mergepath+'APEX_H2CO_merge_high_vsmoothds_noise.fits') / etamb
         spectra = {}
