@@ -1850,7 +1850,7 @@ def signal_to_noise_mask_cube(prefix=None, cube=None, noise=None,
     mask_grow = scipy.ndimage.morphology.binary_dilation(mask, iterations=grow)
 
     cube[~mask_grow] = np.nan
-    if prefix is not None:
+    if prefix is None:
         return cube, mask_grow
 
     ffile[0].data = cube
@@ -2064,7 +2064,8 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
     integrate_mask(molpath+'APEX_H2CO_303_202_smooth',
                    mask=molpath+'APEX_H2CO_303_202_smooth_mask.fits')
     integrate_mask(molpath+'APEX_H2CO_303_202',
-                   mask=molpath+'APEX_H2CO_321_220_mask.fits')
+                   mask=molpath+'APEX_H2CO_321_220_mask.fits',
+                   maskpre='321')
 
     for fn in glob.glob(os.path.join(mergepath,'APEX_H2CO_30*fits')):
         try:
@@ -2090,7 +2091,8 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
             integrate_mask(molpath+'APEX_{0}'.format(line),
                            mask=molpath+'APEX_H2CO_321_220_mask.fits')
             integrate_mask(molpath+'APEX_{0}_smooth'.format(line),
-                           mask=molpath+'APEX_H2CO_303_202_smooth_mask.fits')
+                           mask=molpath+'APEX_H2CO_303_202_smooth_mask.fits',
+                           maskpre='321')
             #integrate_mask(molpath+'APEX_{0}_vsmooth'.format(line),
             #               mask=molpath+'APEX_H2CO_303_202_vsmooth_mask.fits')
             log.debug("Integrated masked file {0}".format(fn))
