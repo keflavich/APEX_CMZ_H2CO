@@ -2059,12 +2059,19 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_smooth',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
                               sigmacut=3)
+    signal_to_noise_mask_cube(molpath+'APEX_H2CO_321_220_smooth',
+                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
+                              sigmacut=3)
+
     integrate_mask(molpath+'APEX_H2CO_303_202',
                    mask=molpath+'APEX_H2CO_303_202_mask.fits')
     integrate_mask(molpath+'APEX_H2CO_303_202_smooth',
                    mask=molpath+'APEX_H2CO_303_202_smooth_mask.fits')
     integrate_mask(molpath+'APEX_H2CO_303_202',
                    mask=molpath+'APEX_H2CO_321_220_mask.fits',
+                   maskpre='321')
+    integrate_mask(molpath+'APEX_H2CO_303_202_smooth',
+                   mask=molpath+'APEX_H2CO_321_220_smooth_mask.fits',
                    maskpre='321')
 
     for fn in glob.glob(os.path.join(mergepath,'APEX_H2CO_30*fits')):
@@ -2093,8 +2100,9 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
             integrate_mask(molpath+'APEX_{0}_smooth'.format(line),
                            mask=molpath+'APEX_H2CO_303_202_smooth_mask.fits',
                            maskpre='321')
-            #integrate_mask(molpath+'APEX_{0}_vsmooth'.format(line),
-            #               mask=molpath+'APEX_H2CO_303_202_vsmooth_mask.fits')
+            integrate_mask(molpath+'APEX_{0}_smooth'.format(line),
+                           mask=molpath+'APEX_H2CO_321_220_smooth_mask.fits',
+                           maskpre='321')
             log.debug("Integrated masked file {0}".format(fn))
         else:
             log.debug("File {0} does not exist".format(fn))
@@ -2107,8 +2115,6 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
             baseline_cube(molpath+'APEX_{0}_smooth.fits'.format(line),
                           maskfn=molpath+'APEX_H2CO_303_202_smooth_mask.fits',
                           order=7)
-            #baseline_cube(molpath+'APEX_{0}_vsmooth.fits'.format(line),
-            #              maskfn=molpath+'APEX_H2CO_303_202_vsmooth_mask.fits')
 
     #compute_noise_high(molpath+'APEX_H2CO_303_202_bl',[350,400])
     #compute_noise_high(molpath+'APEX_H2CO_303_202_smooth_bl',[175,200])
@@ -2122,15 +2128,23 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_321_220_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits'),
                               grow=2)
+    signal_to_noise_mask_cube(molpath+'APEX_H2CO_321_220_smooth_bl',
+                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits'),
+                              grow=2)
 
     for line in lines218:
         if os.path.exists(molpath+'APEX_{0}_bl.fits'.format(line)):
             integrate_mask(molpath+'APEX_{0}_bl'.format(line),
                            mask=molpath+'APEX_H2CO_303_202_bl_mask.fits')
-            integrate_mask(molpath+'APEX_{0}_bl'.format(line),
-                           mask=molpath+'APEX_H2CO_321_220_bl_mask.fits')
             integrate_mask(molpath+'APEX_{0}_smooth_bl'.format(line),
                            mask=molpath+'APEX_H2CO_303_202_smooth_bl_mask.fits')
+
+            integrate_mask(molpath+'APEX_{0}_bl'.format(line),
+                           mask=molpath+'APEX_H2CO_321_220_bl_mask.fits',
+                           maskpre='321')
+            integrate_mask(molpath+'APEX_{0}_smooth_bl'.format(line),
+                           mask=molpath+'APEX_H2CO_321_220_smooth_bl_mask.fits',
+                           maskpre='321')
 
     do_mask_ch3oh(dpath=molpath)
 
