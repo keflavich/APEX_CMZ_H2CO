@@ -2061,7 +2061,7 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
                               sigmacut=3)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_321_220_smooth',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
-                              sigmacut=3)
+                              sigmacut=2)
 
     integrate_mask(molpath+'APEX_H2CO_303_202',
                    mask=molpath+'APEX_H2CO_303_202_mask.fits')
@@ -2096,13 +2096,15 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
             integrate_mask(molpath+'APEX_{0}'.format(line),
                            mask=molpath+'APEX_H2CO_303_202_mask.fits')
             integrate_mask(molpath+'APEX_{0}'.format(line),
-                           mask=molpath+'APEX_H2CO_321_220_mask.fits')
-            integrate_mask(molpath+'APEX_{0}_smooth'.format(line),
-                           mask=molpath+'APEX_H2CO_303_202_smooth_mask.fits',
+                           mask=molpath+'APEX_H2CO_321_220_mask.fits',
                            maskpre='321')
+
+            integrate_mask(molpath+'APEX_{0}_smooth'.format(line),
+                           mask=molpath+'APEX_H2CO_303_202_smooth_mask.fits')
             integrate_mask(molpath+'APEX_{0}_smooth'.format(line),
                            mask=molpath+'APEX_H2CO_321_220_smooth_mask.fits',
                            maskpre='321')
+
             log.debug("Integrated masked file {0}".format(fn))
         else:
             log.debug("File {0} does not exist".format(fn))
@@ -2127,9 +2129,11 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
                               sigmacut=3)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_321_220_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits'),
+                              sigmacut=2,
                               grow=2)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_321_220_smooth_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits'),
+                              sigmacut=2,
                               grow=2)
 
     for line in lines218:
