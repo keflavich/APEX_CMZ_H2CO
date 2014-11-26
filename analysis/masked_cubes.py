@@ -1,3 +1,4 @@
+import numpy as np
 from spectral_cube import SpectralCube,BooleanArrayMask
 from astropy import units as u
 from paths import hpath
@@ -25,6 +26,11 @@ bmasksm = BooleanArrayMask(masksm, cube303sm.wcs)
 cube303msm = cube303sm.with_mask(bmasksm)
 cube321msm = cube321sm.with_mask(bmasksm)
 
+# resample smoothed mask onto original grid
+masksm_rs = np.zeros_like(mask, dtype='bool')
+masksm_rs[::2,:,:] = masksm
+masksm_rs[1::2,:,:] = masksm
+bmasksm_rs = BooleanArrayMask(masksm_rs, cube303.wcs)
 
 sncube = SpectralCube.read(hpath('APEX_H2CO_303_202_signal_to_noise_cube.fits'))
 sncube._wcs = cube303._wcs
