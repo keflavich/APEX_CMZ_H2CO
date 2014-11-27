@@ -6,18 +6,19 @@ from astropy import log
 from spectral_cube import SpectralCube, BooleanArrayMask
 from paths import hpath, apath
 from astropy.table import Table, Column
-from ratio_cubes import ratio303321, eratio303321, noise_flat, mask
-from masked_cubes import cube303m,cube321m,cube303,cube321,cube303msm,cube321msm
+from ratio_cubes import ratio303321, eratio303321, noise_flat, mask, ratioOK
+from masked_cubes import (cube303m,cube321m,cube303msm,cube321msm,
+                          cube303,cube321,cube303sm,cube321sm,
+                          sncube, sncubesm)
 from astropy.utils.console import ProgressBar
 from astrodendro import Dendrogram,ppv_catalog
 from astropy.io import fits
-from dendrograms import dend, dendsm
+from dendrograms import dend, dendsm, dend321, dend321sm
 from piecewise_rtotem import pwtem
-
 
 tcubedata = np.empty(cube303m.shape)
 tcubedata[~mask] = np.nan
-tcubedata[mask] = pwtem(ratio303321)
+tcubedata[mask] = pwtem(ratio303321[ratioOK])
 
 tcube = SpectralCube(data=tcubedata, wcs=cube303m.wcs,
                      mask=cube303m.mask, meta={'unit':'K'},
@@ -42,10 +43,10 @@ for smooth in ('', '_smooth'):
 # Try the same thing but on the dendrogrammed data.  Basically, this is 
 # dendro_temperature but *much* faster
 
-for sm,cubeA,cubeB,objects in zip(("","_smooth"),
-                                  (cube303m,cube303msm),
-                                  (cube321m,cube321msm),
-                                  (dend,dendsm),):
+for sm,cubeA,cubeB,objects in zip(("","_smooth",'_321','_321smooth'),
+                                  (cube303m,cube303msm,cube303m,cube303msm),
+                                  (cube321m,cube321msm,cube321m,cube321msm),
+                                  (dend,dendsm,dend321,dend321sm),):
 
     # reset data
     tcubedata = np.empty(cubeA.shape)

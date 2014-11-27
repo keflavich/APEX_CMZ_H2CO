@@ -198,8 +198,8 @@ for cat,dendro,smooth in zipped:
     fig22 = pl.figure(22)
     fig22.clf()
     ax22 = fig22.gca()
-    hot = cat['temperature_chi2'] > 100
-    ax22.errorbar(cat['higaldusttem'][hot], [99]*hot.sum(),
+    hot = cat['temperature_chi2'] > 150
+    ax22.errorbar(cat['higaldusttem'][hot], [149]*hot.sum(),
                   lolims=True, linestyle='none', capsize=0, alpha=alpha,
                   marker='^', color='r')
     for mask,color,alpha in masks_colors:
@@ -208,7 +208,7 @@ for cat,dendro,smooth in zipped:
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax22.plot([14,38], [14,38], 'k--')
         ax22.set_xlim([13,38])
-        ax22.set_ylim([13,100])
+        ax22.set_ylim([13,150])
         ax22.set_xlabel("HiGal Dust Temperature (K)")
         ax22.set_ylabel("Temperature (K)")
     fig22.savefig(fpath('dendrotem/temperature_vs_dusttem{0}.png'.format(smooth)))
