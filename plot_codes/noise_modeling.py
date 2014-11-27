@@ -3,10 +3,8 @@ import pylab as pl
 import paths
 import pyradex
 import pyradex.fjdu
-import pyspeckit
 import warnings
 warnings.filterwarnings('once')
-from matplotlib.lines import Line2D
 import matplotlib
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 pl.ion()
