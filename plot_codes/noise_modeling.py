@@ -83,9 +83,9 @@ for tem in temperatures:
     recovratiostds.append(recov_ratio_std)
             
 from scipy.optimize import curve_fit
-def f(x,p0,p1,p2,p3):
-    return p2-np.exp(-(x)**p3*p1)*p0
-p,c = curve_fit(f, tb321arr, recovratiomeans)
+def f(x,p0,p1,p2):
+    return p2-np.exp(-(x)**0.25*p1)*p0
+p,c = curve_fit(f, tb321arr[2:], recovratiomeans[2:], p0=(10, 10, 1))
 
 fig1=pl.figure(1)
 fig1.clf()
