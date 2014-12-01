@@ -44,8 +44,8 @@ for smooth in ('', '_smooth'):
 # dendro_temperature but *much* faster
 
 for sm,cubeA,cubeB,objects in zip(("","_smooth",'_321','_321smooth'),
-                                  (cube303m,cube303msm,cube303m,cube303msm),
-                                  (cube321m,cube321msm,cube321m,cube321msm),
+                                  (cube303,cube303sm,cube303,cube303sm),
+                                  (cube321,cube321sm,cube321,cube321sm),
                                   (dend,dendsm,dend321,dend321sm),):
 
     # reset data
