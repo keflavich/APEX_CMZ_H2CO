@@ -42,8 +42,8 @@ for tem in temperatures:
                      temperature=tem,
                      deltav=linewidth,
                     )
-    tb303 = model_table['T_B'][2]
-    tb321 = model_table['T_B'][12]
+    tb303 = model_table['T_B'][2] *ff
+    tb321 = model_table['T_B'][12]*ff
 
     line303 = tb303*np.exp(-xarr**2/(2*linewidth**2))
     line321 = tb321*np.exp(-xarr**2/(2*linewidth**2))
@@ -109,3 +109,17 @@ ax2.grid()
 ax2.set_ylim(0.8, 2.0)
 ax2.set_xlim(0.2, 1.6)
 fig2.savefig(paths.fpath("noisemodeling_recoveredratio_boxplots.pdf"), bbox_inches='tight')
+
+# Not useful: had an idea but it didn't work out.  Save for later...
+#fig3=pl.figure(2)
+#fig3.clf()
+#ax3 = fig3.gca()
+#ax3.boxplot(recovratios, positions=recovratiomeans, widths=0.010)
+#ax3.set_xticks(tb321arr[::4])
+#ax3.set_xticklabels(["{0:0.2f}".format(x) for x in tb321arr[::4]])
+#ax3.set_xlabel("$T_B(3_{2,1}-2_{2,0})$", labelpad=20)
+#ax3.set_ylabel("Observed / Real $T(3_{2,1})/T(3_{0,3})$")
+#ax3.grid()
+#ax3.set_ylim(0.8, 2.0)
+#ax3.set_xlim(0.2, 1.6)
+#fig3.savefig(paths.fpath("noisemodeling_recoveredratio_boxplots.pdf"), bbox_inches='tight')

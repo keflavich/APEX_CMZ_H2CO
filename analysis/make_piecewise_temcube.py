@@ -100,3 +100,8 @@ for sm,cubeA,cubeB,objects in zip(("","_smooth",'_321','_321smooth'),
 
     outpath = 'RatioCube_DendrogramObjects{0}.fits'.format(sm)
     rcube.write(hpath(outpath), overwrite=True)
+
+    max_temcube = tcube.max(axis=0)
+    max_temcube.hdu.writeto(hpath('TemperatureCube_DendrogramObjects{0}_Piecewise_max.fits'.format(sm)), clobber=True)
+    max_rcube = rcube.max(axis=0)
+    max_rcube.hdu.writeto(hpath('RatioCube_DendrogramObjects{0}_Piecewise_max.fits'.format(sm)), clobber=True)
