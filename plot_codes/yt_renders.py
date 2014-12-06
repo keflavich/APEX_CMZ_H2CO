@@ -29,14 +29,14 @@ if 'yt13co' not in locals():
 mask = cube13co>0.2
 
 if 'cube_h2co303' not in locals():
-    cube_sio = SpectralCube.read(paths.mpath('APEX_SiO_54_bl.fits'))
+    cube_sio = SpectralCube.read(paths.molpath('APEX_SiO_54_bl.fits'))
     # HACK:
     mask._wcs = cube_sio.wcs
     ytsio = cube_sio.with_mask(mask).to_yt()
-    cube_h2co303 = SpectralCube.read(paths.mpath('APEX_H2CO_303_202_bl.fits'))
+    cube_h2co303 = SpectralCube.read(paths.molpath('APEX_H2CO_303_202_bl.fits'))
     mask._wcs = cube_h2co303.wcs
     yth2co303 = cube_h2co303.with_mask(mask).to_yt()
-    cube_h2co321 = SpectralCube.read(paths.mpath('APEX_H2CO_321_220_bl.fits'))
+    cube_h2co321 = SpectralCube.read(paths.molpath('APEX_H2CO_321_220_bl.fits'))
     mask._wcs = cube_h2co321.wcs
     yth2co321 = cube_h2co321.with_mask(mask).to_yt()
 
@@ -141,6 +141,38 @@ def render_chem(yth2co321=yth2co321, yth2co303=yth2co303, ytsio=ytsio,
         return images_h2co303,images_h2co321,images_sio
     else:
         return imh2co303,imh2co321,imsio
+
+def make_13co_faces(ytcube=yt13co, outdir='yt_renders_13CO',
+                size=1024, scale=1200., nframes=180,
+                movie=True,
+                camera_angle=[0, 0, 1],
+                north_vector = [1, 0, 0],
+                rot_vector1=[1,0,0],
+                rot_vector2=[0.5,0.5,0.0],
+                rot_vector3=[0.0,0.5,0.5],
+               ):
+
+    tf = yt.ColorTransferFunction([0,30], grey_opacity=True)
+    #tf.map_to_colormap(0.1,5,colormap='Reds')
+    tf.add_gaussian(2, 1, [1.0, 0.8, 0.0, 1.0])
+    tf.add_gaussian(3, 2, [1.0, 0.5, 0.0, 1.0])
+    tf.add_gaussian(5, 3, [1.0, 0.0, 0.0, 1.0])
+    tf.add_gaussian(10, 5, [1.0, 0.0, 0.0, 0.5])
+    tf.map_to_colormap(10, 30, colormap=red, scale=1)
+
+
+    center = ytcube.dataset.domain_dimensions /2.
+    ims = []
+    for camera_angle in ([1,0,0],[0,1,0],[0,0,1]):
+        cam = ytcube.dataset.h.camera(center, camera_angle, scale, size, tf,
+                          north_vector=north_vector, fields='flux')
+
+        im  = cam.snapshot()
+        ims.append(im)
+
+    save_images(ims, 'render_13co_faceon_1024')
+
+
 
 
 def render_13co(ytcube=yt13co, outdir='yt_renders_13CO',
