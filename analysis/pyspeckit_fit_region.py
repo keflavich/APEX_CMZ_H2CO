@@ -41,6 +41,7 @@ def get_subregion_pcube(cube303m, cube303, cube321, region):
 # cold, narrow
 # pc = do_1comp_region('G1.12-0.10', vrange=[-40,0], startpoint=(5,5))
 # pc = do_1comp_region('G1.00-0.02', vrange=[20,130], startpoint=(5,5))
+# pc = do_1comp_region('G0.67-0.10', vrange=[00,50], startpoint=(5,5))
 
 def do_1comp_region(region='G0.47-0.07box', vrange=[50,125], minpeak=0.22,
                     startpoint=(22,6)):
