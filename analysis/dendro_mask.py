@@ -57,6 +57,9 @@ def make_dend(cube, noise, view=True, write=True,
               min_nsig_value=3,
               min_nsig_delta=2,
               outfn="DendroMask_H2CO303202.hdf5"):
+    """
+    Given a cube and a 2D noise map, extract dendrograms.
+    """
 
     # Use a little sigma-rejection to get a decently robust noise estimate
     noise_std = noise[noise==noise].std()

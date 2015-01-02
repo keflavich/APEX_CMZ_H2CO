@@ -50,9 +50,10 @@ for cat,dendro,smooth in zipped:
                      #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                      #xerr=[cat['eratio303321'][mask], cat['eratio303321'][mask]],
                      linestyle='none', capsize=0, alpha=alpha, marker='.',
+                     markersize=10,
                      color=color, linewidth=0.3)
-        ax2.set_xlabel("Ratio 321/303")
-        ax2.set_ylabel("Temperature")
+        ax2.set_xlabel("Ratio $S(3_{2,1}-2_{2,0})/S(3_{0,3}-2_{0,2})$")
+        ax2.set_ylabel("Temperature $[K]$")
     fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}.pdf'.format(smooth)))
         
     if cat is catalog:
@@ -101,9 +102,9 @@ for cat,dendro,smooth in zipped:
         fit_table.write(apath('piecewise_tvsratio_fit.ipac'), format='ascii.ipac')
 
         x = np.linspace(0,0.6,100)
-        ax2.plot(x, func(x), 'k-', alpha=0.5)
-        ax2.set_xlim(0.,0.5)
-        ax2.set_ylim(10.,350)
+        ax2.plot(x, func(x), 'k-', alpha=0.5, zorder=-10)
+        ax2.set_xlim(0.,0.6)
+        ax2.set_ylim(0.,350)
         fig2.savefig(fpath('dendrotem/ratio_vs_temperature_piecewise{0}.pdf'.format(smooth)))
         ax2.plot(x, p1(x), 'k--', alpha=0.5)
         ax2.plot(x, p2(x), 'k:', alpha=0.5)

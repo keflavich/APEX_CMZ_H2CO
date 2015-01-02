@@ -157,35 +157,80 @@ Cauchy distribution in which the mean becomes undefined as the mean of the
 individual values being compared approaches zero.  We therefore sought other
 means to create temperature maps.
 
-\section{Signal Extraction}
+\section{Signal Extraction \& Analysis}
 \label{sec:signal}
 We use the method described partially in \citet{Ao2013a} and more thoroughly in
 \citet{Dame2011b} to mask the data cubes at locations of significant signal in 
 the brightest line. 
 A noise map was created by computing the sample standard deviation over a
-200-pixel range in which no signal was identified.
+200-\kms range in which no signal was present.
 We use the \formaldehyde \threeohthree line to create the mask by
 the following procedure:
 
 \begin{enumerate}
     \item Smooth the data with a gaussian of width 2 pixels in each direction
         (spatial and spectral)
-    \item Identify all pixels with brightness $T_A > 3\sigma$, where the noise
-        map was \emph{not} smoothed
+    \item Identify all pixels with brightness $T_A > 3\sigma$ in the smoothed
+        map
     \item Grow the mask from the previous step by 1 pixel in each direction
         (this is known in image processing as binary dilation)
 \end{enumerate}
 
 The \formaldehyde \threeohthree mask was then applied to the \threetwoone and
-\threetwotwo cubes, and all three cubes were integrated.  There is some overlap
+\threetwotwo cubes created with the same PPV gridding.  There is some overlap
 between the \methanol \fourtwotwo line and the \formaldehyde \threetwotwo
 line in PPV space, so we shifted the \formaldehyde mask to the velocity of the
 \methanol line in the \formaldehyde \threetwotwo cube and excluded any pixels
 expected to have signal.
 
+Figure \ref{fig:ratiomaps} show the ratio of the integrated emission in the
+masked regions.  The \threetwotwo line is missing in large sections of the map
+due to \methanol contamination, and therefore is not very useful in constraining
+the gas temperature, so it is not included.
 
-\subsection{Computing Temperature}
-\label{sec:formaldehydetemmap}
+
+% figure_ratio_maps
+\Figure
+%{figures/big_H2CO_322221_to_303202_smooth_bl_integ.pdf}
+{figures/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
+{Maps of the ratio of the integrated emission ratio
+\threetwoone/\threeohthree (bottom).  The data cubes were masked by
+signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
+indicating nondetections.  The Sgr B2 peaks exhibit \formaldehyde
+absorption and therefore are not reliable.  Higher ratios (red) correspond
+to higher temperatures.
+}
+%{fig:ratiomaps}{1}{7in}
+{fig:ratiomaps}{0.6}{0}
+
+\subsection{Region Extraction}
+In order to extract higher signal-to-noise measurements on selected regions, we
+broke the data down into subsets using both a by-eye region selection drawing
+regions using ds9 and a more systematic approach using a dendrogram-based clump
+finding algorithm \citep[][\url{http://dendrograms.org/}]{Rosolowsky2008c}.
+
+We ran the dendrogram/clumpfind extraction analysis on the full resolution
+\threeohthree cube data.  We enforced thresholds of a minimum number of pixels
+$N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting threshold
+$\Delta = 2\sigma$.  The exact values of these parameters is not particularly
+important, as we are interested in general trends with size-scale and
+galactocentric distance, but we caution against overinterpretation of the
+resulting catalog as the number of sources and their size and distribution can
+change dramatically with small changes in the selected parameters.
+
+For each extracted blob, we measured the corresponding integrated and peak
+emission in the \threetwoone and \thirteenco cubes.  We also extracted the mean
+dust temperature and column density from SED fits to Herschel HiGal 170-500\um
+maps.  The SED fits were performed on background-subtracted data using an
+approach originally described in \citet{Battersby2011a}, which includes details
+of the fitting process and specification of assumed physical parameters.  We
+also extracted dust column density and temperature using a more naive
+pixel-by-pixel approach with no background subtraction
+(\url{http://hi-gal-sed-fitter.readthedocs.org/en/latest/}) and found the two
+to be consistent.
+
+\subsection{Line Modeling}
+\label{sec:linemodeling}
 \todo{Different grids have been used at different stages.  The specific numbers
 will need to be updated.}
 We use RADEX \citet{van-Der-Tak2007a} to create a model grid for the
@@ -196,106 +241,45 @@ $X=10^{-8.5}$ at $N(\hh) = 3\ee{22}$ \persc, and a range of temperatures from
 10 to 300 K with 100 evenly spaced grid points.  The grid was created using
 the \texttt{pyradex} wrapper of
 RADEX\footnote{\url{https://github.com/keflavich/pyradex}}.
-
-%This approach was abandoned; the more effective full-parameter space modeling
-%was adopted instead
-% The line brightnesses returned from RADEX were then divided to create ratios,
-% and the grid inverted to allow interpolation of a measured ratio onto the input
-% temperature grid.   This approach requires that the ratios be monotonic with
-% temperature, which generally holds.  It also required us to \emph{a priori}
-% select a density from the grid; we selected $n=10^4$ \percc.  The choice of
-% density and assumed column density have only a minor effect on the derived
-% temperature.  If the density is $n(\hh)\sim10^5$ \percc rather than $10^4$
-% \percc, the kinetic temperature will be about 10\% lower than we report.  If
-% the column is $N(\hh)=3\ee{23}$ \persc rather than $N(\hh)=3\ee{22}$ \persc, or
-% correspondingly if the abundance is $10\times$ larger, then the temperature
-% will be 10\% lower for $T>175$ K; below that temperature the difference is
-% $<5\%$.  Therefore the systematic effects from the assumed density and
-% temperature are relatively small.
-
-% NOTE: the baselines in The Brick are particularly nasty.  The most advanced
-% fitting techniques will be required to extract anything useful.
-\todo{Move to discussion:}
-\citet{Johnston2014a} noted a very high temperature peak, $T>320$K, using these
-lines of \formaldehyde toward The Brick, G0.253+0.015.  We measure similar line
-ratios toward The Brick, but on larger scales.  The interpretation of these
-line ratios is subject to some question, though.  Above 300K, the collision
-rates provided by LAMDA \citep{Schoier2005a,Wiesenfeld2013a} must be
-extrapolated.  Additionally, some of the ratios cannot be reproduced by high
-temperatures, but instead require that the lines be thermalized and therefore
-at very high densities.   Given the low brightness temperatures observed,
-the emission must be coming from an extremely small area, which is inconsistent
-with the observed large extent of the emission unless it is also extremely
-patchy.  That remains a possibility if we are observing massive, dense clouds
-with relatively uniformly turbulent properties.
-
-% figure_ratio_maps
-\FigureTwoAA
-{figures/big_H2CO_322221_to_303202_smooth_bl_integ.pdf}
-{figures/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
-{Maps of the ratio of the integrated \para \threetwotwo / \threeohthree (top)
-and \threetwoone/\threeohthree (bottom).  The data cubes were masked by
-signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
-indicating nondetections.  The \threetwotwo line is also masked where it
-overlaps with the \methanol \fourtwotwo line, resulting in a large masked area
-around Sgr B2 in the top panel.  The Sgr B2 peaks also exhibit \formaldehyde absorption and therefore
-bias the line ratios.  Higher ratios (red) correspond to higher
-temperatures and/or densities.  \todo{Further modeling is required to determine
-which.}
-}
-{fig:ratiomaps}{1}{7in}
-
-\Figure{figures/big_lores_smooth_tmap_withcontours.pdf}
-{A temperature map derived from the \threetwoone/\threeohthree ratio map shown
-in Figure \ref{fig:ratiomaps} using the method described in Section
-\ref{sec:formaldehydetemmap}.  Regions of lower signal-to-noise, and therefore less
-reliable temperature, are grayed out with a filter that gets more opaque
-toward lower signal-to-noise.
-%The contours correspond to the integrated \threeohthree
-%line intensity at levels [4,7,11,20,38] K \kms.
-}
-{fig:temmap}{0.6}{0}
-
-\section{Line Modeling}
-\label{sec:linemodeling}
-In order to extract more detailed information about the gas properties and
-acquire an understanding of the uncertainties in the ratio-derived
-temperature map described above, we extracted spectra from individual regions
-with relatively high signal-to-noise and modeled them in further detail.
-
-The RADEX grids described above were used, but with finer spacing in density,
-column density, and temperature.  We then upsampled the grids by spline
-interpolating between grid points to acquire a high-resolution ($T\times n
-\times N = 250\times100\times100$) grid
+We then upsampled these grids by spline interpolating between grid points to
+acquire a high-resolution ($T\times n \times N = 250\times100\times100$) grid
 covering $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N <
 10^{15.1}$ \persc\perkmspc.
 
-We created $\chi^2$ grids using independent constraints from the line ratio,
-the \formaldehyde abundance, and the total column density of \hh.  We use the
-line \emph{ratio} rather than line brightnesses to avoid uncertainties due to
-the ``filling factor'' of the emitting gas: even for diffuse clouds, the
-filling factor of the emitting regions may be $ff<<1$ if the emission is
-isolated to compact shocked regions, as expected if highly supersonic
-$\mathcal{M}>10$ turbulence is energetically dominant in the clouds.  We use an
-abundance $N(\para)/N(\hh) = X(\para) = 10^{9.08\pm1} = 1.2\ee{9} \times/\div
-10$, allowing for dramatic uncertainty in the \formaldehyde abundance
+We extracted spectra averaged over each `by-eye' selected region and fitted
+a 6-parameter model to the full 218-219 GHz spectral range.  The fitted
+parameters are the amplitude of the \formaldehyde \threeohthree line, the
+centroid velocity, the line width ($\sigma$, not FWHM), the ratio $R_1 =
+\Rone$, the ratio $R_2 = \Rtwo$, and the amplitude of the \methanol \fourtwotwo
+line.
+
+
+For each extracted region, we created $\chi^2$ grids using independent
+constraints from the line ratio, the \formaldehyde abundance, and the total
+column density of \hh.  We use the line \emph{ratio} rather than line
+brightnesses to avoid uncertainties due to the ``filling factor'' of the
+emitting gas: even for diffuse clouds, the filling factor of the emitting
+regions may be $ff<<1$ if the emission is isolated to compact shocked regions,
+as expected if highly supersonic $\mathcal{M}>10$ turbulence is energetically
+dominant in the clouds.  We use an abundance $N(\para)/N(\hh) = X(\para) =
+10^{9.08\pm1} = 1.2\ee{9} \times/\div 10$, allowing for dramatic uncertainty in
+the \formaldehyde abundance
 \citep{Ginsburg2013a,Carey1998a,Wootten1978a,Mundy1987a}.  To constrain the
 total column density, we use the Herschel dust maps to derive an \hh column
-density, which has a nominal $\sim2-3\times$ uncertainty.  We treat the error as
-$10\times$ to account for the abundance uncertainty.
+density, which has a nominal $\sim2-3\times$ uncertainty.  We treat the error
+as $10\times$ to account for the abundance uncertainty.  This large assumed
+error also accounts for factor $\sim2-3$ uncertainty due to line-of-sight
+confusion, since the dust column density cannot be associated with any specific
+velocity component.
 
 These constraints are shown projected onto the three planes of our fitted
 parameter space in the multi-paneled Figures
 \ref{fig:coltemconstraints}-\ref{fig:parsonbrightness}.  The fitted parameters
-displayed in Figure \ref{fig:parsonbrightness} are the amplitude of the
-\formaldehyde \threeohthree line, the centroid velocity, the line width
-($\sigma$, not FWHM), the ratio $R_1 = \Rone$,
-the ratio $R_2 = \Rtwo$, and the amplitude of
-the \methanol \fourtwotwo line.
+are displayed in Figure \ref{fig:parsonbrightness}.
 
 While $R_2$ can, in some cases, provide significant constraints on various
-parameters, we do not use it in general because of the ambiguity imposed by the
-overlap with the \methanol \fourtwotwo line.
+parameters, we do not use it because of the ambiguity imposed by the overlap
+with the \methanol \fourtwotwo line.
 
 \Figure{figures/simple/d:G0.38+0.04_fit_4_lines_simple.pdf}
 {Fitted spectrum of ``cloud d".  The fitted parameters and their corresponding
@@ -348,8 +332,56 @@ See Figure \ref{fig:coltemconstraints} for details.}
 grayscale images correspond to a slice through the parameter spaces at the
 location of the best-fit parameter.  The colored contours show the allowed
 marginalized regions in each parameter space as described in the
-\ref{fig:coltemconstraints} caption.}
+Figure \ref{fig:coltemconstraints} caption.}
 {fig:parsonbrightness}{0.5}{0}
+
+\subsection{Blob modeling}
+\label{sec:dendromod}
+Similar to the line modeling approach, we derived temperatures for each
+dendrogram catalog blob using the measured line ratio and dust column density.
+The $\chi^2$ grid approach described in Section \ref{sec:linemodeling} was used
+to extract the temperature and associated error.
+
+We plot the derived temperature for all clumps against the measured line ratio
+in Figure \ref{fig:ratiovstem}.  The relation is nearly monotonic for the vast
+majority of sources.  To simplify further analysis, we fit a three-element
+piecewise linear model for temperature as a function of $R_1$.  We use this
+function for further derivations of the temperature.  There is noticeable
+scatter above $R_1 > 0.4$ and $T>150$ K, but in this regime the modeling is
+already intrinsically uncertain and these ratios are best treated as lower
+limits on the gas temperature.
+
+% dendrotem_plots
+\Figure{figures/dendrotem/ratio_vs_temperature_piecewise.pdf}
+{The derived temperature vs the measured ratio \Rone.  The temperature
+includes constraints from the assumed fixed \formaldehyde abundance and the 
+varying column density.  The points are color coded by signal-to-noise in the
+ratio $R_1$, with black $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$,
+and red $S/N > 50$.  The black line shows a three-element piecewise fit
+to the data.
+}
+{fig:ratiovstem}{0.6}{0}
+
+\subsection{Temperature Maps}
+\label{sec:formaldehydetemmap}
+Using the piecewise relation derived in Section \ref{sec:dendromod}, we
+converted the ratio map shown in Figure \ref{fig:ratiomaps} to a temperature
+map in Figure \ref{fig:temmap}.  Because this map includes the full line-of-sight
+integrated emission, there are many regions where multiple independent components
+are being mixed.
+
+\Figure{figures/big_lores_smooth_tmap_withcontours.pdf}
+{A temperature map derived from the \Rone ratio map shown
+in Figure \ref{fig:ratiomaps}.  Regions of lower signal-to-noise, and therefore less
+reliable temperature, are grayed out with a filter that gets more opaque
+toward lower signal-to-noise.  Temperatures above $\gtrsim150$ K should be
+treated as lower limits in the 100-150 K range.
+%The contours correspond to the integrated \threeohthree
+%line intensity at levels [4,7,11,20,38] K \kms.
+}
+{fig:temmap}{0.6}{0}
+
+
 
 \section{Parameter Comparisons}
 In the selected regions we averaged to acquire higher signal-to-noise for more
@@ -473,6 +505,22 @@ of the gas has been heated to the high observed temperatures, we can determine t
 shock velocity required to supply the heating.  Assuming an adiabatic strong shock,
 $T_{ps} = \frac{3}{16}\frac{\mu v_s^2}{k}$, where $\mu = \mu_{\hh} = 2.8$.  A 1 \kms
 shock can provide a temperature of 65 K
+
+% NOTE: the baselines in The Brick are particularly nasty.  The most advanced
+% fitting techniques will be required to extract anything useful.
+\todo{Move to discussion:}
+\citet{Johnston2014a} noted a very high temperature peak, $T>320$K, using these
+lines of \formaldehyde toward The Brick, G0.253+0.015.  We measure similar line
+ratios toward The Brick, but on larger scales.  The interpretation of these
+line ratios is subject to some question, though.  Above 300K, the collision
+rates provided by LAMDA \citep{Schoier2005a,Wiesenfeld2013a} must be
+extrapolated.  Additionally, some of the ratios cannot be reproduced by high
+temperatures, but instead require that the lines be thermalized and therefore
+at very high densities.   Given the low brightness temperatures observed,
+the emission must be coming from an extremely small area, which is inconsistent
+with the observed large extent of the emission unless it is also extremely
+patchy.  That remains a possibility if we are observing massive, dense clouds
+with relatively uniformly turbulent properties.
 
 %\section{Examination of Individual Spectra}
 %%\todo{The modeling is ambiguous still: it is necessary to impose some sort of

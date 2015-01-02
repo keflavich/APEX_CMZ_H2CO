@@ -1,6 +1,6 @@
 import numpy as np
 from astropy import units as u
-from paths import h2copath,figurepath
+from paths import h2copath,figurepath,hpath
 import copy
 import os
 import aplpy
@@ -18,6 +18,8 @@ cm = matplotlib.cm.RdYlBu_r
 cm.set_bad('#888888')
 
 vcuts = np.arange(-60,141,20)
+
+# TODO: do the same thing for the dendrotem maps
 
 fig = pl.figure(1, figsize=(14,6))
 for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
@@ -127,6 +129,10 @@ for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
         tproj = np.copy(proj)
         tproj[np.isfinite(proj)] = pwtem(proj[np.isfinite(proj)].value)
         hdu = fits.PrimaryHDU(tproj, proj.hdu.header)
+        hdu.writeto(hpath("tmap{0}_{1}to{2}".format(smooth,
+                                                    int(vrange[0]),
+                                                    int(vrange[1]))),
+                    clobber=True)
         F = aplpy.FITSFigure(hdu,
                              convention='calabretta',
                              figure=fig)
