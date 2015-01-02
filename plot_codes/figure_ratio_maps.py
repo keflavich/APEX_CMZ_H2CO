@@ -19,8 +19,6 @@ cm.set_bad('#888888')
 
 vcuts = np.arange(-60,141,20)
 
-# TODO: do the same thing for the dendrotem maps
-
 fig = pl.figure(1, figsize=(14,6))
 for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
                           (sncube, sncubesm),
@@ -167,6 +165,7 @@ for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
                               'big_lores{0}_tmap_greyed_{1}to{2}.png'.format(smooth,
                                                                              int(vrange[0]),
                                                                              int(vrange[1]))))
+
 
 
         

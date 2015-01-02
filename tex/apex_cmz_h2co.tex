@@ -370,6 +370,20 @@ map in Figure \ref{fig:temmap}.  Because this map includes the full line-of-sigh
 integrated emission, there are many regions where multiple independent components
 are being mixed.
 
+Figure \ref{fig:dendrotemmap} shows a temperature map created by measuring the
+temperature in each clump from the dendrogram clump extraction based on the
+smoothed data cube and averaging over the velocity axis.  Because there are
+hierarchically nested clumps in the dendrogram-based clumpfind, and because
+there are genuinely independent clumps along common lines of sight, there is
+still overlap and confusion.  The nested clumps in the dendrogram can provide
+more than one temperature measurement per voxel; we therefore use the most
+compact clump's temperature measurement for each voxel.
+
+The two temperature maps broadly agree, but the dendrogram map is smoother and
+aesthetically superior.  The noisy edges of regions in Figure \ref{fig:temmap}
+are unlikely to be real temperature features, so the dendrogram map is
+preferred.
+
 \Figure{figures/big_lores_smooth_tmap_withcontours.pdf}
 {A temperature map derived from the \Rone ratio map shown
 in Figure \ref{fig:ratiomaps}.  Regions of lower signal-to-noise, and therefore less
@@ -380,6 +394,11 @@ treated as lower limits in the 100-150 K range.
 %line intensity at levels [4,7,11,20,38] K \kms.
 }
 {fig:temmap}{0.6}{0}
+
+\Figure{figures/big_lores_smoothdendro_tmap_withcontours}
+{A temperature map created by averaging the dendrogram-derived clump temperature
+along each line-of-sight.  See Figure \ref{fig:temmap} for details.}
+{fig:dendrotemmap}{0.6}{0}
 
 
 

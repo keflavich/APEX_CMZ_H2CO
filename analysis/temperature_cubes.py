@@ -23,3 +23,7 @@ for sm in ("","_smooth",'_321','_321smooth'):
     outpath = 'TemperatureCube_DendrogramObjects{0}_Piecewise.fits'.format(sm)
     tcube = SpectralCube.read(hpath(outpath))
     locals()['tcube_dend{0}'.format(sm)] = tcube
+
+    integ = tcube.mean(axis=0)
+    integ.hdu.writeto(hpath(outpath).replace(".fits","_integ.fits"),
+                      clobber=True)
