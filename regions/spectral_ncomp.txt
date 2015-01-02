@@ -29,7 +29,7 @@
  "G1.38-0.14":         {'ncomp':1, 'velo':[24]},
  "G1.65-0.06":         {'ncomp':1, 'velo':[48]},
  "G0.83-0.23":         {'ncomp':1, 'velo':[48]},
- "G1.00-0.02":         {'ncomp':1, 'velo':[82]},
+ "G1.00-0.02box":      {'ncomp':1, 'velo':[82]},
  "ef:G0.47-0.01":      {'ncomp':1, 'velo':[28]},
  "G0.66-0.14":         {'ncomp':1, 'velo':[28]},
  "G359.49-0.14":       {'ncomp':1, 'velo':[-56]},
@@ -102,4 +102,10 @@
  "G0.1_box":           {'ncomp':2, 'velo':[51,5]},
  "G359.8_box":         {'ncomp':3, 'velo':[13,35,-15]},
  "G359.5_box":         {'ncomp':2, 'velo':[-20,-55]},
+ "G1.16-0.14":         {'ncomp':1, 'velo':[-15]}, # detection is questionable
+ "G0.67-0.11box":      {'ncomp':1, 'velo':[40]},
+ "G1.32-0.02box":      {'ncomp':1, 'velo':[96]}, # not a good fit; too wide.
+ "G0.78-0.19box":      {'ncomp':2, 'velo':[32,90]},
+ "G0.83-0.19box":      {'ncomp':2, 'velo':[44,97]},
+ "G1.59+0.01box":      {'ncomp':3, 'velo':[159,188,54]},
 }

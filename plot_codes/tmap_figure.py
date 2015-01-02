@@ -6,12 +6,16 @@ import copy
 from astropy import log
 from paths import h2copath, figurepath
 
+# Close these figures so we can remake them in the appropriate size
+for fignum in (4,5):
+    pl.close(fignum)
+
 for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fits',
                               'TemperatureCube_DendrogramObjects{0}_Piecewise_integ.fits'),
                              ('','dendro')):
 
     for smooth in ("","_smooth",):#"_vsmooth"):
-        fig = pl.figure(4, figsize=(12,6))
+        fig = pl.figure(4, figsize=(14,7))
         fig.clf()
         F = aplpy.FITSFigure(h2copath+ftemplate.format(smooth),
                              convention='calabretta',
@@ -39,10 +43,18 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
                        zorder=10, convention='calabretta')
         F.add_colorbar()
         F.colorbar.set_axis_label_text('T (K)')
-        F.save(os.path.join(figurepath, 'lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
+        F.save(os.path.join(figurepath, "big_maps", 'lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
         F.recenter(0.55,-0.075,width=2.3,height=0.40)
-        F.save(os.path.join(figurepath, 'big_lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
-        log.info(os.path.join(figurepath, 'big_lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
+        F.save(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
+        log.info(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
+
+        Fsn = aplpy.FITSFigure(peaksn, convention='calabretta')
+        Fsn.show_grayscale(vmin=0, vmax=10, stretch='linear', invert=True)
+        Fsn.add_colorbar()
+        Fsn.colorbar.set_axis_label_text('Peak S/N')
+        Fsn.set_tick_labels_format('d.dd','d.dd')
+        Fsn.recenter(0.55,-0.075,width=2.3,height=0.40)
+        Fsn.save(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_peaksn.pdf'.format(smooth, outtype)))
 
 
         F.hide_layer('contour_set_1')
@@ -51,10 +63,10 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
                        levels=[20,25],
                        colors=[(0,0,x,0.5) for x in [0.9,0.7,0.6,0.2]], zorder=10)
         F.recenter(0.3,-0.03,width=1.2,height=0.30)
-        F.save(os.path.join(figurepath,'lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
+        F.save(os.path.join(figurepath, "big_maps",'lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
         F.recenter(0.55,-0.075,width=2.3,height=0.40)
-        F.save(os.path.join(figurepath,'big_lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
-        log.info(os.path.join(figurepath,'big_lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
+        F.save(os.path.join(figurepath, "big_maps",'big_lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
+        log.info(os.path.join(figurepath, "big_maps",'big_lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
     #F.show_contour('h2co218222_all.fits', levels=[1,7,11,20,38], colors=['g']*5, smooth=1, zorder=5)
     #F.show_contour(datapath+'APEX_H2CO_merge_high_smooth_noise.fits', levels=[0.05,0.1], colors=['#0000FF']*2, zorder=3, convention='calabretta')
     #F.show_contour(datapath+'APEX_H2CO_merge_high_nhits.fits', levels=[9], colors=['#0000FF']*2, zorder=3, convention='calabretta',smooth=3)
@@ -64,7 +76,7 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
     #F.save('CMZ_H2CO_observed_planned_colorful.pdf')
 
 
-fig = pl.figure(5, figsize=(12,6))
+fig = pl.figure(5, figsize=(14,7))
 fig.clf()
 F2 = aplpy.FITSFigure(dusttemperature, convention='calabretta', figure=fig)
 F2.show_colorscale(cmap=pl.cm.hot, vmin=10, vmax=40)
@@ -75,7 +87,7 @@ F2.show_contour(h2copath+'H2CO_321220_to_303202_smooth_bl_integ_temperature.fits
                 cmap=pl.cm.BuGn)
 F2.recenter(0.3,-0.03,width=1.2,height=0.30)
 
-F2.save(os.path.join(figurepath,'H2COtemperatureOnDust.pdf'))
+F2.save(os.path.join(figurepath, "big_maps",'H2COtemperatureOnDust.pdf'))
 
 F2.recenter(0.55,-0.075,width=2.3,height=0.40)
-F2.save(os.path.join(figurepath,'big_H2COtemperatureOnDust.pdf'))
+F2.save(os.path.join(figurepath, "big_maps",'big_H2COtemperatureOnDust.pdf'))

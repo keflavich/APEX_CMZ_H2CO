@@ -71,7 +71,7 @@ font_sizes = {1: 20,
               3: 11,
               4: 8}
 
-def fit_a_spectrum(sp, radexfit=False, write=True):
+def fit_a_spectrum(sp, radexfit=False, write=True, vlimits=(-105,125)):
     sp.plotter.autorefresh=False
     sp.plotter(figure=1)
     ncomp = pars[sp.specname]['ncomp']
@@ -92,10 +92,17 @@ def fit_a_spectrum(sp, radexfit=False, write=True):
                                    multisingle='multi')
     guesses_simple = [x for ii in range(ncomp) 
                       for x in (sp.data.max(),velos[ii],5,0.5,1.0,sp.data.max())]
+
+    if not(min(velos) > vlimits[0] and max(velos) < vlimits[1]):
+        log.warn("A velocity guess {0} is outside limits {1}." .format(velos,
+                                                                       vlimits))
+        vlimits = (min(velos)-25, max(velos)+25)
+        log.warn("Changing limits to {0}".format(vlimits))
+
     sp.specfit(fittype='h2co_simple', multifit=True,
                guesses=guesses_simple,
                limited=[(True,True)] * 6,
-               limits=[(0,20),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
+               limits=[(0,20),vlimits,(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
               )
     sp.baseline(excludefit=True, subtract=True, highlight_fitregion=True, order=1)
 
@@ -103,7 +110,7 @@ def fit_a_spectrum(sp, radexfit=False, write=True):
     sp.specfit(fittype='h2co_simple', multifit=True,
                guesses=guesses_simple,
                limited=[(True,True)] * 6,
-               limits=[(0,20),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
+               limits=[(0,20),vlimits,(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
               )
 
     returns.append(copy.copy(sp.specfit.parinfo))
@@ -137,7 +144,7 @@ def fit_a_spectrum(sp, radexfit=False, write=True):
     sp.specfit(fittype='h2co_simple', multifit=True,
                guesses=guesses_simple,
                limited=[(True,True)] * 6,
-               limits=[(0,1e5),(-105,125),(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
+               limits=[(0,1e5),vlimits,(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
               )
     sp.plotter()
     sp.plotter.axis.plot(sp.xarr, spline_baseline+linear_baseline-err*5, color='orange',

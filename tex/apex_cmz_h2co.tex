@@ -192,7 +192,7 @@ the gas temperature, so it is not included.
 % figure_ratio_maps
 \Figure
 %{figures/big_H2CO_322221_to_303202_smooth_bl_integ.pdf}
-{figures/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
+{figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
 {Maps of the ratio of the integrated emission ratio
 \threetwoone/\threeohthree (bottom).  The data cubes were masked by
 signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
@@ -366,11 +366,11 @@ to the data.
 \label{sec:formaldehydetemmap}
 Using the piecewise relation derived in Section \ref{sec:dendromod}, we
 converted the ratio map shown in Figure \ref{fig:ratiomaps} to a temperature
-map in Figure \ref{fig:temmap}.  Because this map includes the full line-of-sight
+map in Figure \ref{fig:temmap}a.  Because this map includes the full line-of-sight
 integrated emission, there are many regions where multiple independent components
 are being mixed.
 
-Figure \ref{fig:dendrotemmap} shows a temperature map created by measuring the
+Figure \ref{fig:temmap}b shows a temperature map created by measuring the
 temperature in each clump from the dendrogram clump extraction based on the
 smoothed data cube and averaging over the velocity axis.  Because there are
 hierarchically nested clumps in the dendrogram-based clumpfind, and because
@@ -380,25 +380,57 @@ more than one temperature measurement per voxel; we therefore use the most
 compact clump's temperature measurement for each voxel.
 
 The two temperature maps broadly agree, but the dendrogram map is smoother and
-aesthetically superior.  The noisy edges of regions in Figure \ref{fig:temmap}
+aesthetically superior.  The noisy edges of regions in Figure \ref{fig:temmap}a
 are unlikely to be real temperature features, so the dendrogram map is
 preferred.
 
-\Figure{figures/big_lores_smooth_tmap_withcontours.pdf}
-{A temperature map derived from the \Rone ratio map shown
+These temperature maps do not have uniform reliability, unfortunately.  There
+is some spatial variation in the noise, but the variation in the signal is much
+more important.  In regions where the peak signal is low, the reliability of
+these maps is substantially reduced.  Figure \ref{fig:peaksn} shows the peak
+signal-to-noise in both the unsmoothed and the smoothed maps to indicate where
+the temperature measurements can be relied upon.  We have also applied a mask
+to both panels of Figure \ref{fig:temmap} to make the low-reliability regions
+blend into the background by adding a foreground gray layer with opacity set by
+the inverse S/N from Figure \ref{fig:peaksn}b.
+
+% tmap_figure
+\FigureTwoAA{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
+            {figures/big_maps/big_lores_smoothdendro_tmap_withcontours.pdf}
+{(top) A temperature map derived from the \Rone ratio map shown
 in Figure \ref{fig:ratiomaps}.  Regions of lower signal-to-noise, and therefore less
 reliable temperature, are grayed out with a filter that gets more opaque
 toward lower signal-to-noise.  Temperatures above $\gtrsim150$ K should be
 treated as lower limits in the 100-150 K range.
+(bottom) A temperature map created by averaging the dendrogram-derived clump temperature
+along each line-of-sight.
 %The contours correspond to the integrated \threeohthree
 %line intensity at levels [4,7,11,20,38] K \kms.
 }
-{fig:temmap}{0.6}{0}
+{fig:temmap}{1}{7in}
 
-\Figure{figures/big_lores_smoothdendro_tmap_withcontours}
-{A temperature map created by averaging the dendrogram-derived clump temperature
-along each line-of-sight.  See Figure \ref{fig:temmap} for details.}
-{fig:dendrotemmap}{0.6}{0}
+% tmap_figure
+\FigureTwoAA
+{figures/big_maps/big_lores_peaksn}
+{figures/big_maps/big_lores_smooth_peaksn}
+{Map of the peak signal-to-noise in the \para \threeohthree line with no
+smoothing (top) and with 2-pixel (14.4\arcsec) smoothing (bottom).  
+These maps give an indication of the reliability of the temperatures extracted
+in Figure \ref{fig:temmap}.  The colorbars are intentionally saturated at a
+S/N$>10$ since above this threshold, the temperatures are reliable as long as
+they are in the $T<150$ K regime.
+}
+{fig:peaksn}{1}{7in}
+
+\subsection{Ratio examination of individual regions}
+To further examine the reliability of the ratio determination, we have examined
+individual regions in the unsmoothed images on a pixel-by-pixel basis, using
+\texttt{pyspeckit} to fit a 4-parameter model (amplitude, centroid, width, and
+$R_1$) to each spectrum with constrained velocity range and width.  These fits
+were performed on the locally baseline-subtracted data cubes.
+
+
+
 
 
 
