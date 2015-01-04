@@ -422,56 +422,62 @@ they are in the $T<150$ K regime.
 }
 {fig:peaksn}{1}{7in}
 
-\subsection{Ratio examination of individual regions}
-To further examine the reliability of the ratio determination, we have examined
-individual regions in the unsmoothed images on a pixel-by-pixel basis, using
-\texttt{pyspeckit} to fit a 4-parameter model (amplitude, centroid, width, and
-$R_1$) to each spectrum with constrained velocity range and width.  These fits
-were performed on the locally baseline-subtracted data cubes.
-
-
-
-
-
-
-\section{Parameter Comparisons}
-In the selected regions we averaged to acquire higher signal-to-noise for more
-detailed modeling, we examined the correlation of various fitted parameters.
-
-The 1D line width of the gas should be tightly correlated with the 3D Mach
-number.  If turbulent heating is responsible for the observed gas temperatures,
-there should also be a correlation between the Mach number of the turbulence
-and the gas temperature.  However, Figure \ref{fig:temvsfwhm_regions} shows no
-such correlation.
-
-\Figure{figures/chi2_temperature_vs_linewidth_fieldsandsources}
-{The fitted temperature as described in Section \ref{sec:linemodeling} plotted against
-the fitted line width.  The blue symbols are compact `clump' sources and the red symbols
-are large-area square regions.  No trend between the line width and temperature
-is obvious.}
-{fig:temvsfwhm_regions}
-{0.5}{0}
-
 
 \FigureTwo
 {figures/simple/Brick_SW_fit_4_lines_simple_splinebaselined.pdf}
 {figures/simple/G0.42+0.04box_fit_4_lines_simple_splinebaselined.pdf}
-{Fits to the \para lines for (a) The Brick and (b) a box centered on G0.42+0.04.
+{
+\todo{Figure out where this belongs - it has no home.}
+Fits to the \para lines for (a) The Brick and (b) a box centered on G0.42+0.04.
 These spectra have significantly different ratios and therefore derived temperatures:
 The Brick has $T\gtrsim100$ K while G0.42+0.04 has $T\approx40-50$ K.
 The bottom black spectrum is the residual, and the orange wiggly spectrum shows
 the spline fit used to iteratively remove baseline ripples from the residual.}
 {fig:twospectra_hotcold}{1}{3in}
 
-\section{Discussion}
+
+\subsection{Parameter Comparison}
+In a turbulent medium, the 1D line width of the gas should be tightly
+correlated with the 3D Mach number \citep[e.g.][]{Federrath2011a}.  If
+turbulence is the dominant gas heating mechanism, there should also be a
+correlation between the Mach number of the turbulence and the gas temperature.
+However, Figure \ref{fig:temvsfwhm_regions} shows no such correlation.  For
+dendrogram-extracted regions, which consist of multiple nested clumps, there
+are trends between the linewidth and temperature, but not with the naively
+expected sign.  These trends are likely due to variation in the `clump' size.
+
+\FigureTwo
+{figures/chi2_temperature_vs_linewidth_fieldsandsources}
+{figures/dendrotem/temperature_vs_rmsvelocity_smooth} % dendrotem_plots
+{(a) 
+The fitted temperature as described in Section \ref{sec:linemodeling} plotted
+against the fitted line width for the by-eye selected regions.  The blue
+symbols are compact `clump' sources and the red symbols are large-area
+($8\arcmin$) square regions.  No trend between the line width and temperature
+is obvious.
+(b) The same as (a) but for the dendrogram-extracted sources.  The arc of points
+from $\sigma_v=12$ to $8$ \kms and $T=80$ to $140$ K is from the hierarchy of
+Sgr B2 clumps and thus represents a variation in temperature with size scale.
+Similarly, the other high-linewidth points represent large interconnected
+structures.  In the range $1 < \sigma_v < 5$ \kms, which is the only region
+including low temperatures, no trend is observed.}
+{fig:temvsfwhm_regions}
+{1}{3.5in}
+%{0.5}{0}
+
+
+
 \subsection{Variation with Spatial Scale}
 For any given cloud, the ratio \Rone varies with the spatial averaging scale.
+The \para \threeohthree line is often stronger relative to \threetwoone on
+larger scales, while the linewidth is always larger on larger scales.
 For example, around `The Brick', the ratio decreases from $\sim0.55$ at the
 position $\ell=0.237$, $b=0.008$ within a single spectrum to $\sim0.33$ when
 averaged over a radius $\sim70\arcsec$ (Figure \ref{fig:brickradial}).
 \todo{Does this indicate that temperatures are high in spatially compact regions,
 and low elsewhere?  Or does this indicate a strong density selection bias?}
 
+% analysis/multiscale_fit
 \Figure{figures/brick_examples/ratio_vs_scale.pdf}
 {Radial plots centered on the southwest portion of `The Brick'.
 The top panel shows the ratio \Rone as a function of aperture size, starting
@@ -481,6 +487,7 @@ as a function of aperture size.}
 {fig:brickradial}{0.6}{0}
 
 
+\section{Discussion}
 \subsection{Disagreement between gas and dust temperatures}
 The gas and dust temperatures throughout the CMZ continue to disagree far from
 the central $\sim30$ pc previously shown in \citet{Ao2013a}.
@@ -646,7 +653,6 @@ baseline structure on either scale without significantly affecting the
 underlying spectral data.  We simulated a variety of fourier-space suppression
 approaches by adding synthetic signal to baseline spectra extracted from the
 first few PCA components of the real spectra.
-
 The PCA extraction approach is able to pull out the dominant baseline
 components very effectively, but it inevitably includes significant signal in
 the top few most correlated components, especially for the strong \formaldehyde
@@ -676,6 +682,16 @@ lower-amplitude baseline spectra.}
 %signal from the spectral lines.  \todo{This will be
 %replaced with a higher-quality figure}}
 %{fig:eigenspectra}{0.5}{0}
+
+\appendix{Ratio Examination of Individual Regions}
+\todo{While figures have been made for this, they will not be included unless
+necessary.}
+To further examine the reliability of the ratio determination, we have examined
+individual regions in the unsmoothed images on a pixel-by-pixel basis, using
+\texttt{pyspeckit} to fit a 4-parameter model (amplitude, centroid, width, and
+$R_1$) to each spectrum with constrained velocity range and width.  These fits
+were performed on the locally baseline-subtracted data cubes.
+
 
 
 \input{solobib}

@@ -113,7 +113,7 @@ def do_pyspeck_fits_1comp(pcube, cube303m=None, vguesses='moment',
                   **kwargs
                  )
 
-    pcube.mapplot(estimator=0)
+    #pcube.mapplot(estimator=0)
     pcube_orig = pcube.parcube.copy()
     pcube2 = remove_bad_pars(pcube.parcube, pcube.errcube, len(guesses),
                              min_nsig=4)
