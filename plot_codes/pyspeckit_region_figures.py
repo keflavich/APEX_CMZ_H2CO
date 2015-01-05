@@ -35,7 +35,8 @@ regions = {'G1.12-0.10': {'vrange':[-40,0], 'startpoint': (5,5)},
            'G1.59+0.01box': {'vrange':[130,200], 'startpoint':(13,28),
                              'minpeak':0.15, 'signal_cut': 2},
            'G1.21+0.00box': {'vrange':[60,100], 'startpoint':(5,5)},
-           'G1.16-0.14': {'vrange':[120,160], 'startpoint':(5,5)}, # PROBABLY ALL BAD
+           'G1.16-0.14': {'vrange':[120,160], 'startpoint':(5,5),
+                          'minpeak':0.15}, # PROBABLY ALL BAD
            'G359.70-0.06': {'vrange':[-25,25], 'startpoint':(5,5)},
            'G359.82+0.02': {'vrange':[40,80], 'startpoint':(5,5)},
            'd:G0.38+0.04': {'vrange':[20,60], 'startpoint':(5,5)},

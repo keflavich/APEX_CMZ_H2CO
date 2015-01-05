@@ -219,3 +219,26 @@ ax13.errorbar(pcfittable['area'][~maps],
 fig13.savefig(paths.fpath('temperature_vs_area_fieldsandsources.pdf'),
                          bbox_inches='tight')
 
+
+fig14 = pl.figure(14)
+fig14.clf()
+ax14 = fig14.gca()
+ax14.errorbar(pcfittable['higalcolumndens'][maps],
+             pcfittable['temperature_chi2'][maps],
+             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[maps],
+                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[maps]],
+             linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
+#ax14.plot([15,30],[15,30],'k--')
+ax14.set_xlabel("HiGal Fitted Column Density")
+ax14.set_ylabel("Kinetic Temperature (K)")
+fig14.savefig(paths.fpath('chi2_temperature_vs_higaldustcol_byfield.pdf'),
+                         bbox_inches='tight')
+ax14.errorbar(pcfittable['higalcolumndens'][~maps],
+             pcfittable['temperature_chi2'][~maps],
+             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[~maps],
+                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[~maps]],
+             linestyle='none', marker='s', linewidth=1, alpha=0.5, color='b')
+fig14.savefig(paths.fpath('chi2_temperature_vs_higaldustcol_fieldsandsources.pdf'),
+                         bbox_inches='tight')
+
+# pcfittable[np.abs(pcfittable['temperature_chi2']-pcfittable['higaldusttem'])/pcfittable['higaldusttem'] < 1.5].pprint()

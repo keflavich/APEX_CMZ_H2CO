@@ -91,3 +91,20 @@ F2.save(os.path.join(figurepath, "big_maps",'H2COtemperatureOnDust.pdf'))
 
 F2.recenter(0.55,-0.075,width=2.3,height=0.40)
 F2.save(os.path.join(figurepath, "big_maps",'big_H2COtemperatureOnDust.pdf'))
+
+fig = pl.figure(6, figsize=(14,7))
+fig.clf()
+F = aplpy.FITSFigure('/Users/adam/work/gc/Tkin-GC.fits.gz',
+                     convention='calabretta',
+                     figure=fig)
+
+cm = copy.copy(pl.cm.rainbow)
+cm.set_bad((0.5,)*3)
+F.show_colorscale(cmap=cm,vmin=15,vmax=200)
+F.set_tick_labels_format('d.dd','d.dd')
+F.recenter(0.3,-0.03,width=1.2,height=0.30)
+F.add_colorbar()
+F.colorbar.set_axis_label_text('T (K)')
+F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to200.pdf'))
+F.show_colorscale(cmap=cm,vmin=15,vmax=80)
+F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to80.pdf'))
