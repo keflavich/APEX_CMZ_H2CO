@@ -14,6 +14,8 @@
 
 
 
+
+
 \section{Observations \& Data Reduction}
 
 \subsection{Observations}
@@ -557,7 +559,7 @@ There are significant regional variations in the gas temperature.  The most
 obvious is in and around the Sgr B2 complex, where very high gas temperatures
 are inferred.  High gas temperatures, $T>50$ K, were measured in a ridge to the
 Galactic northeast of Sgr B2 N using \methylcyanide previously \citep[][Figure
-4b]{deVicente1997a}, which we now confirm.  \citet{Ott2014a} also showed high
+4b]{de-Vicente1997a}, which we now confirm.  \citet{Ott2014a} also showed high
 \ammonia temperatures in this hot ridge.
 
 The high temperatures in the Sgr B2 region, $T>80$ K, extend to a radius of
@@ -606,6 +608,34 @@ range when using only these two lines, so the map is cut off at $T=80$ K.
 This map can be compared to Figure \ref{fig:temmap}.}
 {fig:nh3tmap}{0.5}{0}
 
+\subsection{Comparison to other measurements with \para}
+The largest survey of \para temperatures prior to this work was
+\citet{Ao2013a}, who observed the inner 30 pc.  They performed a similar
+analyis to ours but over a limited area.  They reported temperatures
+systematically lower by 10-20 K (but still $T\gtrsim50$ K).  This difference is
+due to a different set of collision rates adopted (\citet{Wiesenfeld2013a}
+rather than \citet{Green1991a}) and different priors on the fitted parameter
+space.  In particular, we left density as a free parameter and instead broke
+degeneracies with a conservative but nonetheless useful constraint on the
+column density and abundance.
+
+% NOTE: the baselines in The Brick are particularly nasty.  The most advanced
+% fitting techniques will be required to extract anything useful.
+There have also been observations of \para temperatures with interferometers.
+\citet{Johnston2014a} noted a very high temperature peak, $T>320$K, using these
+lines of \formaldehyde toward The Brick, G0.253+0.015.  We measure similar line
+ratios toward The Brick, but on larger scales.  The interpretation of these
+line ratios is subject to some question, though.  Above 300K, the collision
+rates provided by LAMDA \citep{Green1991a,Schoier2005a,Wiesenfeld2013a} must be
+extrapolated.  Additionally, some of the ratios cannot be reproduced by high
+temperatures, but instead require that the lines be thermalized and therefore
+at very high densities.   Given the low brightness temperatures observed,
+the emission must be coming from an extremely small area, which is inconsistent
+with the observed large extent of the emission unless it is also extremely
+patchy.  That remains a possibility if we are observing massive, dense clouds
+with relatively uniform turbulent properties.
+
+
 
 \subsection{Discussion of Heating Mechanisms}
 \citet{Ao2013a} examined four heating mechanisms in the inner $\sim 40$ pc,
@@ -650,14 +680,14 @@ must be near the observed temperature.
 % dominant heating mechanism in the CMZ clouds, there should be a correlation
 % between the observed line width and the gas kinetic temperature.
 
-\todo{This is speculative.}  In a highly turbulent medium, most of the power
-dissipation happens on the smallest size scale (if $L > \sigma_v^3$).  If the
-cooling rate is enhanced in the postshock medium, the high gas temperature will
-be isolated to high-density, compact clumps, but these clumps will also
-dominate the line emission.  \todo{This should result in a density dependence
-of the temperature or observed temperature $T(n) > n^1$, maybe $T(n) \sim n^2$ ?}
-Cosmic rays should not exhibit this behavior; they should heat all scales equally
-and care only about the \emph{mean} density.
+% \todo{This is speculative.}  In a highly turbulent medium, most of the power
+% dissipation happens on the smallest size scale (if $L > \sigma_v^3$).  If the
+% cooling rate is enhanced in the postshock medium, the high gas temperature will
+% be isolated to high-density, compact clumps, but these clumps will also
+% dominate the line emission.  \todo{This should result in a density dependence
+% of the temperature or observed temperature $T(n) > n^1$, maybe $T(n) \sim n^2$ ?}
+% Cosmic rays should not exhibit this behavior; they should heat all scales equally
+% and care only about the \emph{mean} density.
 
 \subsection{Shocks}
 Assuming the dust temperature reflects the mean gas temperature and only a subset
@@ -665,22 +695,6 @@ of the gas has been heated to the high observed temperatures, we can determine t
 shock velocity required to supply the heating.  Assuming an adiabatic strong shock,
 $T_{ps} = \frac{3}{16}\frac{\mu v_s^2}{k}$, where $\mu = \mu_{\hh} = 2.8$.  A 1 \kms
 shock can provide a temperature of 65 K
-
-% NOTE: the baselines in The Brick are particularly nasty.  The most advanced
-% fitting techniques will be required to extract anything useful.
-\todo{Move to discussion:}
-\citet{Johnston2014a} noted a very high temperature peak, $T>320$K, using these
-lines of \formaldehyde toward The Brick, G0.253+0.015.  We measure similar line
-ratios toward The Brick, but on larger scales.  The interpretation of these
-line ratios is subject to some question, though.  Above 300K, the collision
-rates provided by LAMDA \citep{Schoier2005a,Wiesenfeld2013a} must be
-extrapolated.  Additionally, some of the ratios cannot be reproduced by high
-temperatures, but instead require that the lines be thermalized and therefore
-at very high densities.   Given the low brightness temperatures observed,
-the emission must be coming from an extremely small area, which is inconsistent
-with the observed large extent of the emission unless it is also extremely
-patchy.  That remains a possibility if we are observing massive, dense clouds
-with relatively uniformly turbulent properties.
 
 %\section{Examination of Individual Spectra}
 %%\todo{The modeling is ambiguous still: it is necessary to impose some sort of
