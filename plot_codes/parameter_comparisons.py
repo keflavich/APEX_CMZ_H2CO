@@ -6,6 +6,8 @@ from paths import analysispath
 import numpy as np
 from astropy import coordinates
 from astropy import units as u
+import matplotlib
+matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 pcfittable = table.Table.read(os.path.join(analysispath,
                                          'fitted_line_parameters_Chi2Constraints.ipac'),
@@ -194,3 +196,26 @@ ax.set_title("DEBUG: RADEX+pyspeckit-fitted temperature vs. $\\chi^2$ temperatur
 ax.set_xlabel("$\\chi^2$ Temperature")
 ax.set_ylabel("RADEX+pyspeckit Temperature")
 ax.axis([0,350,0,350])
+
+
+fig13 = pl.figure(13)
+fig13.clf()
+ax13 = fig13.gca()
+ax13.errorbar(pcfittable['area'][maps],
+              pcfittable['temperature_chi2'][maps],
+              yerr=[pcfittable['temperature_chi2'][maps]-pcfittable['tmin1sig_chi2'][maps],
+                    pcfittable['tmax1sig_chi2'][maps]-pcfittable['temperature_chi2'][maps]],
+              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
+ax13.set_xlabel("Area (square degrees)")
+ax13.set_ylabel("Kinetic Temperature (K)")
+ax13.set_xscale('log')
+fig13.savefig(paths.fpath('temperature_vs_area_byfield.pdf'),
+                         bbox_inches='tight')
+ax13.errorbar(pcfittable['area'][~maps],
+              pcfittable['temperature_chi2'][~maps],
+              yerr=[pcfittable['temperature_chi2'][~maps]-pcfittable['tmin1sig_chi2'][~maps],
+                    pcfittable['tmax1sig_chi2'][~maps]-pcfittable['temperature_chi2'][~maps]],
+              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='b')
+fig13.savefig(paths.fpath('temperature_vs_area_fieldsandsources.pdf'),
+                         bbox_inches='tight')
+

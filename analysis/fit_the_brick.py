@@ -26,6 +26,8 @@ brick_pcube.specfit.Registry.add_fitter('h2co_simple', simple_fitter2, 6,
 b303m = cube303m[brick_slice]
 m1 = b303m.moment1(axis=0).to(u.km/u.s)
 
+# For radial multiscale fitting, see multiscale_fit.py
+
 def do_pyspeck_fits_1comp():
     #guesses_simple = [1,25,5,0.5,0.7,1]
     guesses_simple = np.array([[1,x.value,5,0.5,0.7,1] for x in m1.flat]).T.reshape((6,)+m1.shape)
@@ -56,13 +58,6 @@ def do_pyspeck_fits_2comp():
     pcube_orig = brick_pcube.parcube.copy()
     pcube2 = remove_bad_pars(brick_pcube.parcube, brick_pcube.errcube, 6,
                              min_nsig=4)
-
-def multiscale_fit_brick(pcube=brick_pcube, centerx=21, centery=10,
-                         offset_scale=0.3, savedir='brick_examples',
-                         savepre='brick_sw_specfit', **kwargs):
-    return multiscale_fit(pcube=pcube, centerx=centerx, centery=centery,
-                          offset_scale=offset_scale, savedir=savedir,
-                          savepre=savepre, **kwargs)
 
 def remove_bad_pars(parcube, errcube, npars, min_nsig=3):
     """

@@ -470,40 +470,63 @@ including low temperatures, no trend is observed.}
 \subsection{Variation with Spatial Scale}
 For any given cloud, the ratio \Rone varies with the spatial averaging scale.
 The \para \threeohthree line is often stronger relative to \threetwoone on
-larger scales, while the linewidth is always larger on larger scales.
-For example, around `The Brick', the ratio decreases from $\sim0.55$ at the
-position $\ell=0.237$, $b=0.008$ within a single spectrum to $\sim0.33$ when
-averaged over a radius $\sim70\arcsec$ (Figure \ref{fig:brickradial}).
-\todo{Does this indicate that temperatures are high in spatially compact regions,
-and low elsewhere?  Or does this indicate a strong density selection bias?}
+larger scales, while the linewidth is always larger on larger scales.  We have
+examined this effect by selecting a few local \para \threeohthree peaks and
+measuring the ratio \Rone as a function of aperture size.  For each spectrum,
+we have fitted the 6-parameter model described in Section
+\ref{sec:linemodeling} to derive the ratio.
+
+Different variations with scale are observed.  For example, around `The Brick',
+the ratio decreases from $\sim0.55$ at the position $\ell=0.237$, $b=0.008$
+within a single spectrum to $\sim0.33$ when averaged over a radius
+$\sim70\arcsec$ (Figure \ref{fig:brickradial}a).  By contrast, Figure
+\ref{fig:brickradial}b shows a highly turbulent example where the temperature
+is lowest at the center and higher on larger scales.
 
 % analysis/multiscale_fit
-\Figure{figures/brick_examples/ratio_vs_scale.pdf}
-{Radial plots centered on the southwest portion of `The Brick'.
+\FigureTwo
+{figures/brick_examples/brick_sw_specfit_ratio_vs_scale.pdf}
+{figures/g1.2/g1.2_coolspot_ratio_vs_scale.pdf}
+{(a) Radial plots centered on the southwest portion of `The Brick'.
 The top panel shows the ratio \Rone as a function of aperture size, starting
-from a single pixel.  A higher $R_1$ generally indicates a higher temperature.
+from a single pixel.
+The derived temperature using Figure \ref{fig:ratiovstem} is shown on the right
+axis; temperatures above $\gtrsim300$ K are extrapolations from the model and
+should be regarded highly skeptically, and temperatures $\gtrsim150$ K should
+be regarded as lower limits.
 The bottom panel shows the line width $\sigma = FWHM/2.35$
-as a function of aperture size.}
-{fig:brickradial}{0.6}{0}
+as a function of aperture size.  
+(b) The same as (a) but for a region centered on G1.23-0.08, a local
+peak in the \para \threeohthree emission.  In this case,
+the ratio \Rone is lower at the center and increases toward larger radii.
+}
+{fig:brickradial}
+{1}{3.5in}
+%{0.6}{0}
 
 
 \section{Discussion}
 \subsection{Disagreement between gas and dust temperatures}
-The gas and dust temperatures throughout the CMZ continue to disagree far from
-the central $\sim30$ pc previously shown in \citet{Ao2013a}.
-Figure \ref{fig:temvstem_regions} shows the fitted \para temperature vs the fitted
-dust temperature from HiGal.  The majority of the \formaldehyde data points are well
-above the $T_{dust}=T_{gas}$ line.
+Similar to the results of \citet{Ao2013a} for the inner $\sim30$ pc, we find
+that the \para and dust temperatures do not agree anywhere within the inner
+$\sim200$ pc.  Figure \ref{fig:temvstem_regions} shows the fitted \para
+temperature vs the fitted dust temperature from HiGal.  The majority of the
+\formaldehyde data points are well above the $T_{dust}=T_{gas}$ line.
 
-\Figure{figures/chi2_temperature_vs_higaltemperature_fieldsandsources}
-{The fitted temperature as described in Section \ref{sec:linemodeling} plotted
+\FigureTwo
+{figures/chi2_temperature_vs_higaltemperature_fieldsandsources.pdf}
+{figures/dendrotem/temperature_vs_dusttem_smooth.pdf} % dendrotem_plots
+{(a) The fitted temperature as described in Section \ref{sec:linemodeling} plotted
 against the HiGal fitted dust temperature.  As in Figure \ref{fig:temvsfwhm},
 the blue symbols are compact `clump' sources and the red symbols are large-area
 square regions.  The black dashed line shows the $T_g = T_d$ relation.  Nearly
 all of the data points fall above this relation, and very few are consistent
-with it at the 3$\sigma$ level.}
+with it at the 3$\sigma$ level.
+(b) The same as (a) but for the dendrogram-extracted sources.
+}
 {fig:temvstem_regions}
-{0.5}{0}
+{1}{3.5in}
+%{0.5}{0}
 
 \subsection{Discussion of Heating Mechanisms}
 \citet{Ao2013a} examined four heating mechanisms in the inner $\sim 40$ pc,

@@ -41,7 +41,7 @@ regions = {'G1.12-0.10': {'vrange':[-40,0], 'startpoint': (5,5)},
            'd:G0.38+0.04': {'vrange':[20,60], 'startpoint':(5,5)},
            'G0.36-0.08box': {'vrange':[70,110], 'startpoint':(5,5)},
            'G0.24-0.05box': {'vrange':[60,100], 'startpoint':(5,5)},
-           'G1.23-0.08box': {'vrange':[70,110], 'startpoint':(5,5)},
+           'G1.23-0.08box': {'vrange':[70,110], 'startpoint':(5,5), 'minpeak':0.15},
           }
 
 def fit_and_save(regname, fignum=1, pfignum=2):
