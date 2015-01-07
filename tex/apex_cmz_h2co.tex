@@ -50,7 +50,7 @@ threshold from enhanced turbulence.
 We observed the Central Molecular Zone from $-0.4 < \ell < 1.6$ with the SHFI-1
 instrument \citep{Vassilev2008a} on the APEX telescope using the XFFTS backend.
 The observations were divided into 25 hours in June 2013 and 75 hours in
-April-July 2014.  
+April-July 2014.  \todo{Add more dates and times here.}
 
 The 2013 observations were taken in $4\arcmin \times 4\arcmin$ patches, and the
 frequency range covered was 217.5-220 GHz and 216-218.5 GHz in the two spectral
@@ -67,6 +67,8 @@ resolution to make the data more manageable.  We also expect to see no lines
 narrower than a few \kms in the CMZ, particularly not with the relatively
 shallow observations we have acquired.
 
+\todo{Mention typical/min/max system temperatures.}
+
 \subsection{Reduction}
 \subsubsection{Calibration}
 Calibration was performed at the telescope using the standard APEX calibration
@@ -75,8 +77,8 @@ tools
 \url{www.apex-telescope.org/documents/public/APEX-MPI-MAN-0012.pdf}
 \url{www.apex-telescope.org/documents/public/APEX-MPI-MAN-0013.pdf} }.
 These yield flux-calibrated spectra at each position with appropriate pointing
-information.  Typical flux calibration uncertainties are $\sim$ \todo{???} and
-pointing errors \todo{???} ($\sigma<2$\arcsec ?).
+information.  \todo{Typical flux calibration uncertainties are $\sim10\%$ and
+pointing errors $\sigma\lesssim2$\arcsec.} % ask carlos about this
 
 There was a significant calibration error discovered at the APEX telescope during
 a large segment of the 2014 observing campaign
@@ -87,7 +89,7 @@ is higher in this data, $\sim15\%$ total rather than the usual $\sim10\%$.
 
 \subsubsection{Flagging bad spectra}
 Spectra were removed if they showed excessive noise compared to the
-theoretically expectation given the measured system temperature.  As in
+theoretical expectation given the measured system temperature.  As in
 \citet{Ao2013a}, the threshold was set to $1.5\times$ the theoretical noise,
 i.e. $1.5 \sqrt{2} T_{sys} (\Delta\nu t_{exp})^0.5$, where $t_{exp}$ is the
 exposure time (integration time) per spectrum in seconds and $\Delta\nu$ is the
@@ -95,7 +97,7 @@ channel width in Hz.  This approach resulted in $\sim0.2\%$ of the data being
 removed.  
 
 At the position of Sgr B2, the noise was significantly higher due to signal
-from the continuum source.  We therefore disabled flagging in a
+from the continuum source.  We therefore disabled this flagging in a
 $\sim2.5\arcmin$ box around Sgr B2.
 
 
@@ -166,11 +168,11 @@ The data showed significant baseline structure, leading to large-scale
 correlated components in the resulting spectra.  The baselines were removed
 after cube generation by first identifying bright regions in the \para
 \threeohthree line using the technique described in Section \ref{sec:signal},
-masking those out for each other line, then fitting a 5th-order polynomial to
+masking those out for each other line, then fitting a 7th-order polynomial to
 the remaining spectra over the velocity range -150 to 250 \kms and subtracting
-it.
-
-After performing this baselining, the signal was re-extracted.
+it.  Lower order baseline removal left a significant and patterned residual.
+After performing this baselining, the signal was re-extracted using the same
+method.
 
 \section{Signal Extraction \& Analysis}
 \label{sec:signal}
@@ -179,7 +181,7 @@ We use the method described partially in \citet{Ao2013a} and more thoroughly in
 the brightest line. 
 A noise map was created by computing the sample standard deviation over a
 200 \kms range in which no signal was present.
-We use the \formaldehyde \threeohthree line to create the mask by
+We use the \para \threeohthree line to create the mask by
 the following procedure:
 
 \begin{enumerate}
@@ -191,27 +193,30 @@ the following procedure:
         (this is known in image processing as binary dilation)
 \end{enumerate}
 
-The \formaldehyde \threeohthree mask was then applied to the \threetwoone and
+The \para \threeohthree mask was then applied to the \threetwoone and
 \threetwotwo cubes created with the same PPV gridding.  There is some overlap
-between the \methanol \fourtwotwo line and the \formaldehyde \threetwotwo
-line in PPV space, so we shifted the \formaldehyde mask to the velocity of the
-\methanol line in the \formaldehyde \threetwotwo cube and excluded any pixels
-expected to have signal.
+between the \methanol \fourtwotwo line and the \para \threetwotwo line in PPV
+space, so we shifted the \para mask to the velocity of the \methanol line in
+the \para \threetwotwo cube and excluded all pixels with \para detections.
 
 \subsection{Ratio and Temperature Maps}
 \label{sec:h2co}
-We created two independent ratio maps, \threeohthree/\threetwotwo and
-\threeohthree/\threetwoone, so that the two ratios (which are expected to be
-the same) can be used as a sanity check.  However, in many regions, especially
-those with the greatest signal, the \threetwotwo line is strongly affected by
-contamination from a \methanol line, so the ratio is not particularly reliable.
+We created two independent ratio maps, \threetwotwo/\threeohthree and
+\threetwoone/\threeohthree, so that the two ratios (which are expected to be
+nearly the same) can be used as a sanity check.  However, in many regions,
+especially those with the greatest signal, the \threetwotwo line is strongly
+affected by contamination from a \methanol line, so the ratio is not
+particularly reliable.
 
 Ratio maps are subject to dramatic uncertainties in the low signal-to-noise
 regime, which is inevitably reached in some parts of the map.  The error
-distribution on the ratio becomes non-Gaussian, approaching a pathological
-Cauchy distribution in which the mean becomes undefined as the mean of the
-individual values being compared approaches zero.  We therefore sought other
-means to create temperature maps.
+distribution on the ratio becomes non-Gaussian as signal approaches zero,
+approaching a pathological Cauchy distribution in which the mean becomes
+undefined as the mean of the individual values being compared approaches zero.
+We therefore limited our ratio measurements to regions with significance
+$>5\sigma$ in the \threeohthree line and used that line as the denominator
+in the ratio.  By using the brighter line as the denominator, we avoid
+divide-by-zero numerical errors.
 
 
 % figure_ratio_maps
@@ -234,16 +239,19 @@ broke the data down into subsets using both a by-eye region selection drawing
 regions using ds9 and a more systematic approach using a dendrogram-based clump
 finding algorithm \citep[][\url{http://dendrograms.org/}]{Rosolowsky2008c}.
 
+% dendro_temperature.py
 % TODO: decide whether we used the full resolution or the smoothed version.
 % Presently (Jan 5), we are using the smoothed version
-We ran the dendrogram/clumpfind extraction analysis on the full resolution
+We ran the dendrogram/clumpfind extraction analysis on the smoothed
 \threeohthree cube data.  We enforced thresholds of a minimum number of pixels
 $N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting threshold
 $\Delta = 2\sigma$.  The exact values of these parameters is not particularly
 important, as we are interested in general trends with size-scale and
 galactocentric distance, but we caution against overinterpretation of the
 resulting catalog as the number of sources and their size and distribution can
-change dramatically with small changes in the selected parameters.
+change dramatically with small changes in the selected parameters.  The number
+and location of pixels included in the catalog is, however, relatively robust
+against small parameter changes.
 
 For each extracted blob, we measured the corresponding integrated and peak
 emission in the \threetwoone and \thirteenco cubes.  We also extracted the mean
@@ -800,6 +808,11 @@ clouds such as The Brick, Sgr B2, and the Sgr A cloud complex exhibiting
 temperatures in excess of $T>150$ K.
 
 \textbf{Acknowledgements}:
+We thank the staff and observers at APEX for carrying out the service-mode
+observations.  We are grateful to Arnaud Belloche and Axel Wieß for assistance
+in developing the observing strategy, and Per Bergman for his assistance in
+understanding the SHFI-1 baseline issues.
+\todo{Please provide any acknowledgements that are needed here.}
 
 \textbf{Code Packages Used}:
 
@@ -810,7 +823,8 @@ temperatures in excess of $T>150$ K.
     \item pyspeckit \url{http://pyspeckit.bitbucket.org}
 \end{itemize}
 
-\appendix{Baseline Removal}
+\appendix
+\section{Baseline Removal}
 The baselines in our SHFI-1 data were particularly problematic, more than is
 usual in modern heterodyne obervations.  The 218 GHz window we have observed is
 particularly sensitive to resonances within the SHFI-1 receiver that vary on
@@ -857,7 +871,7 @@ lower-amplitude baseline spectra.}
 %replaced with a higher-quality figure}}
 %{fig:eigenspectra}{0.5}{0}
 
-\appendix{Ratio Examination of Individual Regions}
+\section{Ratio Examination of Individual Regions}
 \todo{While figures have been made for this, they will not be included unless
 necessary.}
 To further examine the reliability of the ratio determination, we have examined

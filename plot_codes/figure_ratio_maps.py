@@ -39,6 +39,7 @@ for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
                     color='w', size=14, zorder=20,
                     horizontalalignment='left')
         F.save(os.path.join(figurepath,
+                            'big_maps',
                             "big_H2CO_321220_to_303202{0}_bl_{1}to{2}.pdf"
                             .format(smooth,int(vrange[0]),int(vrange[1]))
                            )
@@ -71,6 +72,7 @@ for (cubehi,cubelo),sn,smooth in zip(((cube303m,cube321m),
                     color='w', size=14, zorder=20,
                     horizontalalignment='left')
         F.save(os.path.join(figurepath,
+                            'big_maps',
                             "big_H2CO_321220_to_303202{0}_bl_{1}to{2}_slabratio.pdf"
                             .format(smooth,int(vrange[0]),int(vrange[1]))
                            )
@@ -108,10 +110,12 @@ for (cubehi,cubelo),sn,smooth in zip(((cube303m,cube321m),
         F.colorbar.set_axis_label_text('T (K)')
         F.recenter(0.55,-0.075,width=2.3,height=0.40)
         F.save(os.path.join(figurepath,
+                            'big_maps',
                             'big_lores{0}_tmap_greyed_{1}to{2}_slabratio.png'.format(smooth,
                                                                            int(vrange[0]),
                                                                            int(vrange[1]))))
         log.info(os.path.join(figurepath,
+                              'big_maps',
                               'big_lores{0}_tmap_greyed_{1}to{2}_slabratio.png'.format(smooth,
                                                                              int(vrange[0]),
                                                                              int(vrange[1]))))
@@ -158,10 +162,12 @@ for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
         F.colorbar.set_axis_label_text('T (K)')
         F.recenter(0.55,-0.075,width=2.3,height=0.40)
         F.save(os.path.join(figurepath,
+                            'big_maps',
                             'big_lores{0}_tmap_greyed_{1}to{2}.png'.format(smooth,
                                                                            int(vrange[0]),
                                                                            int(vrange[1]))))
         log.info(os.path.join(figurepath,
+                              'big_maps',
                               'big_lores{0}_tmap_greyed_{1}to{2}.png'.format(smooth,
                                                                              int(vrange[0]),
                                                                              int(vrange[1]))))
@@ -187,6 +193,10 @@ for bl in ("_bl",""):
             F.tick_labels.set_xformat('d.dd')
             F.tick_labels.set_yformat('d.dd')
             F.recenter(0.31, -0.05, width=1.1, height=0.3)
-            F.save(os.path.join(figurepath, ratio.replace(".fits",".pdf")))
+            F.save(os.path.join(figurepath,
+                                'big_maps',
+                                ratio.replace(".fits",".pdf")))
             F.recenter(0.55,-0.075,width=2.3,height=0.40)
-            F.save(os.path.join(figurepath, "big_"+ratio.replace(".fits",".pdf")))
+            F.save(os.path.join(figurepath,
+                                'big_maps',
+                                "big_"+ratio.replace(".fits",".pdf")))
