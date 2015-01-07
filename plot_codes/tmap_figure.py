@@ -10,6 +10,10 @@ from paths import h2copath, figurepath
 for fignum in (4,5):
     pl.close(fignum)
 
+cmap = pl.cm.RdYlBu_r
+
+small_recen = dict(x=0.3, y=-0.03,width=1.05,height=0.27)
+
 for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fits',
                               'TemperatureCube_DendrogramObjects{0}_Piecewise_integ.fits'),
                              ('','dendro')):
@@ -21,11 +25,11 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
                              convention='calabretta',
                              figure=fig)
 
-        cm = copy.copy(pl.cm.rainbow)
+        cm = copy.copy(cmap)
         cm.set_bad((0.5,)*3)
         F.show_colorscale(cmap=cm,vmin=15,vmax=200)
         F.set_tick_labels_format('d.dd','d.dd')
-        F.recenter(0.3,-0.03,width=1.2,height=0.30)
+        F.recenter(**small_recen)
         peaksn = os.path.join(h2copath,'APEX_H2CO_303_202{0}_bl_mask_integ.fits'.format(smooth))
         #F.show_contour(peaksn, levels=[4,7,11,20,38], colors=[(0.25,0.25,0.25,0.5)]*5, #smooth=3,
         #               linewidths=[1.0]*5,
@@ -62,7 +66,7 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
         F.show_contour(dusttemperature,
                        levels=[20,25],
                        colors=[(0,0,x,0.5) for x in [0.9,0.7,0.6,0.2]], zorder=10)
-        F.recenter(0.3,-0.03,width=1.2,height=0.30)
+        F.recenter(**small_recen)
         F.save(os.path.join(figurepath, "big_maps",'lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
         F.recenter(0.55,-0.075,width=2.3,height=0.40)
         F.save(os.path.join(figurepath, "big_maps",'big_lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
@@ -85,7 +89,7 @@ F2.show_contour(h2copath+'H2CO_321220_to_303202_smooth_bl_integ_temperature.fits
                 convention='calabretta',
                 levels=[30,75,100,150],
                 cmap=pl.cm.BuGn)
-F2.recenter(0.3,-0.03,width=1.2,height=0.30)
+F2.recenter(**small_recen)
 
 F2.save(os.path.join(figurepath, "big_maps",'H2COtemperatureOnDust.pdf'))
 
@@ -98,11 +102,11 @@ F = aplpy.FITSFigure('/Users/adam/work/gc/Tkin-GC.fits.gz',
                      convention='calabretta',
                      figure=fig)
 
-cm = copy.copy(pl.cm.rainbow)
+cm = copy.copy(cmap)
 cm.set_bad((0.5,)*3)
 F.show_colorscale(cmap=cm,vmin=15,vmax=200)
 F.set_tick_labels_format('d.dd','d.dd')
-F.recenter(0.3,-0.03,width=1.2,height=0.30)
+F.recenter(**small_recen)
 F.add_colorbar()
 F.colorbar.set_axis_label_text('T (K)')
 F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to200.pdf'))
