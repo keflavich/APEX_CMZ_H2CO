@@ -664,6 +664,8 @@ def add_pipeline_header_data(header):
     header['NUMPYVER'] = (numpy.version.version,'numpy version')
     import spectral_cube.version
     header['SPCUBEVE'] = (spectral_cube.version.version,'spectral_cube version')
+    header['BUNIT'] = ('K', 'T_A*; ETAMB has efficiency')
+    header['ETAMB'] = (0.75, 'http://www.apex-telescope.org/telescope/efficiency/')
 
 def make_blanks(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
 

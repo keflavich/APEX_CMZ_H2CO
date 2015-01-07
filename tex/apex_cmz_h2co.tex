@@ -22,9 +22,25 @@
 
 \section{Introduction}
 \todo{To do.  To-do items are coded in red.}
+The central region of our Galaxy is the nearest location in which we can study
+star formation in an `extreme' environment.  While there have been great leaps
+in our understanding of low-mass star formation from local molecular clouds in
+the past decade \citep{}, there remain many unanswered questions about how star
+formation changes as gas becomes denser, more opaque, and more turbulent, as it
+most likely was in galaxies at the peak of cosmic star formation.
 
 
+The Galactic Center:
 
+The \citet{Molinari2011a} ring has attracted a great deal of attention
+recently, as it has the most gas in the CMZ and a large, but unrealized,
+star-forming potential
+\citep{Longmore2013a,Longmore2012b,Longmore2012a,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
+The star formation in this region is suppressed relative to expectations based
+on nearby star-forming regions and nearby (on a different scale) Galactic
+disks.  Hypotheses for this depressed star formation rate include suppressed
+fragmentation by cosmic ray and X-ray heating and a raised star formation
+threshold from enhanced turbulence.
 
 
 
@@ -585,7 +601,7 @@ negative-latitude component of the `ring'.  At positive longitudes,
 $\ell\gtrsim0.9$, the gas is uniformly $T\sim60$ K.  Similarly, most of the gas
 in the Sgr C complex is around 60 K.
 
-Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2015a} and
+Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2014d} and
 a position-velocity slice through the fitted temperature cube following that
 orbit.  The fit is imperfect, especially along the green segment, but still very useful
 for tracking the properties of clouds in common environments.
@@ -599,7 +615,7 @@ coldest detected in our survey.
 {figures/orbits/KDL2014_orbit_on_H2CO_DendrogramTemperature_smooth.pdf}
 {figures/orbits/KDL2014_orbitpath_on_H2CO_DendrogramTemperature_smooth.pdf}
 {(a) A position-velocity slice through the dendrogram clumpfind generated
-temperature cube along the \citet{Kruijssen2015a} orbit.  White regions are
+temperature cube along the \citet{Kruijssen2014d} orbit.  White regions are
 outside the mapped area, while grey regions have no gas detected or inadequate
 signal to measure a temperature.
 (b) The path used to create the slice shown in (a).  Each element is a small
@@ -661,6 +677,11 @@ rather than \citet{Green1991a}) and different priors on the fitted parameter
 space.  In particular, we left density as a free parameter and instead broke
 degeneracies with a conservative but nonetheless useful constraint on the
 column density and abundance.
+
+The \citet{Ao2013a} survey found uniformly high temperatures within the bright
+Sgr A cloud complex.  Our survey finds a greater variety in gas temperatures,
+with significant contrast between the back-side cool clouds and the warmer
+foreground infrared dark clouds.
 
 There have also been observations of \para temperatures with interferometers.
 \citet{Johnston2014a} noted a very high temperature peak, $T>320$ K, using these
@@ -730,12 +751,12 @@ must be near the observed temperature.
 % Cosmic rays should not exhibit this behavior; they should heat all scales equally
 % and care only about the \emph{mean} density.
 
-\subsection{Shocks}
-Assuming the dust temperature reflects the mean gas temperature and only a subset
-of the gas has been heated to the high observed temperatures, we can determine the
-shock velocity required to supply the heating.  Assuming an adiabatic strong shock,
-$T_{ps} = \frac{3}{16}\frac{\mu v_s^2}{k}$, where $\mu = \mu_{\hh} = 2.8$.  A 1 \kms
-shock can provide a temperature of 65 K
+%\subsection{Shocks}
+%Assuming the dust temperature reflects the mean gas temperature and only a subset
+%of the gas has been heated to the high observed temperatures, we can determine the
+%shock velocity required to supply the heating.  Assuming an adiabatic strong shock,
+%$T_{ps} = \frac{3}{16}\frac{\mu v_s^2}{k}$, where $\mu = \mu_{\hh} = 2.8$.  A 1 \kms
+%strong shock can produce a postshock temperature of 65 K.  With observed linewidths 
 
 %\section{Examination of Individual Spectra}
 %%\todo{The modeling is ambiguous still: it is necessary to impose some sort of
@@ -747,14 +768,6 @@ shock can provide a temperature of 65 K
 %larger area.
 %
 %\subsection{Sources in the Ring}
-%The \citet{Molinari2011a} ring has attracted a great deal of attention recently,
-%as it has the most gas in the CMZ and a large, but unrealized, star-forming potential
-%\citep{Longmore2013a,Longmore2012b,Longmore2012a,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
-%The star formation in this region is suppressed relative to expectations based
-%on nearby star-forming regions and nearby (on a different scale) Galactic
-%disks.  Hypotheses for this depressed star formation rate include suppressed
-%fragmentation by cosmic ray and X-ray heating and a raised star formation
-%threshold from enhanced turbulence.
 %
 %\subsubsection{The Brick: G0.253+0.016}
 %We examine two lines of sight through The Brick, in the northeast at
@@ -781,7 +794,10 @@ shock can provide a temperature of 65 K
 %much lower than in cloud d and more comparable to The Brick.
 
 \section{Conclusion}
-
+There is warm ($T\gtrsim80$ K) pervading the CMZ out to a radius $\sim200$ pc.
+However, there is also significant contrast in gas temperature, with massive
+clouds such as The Brick, Sgr B2, and the Sgr A cloud complex exhibiting
+temperatures in excess of $T>150$ K.
 
 \textbf{Acknowledgements}:
 
@@ -791,6 +807,7 @@ shock can provide a temperature of 65 K
     \item sdpy \url{https://github.com/keflavich/sdpy}
     \item aplpy \url{http://aplpy.github.io}
     \item pyradex \url{https://github.com/keflavich/pyradex}
+    \item pyspeckit \url{http://pyspeckit.bitbucket.org}
 \end{itemize}
 
 \appendix{Baseline Removal}
