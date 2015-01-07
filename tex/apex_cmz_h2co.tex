@@ -1,12 +1,24 @@
 \input{preface}
 
+\begin{document}
+
 \title{APEX CMZ Survey}
+\titlerunning{W51 DGMF}
+\authorrunning{Ginsburg et al}
 \input{authors}
 
-\section{Abstract}
+\date{Date: \today ~~ Time: \currenttime}
 
-\footnote{Compiled on \today\ at \currenttime}
+\abstract
+{This is an abstract.}
+{To fill it in.}
+{Typing}
+{We have filled it in.}
+{The abstract is done.}
 
+%\footnote{Compiled on \today\ at \currenttime}
+
+\maketitle
 
 \section{Introduction}
 \todo{To do.  To-do items are coded in red.}
@@ -573,15 +585,27 @@ negative-latitude component of the `ring'.  At positive longitudes,
 $\ell\gtrsim0.9$, the gas is uniformly $T\sim60$ K.  Similarly, most of the gas
 in the Sgr C complex is around 60 K.
 
+Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2015a} and
+a position-velocity slice through the fitted temperature cube following that
+orbit.  The fit is imperfect, especially along the green segment, but still very useful
+for tracking the properties of clouds in common environments.
+Intriguingly, the `back-side' clouds (green segment), are cooler than
+many of those on the front side, such as The Brick (red segment).  Nontheless,
+many of the clouds besides The Brick within the molecular `ring' are among the
+coldest detected in our survey.
+
+
 \FigureTwoAA
 {figures/orbits/KDL2014_orbit_on_H2CO_DendrogramTemperature_smooth.pdf}
 {figures/orbits/KDL2014_orbitpath_on_H2CO_DendrogramTemperature_smooth.pdf}
 {(a) A position-velocity slice through the dendrogram clumpfind generated
-temperature cube along the \citet{Kruijssen2015a} orbit.  Dark grey indicates
-regions outside the mapped area, while light grey indicates regions with no
-gas detected or inadequate signal to measure a temperature.
-(b) The path used to create the slice shown in (a).  The orbit exits our
-observed field to the west of Sgr C.
+temperature cube along the \citet{Kruijssen2015a} orbit.  White regions are
+outside the mapped area, while grey regions have no gas detected or inadequate
+signal to measure a temperature.
+(b) The path used to create the slice shown in (a).  Each element is a small
+rectangle over which the temperature has been averaged.  The green rectangle at
+$\ell=359.3$ indicates the starting point (offset$=0$) of the position-velocity
+slice.  The orbit is outside of our observed field to the west of Sgr C.  
 }
 {fig:kdlorbit}{1}{6.5in}
 
