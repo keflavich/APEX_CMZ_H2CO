@@ -86,8 +86,10 @@ for (cubehi,cubelo),sn,smooth in zip(((cube303m,cube321m),
                              convention='calabretta',
                              figure=fig)
 
-        cm = copy.copy(pl.cm.rainbow)
-        cm.set_bad((0.5,0.5,0.5,0.5))
+        #cm = copy.copy(pl.cm.rainbow)
+        cm = copy.copy(pl.cm.RdYlBu_r)
+        cm.set_bad('#888888')
+        #cm.set_bad((0.5,0.5,0.5,0.5))
         F.show_colorscale(cmap=cm,vmin=15,vmax=200)
         F.set_tick_labels_format('d.dd','d.dd')
         peaksn = sn.spectral_slab(*(vrange*u.km/u.s)).max(axis=0)
@@ -139,8 +141,10 @@ for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
                              convention='calabretta',
                              figure=fig)
 
-        cm = copy.copy(pl.cm.rainbow)
-        cm.set_bad((0.5,0.5,0.5,0.5))
+        #cm = copy.copy(pl.cm.rainbow)
+        #cm.set_bad((0.5,0.5,0.5,0.5))
+        cm = copy.copy(pl.cm.RdYlBu_r)
+        cm.set_bad('#888888')
         F.show_colorscale(cmap=cm,vmin=15,vmax=200)
         F.set_tick_labels_format('d.dd','d.dd')
         peaksn = sn.spectral_slab(*(vrange*u.km/u.s)).max(axis=0)

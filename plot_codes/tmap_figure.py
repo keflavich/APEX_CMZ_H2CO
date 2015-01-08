@@ -11,6 +11,7 @@ for fignum in (4,5):
     pl.close(fignum)
 
 cmap = pl.cm.RdYlBu_r
+figsize = (20,10)
 
 small_recen = dict(x=0.3, y=-0.03,width=1.05,height=0.27)
 
@@ -19,7 +20,7 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
                              ('','dendro')):
 
     for smooth in ("","_smooth",):#"_vsmooth"):
-        fig = pl.figure(4, figsize=(14,7))
+        fig = pl.figure(4, figsize=figsize)
         fig.clf()
         F = aplpy.FITSFigure(h2copath+ftemplate.format(smooth),
                              convention='calabretta',
@@ -80,7 +81,7 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
     #F.save('CMZ_H2CO_observed_planned_colorful.pdf')
 
 
-fig = pl.figure(5, figsize=(14,7))
+fig = pl.figure(5, figsize=figsize)
 fig.clf()
 F2 = aplpy.FITSFigure(dusttemperature, convention='calabretta', figure=fig)
 F2.show_colorscale(cmap=pl.cm.hot, vmin=10, vmax=40)
@@ -96,7 +97,7 @@ F2.save(os.path.join(figurepath, "big_maps",'H2COtemperatureOnDust.pdf'))
 F2.recenter(0.55,-0.075,width=2.3,height=0.40)
 F2.save(os.path.join(figurepath, "big_maps",'big_H2COtemperatureOnDust.pdf'))
 
-fig = pl.figure(6, figsize=(14,7))
+fig = pl.figure(6, figsize=figsize)
 fig.clf()
 F = aplpy.FITSFigure('/Users/adam/work/gc/Tkin-GC.fits.gz',
                      convention='calabretta',
