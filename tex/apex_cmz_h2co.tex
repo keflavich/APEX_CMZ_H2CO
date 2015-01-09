@@ -491,6 +491,15 @@ The bottom black spectrum is the residual, and the orange wiggly spectrum shows
 the spline fit used to iteratively remove baseline ripples from the residual.}
 {fig:twospectra_hotcold}{1}{3in}
 
+% tmap_pv
+\FigureTwoAA
+{figures/big_maps/pv_tmap_smooth_dendro_masked.pdf}
+{figures/big_maps/pv_peaksn_smooth_dendro.pdf}
+{(a) A position-velocity diagram made by averaging the smooth
+dendrogram-extracted temperature cube along Galactic latitude.  (b) The peak
+signal-to-noise along Galactic latitude, which is used as a mask in (a).}
+{fig:pvtem}
+{1}{6.5in}
 
 \subsection{Parameter Comparison}
 In a turbulent medium, the 1D line width of the gas should be tightly
@@ -638,6 +647,7 @@ signal to measure a temperature.
 rectangle over which the temperature has been averaged.  The green rectangle at
 $\ell=359.3$ indicates the starting point (offset$=0$) of the position-velocity
 slice.  The orbit is outside of our observed field to the west of Sgr C.  
+The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
 }
 {fig:kdlorbit}{1}{6.5in}
 
@@ -684,6 +694,7 @@ range when using only these two lines, so the map is cut off at $T=80$ K.
 %{0.5}{0}
 
 \subsection{Comparison to other measurements with \para}
+\label{sec:h2cocompare}
 The largest survey of \para temperatures prior to this work was
 \citet{Ao2013a}, who observed the inner 30 pc.  They performed a similar
 analyis to ours but over a limited area.  They reported temperatures
@@ -741,7 +752,58 @@ gas is also the densest.  However, hot and dense gas cools more efficiently, so
 sustaining a population of shock-heated gas may be infeasible.  Additionally,
 the log-poisson distribution followed by a multiplicative cascade has a substantial
 low-temperature tail \citep{Pan2009a}, which implies that the mean temperature
-must be near the observed temperature.
+must be near the observed temperature.  \todo{It would be nice to have some help
+from a theorist to assess whether non-uniform heating could really drive the observed
+temperatures.}
+
+%Gas temperatures higher than dust temperatures occur in both high and low density
+%gas \todo{need to have somes sort of density tracer - probably just dust + spherical}
+
+\subsection{A stream of fresh gas falling into the CMZ?}
+\label{sec:coolstream}
+The gas streamer extending from $\ell=0$ to $\ell=1.3$ may represent a stream
+of infalling gas.  The lack of IRDC features along this stream restricts it to
+be on the back side of the CMZ, while the disagreement with the
+\citet{Kruijssen2014d} orbit suggests that it is not following the same path as
+the Brick, the lettered clouds, and Sgr B2.  The large observed linewidths
+imply that the stream is genuinely associated with the CMZ, though its distance
+from Sgr A may be much larger than its projected distance.
+
+\todo{Figure tracing this streamer.  Trace in PV too.}
+\FigureTwoAA
+{figures/orbits/mydrawnpathpv_on_H2CO_DendrogramTemperature_smooth.pdf}
+{figures/orbits/mydrawnpath_on_H2CO_DendrogramTemperature_smooth.pdf}
+{Position-velocity slice tracing the ``fresh stream'' of cooler molecular
+gas from Section \ref{sec:coolstream}.}
+{fig:coolstream}{1}{6in}
+
+\subsection{Is the gas warm or just optically thick?}
+As noted in Section \ref{sec:h2cocompare}, there is degeneracy in the modeling
+that allows the observed ratios to be produced by very dense gas in addition to
+hot gas.  Indeed, ratios approaching $\Rone=1$ occur for relatively low
+temperatures ($T\sim30$ K) at very high densities ($n>10^{6.5}$ \percc)
+and very high column densities ($N(\para)>10^{16}$ \perkms \persc) because
+the lines become optically thick and have LTE temperatures.
+
+Since the mean densities at 30\arcsec resolution are always significantly lower
+than this value ($n\lesssim\mathrm{few}\ee{5}$ \percc), such high density,
+optically thick gas would have to have a very low filling factor.  The peak
+\para \threeohthree brightness ranged from $0.2 \lesssim T_{mb} \lesssim 2$ K
+in the detected regions, implying upper limits on the filling factor 1-7\%.
+In practice, the filling factor would have to be lower still, since any optically
+thin \para would favor the \threeohthree line and contribute to a lower \Rone.
+
+The strongest argument against such a scenario is the extremely high column
+density required.  At typical \para abundances $X\sim10^9$, or even more
+extreme abundances $X\sim10^8$, the implied local column density is
+$N(\hh)\gtrsim10^{25(24)}$ in a single velocity bin.  Column densities up to
+$N(\hh)\sim10^{24}$ \percc are observed, but with much lower filling fractions
+$ff\sim10^{-4}$, in The Brick \citep[][Figure 4]{Rathborne2014a}.  Even in The
+Brick, the densest cloud besides Sgr B2, higher column densities are not
+observed.  So, while it remains possible that optically thick \para is
+responsible for the observed line ratios, it is very unlikely, especially
+outside the densest clouds.
+
 
 % However, it is still possible
 % to distinguish cosmic ray and turbulent heating if one dominates over the

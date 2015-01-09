@@ -48,8 +48,8 @@ def offset_to_point(ll, bb):
     return line.project(point)
 
 cmap = copy.copy(pl.cm.RdYlBu_r)
-cmap.set_bad((1.0,)*3)
-cmap.set_under((0.9,0.9,0.9,0.5))
+cmap.set_bad((0.5,)*3)
+cmap.set_under((0.5,)*3)
 
 for molecule,fn in zip(molecules[-2:],filenames[-2:]):
     log.info(molecule)
@@ -71,7 +71,7 @@ for molecule,fn in zip(molecules[-2:],filenames[-2:]):
     if 'Temperature' in fn:
         F.show_colorscale(cmap=cmap, aspect=1, vmin=20, vmax=200)
         # This is where it fails...
-        #F.add_colorbar()
+        F.add_colorbar()
         #divider = make_axes_locatable(F._ax1)
         #cax = divider.append_axes("right", size="5%", pad=0.05)
         #pl.colorbar(F._ax1.images[0], cax=cax)
@@ -87,7 +87,7 @@ for molecule,fn in zip(molecules[-2:],filenames[-2:]):
     #F.show_markers([offset_to_point(0.47, -0.01)],[30.404e3], edgecolor='r', marker='x')
     #F.show_markers([offset_to_point(0.38, 0.04)], [39.195e3], edgecolor='b', marker='x')
     #F.show_markers([offset_to_point(0.253, 0.016)], [36.5e3], edgecolor='purple', marker='x')
-    F.save(fpath('orbits/mydrawnpath_on.pdf'.format(molecule)))
+    F.save(fpath('orbits/mydrawnpathpv_on_{0}.pdf'.format(molecule)))
 
     fig2 = pl.figure(2)
     pl.clf()
