@@ -29,12 +29,12 @@
  "G1.65-0.06":         {'ncomp':1, 'velo':[48]},
  "G0.83-0.23":         {'ncomp':1, 'velo':[48]},
  "G1.00-0.02box":      {'ncomp':1, 'velo':[82]},
- "b:G0.34+0.06":       {'ncomp':1, 'velo':[40]}, # TODO-refit
- "c:G0.38+0.04":       {'ncomp':1, 'velo':[40]}, # TODO-refit
- "ds:G0.42+0.03box":   {'ncomp':1, 'velo':[25]}, # TODO-refit
- "dn:G0.41+0.05box":   {'ncomp':1, 'velo':[25]}, # TODO-refit
- "e:G0.48-0.01":       {'ncomp':1, 'velo':[28]}, # TODO-refit
- "f:G0.49+0.02":       {'ncomp':1, 'velo':[28]}, # TODO-refit
+ "b:G0.34+0.06":       {'ncomp':1, 'velo':[0]},
+ "c:G0.38+0.04":       {'ncomp':1, 'velo':[40]},
+ "ds:G0.42+0.03box":   {'ncomp':1, 'velo':[16]},
+ "dn:G0.41+0.05box":   {'ncomp':1, 'velo':[19]},
+ "e:G0.48-0.01":       {'ncomp':2, 'velo':[30,98]},
+ "f:G0.49+0.02":       {'ncomp':1, 'velo':[31]},
  "G0.66-0.14":         {'ncomp':1, 'velo':[28]},
  "G359.49-0.14":       {'ncomp':1, 'velo':[-56]},
  "G359.60-0.22":       {'ncomp':2, 'velo':[-80,22]},
@@ -42,18 +42,18 @@
  "G359.63-0.13":       {'ncomp':1, 'velo':[-31]},
  "G359.44-0.11":       {'ncomp':1, 'velo':[-54]},
  "G359.62-0.24":       {'ncomp':1, 'velo':[22]},
- "G0.33-0.08":         {'ncomp':3, 'velo':[17,80,100]}, # TODO-refit
- "G0.47-0.07box":      {'ncomp':1, 'velo':[80]}, # TODO-refit
- "G0.24-0.05box":      {'ncomp':2, 'velo':[29,80]}, # TODO-refit
- "BrickInABox":        {'ncomp':2, 'velo':[36,15]}, # TODO-refit
- "G0.29+0.04box":      {'ncomp':2, 'velo':[2, 8]}, # TODO-refit
- "G0.11-0.01box":      {'ncomp':2, 'velo':[52,45]}, # TODO-refit
- "G0.08-0.08box":      {'ncomp':1, 'velo':[25]}, # TODO-refit
- "G0.99+0.05box":      {'ncomp':1, 'velo':[85]}, # TODO-refit
- "G1.21+0.00box":      {'ncomp':1, 'velo':[85]}, # TODO-refit
- "G0.85-0.04box":      {'ncomp':2, 'velo':[5,80]}, # TODO-refit
- "G0.56-0.07box":      {'ncomp':2, 'velo':[85,60]}, # TODO-refit
- "G0.36-0.08box":      {'ncomp':2, 'velo':[90,24]}, # TODO-refit
+ "G0.33-0.08":         {'ncomp':3, 'velo':[17,80,100]},
+ "G0.47-0.07box":      {'ncomp':1, 'velo':[91]},
+ "G0.24-0.05box":      {'ncomp':2, 'velo':[29,80]},
+ "BrickInABox":        {'ncomp':2, 'velo':[36,15]},
+ "G0.29+0.04box":      {'ncomp':2, 'velo':[2, 10]},
+ "G0.11-0.01box":      {'ncomp':2, 'velo':[55,48]},
+ "G0.08-0.08box":      {'ncomp':1, 'velo':[52]},
+ "G0.99+0.05box":      {'ncomp':1, 'velo':[83]},
+ "G1.21+0.00box":      {'ncomp':1, 'velo':[82]},
+ "G0.85-0.04box":      {'ncomp':2, 'velo':[4,82]},
+ "G0.56-0.07box":      {'ncomp':2, 'velo':[86,49]},
+ "G0.36-0.08box":      {'ncomp':2, 'velo':[90,24]},
  "Map_001 Off 2":      {'ncomp':1, 'velo':[15]},
  "Map_002 Off 2":      {'ncomp':2, 'velo':[10,30]},
  "Map_003 Off 2":      {'ncomp':2, 'velo':[13,80]},
