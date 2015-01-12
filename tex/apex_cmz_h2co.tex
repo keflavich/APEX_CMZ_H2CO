@@ -20,17 +20,19 @@
 
 \maketitle
 
+\todo{To-do items are coded in red.}
+
 \section{Introduction}
-\todo{To do.  To-do items are coded in red.}
 The central region of our Galaxy is the nearest location in which we can study
 star formation in an `extreme' environment.  While there have been great leaps
 in our understanding of low-mass star formation from local molecular clouds in
-the past decade \citep{}, there remain many unanswered questions about how star
-formation changes as gas becomes denser, more opaque, and more turbulent, as it
-most likely was in galaxies at the peak of cosmic star formation.
+the past decade \citep{Lada2012a,Heiderman2010a,Lada2010a}, there remain many
+unanswered questions about how star formation changes as gas becomes denser,
+more opaque, and more turbulent, as it most likely was in galaxies at the peak
+of cosmic star formation \citep{Kruijssen2013a}.
 
 
-The Galactic Center:
+
 
 The \citet{Molinari2011a} ring has attracted a great deal of attention
 recently, as it has the most gas in the CMZ and a large, but unrealized,
@@ -38,19 +40,56 @@ star-forming potential
 \citep{Longmore2013a,Longmore2012b,Longmore2012a,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
 The star formation in this region is suppressed relative to expectations based
 on nearby star-forming regions and nearby (on a different scale) Galactic
-disks.  Hypotheses for this depressed star formation rate include suppressed
-fragmentation by cosmic ray and X-ray heating and a raised star formation
-threshold from enhanced turbulence.
+disks \citep{Kennicutt1998a,Kennicutt2012a,Leroy2013a,Heiderman2010a}.
 
+Variations in star formation rate at a fixed gas surface density are observed
+in galactic nuclear regions even without AGN.  For example in the nuclei of NGC
+2614 and NGC 34, both galaxies with nuclear starburst rings, the star formation
+rate is well above the standard star formation laws \citep{Xu2014b}.  However,
+in our own Galaxy's circumnuclear ring (not to be confused with the
+circumnuclear disk within $\sim1$ pc of Sgr A*), star formation is lower.
+
+Hypotheses for this reduced star formation rate include suppressed
+fragmentation by cosmic ray and X-ray heating and a raised star formation
+threshold from enhanced turbulence.  \citet{Papadopoulos2010a} and
+\citet{Papadopoulos2011a} suggested that high temperatures driven by cosmic
+rays may suppress fragmentation.  \citet{Kruijssen2014c} concluded that the
+`threshold' for star formation must be higher in the CMZ to explain the
+suppressed star formation rate.  
+
+There is a long-standing problem that the observed gas and dust temperatures do
+not agree throughout the CMZ
+\citep{Guesten1981a,Ao2013a,Ott2014a,Molinari2011a}.  This discrepancy
+represents a significant problem for understanding the interplay betweeng gas
+temperature and star formation, since the gas temperature drives gas pressure
+and the important dynamical effects, while dust temperature is readily
+determined on large scales.
+
+These prior works primarily used the popular ammonia (\ammonia) metastable
+inversion transition thermometer, which is sensitive to moderate density gas
+($n(\hh) \sim A_{ul}/C_{ul} \sim 2\ee{4}$ \percc).  While this thermometer is
+generally reliable in cold regions, the population of the higher energy states
+- those sensitive to temperatures $T\gtrsim60$ K - may be affected by
+`formation heating', a mechanism recently discovered to affect much of the CMZ
+gas \citep[][]{Lis2014a,Mills2013a}.  \citet{Ao2013a} used the \para 220 GHz
+thermometer \citep{Mangum1993a}, which is sensitive to denser gas, and still
+found a significant discrepancy between gas and dust temperature, but they only
+covered the inner 30 pc.
+
+We describe new observations using the \para thermometer in Section
+\ref{sec:observations}.
 
 
 \section{Observations \& Data Reduction}
+\label{sec:observations}
 
 \subsection{Observations}
 We observed the Central Molecular Zone from $-0.4 < \ell < 1.6$ with the SHFI-1
 instrument \citep{Vassilev2008a} on the APEX telescope using the XFFTS backend.
-The observations were divided into 25 hours in June 2013 and 75 hours in
-April-July 2014.  \todo{Add more dates and times here.}
+The observations were performed in service mode, and were spread out over two
+years.  The time was divided into 25 hours in June 2013, 75 hours in April-July
+2014, and 50 hours in October 2014.  The time was split between the ESO (50h),
+MPIfR (75h), and OSO (25h) queues.
 
 The 2013 observations were taken in $4\arcmin \times 4\arcmin$ patches, and the
 frequency range covered was 217.5-220 GHz and 216-218.5 GHz in the two spectral
@@ -67,7 +106,16 @@ resolution to make the data more manageable.  We also expect to see no lines
 narrower than a few \kms in the CMZ, particularly not with the relatively
 shallow observations we have acquired.
 
-\todo{Mention typical/min/max system temperatures.}
+Additionally, for the \para data, we incorporated the 41 hours of observations
+using the older FFTS backend from \citet{Ao2013a}.  These data covered only 2
+GHz of bandwidth, including all three of the \para lines, but they did not
+cover the CO lines.
+
+\todo{The system temperature ranged from $120 < T_{sys} < 200$ K for the majority of
+the observations, with a small fraction (...\%) in the range $200 < T_{sys} <
+300$ K.  There were also a very small number with much higher system
+temperatures, $300 < T_{sys} < 750$ K, but these are associated with
+observations of the bright Sgr B2 continuum source.}
 
 \subsection{Reduction}
 \subsubsection{Calibration}
@@ -159,6 +207,7 @@ mapping technique used here.
 The PPV cubes were created with units of brightness temperature ($T_A^*$).  The
 main beam efficiency is $\eta_{mb} = 0.75$ (gain $\sim39$
 Jy/K)\footnote{\url{http://www.apex-telescope.org/telescope/efficiency/}}.
+These values are noted in the FITS headers of the released data.
 
 
 
@@ -232,6 +281,7 @@ to higher temperatures.
 }
 %{fig:ratiomaps}{1}{7in}
 {fig:ratiomaps}{0.6}{0}
+%{fig:ratiomaps}{1}{9.5in}
 
 \subsection{Region Extraction}
 In order to extract higher signal-to-noise measurements on selected regions, we
@@ -291,11 +341,17 @@ covering $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N <
 10^{15.1}$ \persc\perkmspc.
 
 We extracted spectra averaged over each `by-eye' selected region and fitted
-a 6-parameter model to the full 218-219 GHz spectral range.  The fitted
-parameters are the amplitude of the \formaldehyde \threeohthree line, the
-centroid velocity, the line width ($\sigma$, not FWHM), the ratio $R_1 =
-\Rone$, the ratio $R_2 = \Rtwo$, and the amplitude of the \methanol \fourtwotwo
-line.
+a 6-parameter model to the full 218-219 GHz spectral range using
+\texttt{pyspeckit} \citep{Ginsburg2011c}.  The fitted parameters are the amplitude of the
+\formaldehyde \threeohthree line, the centroid velocity, the line width
+($\sigma$, not FWHM), the ratio $R_1 = \Rone$, the ratio $R_2 = \Rtwo$, and the
+amplitude of the \methanol \fourtwotwo line.  For these spectra, we performed
+a different baseline subtraction to that described in Section
+\ref{sec:baseline}.  We first fit the described 6-parameter model, then fit a
+spline curve to the residual smoothed to a 50-channel (50 \kms) scale.  We then
+re-fit the model to the data.  In all but the lowest signal-to-noise cases,
+this approach resulted in consistent ratio measurements between the two fits
+and with the other methods.
 
 
 For each extracted region, we created $\chi^2$ grids using independent
@@ -451,22 +507,26 @@ because the \para line ratio is intrinsically insensitive to higher
 temperatures as can be seen in Figure\ref{fig:parsonbrightness}.
 
 % tmap_figure
-\FigureTwoAA{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
-            {figures/big_maps/big_lores_smoothdendro_tmap_withcontours.pdf}
+\RotFigureTwoAA
+{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
+{figures/big_maps/big_lores_smoothdendro_tmap_withcontours.pdf}
 {(top) A temperature map derived from the \Rone ratio map shown
 in Figure \ref{fig:ratiomaps}.  Regions of lower signal-to-noise, and therefore less
 reliable temperature, are grayed out with a filter that gets more opaque
 toward lower signal-to-noise.  Temperatures above $\gtrsim150$ K should be
 treated as lower limits in the 100-150 K range.
+The thin contours are from the Herschel HiGal dust SED fit at a level $N(\hh)=5\ee{22}$
+and are included to provide a visual reference for comparison between the temperature
+maps.
 (bottom) A temperature map created by averaging the dendrogram-derived clump temperature
 along each line-of-sight.
 %The contours correspond to the integrated \threeohthree
 %line intensity at levels [4,7,11,20,38] K \kms.
 }
-{fig:temmap}{1}{7in}
+{fig:temmap}{1}{9.5in}
 
 % tmap_figure
-\FigureTwoAA
+\RotFigureTwoAA
 {figures/big_maps/big_lores_peaksn}
 {figures/big_maps/big_lores_smooth_peaksn}
 {Map of the peak signal-to-noise in the \para \threeohthree line with no
@@ -476,7 +536,7 @@ in Figure \ref{fig:temmap}.  The colorbars are intentionally saturated at a
 S/N$>10$ since above this threshold, the temperatures are reliable as long as
 they are in the $T<150$ K regime.
 }
-{fig:peaksn}{1}{7in}
+{fig:peaksn}{1}{9.5in}
 
 
 \FigureTwo
@@ -492,14 +552,14 @@ the spline fit used to iteratively remove baseline ripples from the residual.}
 {fig:twospectra_hotcold}{1}{3in}
 
 % tmap_pv
-\FigureTwoAA
+\RotFigureTwoAA
 {figures/big_maps/pv_tmap_smooth_dendro_masked.pdf}
 {figures/big_maps/pv_peaksn_smooth_dendro.pdf}
 {(a) A position-velocity diagram made by averaging the smooth
 dendrogram-extracted temperature cube along Galactic latitude.  (b) The peak
 signal-to-noise along Galactic latitude, which is used as a mask in (a).}
 {fig:pvtem}
-{1}{6.5in}
+{1}{9.5in}
 
 \subsection{Parameter Comparison}
 In a turbulent medium, the 1D line width of the gas should be tightly
@@ -636,7 +696,7 @@ black hole.
 \todo{temperature as a function of time since closest passage to Sgr A*}
 
 
-\FigureTwoAA
+\RotFigureTwoAA
 {figures/orbits/KDL2014_orbit_on_H2CO_DendrogramTemperature_smooth.pdf}
 {figures/orbits/KDL2014_orbitpath_on_H2CO_DendrogramTemperature_smooth.pdf}
 {(a) A position-velocity slice through the dendrogram clumpfind generated
@@ -649,7 +709,7 @@ $\ell=359.3$ indicates the starting point (offset$=0$) of the position-velocity
 slice.  The orbit is outside of our observed field to the west of Sgr C.  
 The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
 }
-{fig:kdlorbit}{1}{6.5in}
+{fig:kdlorbit}{1}{9.5in}
 
 \subsection{Comparison to \citet{Ott2014a} \ammonia temperature map}
 \label{sec:ammoniacompare}
@@ -679,8 +739,8 @@ southwest of Sgr B2 S.  This difference probably indicates that there is a
 massive, cool, diffuse component being detected in \ammonia, while
 \formaldehyde is detecting a hotter, denser component.
 
-\FigureTwoAA
-{figures/big_maps/ott2014_nh3_tmap_15to80.pdf}
+\RotFigureTwoAA
+{figures/big_maps/ott2014_nh3_tmap_15to80_withcontours.pdf}
 {figures/big_maps/lores_smoothdendro_tmap_withcontours.pdf}
 {(a) A temperature map derived from the \ammonia 1-1/2-2 line ratio from
 \citet{Ott2014a}.  The \ammonia thermometer has a more limited temperature
@@ -690,7 +750,7 @@ range when using only these two lines, so the map is cut off at $T=80$ K.
 \ref{fig:temmap}b
 }
 {fig:nh3tmap}
-{1}{6.5in}
+{1}{9.5in}
 %{0.5}{0}
 
 \subsection{Comparison to other measurements with \para}
@@ -770,12 +830,12 @@ imply that the stream is genuinely associated with the CMZ, though its distance
 from Sgr A may be much larger than its projected distance.
 
 \todo{Figure tracing this streamer.  Trace in PV too.}
-\FigureTwoAA
+\RotFigureTwoAA
 {figures/orbits/mydrawnpathpv_on_H2CO_DendrogramTemperature_smooth.pdf}
 {figures/orbits/mydrawnpath_on_H2CO_DendrogramTemperature_smooth.pdf}
 {Position-velocity slice tracing the ``fresh stream'' of cooler molecular
 gas from Section \ref{sec:coolstream}.}
-{fig:coolstream}{1}{6in}
+{fig:coolstream}{1}{9.5in}
 
 \subsection{Is the gas warm or just optically thick?}
 As noted in Section \ref{sec:h2cocompare}, there is degeneracy in the modeling

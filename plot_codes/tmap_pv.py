@@ -66,8 +66,8 @@ for smooth in ("","_smooth",):#"_vsmooth"):
 
         color = (0.5,)*3 # should be same as background #888
         F.show_contour(snhdu,
-                       levels=[0]+np.logspace(0.20,2).tolist(),
-                       colors=([(0.5,0.5,0.5,1)] + 
+                       levels=[-1,0]+np.logspace(0.20,2).tolist(),
+                       colors=([(0.5,0.5,0.5,1)]*2 + 
                                [color + (alpha,) for alpha in
                                 np.exp(-(np.logspace(0.20,2)-1.7)**2/(2.5**2*2.))]),
                        filled=True,

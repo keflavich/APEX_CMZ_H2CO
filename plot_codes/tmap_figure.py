@@ -5,9 +5,12 @@ import os
 import copy
 from astropy import log
 from paths import h2copath, figurepath
+import paths
+import matplotlib
+matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 # Close these figures so we can remake them in the appropriate size
-for fignum in (4,5):
+for fignum in (4,5,6,7):
     pl.close(fignum)
 
 cmap = pl.cm.RdYlBu_r
@@ -42,13 +45,15 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
         #               #linewidths=[1.0]*5,
         #               zorder=10, convention='calabretta')
         color = (0.5,)*3 # should be same as background #888
-        F.show_contour(peaksn, levels=[0]+np.logspace(0.20,2).tolist(),
-                       colors=[(0.5,0.5,0.5,1)] + [color + (alpha,) for alpha in np.exp(-(np.logspace(0.20,2)-1.7)**2/(2.5**2*2.))], #smooth=3,
+        F.show_contour(peaksn, levels=[-1,0]+np.logspace(0.20,2).tolist(),
+                       colors=[(0.5,0.5,0.5,1)]*2 + [color + (alpha,) for alpha in np.exp(-(np.logspace(0.20,2)-1.7)**2/(2.5**2*2.))], #smooth=3,
                        filled=True,
                        #linewidths=[1.0]*5,
                        zorder=10, convention='calabretta')
         F.add_colorbar()
         F.colorbar.set_axis_label_text('T (K)')
+        F.colorbar.set_axis_label_font(size=18)
+        F.colorbar.set_label_properties(size=16)
 
         F.save(os.path.join(figurepath, "big_maps", 'lores{0}{1}_tmap_withmask.pdf'.format(smooth, outtype)))
         F.recenter(**big_recen)
@@ -67,10 +72,14 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
         F.save(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
         log.info(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
 
-        Fsn = aplpy.FITSFigure(peaksn, convention='calabretta')
+        fig7 = pl.figure(7, figsize=figsize)
+        fig7.clf()
+        Fsn = aplpy.FITSFigure(peaksn, convention='calabretta', figure=fig7)
         Fsn.show_grayscale(vmin=0, vmax=10, stretch='linear', invert=True)
         Fsn.add_colorbar()
         Fsn.colorbar.set_axis_label_text('Peak S/N')
+        Fsn.colorbar.set_axis_label_font(size=18)
+        Fsn.colorbar.set_label_properties(size=16)
         Fsn.set_tick_labels_format('d.dd','d.dd')
         Fsn.recenter(**big_recen)
         Fsn.save(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_peaksn.pdf'.format(smooth, outtype)))
@@ -124,6 +133,15 @@ F.set_tick_labels_format('d.dd','d.dd')
 F.recenter(**small_recen)
 F.add_colorbar()
 F.colorbar.set_axis_label_text('T (K)')
+F.colorbar.set_axis_label_font(size=18)
+F.colorbar.set_label_properties(size=16)
 F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to200.pdf'))
 F.show_colorscale(cmap=cm,vmin=15,vmax=80)
 F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to80.pdf'))
+
+F.show_contour(dustcolumn,
+               levels=[5], colors=[(0,0,0,0.5)], zorder=15,
+               alpha=0.5,
+               linewidths=[0.5],
+               layer='dustcontour')
+F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to80_withcontours.pdf'))
