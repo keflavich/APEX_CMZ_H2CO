@@ -2,11 +2,11 @@
 global color=green dashlist=8 3 width=1 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1
 galactic
 box(1.227,-0.084,141.31738",149.39266",0) # text={G1.23-0.08box}
+circle(0.33761645,0.059522017,35.18586") # text={b:G0.34+0.06}
 circle(0.3767654,0.040528961,35.18586") # text={c:G0.38+0.04}
 box(0.4150839,0.031897894,82.013998",77.450126",0) # text={ds:G0.42+0.03box}
 box(0.41198299,0.054767083,90.386453",91.404209",0) # text={dn:G0.41+0.05box}
 circle(0.47559421,-0.0084617925,59.73732") # text={e:G0.48-0.01}
-circle(0.33761645,0.059522017,35.18586") # text={b:G0.34+0.06}
 circle(0.49419965,0.015182624,33.177168") # text={f:G0.49+0.02}
 circle(0.24100933,0.0057372266,24.9225") # text={Brick SW}
 circle(0.26149356,0.028262806,22.8946") # text={Brick NE}
