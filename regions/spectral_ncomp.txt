@@ -20,7 +20,6 @@
  "G0.40-0.03":         {'ncomp':1, 'velo':[95]},
  "G0.39-0.08":         {'ncomp':1, 'velo':[102]},
  "G0.67-0.10":         {'ncomp':1, 'velo':[32]},
- "d:G0.38+0.04":       {'ncomp':1, 'velo':[40]},
  "G0.46-0.07":         {'ncomp':2, 'velo':[89,14]},
  "G0.43-0.05":         {'ncomp':1, 'velo':[95]},
  "G0.02-0.04":         {'ncomp':1, 'velo':[88]},
@@ -30,7 +29,12 @@
  "G1.65-0.06":         {'ncomp':1, 'velo':[48]},
  "G0.83-0.23":         {'ncomp':1, 'velo':[48]},
  "G1.00-0.02box":      {'ncomp':1, 'velo':[82]},
- "ef:G0.47-0.01":      {'ncomp':1, 'velo':[28]},
+ "b:G0.34+0.06":       {'ncomp':1, 'velo':[40]}, # TODO-refit
+ "c:G0.38+0.04":       {'ncomp':1, 'velo':[40]}, # TODO-refit
+ "ds:G0.42+0.03box":   {'ncomp':1, 'velo':[25]}, # TODO-refit
+ "dn:G0.41+0.05box":   {'ncomp':1, 'velo':[25]}, # TODO-refit
+ "e:G0.48-0.01":       {'ncomp':1, 'velo':[28]}, # TODO-refit
+ "f:G0.49+0.02":       {'ncomp':1, 'velo':[28]}, # TODO-refit
  "G0.66-0.14":         {'ncomp':1, 'velo':[28]},
  "G359.49-0.14":       {'ncomp':1, 'velo':[-56]},
  "G359.60-0.22":       {'ncomp':2, 'velo':[-80,22]},
@@ -43,7 +47,6 @@
  "G0.24-0.05box":      {'ncomp':2, 'velo':[29,80]}, # TODO-refit
  "BrickInABox":        {'ncomp':2, 'velo':[36,15]}, # TODO-refit
  "G0.29+0.04box":      {'ncomp':2, 'velo':[2, 8]}, # TODO-refit
- "G0.42+0.04box":      {'ncomp':1, 'velo':[25]}, # TODO-refit
  "G0.11-0.01box":      {'ncomp':2, 'velo':[52,45]}, # TODO-refit
  "G0.08-0.08box":      {'ncomp':1, 'velo':[25]}, # TODO-refit
  "G0.99+0.05box":      {'ncomp':1, 'velo':[85]}, # TODO-refit

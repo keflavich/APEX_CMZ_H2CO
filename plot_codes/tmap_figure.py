@@ -14,6 +14,7 @@ cmap = pl.cm.RdYlBu_r
 figsize = (20,10)
 
 small_recen = dict(x=0.3, y=-0.03,width=1.05,height=0.27)
+big_recen = dict(x=0.55, y=-0.075,width=2.3,height=0.40)
 
 for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fits',
                               'TemperatureCube_DendrogramObjects{0}_Piecewise_integ.fits'),
@@ -48,8 +49,21 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
                        zorder=10, convention='calabretta')
         F.add_colorbar()
         F.colorbar.set_axis_label_text('T (K)')
+
+        F.save(os.path.join(figurepath, "big_maps", 'lores{0}{1}_tmap_withmask.pdf'.format(smooth, outtype)))
+        F.recenter(**big_recen)
+        F.save(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withmask.pdf'.format(smooth, outtype)))
+        log.info(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withmask.pdf'.format(smooth, outtype)))
+
+        dustcolumn = '/Users/adam/work/gc/gcmosaic_column_conv36.fits'
+        F.show_contour(dustcolumn,
+                       levels=[5], colors=[(0,0,0,0.5)], zorder=15,
+                       alpha=0.5,
+                       linewidths=[0.5],
+                       layer='dustcontour')
+        F.recenter(**small_recen)
         F.save(os.path.join(figurepath, "big_maps", 'lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
-        F.recenter(0.55,-0.075,width=2.3,height=0.40)
+        F.recenter(**big_recen)
         F.save(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
         log.info(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
 
@@ -58,18 +72,18 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
         Fsn.add_colorbar()
         Fsn.colorbar.set_axis_label_text('Peak S/N')
         Fsn.set_tick_labels_format('d.dd','d.dd')
-        Fsn.recenter(0.55,-0.075,width=2.3,height=0.40)
+        Fsn.recenter(**big_recen)
         Fsn.save(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_peaksn.pdf'.format(smooth, outtype)))
 
 
-        F.hide_layer('contour_set_1')
-        dusttemperature = '/Users/adam/work/gc/gcmosaic_temp_conv25.fits'
+        F.hide_layer('dustcontour')
+        dusttemperature = '/Users/adam/work/gc/gcmosaic_temp_conv36.fits'
         F.show_contour(dusttemperature,
                        levels=[20,25],
-                       colors=[(0,0,x,0.5) for x in [0.9,0.7,0.6,0.2]], zorder=10)
+                       colors=[(0,0,x,0.5) for x in [0.9,0.7,0.6,0.2]], zorder=20)
         F.recenter(**small_recen)
         F.save(os.path.join(figurepath, "big_maps",'lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
-        F.recenter(0.55,-0.075,width=2.3,height=0.40)
+        F.recenter(**big_recen)
         F.save(os.path.join(figurepath, "big_maps",'big_lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
         log.info(os.path.join(figurepath, "big_maps",'big_lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
     #F.show_contour('h2co218222_all.fits', levels=[1,7,11,20,38], colors=['g']*5, smooth=1, zorder=5)
@@ -94,7 +108,7 @@ F2.recenter(**small_recen)
 
 F2.save(os.path.join(figurepath, "big_maps",'H2COtemperatureOnDust.pdf'))
 
-F2.recenter(0.55,-0.075,width=2.3,height=0.40)
+F2.recenter(**big_recen)
 F2.save(os.path.join(figurepath, "big_maps",'big_H2COtemperatureOnDust.pdf'))
 
 fig = pl.figure(6, figsize=figsize)
