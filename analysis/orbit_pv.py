@@ -10,6 +10,10 @@ from astropy import units as u
 from astropy import coordinates
 from astropy.io import ascii
 from astropy import log
+from astropy.wcs import WCS
+import paths
+import matplotlib
+matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 # obsolete x,y = np.loadtxt(apath('orbit_K14.dat')).T
 table = ascii.read(apath('orbit_K14_2.dat'), format='basic', comment="#", guess=False) 
@@ -22,16 +26,6 @@ dist = (dl**2+db**2)**0.5
 cdist = np.zeros(dist.size+1)
 cdist[1:] = dist.cumsum()
 
-
-molecules = ('13CO_2014_merge', 'C18O_2014_merge', 'H2CO_303_202_bl', 'SiO_54_bl')
-
-filenames = [molpath('APEX_{0}.fits'.format(molecule))
-            for molecule in molecules]
-
-molecules = molecules + ('H2CO_DendrogramTemperature',
-                         'H2CO_DendrogramTemperature_smooth')
-filenames.append(hpath('TemperatureCube_DendrogramObjects_Piecewise.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_Piecewise.fits'))
 
 def offset_to_point(glon, glat):
     """
@@ -66,11 +60,24 @@ def offset_to_point(glon, glat):
     
     return total_offset
 
+molecules = ('13CO_2014_merge', 'C18O_2014_merge', 'H2CO_303_202_bl', 'SiO_54_bl')
+
+filenames = [molpath('APEX_{0}.fits'.format(molecule))
+            for molecule in molecules]
+
+molecules = molecules + ('H2CO_TemperatureFromRatio',
+                         'H2CO_DendrogramTemperature',
+                         'H2CO_DendrogramTemperature_smooth')
+filenames.append(hpath('TemperatureCube_PiecewiseFromRatio.fits'))
+filenames.append(hpath('TemperatureCube_DendrogramObjects_Piecewise.fits'))
+filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_Piecewise.fits'))
+
+
 cmap = copy.copy(pl.cm.RdYlBu_r)
 cmap.set_bad((1.0,)*3)
 cmap.set_under((0.9,0.9,0.9,0.5))
 
-for molecule,fn in zip(molecules[-2:],filenames[-2:]):
+for molecule,fn in zip(molecules,filenames):
     log.info(molecule)
     cube = spectral_cube.SpectralCube.read(fn)
 
@@ -82,7 +89,8 @@ for molecule,fn in zip(molecules[-2:],filenames[-2:]):
     #pv = pvextractor.extract_pv_slice(cube, P, respect_nan=False)
     pv = pvextractor.extract_pv_slice(cube, P, respect_nan=True)
     bad_cols = np.isnan(np.nanmax(pv.data, axis=0))
-    pv.data[np.isnan(pv.data) & ~bad_cols] = 0
+    nandata = np.isnan(pv.data)
+    pv.data[nandata & ~bad_cols] = 0
 
     fig1 = pl.figure(1, figsize=(14,8))
     fig1.clf()
@@ -156,7 +164,7 @@ for molecule,fn in zip(molecules[-2:],filenames[-2:]):
         if np.argmax(selection) > 0:
             selection[np.argmax(selection)-1] = True
         F2.show_lines(np.array([[table['l'][selection],
-                                table["b"][selection]]]), zorder=1000,
+                                 table["b"][selection]]]), zorder=1000,
                      color=color, linewidth=3, alpha=0.5)
         #F2.show_markers(table['l'][selection], table["b"][selection], zorder=1000,
         #             color=color, marker='+', alpha=0.5)
@@ -170,3 +178,64 @@ for molecule,fn in zip(molecules[-2:],filenames[-2:]):
     F2.show_markers([0.253], [0.016], edgecolor='purple', marker='x', zorder=1500)
 
     F2.save(fpath('orbits/KDL2014_orbitpath_on_{0}.pdf'.format(molecule)))
+
+    # Compute the temperature as a function of time in a ppv tube
+    offset = np.linspace(0, cdist.max(), pv.shape[1])
+    time = np.interp(offset, cdist, table['t'])
+    vel = np.interp(time, table['t'], table["v'los"])
+    y,x = np.indices(pv.data.shape)
+    p,v = WCS(pv.header).wcs_pix2world(x,y, 0)
+
+    vdiff = 15
+
+    velsel = (v > (vel-vdiff)*1e3) & (v < (vel+vdiff)*1e3)
+
+    pv.data[nandata] = np.nan
+    pv.data[pv.data==0] = np.nan
+    pv.data[~velsel] = np.nan
+
+    mean_tem = np.nanmean(pv.data, axis=0)
+    min_tem = np.nanmin(pv.data, axis=0)
+    max_tem = np.nanmax(pv.data, axis=0)
+    std_tem = np.nanstd(pv.data, axis=0)
+
+    # errorbar version: ugly
+    #eb = ax3.errorbar(time, mean_tem, yerr=[min_tem, max_tem],
+    #                  linestyle='none', capsize=0, color='r', errorevery=20)
+    #eb[-1][0].set_linestyle('--')
+
+    #ax3.fill_between(time, mean_tem-std_tem, mean_tem+std_tem,
+    #                 color='b', alpha=0.2)
+
+    #ax3.plot(time, mean_tem, color='b', alpha=0.2)
+
+    fig3 = pl.figure(3)
+    fig3.clf()
+    ax3 = fig3.gca()
+
+    reftime = -2
+    bricktime = 0.3
+    ax3.plot(time-reftime, pv.data.T, 'k.', alpha=0.5, markersize=3)
+    ax3.set_xlabel("Time since 1$^\\mathrm{st}$ pericenter passage [Myr]", size=36, labelpad=20)
+    if 'Temperature' in fn:
+        ax3.set_ylim(0,150)
+        ax3.set_ylabel("Temperature [K]", size=36, labelpad=20)
+        ytext = 140
+    else:
+        ax3.set_ylabel("$T_A^*$ [K]", size=36, labelpad=20)
+        ytext = ax3.get_ylim()[1]*(14./15.)
+    ax3.text(bricktime, ytext, "Brick", verticalalignment='center',
+             horizontalalignment='center', rotation='vertical', color='purple', weight='bold')
+    ax3.text(bricktime+0.43, ytext, "Sgr B2", verticalalignment='center',
+             horizontalalignment='center', rotation='vertical', color='b', weight='bold')
+    ax3.text(bricktime+3.58, ytext*135./140., "20 km s$^{-1}$", verticalalignment='center',
+             horizontalalignment='center', rotation='vertical', color='g', weight='bold')
+    ax3.text(bricktime+3.66, ytext*135./140., "50 km s$^{-1}$", verticalalignment='center',
+             horizontalalignment='center', rotation='vertical', color='g', weight='bold')
+    ax3.text(bricktime+3.28, ytext, "Sgr C", verticalalignment='center',
+             horizontalalignment='center', rotation='vertical', color='m', weight='bold')
+    pl.setp(ax3.get_xticklabels(), fontsize=24)
+    pl.setp(ax3.get_yticklabels(), fontsize=24)
+    ax3.set_xlim(-0.1,4.6)
+    fig3.savefig(fpath('orbits/KDL2014_{0}_vs_time.pdf'.format(molecule)),
+                 bbox_inches='tight')

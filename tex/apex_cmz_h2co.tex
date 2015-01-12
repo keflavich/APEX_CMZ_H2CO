@@ -3,7 +3,7 @@
 \begin{document}
 
 \title{APEX CMZ Survey}
-\titlerunning{W51 DGMF}
+\titlerunning{APEX CMZ \formaldehyde}
 \authorrunning{Ginsburg et al}
 \input{authors}
 
@@ -111,11 +111,12 @@ using the older FFTS backend from \citet{Ao2013a}.  These data covered only 2
 GHz of bandwidth, including all three of the \para lines, but they did not
 cover the CO lines.
 
-\todo{The system temperature ranged from $120 < T_{sys} < 200$ K for the majority of
-the observations, with a small fraction (...\%) in the range $200 < T_{sys} <
-300$ K.  There were also a very small number with much higher system
-temperatures, $300 < T_{sys} < 750$ K, but these are associated with
-observations of the bright Sgr B2 continuum source.}
+The system temperature ranged from $120 < T_{sys} < 200$ K for the majority of
+the observations, with a mean $T_{sys}=165$ K.  A small fraction (10\%) of
+observations were in the range $200 < T_{sys} < 300$ K.  There were also a very
+small number ($<1\%$) with much higher system temperatures, $300 < T_{sys} <
+750$ K, but these are associated with observations of the bright Sgr B2
+continuum source.
 
 \subsection{Reduction}
 \subsubsection{Calibration}
@@ -198,7 +199,9 @@ to avoid empty pixels and maximize the signal-to-noise, the spectra were added
 to the grid with a weight set from a gaussian with $FWHM=10\arcsec$, which
 effectively smooths the output images from $FWHM\approx28\arcsec$ to
 $\approx30\arcsec$.  See \citet{Mangum2007a} for more detail on the on-the-fly
-mapping technique used here.
+mapping technique used here.  The spectra were averaged with inverse-variance
+weighting.
+
 
 %\todo{To demonstrate the utility of the PCA subtraction approach described in Section
 %\ref{sec:baseline}, we show maps of the \formaldehyde \threeohthree line before
@@ -320,7 +323,7 @@ included a series of large square $8\arcmin \times 8\arcmin$ `apertures'
 corresponding to each observed field.  For each region extracted in this
 fashion, we fit a 1-3 component model as described in Section
 \ref{sec:linemodeling}.  An example spectrum extracted from a small region
-around ``cloud d'' is shown in Figure \ref{fig:clouddspec}.
+around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
 
 
 \subsection{Line Modeling}
@@ -381,17 +384,19 @@ While $R_2$ can, in some cases, provide significant constraints on various
 parameters, we do not use it because of the ambiguity imposed by the overlap
 with the \methanol \fourtwotwo line.
 
-\Figure{figures/simple/d:G0.38+0.04_fit_4_lines_simple.pdf}
-{Fitted spectrum of ``cloud d".  The fitted parameters and their corresponding
+% individual_spectra
+\Figure{figures/simple/c:G0.38+0.04_fit_4_lines_simple.pdf}
+{Fitted spectrum of ``cloud c".  The fitted parameters and their corresponding
 errors are shown in the legend.  The parameters are the amplitude of the
 \formaldehyde \threeohthree line, the centroid velocity, the line width
 ($\sigma$, not FWHM), the ratio $R_1 = \Rone$,
 the ratio $R_2 = \Rtwo$, and the amplitude of
 the \methanol \fourtwotwo line.  }
-{fig:clouddspec}{0.5}{0}
+{fig:cloudcspec}{0.5}{0}
 
-\Figure{figures/param_fits/d:G0.38+0.04_col_tem_0_parameter_constraints.pdf}
-{The parameter constraints for ``cloud d'' (Figure \ref{fig:clouddspec})
+% param_plots
+\Figure{figures/param_fits/c:G0.38+0.04_col_tem_0_parameter_constraints.pdf}
+{The parameter constraints for ``cloud c'' (Figure \ref{fig:cloudcspec})
 projected (marginalized) onto the temperature/column density plane.\newline
 (top left) Constraints imposed by the measured ratio \Rone are shown in filled contours,
 with blue corresponding to $\Delta\chi^2 < 1$, cyan $1 < \Delta\chi^2 < 2$,
@@ -541,12 +546,12 @@ they are in the $T<150$ K regime.
 
 \FigureTwo
 {figures/simple/Brick_SW_fit_4_lines_simple_splinebaselined.pdf}
-{figures/simple/G0.42+0.04box_fit_4_lines_simple_splinebaselined.pdf}
+{figures/simple/ds:G0.42+0.03box_fit_4_lines_simple_splinebaselined.pdf}
 {
 \todo{Figure out where this belongs - it has no home.}
 Fits to the \para lines for (a) The Brick and (b) a box centered on G0.42+0.04.
 These spectra have significantly different ratios and therefore derived temperatures:
-The Brick has $T\gtrsim100$ K while G0.42+0.04 has $T\approx40-50$ K.
+The Brick has $T\gtrsim100$ K while G0.42+0.03 has $T\approx40-50$ K.
 The bottom black spectrum is the residual, and the orange wiggly spectrum shows
 the spline fit used to iteratively remove baseline ripples from the residual.}
 {fig:twospectra_hotcold}{1}{3in}
@@ -608,7 +613,9 @@ the ratio decreases from $\sim0.55$ at the position $\ell=0.237$, $b=0.008$
 within a single spectrum to $\sim0.33$ when averaged over a radius
 $\sim70\arcsec$ (Figure \ref{fig:brickradial}a).  By contrast, Figure
 \ref{fig:brickradial}b shows a highly turbulent example where the temperature
-is lowest at the center and higher on larger scales.
+is lowest at the center and higher on larger scales.  These observations imply
+that two different heating mechanisms, one internally driven (The Brick) and
+one external (G1.23-0.08), are active within the CMZ.
 
 % analysis/multiscale_fit
 \FigureTwo
@@ -693,8 +700,19 @@ of the gas.  At least in terms of gas temperature, The Brick is in the same clas
 as the massive star-forming Sgr B2 complex and the clouds closest to the central
 black hole.
 
-\todo{temperature as a function of time since closest passage to Sgr A*}
-
+There is some evolution of temperature over time evident in Figure
+\ref{fig:kdltemvstime}, which shows the temperature at each voxel within 15
+\kms and 6 pc of the \citet{Kruijssen2014d} orbit extracted from the
+dendrogram-based temperature cube.  The linear increase in temperature seems to
+support the \citet{Kruijssen2014d} hypothesis that the `ring' represents a
+single gas stream on its first passage by Sgr A*, though The Brick stands out
+as a significant outlier in this data.  The Brick has had the most recent
+pericenter passage, so it is possible that it is presently overheated from
+additional turbulence driven by this most recent passage.  In that case, the
+overall temperature rise observed from Sgr A to Sgr B2 cannot be caused by
+turbulence decay alone, since The Brick should follow the general trend.
+Perhaps, instead, this temperature increase is driven by increased star
+formation and internal heating along the dust ridge.
 
 \RotFigureTwoAA
 {figures/orbits/KDL2014_orbit_on_H2CO_DendrogramTemperature_smooth.pdf}
@@ -710,6 +728,15 @@ slice.  The orbit is outside of our observed field to the west of Sgr C.
 The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
 }
 {fig:kdlorbit}{1}{9.5in}
+
+\Figure
+{figures/orbits/KDL2014_H2CO_DendrogramTemperature_smooth_vs_time.pdf}
+{The observed temperature vs time since the most recent pericenter passage of
+The Brick on the \citet{Kruijssen2014d} orbit.  The Brick and Sgr B2 are
+highlighted as `hot points' along the plot.  Prior to Sgr B2, there appears to
+be a linear increase in temperature with time, from an initial temperature
+$T\sim40-60$ K to $T\sim120$ K over a period $\tau\sim0.5-1$ Myr.}
+{fig:kdltemvstime}{0.4}{0}
 
 \subsection{Comparison to \citet{Ott2014a} \ammonia temperature map}
 \label{sec:ammoniacompare}
@@ -922,7 +949,7 @@ outside the densest clouds.
 %
 %\Figure{figures/G0.38+0.04_fit_h2co_mm_radex.pdf}
 %{The 218-219 GHz spectrum of Cloud d}
-%{fig:cloudDspec}{0.5}{0.0}
+%{fig:cloudcspec}{0.5}{0.0}
 %
 %\subsection{Clouds e/f: G0.47+0.01}
 %Clouds ``e'' and ``f'' together make another proto-cluster in

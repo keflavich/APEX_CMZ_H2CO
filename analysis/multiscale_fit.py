@@ -197,6 +197,19 @@ def multiscale_fit_brick(pcube=brick_pcube, centerx=21, centery=10,
                           offset_scale=offset_scale, savedir=savedir,
                           savepre=savepre, **kwargs)
 
+def multiscale_fit_clouddn(center=(643-1,164-1)):
+    clouddn_slice = np.s_[:,center[1]-16:center[1]+16,center[0]-16:center[0]+16]
+
+    clouddn_cube = cube_merge_high[clouddn_slice]
+    clouddn_pcube = pyspeckit.Cube(cube=clouddn_cube)
+    clouddn_pcube.xarr.refX = clouddn_cube.wcs.wcs.restfrq
+
+    return multiscale_fit(clouddn_pcube, 16, 16, savedir='clouddn',
+                          savepre='clouddn',
+                          guesses=[0.1, 19, 8, 0.3, 0.9, 0.2],
+                          offset_scale=0.4)
+
+
 def all_multiscales():
     multiscale_fit_g1pt2_cool()
     multiscale_fit_g08south_hot()
