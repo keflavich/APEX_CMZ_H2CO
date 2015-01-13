@@ -275,7 +275,7 @@ divide-by-zero numerical errors.
 \Figure
 %{figures/big_H2CO_322221_to_303202_smooth_bl_integ.pdf}
 {figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
-{Maps of the ratio of the integrated emission of
+{Map of the ratio of the integrated emission of
 \Rone.  The data cubes were masked by
 signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
 indicating nondetections.  The Sgr B2 peaks exhibit \formaldehyde
@@ -354,7 +354,20 @@ a different baseline subtraction to that described in Section
 spline curve to the residual smoothed to a 50-channel (50 \kms) scale.  We then
 re-fit the model to the data.  In all but the lowest signal-to-noise cases,
 this approach resulted in consistent ratio measurements between the two fits
-and with the other methods.
+and with the other methods.  Figure \ref{fig:twospectra_hotcold} shows two example
+spectra with significantly different ratios measured and with the spline baseline
+fit indicated.
+
+\FigureTwo
+{figures/simple/Brick_SW_fit_4_lines_simple_splinebaselined.pdf}
+{figures/simple/ds:G0.42+0.03box_fit_4_lines_simple_splinebaselined.pdf}
+{
+Fits to the \para lines for (a) The Brick and (b) a box centered on G0.42+0.03.
+These spectra have significantly different ratios and therefore derived temperatures:
+The Brick has $T\gtrsim100$ K while G0.42+0.03 has $T\approx40-50$ K.
+The bottom black spectrum is the residual, and the orange wiggly spectrum shows
+the spline fit used to iteratively remove baseline ripples from the residual.}
+{fig:twospectra_hotcold}{1}{3in}
 
 
 For each extracted region, we created $\chi^2$ grids using independent
@@ -544,17 +557,6 @@ they are in the $T<150$ K regime.
 {fig:peaksn}{1}{9.5in}
 
 
-\FigureTwo
-{figures/simple/Brick_SW_fit_4_lines_simple_splinebaselined.pdf}
-{figures/simple/ds:G0.42+0.03box_fit_4_lines_simple_splinebaselined.pdf}
-{
-\todo{Figure out where this belongs - it has no home.}
-Fits to the \para lines for (a) The Brick and (b) a box centered on G0.42+0.04.
-These spectra have significantly different ratios and therefore derived temperatures:
-The Brick has $T\gtrsim100$ K while G0.42+0.03 has $T\approx40-50$ K.
-The bottom black spectrum is the residual, and the orange wiggly spectrum shows
-the spline fit used to iteratively remove baseline ripples from the residual.}
-{fig:twospectra_hotcold}{1}{3in}
 
 % tmap_pv
 \RotFigureTwoAA
@@ -1036,6 +1038,14 @@ individual regions in the unsmoothed images on a pixel-by-pixel basis, using
 \texttt{pyspeckit} to fit a 4-parameter model (amplitude, centroid, width, and
 $R_1$) to each spectrum with constrained velocity range and width.  These fits
 were performed on the locally baseline-subtracted data cubes.
+
+\section{Spectral fits for regions and apertures}
+\todo{This section is intended to be electronic-only.}
+We provide a catalog of line ratios measured from aperture-extracted spectra
+along with figures showing the best fit model for each spectrum.  We have
+extracted spectra in regions with significant \para emission and in commonly
+studied individual regions.  This catalog is intended to provide archival value
+from our data set and enable future studies of individual regions.
 
 
 
