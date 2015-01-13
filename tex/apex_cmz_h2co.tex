@@ -212,6 +212,23 @@ main beam efficiency is $\eta_{mb} = 0.75$ (gain $\sim39$
 Jy/K)\footnote{\url{http://www.apex-telescope.org/telescope/efficiency/}}.
 These values are noted in the FITS headers of the released data.
 
+The maps achieved a depth of $\sigma=50-80$ mK in 1 \kms channels (Figure
+\ref{fig:noisestats}).  The noise is moderately lower (about 15\%) than
+expected from the online APEX calculator because our noise estimates include
+modest spatial smoothing.  While Figure \ref{fig:noisestats} shows the
+generally good performance of SHFI-1 during our observations, our data are
+nonetheless affected by significant baseline problems which tend to obscure
+signal.
+
+\Figure
+{figures/observing_stats}
+{The $1-\sigma$ noise level in each $8\arcmin\times8\arcmin$ field
+computed by measuring the spectral RMS over a 200 \kms line-free region
+from 218.5 to 218.65 GHz, between the \threetwoone and \threetwotwo lines.
+The curve shows a $t^{-1/2}$ scaling with an arbitrarily set amplitude.  The
+$x$-axis shows the mean pixel weight within each field, which is approximately
+proportional to the exposure time scaled by the system temperature.}
+{fig:noisestats}{0.5}{0}
 
 
 \subsection{Baselining}
@@ -396,6 +413,13 @@ are displayed in Figure \ref{fig:parsonbrightness}.
 While $R_2$ can, in some cases, provide significant constraints on various
 parameters, we do not use it because of the ambiguity imposed by the overlap
 with the \methanol \fourtwotwo line.
+
+% TODO: bootstrap-ish analysis?  For a given *known* set of physical parameters,
+% what will we derive?
+%We note that $\chi^2$ minimization, while commonly used for parameter space
+%fitting with LVG grid \citep[e.g.][]{Zeiger2010a,Ginsburg2011a,Ao2013a}, is not
+%well justified.  The $\Delta \chi^2$ values probably do not correspond to their
+
 
 % individual_spectra
 \Figure{figures/simple/c:G0.38+0.04_fit_4_lines_simple.pdf}
@@ -1047,7 +1071,29 @@ extracted spectra in regions with significant \para emission and in commonly
 studied individual regions.  This catalog is intended to provide archival value
 from our data set and enable future studies of individual regions.
 
+In the attached electronic table, three types of region are included: 
+\begin{enumerate}
+    \item Circular regions-of-interest (Figure \ref{fig:regions}a)
+    \item Rectangular regions-of-interest (Figure \ref{fig:regions}b)
+    \item $8\arcmin \times 8\arcmin$ square observation fields (Figure \ref{fig:regions}c)
+\end{enumerate}
+The fit tables include multicomponent spectral fits with and without
+spline-based baseline removal (see Section \ref{sec:linemodeling}).
+Spatial parameters for the box (\texttt{GLON}, \texttt{GLAT},
+\texttt{boxheight}, and \texttt{boxwidth}) or circle (\texttt{GLON},
+\texttt{GLAT}, and \texttt{radius}) regions are included.  The average dust
+column and dust temperature are reported (\texttt{higaldusttem} and
+\texttt{higalcolumndens}).  The best fit parameters for gas temperature, \para
+column, and \hh density are included along with their $\pm1-sigma$ marginalized
+limits.
 
+\RotFigureThreeAA
+{figures/regions/boxes_on_h2co}
+{figures/regions/circles_on_h2co}
+{figures/regions/square_fields_on_h2co}
+{Figures showing the extracted regions.  The background is the integrated
+masked \para \threeohthree image.}
+{fig:regions}{1}{9.5in}
 
 \input{solobib}
 \end{document}

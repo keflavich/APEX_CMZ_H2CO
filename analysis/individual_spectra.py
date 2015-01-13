@@ -49,18 +49,19 @@ parmap_simple2_spline = {'spline_ampH2CO':'AMPLITUDE',
                          'spline_center':'VELOCITY',
                          'spline_h2coratio321303':'RATIO321303X',
                          'spline_h2coratio322321':'RATIO322321X',}
-parmap_radex = {
-          'temperature':'TEMPERATURE',
-          'density':'DENSITY',
-          'column':'COLUMN',
-          'denswidth':'WIDTH',
-          'denscenter':'CENTER',}
+#parmap_radex = {
+#          'temperature':'TEMPERATURE',
+#          'density':'DENSITY',
+#          'column':'COLUMN',
+#          'denswidth':'WIDTH',
+#          'denscenter':'CENTER',}
 
 def set_row(parinfo, ncomp, rows, parmap):
 
     assert ncomp == len(rows)
 
     for ii,row in enumerate(rows):
+        row['ComponentID'] = ii
         for par in parmap:
             row[par] = parinfo[parmap[par]+str(ii)].value
             row["e"+par] = parinfo[parmap[par]+str(ii)].error
@@ -264,12 +265,15 @@ if __name__ == "__main__":
     columns = [table.Column(name="{ee}{name}".format(name=name, ee=ee),
                             dtype='float',
                             length=name_column.size)
-               for name in (parmap_simple2.keys() + parmap_radex.keys() +
-                            parmap_simple2_spline.keys() + ['boxwidth',
-                                                            'boxheight', 'radius',
-                                                            'area', 'posang'])
+               for name in (parmap_simple2.keys() +# parmap_radex.keys() +
+                            parmap_simple2_spline.keys())
                for ee in ['','e']
               ]
+    columns += [table.Column(name="{name}".format(name=name, ee=ee),
+                            dtype='float',
+                            length=name_column.size)
+                for name in ['boxwidth', 'boxheight', 'radius', 'area',
+                             'posang'] ]
     out_table = table.Table([name_column, comp_id_column, lon_column, lat_column] +
                             columns)
 
@@ -308,8 +312,8 @@ if __name__ == "__main__":
             ncomp, pinf1, pinf2 = returns
 
         if reg.name == 'box':
-            out_table[row_number:row_number+ncomp]['width'] = reg.coord_list[2]
-            out_table[row_number:row_number+ncomp]['height'] = reg.coord_list[3]
+            out_table[row_number:row_number+ncomp]['boxwidth'] = reg.coord_list[2]
+            out_table[row_number:row_number+ncomp]['boxheight'] = reg.coord_list[3]
             out_table[row_number:row_number+ncomp]['area'] = reg.coord_list[2] * reg.coord_list[3]
             out_table[row_number:row_number+ncomp]['posang'] = reg.coord_list[4]
         elif reg.name == 'circle':
@@ -323,7 +327,7 @@ if __name__ == "__main__":
                 parmap=parmap_simple2)
         set_row(pinf2, ncomp, out_table[row_number:row_number+ncomp],
                 parmap=parmap_simple2_spline)
-        if radexfit:
+        if radexfit and False: # hard-coded out the radex par mapping above
             set_row(pinf3, ncomp,
                     out_table[row_number:row_number+ncomp], parmap=parmap_radex)
 

@@ -1,8 +1,11 @@
-from paths import rpath,mpath,opath
+from paths import rpath,mpath,opath,fpath
 from astropy.io import fits
 import pyregion
 import numpy as np
 from astropy import table
+import paths
+import matplotlib
+matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 noise_img = fits.open(mpath('APEX_H2CO_merge_high_plait_all_noise.fits'))[0]
 nhits_img = fits.open(mpath('APEX_H2CO_merge_high_plait_all_nhits.fits'))[0]
@@ -44,14 +47,23 @@ tbl[::-1].write(opath('field_noise_stats_sorted.ipac'), format='ascii.ipac')
 import pylab as pl
 pl.figure(1)
 pl.clf()
-pl.plot(tbl['nhits_mean'],tbl['noise_mean'],'.', zorder=5)
+ax = pl.gca()
+ax.plot(tbl['nhits_mean'],tbl['noise_mean'], '.', zorder=5, markersize=15, alpha=0.75)
+exptime = np.arange(*ax.get_xlim())
+exptime = np.arange(60,220,dtype='float')
 # Not clear if 0.75 is physical or a fit or what...
-pl.plot(np.arange(20,220), 0.75/np.sqrt(np.arange(20,220,dtype='float')),
-        label='$1/\\sqrt{t}$', linewidth=2, alpha=0.5, color='k', zorder=-5)
+#pl.plot(exptime, 0.75/np.sqrt(np.arange(20,220,dtype='float')),
+#        label='$1/\\sqrt{t}$', linewidth=2, alpha=0.5, color='k', zorder=-5)
+# Apparently each "weight point" is 1/8s; this is empirical though
+pl.plot(exptime, 2**0.5*155/(0.733e6 * exptime/8.)**0.5,
+        label=r'$\sim1/\sqrt{t}$', linewidth=3, alpha=0.25, color='k',
+        zorder=-5)
 pl.axis((60,220,0.045,0.09))
 pl.xlabel("Sum of 1/variance * gaussian weights")
-pl.ylabel("Noise per pixel in a 1 km/s bin (K)")
+pl.xlabel(r"Weighted Exposure Time ($\sim s$)", labelpad=20)
+pl.ylabel("Noise per pixel in a 1 km s$^{-1}$ bin (K)")
 pl.legend(loc='best')
-pl.savefig(opath("observing_stats.png"))
+pl.savefig(opath("observing_stats.png"), bbox_inches='tight')
+pl.savefig(fpath("observing_stats.pdf"), bbox_inches='tight')
 #pl.errorbar(tbl['nhits_mean'],tbl['noise_mean'],yerr=tbl['noise_std'],linestyle='none',marker='s')
 #pl.plot(tbl['nhits_mean'],tbl['nhits_median'],'.')

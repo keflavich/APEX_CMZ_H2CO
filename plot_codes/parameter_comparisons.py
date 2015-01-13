@@ -33,11 +33,12 @@ ax.errorbar(pcfittable['temperature_chi2'], pcfittable['density_chi2'],
                   pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2']],
             linestyle='none', marker='s', linewidth=1, alpha=0.5)
 ax2 = fig4.add_subplot(1,3,2)
-ax2.errorbar(pcfittable['temperature_chi2'], pcfittable['temperature'],
-             yerr=pcfittable['etemperature'],
-             xerr=[pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'],
-                   pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2']],
-             linestyle='none', marker='s', linewidth=1, alpha=0.5)
+# Don't do this any more: it relies on having the RADEX fits, which we don't.
+#ax2.errorbar(pcfittable['temperature_chi2'], pcfittable['temperature'],
+#             yerr=pcfittable['etemperature'],
+#             xerr=[pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'],
+#                   pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2']],
+#             linestyle='none', marker='s', linewidth=1, alpha=0.5)
 ax2.plot([0,300],[0,300],'k--',linewidth=2,alpha=0.5)
 
 fig5 = pl.figure(5)
@@ -182,20 +183,20 @@ ax11.errorbar(pcfittable['higaldusttem'][~maps],
 fig11.savefig(paths.fpath('ratio_vs_higaltemperature_fieldsandsources.pdf'),
                          bbox_inches='tight')
 
-
-fig12 = pl.figure(12)
-fig12.clf()
-ax = fig12.add_subplot(1,1,1)
-ax.errorbar(pcfittable['temperature_chi2'], pcfittable['temperature'],
-            yerr=pcfittable['etemperature'],
-            xerr=[pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'],
-                  pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2']],
-            linestyle='none', marker='s', linewidth=1, alpha=0.5)
-ax.plot([0,300],[0,300],'k--',linewidth=2,alpha=0.5)
-ax.set_title("DEBUG: RADEX+pyspeckit-fitted temperature vs. $\\chi^2$ temperature")
-ax.set_xlabel("$\\chi^2$ Temperature")
-ax.set_ylabel("RADEX+pyspeckit Temperature")
-ax.axis([0,350,0,350])
+# RADEX fitting has been removed
+#fig12 = pl.figure(12)
+#fig12.clf()
+#ax = fig12.add_subplot(1,1,1)
+#ax.errorbar(pcfittable['temperature_chi2'], pcfittable['temperature'],
+#            yerr=pcfittable['etemperature'],
+#            xerr=[pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'],
+#                  pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2']],
+#            linestyle='none', marker='s', linewidth=1, alpha=0.5)
+#ax.plot([0,300],[0,300],'k--',linewidth=2,alpha=0.5)
+#ax.set_title("DEBUG: RADEX+pyspeckit-fitted temperature vs. $\\chi^2$ temperature")
+#ax.set_xlabel("$\\chi^2$ Temperature")
+#ax.set_ylabel("RADEX+pyspeckit Temperature")
+#ax.axis([0,350,0,350])
 
 
 fig13 = pl.figure(13)

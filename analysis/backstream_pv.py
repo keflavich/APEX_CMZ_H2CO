@@ -11,6 +11,9 @@ from astropy import units as u
 from astropy import coordinates
 from astropy.io import ascii
 from astropy import log
+import paths
+import matplotlib
+matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 reg = pyregion.open(rpath('backstream.reg'))[0].coord_list
 glon,glat = np.array(reg[::2]), np.array(reg[1::2])
