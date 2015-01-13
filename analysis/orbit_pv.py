@@ -220,7 +220,7 @@ for molecule,fn in zip(molecules,filenames):
     if 'Temperature' in fn:
         ax3.set_ylim(0,150)
         ax3.set_ylabel("Temperature [K]", size=36, labelpad=20)
-        ytext = 140
+        ytext = 135
     else:
         ax3.set_ylabel("$T_A^*$ [K]", size=36, labelpad=20)
         ytext = ax3.get_ylim()[1]*(14./15.)

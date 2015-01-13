@@ -23,5 +23,7 @@ sp.specfit(fittype='h2co_simple', multifit=True,
            limited=[(True,True)] * 6,
            limits=[(0,20),[-150,150],(1, 60),(0,1),(0.3,1.1),(0,1e5)],
           )
+
+sp.specfit.plot_fit(show_components=True)
 sp.plotter.savefig(paths.fpath('simple/WholeCMZ_6parameter.pdf'),
                    bbox_inches='tight')

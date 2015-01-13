@@ -2,7 +2,7 @@
 
 \begin{document}
 
-\title{APEX CMZ Survey}
+\title{APEX CMZ \para 218 GHz Survey: Temperature Map of the CMZ}
 \titlerunning{APEX CMZ \formaldehyde}
 \authorrunning{Ginsburg et al}
 \input{authors}
@@ -12,7 +12,7 @@
 \abstract
 {This is an abstract.}
 {To fill it in.}
-{Typing}
+{Please write your own version of this and send it to Adam.}
 {We have filled it in.}
 {The abstract is done.}
 
@@ -354,7 +354,7 @@ $N(\formaldehyde) = 9.5\ee{13}$ \persc (which corresponds to an abundance
 $X=10^{-8.5}$ at $N(\hh) = 3\ee{22}$ \persc, and a range of temperatures from
 10 to 300 K with 100 evenly spaced grid points.  The grid was created using
 the \texttt{pyradex} wrapper of
-RADEX\footnote{\url{https://github.com/keflavich/pyradex}}.
+RADEX\footnote{\url{https://github.com/adamginsburg/pyradex}}.
 We then upsampled these grids by spline interpolating between grid points to
 acquire a high-resolution ($T\times n \times N = 250\times100\times100$) grid
 covering $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N <
@@ -456,19 +456,19 @@ by forcing the filling factor of the line emission to be $ff < 1$.
 }
 {fig:coltemconstraints}{0.5}{0}
 
-\Figure{figures/param_fits/d:G0.38+0.04_dens_col_0_parameter_constraints.pdf}
+\Figure{figures/param_fits/c:G0.38+0.04_dens_col_0_parameter_constraints.pdf}
 {The constraints in density-column parameter space.
 See Figure \ref{fig:coltemconstraints} for details.  In the bottom-right panel, the
 solid line shows the contour corresponding to $ff(\threeohthree)=0.1$ in
 black.}
 {fig:denscolconstraints}{0.5}{0}
 
-\Figure{figures/param_fits/d:G0.38+0.04_dens_tem_0_parameter_constraints.pdf}
+\Figure{figures/param_fits/c:G0.38+0.04_dens_tem_0_parameter_constraints.pdf}
 {The constraints in density-temperature parameter space.
 See Figure \ref{fig:coltemconstraints} for details.}
 {fig:denstemconstraints}{0.5}{0}
 
-\Figure{figures/param_fits/d:G0.38+0.04_0_h2coratio_minaxis.pdf}
+\Figure{figures/param_fits/c:G0.38+0.04_0_h2coratio_minaxis.pdf}
 {The line brightness of \para \threeohthree (top row) and \para \threetwoone
 (bottom row) in the three different projections of parameter space.  The
 grayscale images correspond to a slice through the parameter spaces at the
@@ -591,6 +591,14 @@ dendrogram-extracted temperature cube along Galactic latitude.  (b) The peak
 signal-to-noise along Galactic latitude, which is used as a mask in (a).}
 {fig:pvtem}
 {1}{9.5in}
+
+\Figure
+{figures/temvslon/temperature_vs_longitude_dendsm}
+{A plot of the latitude-averaged temperature in each pixel as a function of
+longitude.  This plot shows the temperature distribution across the CMZ and is
+meant to better-quantify Figure \ref{fig:temmap}.  The pixels are colored by
+velocity in 20 \kms velocity bins.}
+{fig:tempoints}{0.5}{0}
 
 \subsection{Parameter Comparison}
 In a turbulent medium, the 1D line width of the gas should be tightly
@@ -874,15 +882,19 @@ temperatures.}
 
 \subsection{A stream of fresh gas falling into the CMZ?}
 \label{sec:coolstream}
-The gas streamer extending from $\ell=0$ to $\ell=1.3$ may represent a stream
-of infalling gas.  The lack of IRDC features along this stream restricts it to
-be on the back side of the CMZ, while the disagreement with the
-\citet{Kruijssen2014d} orbit suggests that it is not following the same path as
-the Brick, the lettered clouds, and Sgr B2.  The large observed linewidths
-imply that the stream is genuinely associated with the CMZ, though its distance
-from Sgr A may be much larger than its projected distance.
+The gas streamer extending from $\ell=0$ to $\ell=1.3$ (Figure
+\ref{fig:coolstream}) may represent a stream of infalling gas.  The lack of
+IRDC features along this stream restricts it to be on the back side of the CMZ,
+while the disagreement with the \citet{Kruijssen2014d} orbit suggests that it
+is not following the same path as the Brick, the lettered clouds, and Sgr B2.
+The large observed linewidths imply that the stream is genuinely associated
+with the CMZ, though its distance from Sgr A may be much larger than its
+projected distance.  The path we have traced through Figure \ref{fig:coolstream}
+has been selected by eye and is not physically motivated (e.g., by a predicted orbit)
+but it can be observed as a coherent-appearing stream in the \thirteenco data cubes
+as well.
 
-\todo{Figure tracing this streamer.  Trace in PV too.}
+
 \RotFigureTwoAA
 {figures/orbits/mydrawnpathpv_on_H2CO_DendrogramTemperature_smooth.pdf}
 {figures/orbits/mydrawnpath_on_H2CO_DendrogramTemperature_smooth.pdf}
@@ -917,6 +929,34 @@ observed.  So, while it remains possible that optically thick \para is
 responsible for the observed line ratios, it is very unlikely, especially
 outside the densest clouds.
 
+\subsection{The CMZ average}
+For comparison to extragalactic observations, we have included a spectrum
+averaged over the whole $\sim300$ pc extent of our survey in Figure
+\ref{fig:wholecmzspec}.  The peak amplitude is 50-60 mK and the measured
+line ratio $\Rone = 0.25$, corresponding to a temperature $T=60$ K.  
+Over the same area, the measured mean dust temperature from HiGal is 23 K,
+though on such large scales it would be more appropriate to use Planck or WMAP
+data to perform this measurement.
+The spectral fit is imperfect, showing a non-flat baseline between the
+\threetwoone and \threetwotwo lines, but nonetheless the extracted value is
+likely representative of the CMZ-wide average.  This temperature is very close
+to the \ammonia-measured temperature in M83 \citep[56 K][]{Mangum2013a}, which
+also has a similarly low dust temperature $T_{dust,M83} = 31$ K over a 600 pc
+region.  Maffei 2, NGC 1365, and NGC 6946 also exhibit similar gas and dust
+temperatures to our Galactic center in the \citet{Mangum2013a} sample,
+suggesting that these galaxies all have analogous gas thermal structures in
+their inner regions.  The other galaxies in that sample, especially the
+starburst galaxies, have significantly warmer gas and dust, with temperatures
+closer to those measured for Sgr B2 than for the whole CMZ.
+
+
+\Figure
+{simple/WholeCMZ_6parameter.pdf}
+{The spectrum of the whole survey averaged over all pixels.
+The fit parameters, along with the nominal errors on the parameters,
+are shown in the legend.  A single-component fit was used, though many
+subtler individual components are evident.}
+{fig:wholecmzspec}{0.5}{0}
 
 % However, it is still possible
 % to distinguish cosmic ray and turbulent heating if one dominates over the
@@ -985,10 +1025,10 @@ outside the densest clouds.
 %much lower than in cloud d and more comparable to The Brick.
 
 \section{Conclusion}
-There is warm ($T\gtrsim80$ K) pervading the CMZ out to a radius $\sim200$ pc.
+There is warm ($T\gtrsim60$ K) pervading the CMZ out to a radius $\sim200$ pc.
 However, there is also significant contrast in gas temperature, with massive
 clouds such as The Brick, Sgr B2, and the Sgr A cloud complex exhibiting
-temperatures in excess of $T>150$ K.
+temperatures in excess of $T>100$ K.
 
 \textbf{Acknowledgements}:
 We thank the staff and observers at APEX for carrying out the service-mode
@@ -1000,10 +1040,14 @@ understanding the SHFI-1 baseline issues.
 \textbf{Code Packages Used}:
 
 \begin{itemize}
-    \item sdpy \url{https://github.com/keflavich/sdpy}
+    \item sdpy \url{https://github.com/adamginsburg/sdpy}
     \item aplpy \url{http://aplpy.github.io}
-    \item pyradex \url{https://github.com/keflavich/pyradex}
+    \item pyradex \url{https://github.com/adamginsburg/pyradex}
     \item pyspeckit \url{http://pyspeckit.bitbucket.org}
+    \item aplpy \url{https://aplpy.github.io/}
+    \item wcsaxes \url{http://wcsaxes.readthedocs.org}
+    \item spectral cube \url{http://spectral-cube.readthedocs.org}
+    \item pvextractor \url{http://pvextractor.readthedocs.org/}
 \end{itemize}
 
 \appendix
@@ -1094,6 +1138,29 @@ limits.
 {Figures showing the extracted regions.  The background is the integrated
 masked \para \threeohthree image.}
 {fig:regions}{1}{9.5in}
+
+\section{Source code and Data release}
+The reduced and raw data are made available via the CfA dataverse
+(doi:10.7910/DVN/27601).
+
+The source code for this project in its entirety is available in the attached
+tar file and on the internet at
+\url{https://github.com/adamginsburg/APEX_CMZ_H2CO}.
+Because the archives are public, we include scripts to download and process the
+raw data so that all steps of the analysis performed here can be performed by
+any individual with access to a computer.  Most of the data sets can be retrieved
+in an automated fashion using an \texttt{astroquery}-based script from the ESO archive,
+but some of the data is not stored in the archive and must be retrieved manually from the
+\texttt{dataverse} servers. The total data reduction process
+takes $\sim30$ hours on a 48-core, 2012-era linux machine, though most steps
+are not parallelized so the process may be faster on more recent machines with
+fewer cores.  About 300 GB of free space are required to store the raw,
+intermediate, and reduced data products, though the final products are $<30$
+GB, with an actual size depending on whether the baseline-subtracted versions
+are kept separate from the original files.  The download process may take
+substantially longer than the data reduction.
+
+
 
 \input{solobib}
 \end{document}
