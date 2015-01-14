@@ -129,14 +129,14 @@ def makefits(data, btype, densities=densities, temperatures=temperatures,
     else:
         newfile.header.update('CTYPE3' ,  'LIN-TEMP' )
         newfile.header.update('CDELT3' , (np.unique(temperatures)[1]) - (np.unique(temperatures)[0]) )
-    newfile.header.update('CRVAL1' ,  min(densities) )
-    newfile.header.update('CRPIX1' ,  1 )
-    newfile.header.update('CDELT1' , densities[1]-densities[0] )
-    newfile.header.update('CTYPE1' ,  'LOG-DENS' )
-    newfile.header.update('CRVAL2' ,  min(columns) )
+    newfile.header.update('CRVAL2' ,  min(densities) )
     newfile.header.update('CRPIX2' ,  1 )
-    newfile.header.update('CDELT2' , columns[1]-columns[0] )
-    newfile.header.update('CTYPE2' ,  'LOG-COLU' )
+    newfile.header.update('CDELT2' , densities[1]-densities[0] )
+    newfile.header.update('CTYPE2' ,  'LOG-DENS' )
+    newfile.header.update('CRVAL1' ,  min(columns) )
+    newfile.header.update('CRPIX1' ,  1 )
+    newfile.header.update('CDELT1' , columns[1]-columns[0] )
+    newfile.header.update('CTYPE1' ,  'LOG-COLU' )
     return newfile
 
 if __name__ == "__main__":
