@@ -1678,7 +1678,7 @@ def make_low_mergecube(pca_clean={'2014':False,
 
     mapnames = ['MAP_{0:03d}'.format(ii) for ii in range(1,130)]
 
-    log.info("Building cubes: "+str(mapnames)+" "+lowhigh+" bscans")
+    log.info("Building cubes: "+str(mapnames)+" low bscans")
     build_cube_2014(mapnames,
                     mergefile=mergefile1+"_2014_bscans",
                     posang=[140,160],
@@ -1690,7 +1690,7 @@ def make_low_mergecube(pca_clean={'2014':False,
                     scanblsub=scanblsub['2014'],
                     datasets=datasets_2014)
 
-    log.info("Building cubes: "+str(mapnames)+" "+lowhigh+" lscans")
+    log.info("Building cubes: "+str(mapnames)+" low lscans")
     build_cube_2014(mapnames,
                     mergefile=mergefile1+"_2014_lscans",
                     posang=[50,70],
