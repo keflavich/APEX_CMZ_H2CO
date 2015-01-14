@@ -1664,35 +1664,65 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
 
 
 
-def make_low_mergecube(datasets_2014=datasets_2014, pca_clean=True,
-                       scanblsub=False, timewise_pca=True, mergefile1=None):
-    mergefile1 = 'APEX_H2CO_merge_low'
+def make_low_mergecube(pca_clean={'2014':False,
+                                   '2013':False,
+                                   'ao':False},
+                        scanblsub={'2014':False, '2013':False, 'ao':False},
+                        timewise_pca={'2014': True, '2013':False, 'ao':True},
+                        mergefile1 = 'APEX_H2CO_merge_low',):
     make_blanks_merge(os.path.join(mergepath,mergefile1), lowhigh='low')
-    build_cube_ao(window='low',
-                  mergefile=True,
-                  freq=True,
-                  outpath=mergepath,
-                  datapath=june2013datapath,
-                  timewise_pca=timewise_pca,
-                  pca_clean=pca_clean,
-                  scanblsub=scanblsub,
-                  mergefilename=os.path.join(mergepath, mergefile1),
-                 )
-    build_cube_2013(mergefile=mergefile1,
+
+    for suff in ("_2014_bscans", "_2014_lscans", "_2013","_ao"):
+        make_blanks_merge(os.path.join(mergepath,mergefile1+suff),
+                          lowhigh='high', lowest_freq=216.9e9, width=2.0*u.GHz)
+
+    mapnames = ['MAP_{0:03d}'.format(ii) for ii in range(1,130)]
+
+    log.info("Building cubes: "+str(mapnames)+" "+lowhigh+" bscans")
+    build_cube_2014(mapnames,
+                    mergefile=mergefile1+"_2014_bscans",
+                    posang=[140,160],
+                    outpath=mergepath,
+                    datapath=april2014path,
+                    lowhigh='low',
+                    pca_clean=pca_clean['2014'],
+                    timewise_pca=timewise_pca['2014'],
+                    scanblsub=scanblsub['2014'],
+                    datasets=datasets_2014)
+
+    log.info("Building cubes: "+str(mapnames)+" "+lowhigh+" lscans")
+    build_cube_2014(mapnames,
+                    mergefile=mergefile1+"_2014_lscans",
+                    posang=[50,70],
+                    outpath=mergepath,
+                    datapath=april2014path,
+                    lowhigh='low',
+                    pca_clean=pca_clean['2014'],
+                    timewise_pca=timewise_pca['2014'],
+                    scanblsub=scanblsub['2014'],
+                    datasets=datasets_2014)
+
+    log.info("Building Ao cubes")
+    # ('ao', 'high'): (218.0, 219.0),
+    build_cube_ao(window='low', mergefile=True, freq=True, outpath=mergepath,
+                  pca_clean=pca_clean['ao'], timewise_pca=timewise_pca['ao'],
+                  mergefilename=os.path.join(mergepath, mergefile1+"_ao"),
+                  scanblsub=scanblsub['ao'],
+                  datapath=aorawpath)
+
+    log.info("Building 2013 cubes")
+    # (2013, 'high'): (217.5, 220.0)
+    build_cube_2013(mergefile=mergefile1+"_2013",
                     outpath=mergepath,
                     datapath=june2013datapath,
                     lowhigh='low',
-                    scanblsub=scanblsub)
+                    timewise_pca=timewise_pca['2013'],
+                    pca_clean=pca_clean['2013'],
+                    scanblsub=scanblsub['2013'])
 
-    log.info("Starting merge")
-    for lowhigh in ('low',):
-        mapnames = ['MAP_{0:03d}'.format(ii) for ii in range(1,130)]
-        log.info("Building cubes: "+str(mapnames)+" "+lowhigh)
-        build_cube_2014(mapnames,
-                        mergefile=mergefile1,
-                        outpath=mergepath,
-                        lowhigh=lowhigh,
-                        datasets=datasets_2014)
+    print "TODO: plait the low-frequency merge."
+    print "TODO: possible merge the ao low/high into the low-merge?"
+
 
 
 def integrate_slices_high(prefix='merged_datasets/APEX_H2CO_merge_high_sub'):

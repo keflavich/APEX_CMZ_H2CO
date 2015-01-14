@@ -10,11 +10,25 @@
 \date{Date: \today ~~ Time: \currenttime}
 
 \abstract
+%{The Galactic center is the best region to study star formation under `extreme'
+%conditions.  It has a star formation rate below that of normal molecular clouds
+%and disk galaxies.}
+%{To assess what is suppressing star formation in the Galactic center.}
+%{We have mapped the inner 200 pc of the Central Molecular Zone (CMZ) in \para
+%in order to measure temperatures in the dense gas.}
+%{Gas temperatures in the Galactic Center range from $\sim60$ K to $>100$ K in
+%selected regions.  The gas at $R_{gal}>90$ pc is somewhat cooler than that within
+%$R_{gal}<90$ pc.}
+%{There is a streamer of relatively cool ($T\sim60$ K) gas falling in to the CMZ.
+%It overlaps along the line of sight with much of the molecular ring.  Within the
+%ring, there is a progression in temperature from Sgr A to Sgr B2 that is
+%consistent with proposed orbital models.}
 {This is an abstract.}
 {To fill it in.}
 {Please write your own version of this and send it to Adam.}
 {We have filled it in.}
 {The abstract is done.}
+
 
 %\footnote{Compiled on \today\ at \currenttime}
 
@@ -105,8 +119,9 @@ We observed the Central Molecular Zone from $-0.4 < \ell < 1.6$ with the SHFI-1
 instrument \citep{Vassilev2008a} on the APEX telescope using the XFFTS backend.
 The observations were performed in service mode, and were spread out over two
 years.  The time was divided into 25 hours in June 2013, 75 hours in April-July
-2014, and 50 hours in October 2014.  The time was split between the ESO (50h),
-MPIfR (75h), and OSO (25h) queues.
+2014, and 50 hours in October 2014.  The time was split between the ESO
+(E-093.C-0144A; 50h), MPIfR (M-091.F-0019 and M-093.F-0009; 75h), and OSO
+(E-093.C-0144A; 25h) queues.
 
 The 2013 observations were taken in $4\arcmin \times 4\arcmin$ patches, and the
 frequency range covered was 217.5-220 GHz and 216-218.5 GHz in the two spectral
@@ -143,8 +158,8 @@ tools
 \url{www.apex-telescope.org/documents/public/APEX-MPI-MAN-0012.pdf}
 \url{www.apex-telescope.org/documents/public/APEX-MPI-MAN-0013.pdf} }.
 These yield flux-calibrated spectra at each position with appropriate pointing
-information.  \todo{Typical flux calibration uncertainties are $\sim10\%$ and
-pointing errors $\sigma\lesssim2$\arcsec.} % ask carlos about this
+information.  Typical flux calibration uncertainties are $\sim10\%$ and
+pointing errors $\sigma\lesssim2$\arcsec. % Carlos de Breuck, privat comm
 
 There was a significant calibration error discovered at the APEX telescope during
 a large segment of the 2014 observing campaign
@@ -157,14 +172,14 @@ is higher in this data, $\sim15\%$ total rather than the usual $\sim10\%$.
 Spectra were removed if they showed excessive noise compared to the
 theoretical expectation given the measured system temperature.  As in
 \citet{Ao2013a}, the threshold was set to $1.5\times$ the theoretical noise,
-i.e. $1.5 \sqrt{2} T_{sys} (\Delta\nu t_{exp})^0.5$, where $t_{exp}$ is the
+i.e. $1.5 \sqrt{2} T_{sys} (\Delta\nu t_{exp})^{0.5}$, where $t_{exp}$ is the
 exposure time (integration time) per spectrum in seconds and $\Delta\nu$ is the
 channel width in Hz.  This approach resulted in $\sim0.2\%$ of the data being
 removed.  
 
 At the position of Sgr B2, the noise was significantly higher due to signal
 from the continuum source.  We therefore disabled this flagging in a
-$\sim2.5\arcmin$ box around Sgr B2.
+$2.5\arcmin$ box around Sgr B2.
 
 
 % Removing these baselines by
@@ -231,11 +246,10 @@ These values are noted in the FITS headers of the released data.
 
 The maps achieved a depth of $\sigma=50-80$ mK in 1 \kms channels (Figure
 \ref{fig:noisestats}).  The noise is moderately lower (about 15\%) than
-expected from the online APEX calculator because our noise estimates include
-modest spatial smoothing.  While Figure \ref{fig:noisestats} shows the
+expected from the online APEX calculator because our noise measurements are
+made in moderately smoothed maps.  While Figure \ref{fig:noisestats} shows the
 generally good performance of SHFI-1 during our observations, our data are
-nonetheless affected by significant baseline problems which tend to obscure
-signal.
+affected by significant baseline problems which tend to obscure signal.
 
 \Figure
 {figures/observing_stats}
@@ -258,7 +272,8 @@ masking those out for each other line, then fitting a 7th-order polynomial to
 the remaining spectra over the velocity range -150 to 250 \kms and subtracting
 it.  Lower order baseline removal left a significant and patterned residual.
 After performing this baselining, the signal was re-extracted using the same
-method.
+method.  A more detailed examination of the baseline removal process is
+described in Appendix \ref{sec:baselineappendix}.
 
 \section{Signal Extraction \& Analysis}
 \label{sec:signal}
@@ -291,14 +306,14 @@ We created two independent ratio maps, \threetwotwo/\threeohthree and
 \threetwoone/\threeohthree, so that the two ratios (which are expected to be
 nearly the same) can be used as a sanity check.  However, in many regions,
 especially those with the greatest signal, the \threetwotwo line is strongly
-affected by contamination from a \methanol line, so the ratio is not
-particularly reliable.
+affected by contamination from a \methanol line, so that ratio is not
+usable for integrated maps.  The \Rone maps are used for all further analysis.
 
 Ratio maps are subject to dramatic uncertainties in the low signal-to-noise
 regime, which is inevitably reached in some parts of the map.  The error
 distribution on the ratio becomes non-Gaussian as signal approaches zero,
 approaching a pathological Cauchy distribution in which the mean becomes
-undefined as the mean of the individual values being compared approaches zero.
+undefined.
 We therefore limited our ratio measurements to regions with significance
 $>5\sigma$ in the \threeohthree line and used that line as the denominator
 in the ratio.  By using the brighter line as the denominator, we avoid
@@ -362,20 +377,17 @@ around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
 
 \subsection{Line Modeling}
 \label{sec:linemodeling}
-\todo{Different grids have been used at different stages.  The specific numbers
-will need to be updated.}
-We use RADEX \citet{van-Der-Tak2007a} to create a model grid for the
-p-\formaldehyde lines over a sparse grid of density ($n=10^{4,5,6,7}$ \percc),
-a fixed assumed line gradient of 5 \kms / pc, a fixed column of \formaldehyde
-$N(\formaldehyde) = 9.5\ee{13}$ \persc (which corresponds to an abundance
-$X=10^{-8.5}$ at $N(\hh) = 3\ee{22}$ \persc, and a range of temperatures from
-10 to 300 K with 100 evenly spaced grid points.  The grid was created using
-the \texttt{pyradex} wrapper of
-RADEX\footnote{\url{https://github.com/adamginsburg/pyradex}}.
-We then upsampled these grids by spline interpolating between grid points to
-acquire a high-resolution ($T\times n \times N = 250\times100\times100$) grid
-covering $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N <
-10^{15.1}$ \persc\perkmspc.
+We use RADEX \citet{van-Der-Tak2007a} and a related solver (Fujun Du's
+\texttt{myRadex}; \url{https://github.com/fjdu/myRadex}) to create a model grid
+for the p-\formaldehyde lines over a grid of 20 density ($n=10^{2.5}$-$10^{7}$
+\percc), a fixed assumed line gradient of 5 \kms / pc, 20 \formaldehyde column
+densities $N(\formaldehyde) = 1\ee{11}-1\ee{15.1}$ \persc, and 50 temperatures
+from 10 to 350 K.  The grid was created using the \texttt{pyradex} wrapper of
+RADEX\footnote{\url{https://github.com/adamginsburg/pyradex}}.  We then
+upsampled these grids by spline interpolating between grid points to acquire a
+high-resolution ($T\times n \times N = 250\times100\times100$) grid covering
+$10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N < 10^{15.1}$
+\persc\perkmspc.
 
 We extracted spectra averaged over each `by-eye' selected region and fitted
 a 6-parameter model to the full 218-219 GHz spectral range using
@@ -396,11 +408,12 @@ fit indicated.
 {figures/simple/Brick_SW_fit_4_lines_simple_splinebaselined.pdf}
 {figures/simple/ds:G0.42+0.03box_fit_4_lines_simple_splinebaselined.pdf}
 {
-Fits to the \para lines for (a) The Brick and (b) a box centered on G0.42+0.03.
-These spectra have significantly different ratios and therefore derived temperatures:
-The Brick has $T\gtrsim100$ K while G0.42+0.03 has $T\approx40-50$ K.
-The bottom black spectrum is the residual, and the orange wiggly spectrum shows
-the spline fit used to iteratively remove baseline ripples from the residual.}
+Fits to the \para lines and the \methanol \fourtwotwo line for (a) The Brick
+and (b) a box centered on G0.42+0.03.  These spectra have significantly
+different ratios and therefore derived temperatures: The Brick has
+$T\gtrsim100$ K while G0.42+0.03 has $T\approx40-50$ K.  The bottom black
+spectrum is the residual, and the orange wiggly spectrum shows the spline fit
+used to remove baseline ripples.}
 {fig:twospectra_hotcold}{1}{3in}
 
 
@@ -543,7 +556,7 @@ aesthetically superior.  The noisy edges of regions in Figure \ref{fig:temmap}a
 are unlikely to be real temperature features, so the dendrogram map is
 preferred.
 
-These temperature maps do not have uniform reliability, unfortunately.  There
+These temperature maps do not have uniform reliability.  There
 is some spatial variation in the noise, but the variation in the signal is much
 more important.  In regions where the peak signal is low, the reliability of
 these maps is substantially reduced.  Figure \ref{fig:peaksn} shows the peak
@@ -563,7 +576,7 @@ detected.  If the high column density gas in, e.g., G0.253+0.016 had a lower
 gas temperature, our data would be sensitive enough to measure temperature down
 to $T\sim20$ K.  The higher temperatures become lower limits above $\sim150$ K
 because the \para line ratio is intrinsically insensitive to higher
-temperatures as can be seen in Figure\ref{fig:parsonbrightness}.
+temperatures as can be seen in Figure \ref{fig:parsonbrightness}.
 
 % tmap_figure
 \RotFigureTwoAA
@@ -621,6 +634,8 @@ meant to better-quantify Figure \ref{fig:temmap}.  The pixels are colored by
 velocity in 20 \kms velocity bins.}
 {fig:tempoints}{0.5}{0}
 
+\section{Discussion}
+\label{sec:discussion}
 \subsection{Parameter Comparison}
 In a turbulent medium, the 1D line width of the gas should be tightly
 correlated with the 3D Mach number \citep[e.g.][]{Federrath2011a}.  If
@@ -647,7 +662,9 @@ from $\sigma_v=12$ to $8$ \kms and $T=80$ to $140$ K is from the hierarchy of
 Sgr B2 clumps and thus represents a variation in temperature with size scale.
 Similarly, the other high-linewidth points represent large interconnected
 structures.  In the range $1 < \sigma_v < 5$ \kms, which is the only region
-including low temperatures, no trend is observed.}
+including low temperatures, no trend is observed.  The points are color coded
+by signal-to-noise in the ratio $R_1$, with black $S/N < 5$, blue $5 < S/N <
+25$, green $25 < S/N < 50$, and red $S/N > 50$.  }
 {fig:temvsfwhm_regions}
 {1}{3.5in}
 %{0.5}{0}
@@ -695,8 +712,6 @@ the ratio \Rone is lower at the center and increases toward larger radii.
 
 
 
-\section{Discussion}
-\label{sec:discussion}
 \subsection{Disagreement between gas and dust temperatures}
 Similar to the results of \citet{Ao2013a} for the inner $\sim30$ pc, we find
 that the \para and dust temperatures do not agree anywhere within the inner
@@ -717,7 +732,9 @@ square regions.  The black dashed line shows the $T_g = T_d$ relation.  Nearly
 all of the data points fall above this relation, and very few are consistent
 with it at the 3$\sigma$ level.
 (b) The same as (a) but for the dendrogram-extracted sources.
-}
+The points are color coded by signal-to-noise in the
+ratio $R_1$, with black $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$,
+and red $S/N > 50$.  }
 {fig:temvstem_regions}
 {1}{3.5in}
 %{0.5}{0}
@@ -725,7 +742,7 @@ with it at the 3$\sigma$ level.
 \subsection{Regional variations in gas temperature}
 There are significant regional variations in the gas temperature.  The most
 obvious is in and around the Sgr B2 complex, where very high gas temperatures
-are inferred.  High gas temperatures, $T>50$ K, were measured in a ridge to the
+are measured.  High gas temperatures, $T>50$ K, were measured in a ridge to the
 Galactic northeast of Sgr B2 N using \methylcyanide previously \citep[][Figure
 4b]{de-Vicente1997a}, which we now confirm.  \citet{Ott2014a} also showed high
 \ammonia temperatures in this hot ridge.
@@ -799,8 +816,9 @@ $T\sim40-60$ K to $T\sim120$ K over a period $\tau\sim0.5-1$ Myr.}
 \citet{Ott2014a} measured the \ammonia 1-1 and 2-2 lines over a subset of the
 region we mapped, from $-0.2 < \ell < 0.8$.  These two lines are a frequently
 used thermometer sensitive to gas temperatures $5 \lesssim T \lesssim 40$ K,
-with very modest sensitivity up to $\sim80$ K.  The \ammonia lines also have
-lower critical densities by about 2 orders of magnitude.  The temperatures
+with weak sensitivity up to $\sim80$ K \citep[][Figure 1]{Mangum2013a}.  The
+\ammonia lines also have lower critical densities by about 2 orders of
+magnitude.  The temperatures
 derived from this line ratio are necessarily lower than those we have measured.
 Nonetheless, we compare our temperature map to that of \citet{Ott2014a} to look
 for common trends and significant differences.
@@ -839,7 +857,7 @@ range when using only these two lines, so the map is cut off at $T=80$ K.
 \subsection{Comparison to other measurements with \para}
 \label{sec:h2cocompare}
 The largest survey of \para temperatures prior to this work was
-\citet{Ao2013a}, who observed the inner 30 pc.  They performed a similar
+by \citet{Ao2013a}, who observed the inner 30 pc.  They performed a similar
 analyis to ours but over a limited area.  They reported temperatures
 systematically lower by 10-20 K (but still $T\gtrsim50$ K).  This difference is
 due to a different set of collision rates adopted (\citet{Wiesenfeld2013a}
@@ -859,14 +877,17 @@ lines of \para toward The Brick, G0.253+0.015.  We measure similar line
 ratios toward The Brick, but on larger scales.  The interpretation of these
 line ratios is subject to some question, though.  Above 300K, the collision
 rates provided by LAMDA \citep{Green1991a,Schoier2005a,Wiesenfeld2013a} must be
-extrapolated.  Additionally, some of the ratios cannot be reproduced by high
-temperatures, but instead require that the lines be thermalized and therefore
-at very high densities.   Given the low brightness temperatures observed,
-the emission must be coming from an extremely small area, which is inconsistent
-with the observed large extent of the emission unless it is also extremely
-patchy.  That remains a possibility if we are observing massive, dense clouds
-with relatively uniform turbulent properties.
-
+extrapolated.  Additionally, some of the observed ratios in our cannot be
+reproduced by high temperatures with the current suite of collision rates, but
+instead require that the lines be optically thick and thermalized and therefore
+at very high densities.   Given the low brightness temperatures observed, if
+the emission is optically thick, it must be coming from an extremely small
+area, which is inconsistent with the observed large extent of the emission
+unless it is also extremely patchy.  That remains a possibility if we are
+observing massive, dense clouds with relatively uniform turbulent properties,
+though it is unlikely - we discuss this further in Section
+\ref{sec:thickorwarm}.  We conclude, therefore, that a lower limit on the
+gas temperature in The Brick, $T>120$ K, is consistent with our observations.
 
 
 \subsection{Discussion of Heating Mechanisms}
@@ -890,7 +911,7 @@ Non-uniform heating of the molecular gas could explain the temperature
 structure observed in the CMZ molecular clouds.  If supersonic shocks within
 the gas are responsible for heating the gas above a mean background temperature
 $T_{gas} \sim T_{dust}$, only about 10\% of the gas needs to be heated to
-$T\sim50-100$ K to generate the line brighntess observed \emph{if} the hottest
+$T\sim50-100$ K to generate the line brightness observed \emph{if} the hottest
 gas is also the densest.  However, hot and dense gas cools more efficiently, so
 sustaining a population of shock-heated gas may be infeasible.  Additionally,
 the log-poisson distribution followed by a multiplicative cascade has a substantial
@@ -965,10 +986,11 @@ gas from Section \ref{sec:coolstream}.}
 {fig:coolstream}{1}{9.5in}
 
 \subsection{Is the gas warm or just optically thick?}
+\label{sec:thickorwarm}
 As noted in Section \ref{sec:h2cocompare}, there is degeneracy in the modeling
 that allows the observed ratios to be produced by very dense gas in addition to
 hot gas.  Indeed, ratios approaching $\Rone=1$ occur for relatively low
-temperatures ($T\sim30$ K) at very high densities ($n>10^{6.5}$ \percc)
+temperatures ($T\sim30$ K) at very high densities ($n>10^{6}$ \percc)
 and very high column densities ($N(\para)>10^{16}$ \perkms \persc) because
 the lines become optically thick and have LTE temperatures.
 
@@ -1002,7 +1024,7 @@ data to perform this measurement.
 The spectral fit is imperfect, showing a non-flat baseline between the
 \threetwoone and \threetwotwo lines, but nonetheless the extracted value is
 likely representative of the CMZ-wide average.  This temperature is very close
-to the \ammonia-measured temperature in M83 \citep[56 K][]{Mangum2013a}, which
+to the \ammonia-measured temperature in M83 \citep[56 K;][]{Mangum2013a}, which
 also has a similarly low dust temperature $T_{dust,M83} = 31$ K over a 600 pc
 region.  Maffei 2, NGC 1365, and NGC 6946 also exhibit similar gas and dust
 temperatures to our Galactic center in the \citet{Mangum2013a} sample,
@@ -1108,9 +1130,9 @@ center.
 
 \textbf{Acknowledgements}:
 We thank the staff and observers at APEX for carrying out the service-mode
-observations.  We are grateful to Arnaud Belloche and Axel Wieß for assistance
-in developing the observing strategy, and Per Bergman for his assistance in
-understanding the SHFI-1 baseline issues.
+observations.  We are grateful to Arnaud Belloche, Axel Wieß, and Carlos de
+Breuck for assistance in developing the observing strategy, and Per Bergman for
+his assistance in understanding the SHFI-1 baseline issues.
 \todo{Please provide any acknowledgements that are needed here.}
 
 \textbf{Code Packages Used}:
@@ -1119,6 +1141,7 @@ understanding the SHFI-1 baseline issues.
     \item sdpy \url{https://github.com/adamginsburg/sdpy}
     \item aplpy \url{http://aplpy.github.io}
     \item pyradex \url{https://github.com/adamginsburg/pyradex}
+    \item myRadex \url{https://github.com/fjdu/myRadex}
     \item pyspeckit \url{http://pyspeckit.bitbucket.org}
     \item aplpy \url{https://aplpy.github.io/}
     \item wcsaxes \url{http://wcsaxes.readthedocs.org}
@@ -1128,7 +1151,7 @@ understanding the SHFI-1 baseline issues.
 
 \appendix
 \section{Baseline Removal}
-\label{sec:baseline}
+\label{sec:baselineappendix}
 The baselines in our SHFI-1 data were particularly problematic, more than is
 usual in modern heterodyne obervations.  The 218 GHz window we have observed is
 particularly sensitive to resonances within the SHFI-1 receiver that vary on
