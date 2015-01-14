@@ -15,7 +15,7 @@ from h2co_modeling import grid_fitter
 
 class paraH2COmodel(object):
 
-    def __init__(self, tbackground=2.73, gridsize=[250.,100.,100.]):
+    def __init__(self, tbackground=2.73, gridsize=[250.,101.,100.]):
         t0 = time.time()
         from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
                                        texgrid322, taugrid322, hdr)
