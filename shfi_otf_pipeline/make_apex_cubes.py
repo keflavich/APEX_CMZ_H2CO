@@ -1971,6 +1971,10 @@ def do_extract_subcubes(outdir=molpath, merge_prefix='APEX_H2CO_merge',
     # For each cube, (maybe) load it, check it, then move on
     # (the previous method would only match things in the first cube selected...)
     for cubefilename in cubefilenames:
+        if not os.path.exists(cubefilename):
+            log.info("File {0} does not exist.  Skipping.".format(cubefilename))
+            continue
+
         for line,freq in lines.iteritems():
             if frange is not None:
                 if freq<frange[0] or freq>frange[1]:
@@ -1988,15 +1992,15 @@ def do_extract_subcubes(outdir=molpath, merge_prefix='APEX_H2CO_merge',
             # cubes from the edges of the high/low cubes...
             if freq*1e9 > freqarr.min() and freq*1e9 < freqarr.max():
                 extract_subcube(cubefilename,
+                                os.path.join(outdir, 'APEX_{0}.fits').format(line),
+                                linefreq=freq*u.GHz)
+                extract_subcube(cubefilename,
                                 os.path.join(outdir, 'APEX_{0}_smooth.fits').format(line),
                                 linefreq=freq*u.GHz, smooth=True)
                 if vsmooth:
                     extract_subcube(cubefilename,
                                     os.path.join(outdir, 'APEX_{0}_vsmooth.fits').format(line),
                                     linefreq=freq*u.GHz, smooth=True, vsmooth=True)
-                extract_subcube(cubefilename,
-                                os.path.join(outdir, 'APEX_{0}.fits').format(line),
-                                linefreq=freq*u.GHz)
                 if integrate:
                     integrate_mask(os.path.join(outdir, 'APEX_{0}'.format(line)))
                     integrate_mask(os.path.join(outdir, 'APEX_{0}_smooth'.format(line)),
