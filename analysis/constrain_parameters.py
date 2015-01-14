@@ -40,8 +40,8 @@ class paraH2COmodel(object):
 
         zinds,yinds,xinds = np.indices(self.tline303a.shape)
         upsample_factor = np.array([gridsize[0]/self.tline303a.shape[0], # temperature
-                                    gridsize[1]/self.tline303a.shape[1], # column
-                                    gridsize[2]/self.tline303a.shape[2]], # density
+                                    gridsize[1]/self.tline303a.shape[1], # density
+                                    gridsize[2]/self.tline303a.shape[2]], # column
                                    dtype='float')
         uzinds,uyinds,uxinds = upsinds = np.indices([x*us
                                                      for x,us in zip(self.tline303a.shape,
@@ -61,17 +61,20 @@ class paraH2COmodel(object):
                       321: self.tline321,
                       322: self.tline322}
 
-        self.densityarr = ((uxinds + self.hdr['CRPIX1']-1)*self.hdr['CDELT1'] /
-                      float(upsample_factor[2])+self.hdr['CRVAL1']) # log density
-        self.columnarr  = ((uyinds + self.hdr['CRPIX2']-1)*self.hdr['CDELT2'] /
-                      float(upsample_factor[1])+self.hdr['CRVAL2']) # log column
+        assert self.hdr['CTYPE2'].strip() == 'LOG-DENS'
+        assert self.hdr['CTYPE1'].strip() == 'LOG-COLU'
+
+        self.columnarr = ((uxinds + self.hdr['CRPIX1']-1)*self.hdr['CDELT1'] /
+                      float(upsample_factor[2])+self.hdr['CRVAL1']) # log column
+        self.densityarr  = ((uyinds + self.hdr['CRPIX2']-1)*self.hdr['CDELT2'] /
+                      float(upsample_factor[1])+self.hdr['CRVAL2']) # log density
         self.temparr    = ((uzinds + self.hdr['CRPIX3']-1)*self.hdr['CDELT3'] /
                       float(upsample_factor[0])+self.hdr['CRVAL3']) # lin temperature
         self.drange = [self.densityarr.min(), self.densityarr.max()]
         self.crange = [self.columnarr.min(),  self.columnarr.max()]
         self.trange = [self.temparr.min(),    self.temparr.max()]
-        self.darr = self.densityarr[0,0,:]
-        self.carr = self.columnarr[0,:,0]
+        self.darr = self.densityarr[0,:,0]
+        self.carr = self.columnarr[0,0,:]
         self.tarr = self.temparr[:,0,0]
         self.axes = {'dens': self.darr,
                      'col': self.carr,
