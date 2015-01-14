@@ -1611,6 +1611,7 @@ def do_plait_h2comerge(mergepath=mergepath, mergefile2=None):
                            header=fits.getheader(fnify(suff, '_nhits.fits')))
     whdu.writeto(fnify('_nhits'), clobber=True)
 
+    # Add back the 2013 and Ao data without plaiting (since that doesn't work)
     data = [cube_comb] + [np.nan_to_num(fits.getdata(fnify(suff)))
                           for suff in all_targets[2:]]
     weights = ([comb_weights] +
@@ -1955,9 +1956,13 @@ def do_extract_subcubes(outdir=molpath, merge_prefix='APEX_H2CO_merge',
     integrate : bool
         Integrate the extracted cube using a mask.  WARNING: doesn't check
         if the mask exists!
-    Example:
-    do_extract_subcubes(outdir='/Volumes/passport/apex/merged_datasets/molecule_cubes',
-                        suffix='', merge_prefix='APEX_H2CO_2014_merge')
+
+    Examples
+    --------
+    >>> do_extract_subcubes(outdir='/Volumes/passport/apex/merged_datasets/molecule_cubes',
+    ...                     suffix='', merge_prefix='APEX_H2CO_2014_merge')
+    >>> do_extract_subcubes(lines=lines, merge_prefix='APEX_H2CO_merge',
+    ...                     suffix='_plait_all')
     """
 
     if cubefilename is None:
@@ -1981,7 +1986,7 @@ def do_extract_subcubes(outdir=molpath, merge_prefix='APEX_H2CO_merge',
                     log.info("Skipping line {0}".format(line))
                     continue
 
-            log.info("Extracting {0}".format(line))
+            log.info("Extracting {0} from {1}".format(line,cubefilename))
 
             header = fits.getheader(cubefilename)
             ww = wcs.WCS(header)

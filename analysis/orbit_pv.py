@@ -66,9 +66,11 @@ filenames = [molpath('APEX_{0}.fits'.format(molecule))
             for molecule in molecules]
 
 molecules = molecules + ('H2CO_TemperatureFromRatio',
+                         'H2CO_TemperatureFromRatio_smooth',
                          'H2CO_DendrogramTemperature',
                          'H2CO_DendrogramTemperature_smooth')
 filenames.append(hpath('TemperatureCube_PiecewiseFromRatio.fits'))
+filenames.append(hpath('TemperatureCube_smooth_PiecewiseFromRatio.fits'))
 filenames.append(hpath('TemperatureCube_DendrogramObjects_Piecewise.fits'))
 filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_Piecewise.fits'))
 
@@ -216,13 +218,13 @@ for molecule,fn in zip(molecules,filenames):
     reftime = -2
     bricktime = 0.3
     ax3.plot(time-reftime, pv.data.T, 'k.', alpha=0.5, markersize=3)
-    ax3.set_xlabel("Time since 1$^\\mathrm{st}$ pericenter passage [Myr]", size=36, labelpad=20)
+    ax3.set_xlabel("Time since 1$^\\mathrm{st}$ pericenter passage [Myr]", size=24, labelpad=10)
     if 'Temperature' in fn:
         ax3.set_ylim(0,150)
-        ax3.set_ylabel("Temperature [K]", size=36, labelpad=20)
+        ax3.set_ylabel("Temperature [K]", size=24, labelpad=10)
         ytext = 135
     else:
-        ax3.set_ylabel("$T_A^*$ [K]", size=36, labelpad=20)
+        ax3.set_ylabel("$T_A^*$ [K]", size=24, labelpad=10)
         ytext = ax3.get_ylim()[1]*(14./15.)
     ax3.text(bricktime, ytext, "Brick", verticalalignment='center',
              horizontalalignment='center', rotation='vertical', color='purple', weight='bold')
@@ -234,8 +236,8 @@ for molecule,fn in zip(molecules,filenames):
              horizontalalignment='center', rotation='vertical', color='g', weight='bold')
     ax3.text(bricktime+3.28, ytext, "Sgr C", verticalalignment='center',
              horizontalalignment='center', rotation='vertical', color='m', weight='bold')
-    pl.setp(ax3.get_xticklabels(), fontsize=24)
-    pl.setp(ax3.get_yticklabels(), fontsize=24)
+    pl.setp(ax3.get_xticklabels(), fontsize=20)
+    pl.setp(ax3.get_yticklabels(), fontsize=20)
     ax3.set_xlim(-0.1,4.6)
     fig3.savefig(fpath('orbits/KDL2014_{0}_vs_time.pdf'.format(molecule)),
                  bbox_inches='tight')

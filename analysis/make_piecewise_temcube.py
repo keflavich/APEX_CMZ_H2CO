@@ -6,7 +6,8 @@ from astropy import log
 from spectral_cube import SpectralCube, BooleanArrayMask
 from paths import hpath, apath
 from astropy.table import Table, Column
-from ratio_cubes import ratio303321, eratio303321, noise_flat, mask, ratioOK
+from ratio_cubes import (ratio303321, eratio303321, noise_flat, mask, ratioOK,
+                         ratio303321sm, ratioOKsm, masksm)
 from masked_cubes import (cube303m,cube321m,cube303msm,cube321msm,
                           cube303,cube321,cube303sm,cube321sm,
                           sncube, sncubesm)
@@ -15,18 +16,13 @@ from astrodendro import Dendrogram,ppv_catalog
 from astropy.io import fits
 from dendrograms import dend, dendsm, dend321, dend321sm
 from piecewise_rtotem import pwtem
+from temperature_cubes import tcubesm_direct, tcube_direct
 
-tcubedata = np.empty(cube303m.shape)
-tcubedata[~mask] = np.nan
-tcubedata[mask] = pwtem(ratio303321[ratioOK])
 
-tcube = SpectralCube(data=tcubedata, wcs=cube303m.wcs,
-                     mask=cube303m.mask, meta={'unit':'K'},
-                     header=cube303m.header,
-                    )
-assert tcube.header['CUNIT3'] == 'km s-1'
+tcube_direct.write(hpath('TemperatureCube_PiecewiseFromRatio.fits'), overwrite=True)
 
-tcube.write(hpath('TemperatureCube_PiecewiseFromRatio.fits'), overwrite=True)
+tcubesm_direct.write(hpath('TemperatureCube_smooth_PiecewiseFromRatio.fits'), overwrite=True)
+
 
 # Do the integrated version
 for smooth in ('', '_smooth'):
