@@ -243,6 +243,8 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         columns['dustmass'].append(mass.value)
         columns['dustmindens'].append(density.value)
         mindens = np.log10(density.value)
+        if mindens < 3:
+            mindens = 3
 
         if (r321303 < 0 or np.isnan(r321303)) and line != '321':
             raise ValueError("Ratio <0: This can't happen any more because "
@@ -332,8 +334,13 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                         )
 
     if write:
-        tcube.write(hpath('TemperatureCube_DendrogramObjects{0}.fits'.format(suffix)),
+        outpath = 'TemperatureCube_DendrogramObjects{0}.fits'
+        tcube.write(hpath(outpath.format(suffix)),
                     overwrite=True)
+
+        integ = tcube.mean(axis=0)
+        integ.hdu.writeto(hpath(outpath.format(suffix)).replace(".fits","_integ.fits"),
+                          clobber=True)
 
     return catalog, tcube
 

@@ -1,13 +1,6 @@
-execfile('param_plots_densgt4.py')
-import sys
-sys.exit(0)
-
-# This version is obsolete:  use the other file which includes a constraint on
-# the density
-
-
-
 """
+ADDED CONSTRAINT: density > 10^4
+
 For each of the fitted spectra from individual_spectra.py, use the fitted ratio
 (and appropriate ancillary data, e.g. h2 column) to derive the best fit
 temperature, etc.
@@ -21,6 +14,7 @@ import pylab as pl
 import numpy as np
 from astropy import log
 from astropy import units as u
+from astropy import constants
 from astropy import coordinates
 from paths import analysispath
 from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
@@ -29,6 +23,7 @@ from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
 from constrain_parameters import paraH2COmodel
 from h2co_modeling import grid_fitter
 from astropy import table
+
 
 pl.rcParams['font.size'] = 16.0
 
@@ -88,6 +83,15 @@ for row in fittable:
     logabundance = np.log10(1.2e-9)
     elogabundance = 1.0
 
+    # Constraint from density
+    r_deg = (row['area']/np.pi)**0.5 * u.deg
+    reff = (r_deg*(8.5*u.kpc)).to(u.pc, u.dimensionless_angles())
+    mass = ((10**logh2column*u.cm**-2)*np.pi*reff**2*2.8*constants.m_p).to(u.M_sun)
+    density = (mass/(4/3.*np.pi*reff**3)/constants.m_p/2.8).to(u.cm**-3)
+    mindens = np.log10(density.value)
+    if mindens < 3:
+        mindens = 3
+
     # Combined abundance + total column constraint
     # N(H2CO) * dv * X = N(H2)
     # We are effectively ignoring errors in the linewidth here:
@@ -106,6 +110,7 @@ for row in fittable:
                        logabundance=logabundance, elogabundance=elogabundance,
                        taline303=par1, etaline303=epar1,
                        taline321=par2, etaline321=epar2,
+                       mindens=mindens,
                        linewidth=linewidth)
 
 
@@ -116,7 +121,8 @@ for row in fittable:
     chi2_1 = mf.chi2_ff1
     chi2_2 = mf.chi2_ff2
     chi2_ff = chi2_1+chi2_2
-    chi2b = chi2r + chi2_ff + chi2X + chi2_h2
+    chi2_dens = mf.chi2_dens
+    chi2b = chi2r + chi2_ff + chi2X + chi2_h2 + chi2_dens
 
     match = chi2b < 1
     indbest,match = grid_fitter.getmatch(chi2b, match)
@@ -339,6 +345,7 @@ for row in fittable:
     chi2X = chi2X.swapaxes(1,2)
     chi2_h2 = chi2_h2.swapaxes(1,2)
     chi2_ff = chi2_ff.swapaxes(1,2)
+    chi2_dens = chi2_dens.swapaxes(1,2)
     tline303 = mf.tline303.swapaxes(1,2)
 
     for xax,yax,xlabel,ylabel,axis,ptype in zip((mf.darr,mf.darr,mf.carr),
@@ -373,23 +380,34 @@ for row in fittable:
         pl.xlabel(xlabel)
         pl.title("log(p-H$_2$CO/H$_2$) $= {0:0.1f}\pm{1:0.1f}$".format(logabundance, elogabundance))
         ax3 = pl.subplot(2,2,3)
-        pl.contourf(xax, yax, chi2_h2.min(axis=axis), levels=chi2_h2.min()+np.arange(nlevs), alpha=0.5)
+        #pl.contourf(xax, yax, chi2_h2.min(axis=axis), levels=chi2_h2.min()+np.arange(nlevs), alpha=0.5)
+        pl.contourf(xax, yax, chi2_dens.min(axis=axis), levels=chi2_dens.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
         pl.xlabel(xlabel)
         pl.ylabel(ylabel)
-        pl.title("Total log$(N(\\mathrm{{H}}_2)) = {0:0.1f}\pm{1:0.1f}$".format(logh2column,
-                                                                                elogh2column))
+        #pl.title("Total log$(N(\\mathrm{{H}}_2)) = {0:0.1f}\pm{1:0.1f}$".format(logh2column,
+        #                                                                        elogh2column))
+        pl.title("Density $n>10^{{{0:0.1f}}}$cm$^{{-3}}$".format(mindens))
+
+        #ax5 = pl.subplot(2,2,4)
+        #pl.contourf(xax, yax, (chi2_ff.min(axis=axis)),
+        #            levels=chi2_ff.min()+np.arange(nlevs), alpha=0.5)
+        #pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
+        #pl.contour(xax, yax, (tline303 < 10*par1).max(axis=axis), levels=[0.5], colors='k')
+        ##pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis), levels=[0.5], colors='k')
+        ##pl.contour(xax, yax, (tline321 < 10*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
+        ##pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
+        #pl.xlabel(xlabel)
+        #pl.ylabel(ylabel)
+        #pl.title("Line Brightness + $ff\leq1$")
+
         ax5 = pl.subplot(2,2,4)
-        pl.contourf(xax, yax, (chi2_ff.min(axis=axis)),
-                    levels=chi2_ff.min()+np.arange(nlevs), alpha=0.5)
-        pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
-        pl.contour(xax, yax, (tline303 < 10*par1).max(axis=axis), levels=[0.5], colors='k')
-        #pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis), levels=[0.5], colors='k')
-        #pl.contour(xax, yax, (tline321 < 10*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
-        #pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
-        pl.xlabel(xlabel)
-        pl.ylabel(ylabel)
-        pl.title("Line Brightness + $ff\leq1$")
+        ax5.contourf(xax, yax, chi2_h2.min(axis=axis), levels=chi2_h2.min()+np.arange(nlevs), alpha=0.5)
+        ax5.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
+        ax5.set_xlabel(xlabel)
+        ax5.set_ylabel(ylabel)
+        ax5.set_title("Total log$(N(\\mathrm{{H}}_2)) = {0:0.1f}\pm{1:0.1f}$"
+                      .format(logh2column, elogh2column))
 
         if xax is mf.carr:
             for ss in range(1,5):
@@ -403,6 +421,7 @@ for row in fittable:
         pl.savefig(outf, bbox_inches='tight')
 
 
+
     # IGNORE 321/322: it is generally not well constrained anyway
     mf.chi2 -= mf.chi2_r321322
 
@@ -413,9 +432,13 @@ for row in fittable:
     #if row_data['temperature_chi2'] == 10:
     #    import ipdb; ipdb.set_trace()
 
+log.info("Completed source loop.")
+
 fittable.write(os.path.join(analysispath,
                             'fitted_line_parameters_Chi2Constraints.ipac'),
                format='ascii.ipac')
+
+log.info("Wrote table file.  Continuing to parameter plots.")
 
 
 execfile(paths.pcpath('parameter_comparisons.py'))

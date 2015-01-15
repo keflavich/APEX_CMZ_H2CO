@@ -89,6 +89,7 @@ for cat,dendro,smooth in zipped:
         log.info(" < {0}: {1}".format(root1, p1.coef))
         log.info(" [{0}, {1}]: {2}".format(root1, root2, p2.coef))
         log.info(" > {0}: {1}".format(root2, p3.coef))
+        # debug func = lambda x:x
 
         fit_table = Table(
             [Column(name='MinBound', data=[0,root1,root2]),
@@ -103,28 +104,61 @@ for cat,dendro,smooth in zipped:
         fit_table.write(apath('piecewise_tvsratio_fit.ipac'), format='ascii.ipac')
 
         x = np.linspace(0,0.6,100)
-        ax2.plot(x, func(x), 'k-', alpha=0.5, zorder=-10)
+        l0, = ax2.plot(x, func(x), 'k-', alpha=0.5, zorder=-10)
         ax2.set_xlim(0.,0.6)
         ax2.set_ylim(0.,350)
         fig2.savefig(fpath('dendrotem/ratio_vs_temperature_piecewise{0}.pdf'.format(smooth)))
-        ax2.plot(x, p1(x), 'k--', alpha=0.5)
-        ax2.plot(x, p2(x), 'k:', alpha=0.5)
-        ax2.plot(x, p3(x), 'k-.', alpha=0.5)
+        l1, = ax2.plot(x, p1(x), 'k--', alpha=0.5)
+        l2, = ax2.plot(x, p2(x), 'k:', alpha=0.5)
+        l3, = ax2.plot(x, p3(x), 'k-.', alpha=0.5)
         fig2.savefig(fpath('dendrotem/ratio_vs_temperature_piecewise_pieces{0}.pdf'.format(smooth)))
+
+        sel = cat['ratio303321'][ok] < 0.6
+        pars = np.polyfit(cat['ratio303321'][ok][sel],
+                          cat['temperature_chi2'][ok][sel],2)
+        log.info("Polynomial parameters: {0}".format(pars))
+        for ll in l1,l2,l3,l0:
+            ll.set_visible(False)
+        ax2.plot(x, np.polyval(pars, x), 'r--', alpha=0.5)
+        ax2.axis([0,0.55,0,200])
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature_powerlaw.pdf'))
+
+    elif cat is catalog_sm:
+        sel = cat['ratio303321'][ok] < 0.6
+        pars = np.polyfit(cat['ratio303321'][ok][sel],
+                          cat['temperature_chi2'][ok][sel],2)
+        log.info("Polynomial parameters (smooth): {0}".format(pars))
+        L, = ax2.plot(x, np.polyval(pars, x), 'k--', alpha=0.5,
+                      label=r"$y={0:0.2f}x^2 {1:+0.2f}x {2:+0.2f}$".format(*pars))
+        ax2.axis([0,0.55,0,200])
+        pl.legend(loc='lower right')
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature_powerlaw_smooth.pdf'))
+        
 
     fig3, ax3 = pl.subplots(num=3)
     ax3.hist(sn[sn==sn], bins=50)
     ax3.set_xlabel("Signal/Noise")
 
-    fig4, ax4 = pl.subplots(num=4)
+    pl.figure(4).clf()
+    fig4, (ax4a,ax4b) = pl.subplots(nrows=2,ncols=1,num=4)
     for mask,color,alpha in masks_colors:
-        ax4.errorbar(cat['density_chi2'][mask], cat['temperature_chi2'][mask],
+        ax4a.errorbar(cat['density_chi2'][mask], cat['temperature_chi2'][mask],
                      #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                      #xerr=[cat['elo_d'][mask], cat['ehi_d'][mask]],
                      linestyle='none', capsize=0, alpha=alpha, marker='.',
                      color=color, linewidth=0.1)
-        ax4.set_xlabel("Density")
-        ax4.set_ylabel("Temperature")
+        ax4a.set_xlabel("Density")
+        ax4a.set_ylabel("Temperature")
+        ax4a.set_xlim(3.0, 6.5)
+        ax4b.errorbar(np.log10(cat['dustmindens'][mask]), cat['temperature_chi2'][mask],
+                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
+                     #xerr=[cat['elo_d'][mask], cat['ehi_d'][mask]],
+                     linestyle='none', capsize=0, alpha=alpha, marker='.',
+                     color=color, linewidth=0.1)
+        ax4b.set_xlabel("Density from dust")
+        ax4b.set_ylabel("Temperature")
+        ax4b.set_xlim(*ax4a.get_xlim())
+    fig4.savefig(fpath("dendrotem/temperature_vs_density{0}.pdf".format(smooth)))
 
     fig5, ax5 = pl.subplots(num=5)
     for mask,color,alpha in masks_colors:
@@ -237,6 +271,22 @@ for cat,dendro,smooth in zipped:
         ax24.set_ylabel("Temperature [K]")
     fig24.savefig(fpath('dendrotem/temperature_vs_dustcol{0}.pdf'.format(smooth)))
 
+    fig25 = pl.figure(25)
+    fig25.clf()
+    ax25 = fig25.gca()
+    tem_to_color = pl.cm.RdYlBu_r((cat['temperature_chi2']-15)/(200-15.))
+    sc = ax25.scatter(cat['ratio303321'], np.log10(cat['dustmindens']),
+                      c=cat['temperature_chi2'], cmap=pl.cm.RdYlBu_r,
+                      marker='o', vmin=15, vmax=200, alpha=0.8,
+                      lw=0, s=40, edgecolors='none')
+    ax25.set_xlim(0, 0.6)
+    ax25.set_ylabel("HiGal Dust-derived Density")
+    ax25.set_xlabel("Ratio $R_1$")
+    ax25.set_axis_bgcolor((0.6,0.6,0.6))
+    pl.colorbar(sc)
+    fig25.savefig(fpath('dendrotem/ratio_vs_density{0}.pdf'.format(smooth)))
+
+
     fig13, ax13 = pl.subplots(num=13)
     lon=cat['x_cen']
     lon[lon>180] -= 360
@@ -244,26 +294,27 @@ for cat,dendro,smooth in zipped:
                          c=cat['temperature_chi2'],
                          alpha=0.3, marker='o',
                          norm=matplotlib.colors.PowerNorm(0.5),
+                         cmap=matplotlib.cm.RdYlBu_r,
                          s=(cat['area_exact'])**0.5)
     ax13.clear()
     pn = matplotlib.colors.PowerNorm(0.5, vmax=np.nanmax(cat['temperature_chi2']), vmin=np.nanmin(cat['temperature_chi2']))
     y = pn(cat['temperature_chi2'])
-    colors = matplotlib.cm.jet(y)
+    colors = matplotlib.cm.RdYlBu_r(y)
     colors[:,3] = np.nan_to_num(np.array((pn(cat['temperature_chi2'])+1)/2.))
     sz = (cat['area_exact'])**0.5
     colors[:,3][sz>100] /= 3
     ln = matplotlib.colors.LogNorm(vmax=100, vmin=3, clip=True)
     colors[:,3] = np.nan_to_num(ln(sn))
-    ax13.scatter(lon, cat['y_cen'],
-                 c=colors,
-                 marker='o',
-                 edgecolor='none',
-                 norm=matplotlib.colors.PowerNorm(0.5),
-                 s=sz)
+    pts13b = ax13.scatter(lon, cat['y_cen'], c=colors, marker='o',
+                          edgecolor='none',
+                          norm=matplotlib.colors.PowerNorm(0.5), alpha=0.75,
+                          s=sz)
     ax13.set_xlabel("Galactic Longitude")
     ax13.set_ylabel("Galactic Latitude")
     cb13 = pl.colorbar(pts13)
     cb13.set_label(r'Temperature')
+    ax13.set_xlim(1.7,-0.6)
+    ax13.set_axis_bgcolor((0.6,0.6,0.6))
 
 
     try:
@@ -437,7 +488,7 @@ for cat,dendro,smooth in zipped:
             ax.set_ylim(10, 125)
         pl.draw()
 
-    pl.close(25)
+    pl.close(26)
 
     dview = dendro.viewer()
     structure = dendro.structure_at([262/(2 if 'smooth' in smooth else 1),143,725]).ancestor

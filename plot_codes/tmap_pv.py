@@ -26,7 +26,7 @@ for smooth in ("","_smooth",):#"_vsmooth"):
     snhdu.header['CTYPE1'] = 'GLON'
 
     for ftemplate,outtype in zip(('TemperatureCube{0}_PiecewiseFromRatio.fits',
-                                  'TemperatureCube_DendrogramObjects{0}_Piecewise.fits'),
+                                  'TemperatureCube_DendrogramObjects{0}.fits'),
                                  ('','dendro')):
 
         log.info("Starting "+ftemplate.format(smooth))

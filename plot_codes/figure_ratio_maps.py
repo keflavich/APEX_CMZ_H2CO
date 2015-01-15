@@ -18,6 +18,8 @@ cm = matplotlib.cm.RdYlBu_r
 cm.set_bad('#888888')
 
 vcuts = np.arange(-60,141,20)
+small_recen = dict(x=0.3, y=-0.03,width=1.05,height=0.27)
+big_recen = dict(x=0.55, y=-0.075,width=2.3,height=0.40)
 
 fig = pl.figure(1, figsize=(14,6))
 for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
@@ -31,9 +33,9 @@ for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
         F.add_colorbar()
         F.tick_labels.set_xformat('d.dd')
         F.tick_labels.set_yformat('d.dd')
-        #F.recenter(0.31, -0.05, width=1.1, height=0.3)
+        #F.recenter(**small_recen)
         #F.save(os.path.join(figurepath, ratio.replace(".fits",".pdf")))
-        F.recenter(0.55,-0.075,width=2.3,height=0.40)
+        F.recenter(**big_recen)
         F.add_label(1.60, -0.22,
                     "$v=[{0}, {1}]$ km s$^{{-1}}$".format(vrange[0],vrange[1]),
                     color='w', size=14, zorder=20,
@@ -64,9 +66,9 @@ for (cubehi,cubelo),sn,smooth in zip(((cube303m,cube321m),
         F.add_colorbar()
         F.tick_labels.set_xformat('d.dd')
         F.tick_labels.set_yformat('d.dd')
-        #F.recenter(0.31, -0.05, width=1.1, height=0.3)
+        #F.recenter(**small_recen)
         #F.save(os.path.join(figurepath, ratio.replace(".fits",".pdf")))
-        F.recenter(0.55,-0.075,width=2.3,height=0.40)
+        F.recenter(**big_recen)
         F.add_label(1.60, -0.22,
                     "$v=[{0}, {1}]$ km s$^{{-1}}$".format(vrange[0],vrange[1]),
                     color='w', size=14, zorder=20,
@@ -110,7 +112,7 @@ for (cubehi,cubelo),sn,smooth in zip(((cube303m,cube321m),
                     horizontalalignment='left',
                     zorder=20)
         F.colorbar.set_axis_label_text('T (K)')
-        F.recenter(0.55,-0.075,width=2.3,height=0.40)
+        F.recenter(**big_recen)
         F.save(os.path.join(figurepath,
                             'big_maps',
                             'big_lores{0}_tmap_greyed_{1}to{2}_slabratio.png'.format(smooth,
@@ -164,7 +166,7 @@ for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
                     color='w', size=14, zorder=20,
                     horizontalalignment='left')
         F.colorbar.set_axis_label_text('T (K)')
-        F.recenter(0.55,-0.075,width=2.3,height=0.40)
+        F.recenter(**big_recen)
         F.save(os.path.join(figurepath,
                             'big_maps',
                             'big_lores{0}_tmap_greyed_{1}to{2}.png'.format(smooth,
@@ -180,7 +182,8 @@ for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
 
         
 
-# Old version
+
+# Old version: integrated ratio maps (this is still used in publication)
 for bl in ("_bl",""):
     for smooth in ("","_smooth",):#"_vsmooth"):
         ratio1 = 'H2CO_321220_to_303202{0}{1}_integ.fits'.format(smooth,bl)
@@ -196,11 +199,32 @@ for bl in ("_bl",""):
             F.add_colorbar()
             F.tick_labels.set_xformat('d.dd')
             F.tick_labels.set_yformat('d.dd')
-            F.recenter(0.31, -0.05, width=1.1, height=0.3)
+            F.recenter(**small_recen)
             F.save(os.path.join(figurepath,
                                 'big_maps',
                                 ratio.replace(".fits",".pdf")))
-            F.recenter(0.55,-0.075,width=2.3,height=0.40)
+            F.recenter(**big_recen)
             F.save(os.path.join(figurepath,
                                 'big_maps',
                                 "big_"+ratio.replace(".fits",".pdf")))
+
+# Dendrogram mean ratios
+for smooth in ("","_smooth",):#"_vsmooth"):
+    ratio = 'RatioCube_DendrogramObjects{0}_Piecewise_mean.fits'.format(smooth)
+
+    fig = pl.figure(1)
+    fig.clf()
+    F = aplpy.FITSFigure(os.path.join(h2copath, ratio),
+                         convention='calabretta', figure=fig)
+    F.show_colorscale(cmap=cm)
+    F.add_colorbar()
+    F.tick_labels.set_xformat('d.dd')
+    F.tick_labels.set_yformat('d.dd')
+    F.recenter(**small_recen)
+    F.save(os.path.join(figurepath,
+                        'big_maps',
+                        ratio.replace(".fits",".pdf")))
+    F.recenter(**big_recen)
+    F.save(os.path.join(figurepath,
+                        'big_maps',
+                        "big_"+ratio.replace(".fits",".pdf")))

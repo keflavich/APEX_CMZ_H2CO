@@ -321,15 +321,18 @@ divide-by-zero numerical errors.
 
 
 % figure_ratio_maps
-\Figure
+\RotFigureTwoAA
 %{figures/big_H2CO_322221_to_303202_smooth_bl_integ.pdf}
 {figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
-{Map of the ratio of the integrated emission of
+{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
+{(a) Map of the ratio of the integrated emission of
 \Rone.  The data cubes were masked by
 signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
 indicating nondetections.  The Sgr B2 peaks exhibit \formaldehyde
 absorption and therefore are not reliable.  Higher ratios (red) correspond
 to higher temperatures.
+(b) The temperature map derived from (a).  The modeling used to derive
+temperature is discussed in Section \ref{sec:linemodeling}.
 }
 %{fig:ratiomaps}{1}{7in}
 {fig:ratiomaps}{0.6}{0}
@@ -475,25 +478,27 @@ contours show the joint constraints imposed by including restrictions on the
 total column density, filling factor, and abundance, following the same color
 scheme.  The solid grayscale contours show the constraints imposed by
 $R_2=\Rtwo$, from black ($\Delta\chi^2 < 1$) to white.  In this case, $R_2$
-imposes only a weak lower limit on column. \newline
+is weakly inconsistent with the joint constraints from the other parameters.
+\newline
 (top right) The same colorscheme as before, showing the constraints imposed by
-assuming the abundance of \para relative to \hh is as labeled.  In this case,
-the abundance does not constraint these parameters. \newline
+assuming the abundance of \para relative to \hh is as labeled.  
+The abundance does not constrain these parameters.
+\newline
+(bottom right) The same colorscheme as before, showing the constraints imposed
+by using the measured mean volume density as a lower limit.
+\newline
 (bottom left) The same colorscheme as before, showing the constraints imposed
 by the measured total column density of \hh, converted to a constraint on the
 \para column by assuming a velocity gradient (5 \kms \perpc) and abundance as
 shown in the top right panel.  The uncertainty is dominated by the abundance
-uncertainty.  \newline
-(bottom right) The same colorscheme as before, showing the constraints imposed
-by forcing the filling factor of the line emission to be $ff < 1$.
+uncertainty.
 }
 {fig:coltemconstraints}{0.5}{0}
 
 \Figure{figures/param_fits/c:G0.38+0.04_dens_col_0_parameter_constraints.pdf}
 {The constraints in density-column parameter space.
-See Figure \ref{fig:coltemconstraints} for details.  In the bottom-right panel, the
-solid line shows the contour corresponding to $ff(\threeohthree)=0.1$ in
-black.}
+See Figure \ref{fig:coltemconstraints} for details.
+}
 {fig:denscolconstraints}{0.5}{0}
 
 \Figure{figures/param_fits/c:G0.38+0.04_dens_tem_0_parameter_constraints.pdf}
@@ -527,13 +532,12 @@ already intrinsically uncertain and these ratios are best treated as lower
 limits on the gas temperature.
 
 % dendrotem_plots
-\Figure{figures/dendrotem/ratio_vs_temperature_piecewise.pdf}
+\Figure{figures/dendrotem/ratio_vs_temperature_powerlaw_smooth.pdf}
 {The derived temperature vs the measured ratio \Rone.  The temperature
 includes constraints from the assumed fixed \formaldehyde abundance and the 
 varying column density.  The points are color coded by signal-to-noise in the
 ratio $R_1$, with black $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$,
-and red $S/N > 50$.  The black line shows a three-element piecewise fit
-to the data.
+and red $S/N > 50$.  The black line shows a 2nd order polynomial fit.
 }
 {fig:ratiovstem}{0.6}{0}
 
@@ -726,10 +730,10 @@ of data points near the $T_{dust}=T_{gas}$ line are the low signal-to-noise
 points with untrustworthy fits.
 
 \FigureTwo
-{figures/chi2_temperature_vs_higaltemperature_fieldsandsources.pdf}
+{figures/chi2_temperature_vs_higaltemperature_fieldsandsources.pdf} % parameter_comparisons
 {figures/dendrotem/temperature_vs_dusttem_smooth.pdf} % dendrotem_plots
 {(a) The fitted temperature as described in Section \ref{sec:linemodeling} plotted
-against the HiGal fitted dust temperature.  As in Figure \ref{fig:temvsfwhm},
+against the HiGal fitted dust temperature.  As in Figure \ref{fig:temvsfwhm_regions},
 the blue symbols are compact `clump' sources and the red symbols are large-area
 square regions.  The black dashed line shows the $T_g = T_d$ relation.  Nearly
 all of the data points fall above this relation, and very few are consistent

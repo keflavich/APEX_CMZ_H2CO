@@ -73,6 +73,8 @@ ax6.errorbar(pcfittable['higaldusttem'][maps],
 ax6.plot([15,30],[15,30],'k--')
 ax6.set_xlabel("HiGal Fitted Temperature")
 ax6.set_ylabel("Kinetic Temperature (K)")
+ax6.set_ylim(0,200)
+ax6.set_xlim(15,30)
 fig6.savefig(paths.fpath('chi2_temperature_vs_higaltemperature_byfield.pdf'),
                          bbox_inches='tight')
 ax6.errorbar(pcfittable['higaldusttem'][~maps],
@@ -80,6 +82,8 @@ ax6.errorbar(pcfittable['higaldusttem'][~maps],
              yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[~maps],
                    (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[~maps]],
              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='b')
+ax6.set_ylim(0,200)
+ax6.set_xlim(15,30)
 fig6.savefig(paths.fpath('chi2_temperature_vs_higaltemperature_fieldsandsources.pdf'),
                          bbox_inches='tight')
 
@@ -172,6 +176,8 @@ ax11.errorbar(pcfittable['higaldusttem'][maps],
              pcfittable['h2coratio321303'][maps],
              yerr=pcfittable['eh2coratio321303'][maps],
              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
+ax11.set_ylim(0,200)
+ax11.set_xlim(15,30)
 ax11.set_xlabel("HiGal Fitted Temperature")
 ax11.set_ylabel("Ratio 321/303")
 fig11.savefig(paths.fpath('ratio_vs_higaltemperature_byfield.pdf'),

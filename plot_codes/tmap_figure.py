@@ -20,7 +20,7 @@ small_recen = dict(x=0.3, y=-0.03,width=1.05,height=0.27)
 big_recen = dict(x=0.55, y=-0.075,width=2.3,height=0.40)
 
 for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fits',
-                              'TemperatureCube_DendrogramObjects{0}_Piecewise_integ.fits'),
+                              'TemperatureCube_DendrogramObjects{0}_integ.fits'),
                              ('','dendro')):
 
     for smooth in ("","_smooth",):#"_vsmooth"):

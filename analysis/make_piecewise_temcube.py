@@ -35,6 +35,27 @@ for smooth in ('', '_smooth'):
     ff.writeto(hpath('IntegratedRatioPiecewiseTemperature{0}_303to321.fits'.format(smooth)),
                clobber=True)
 
+# Moved from temperature_cube: make integrated temperature maps
+for sm in ("","_smooth",'_321','_321smooth'):
+    outpath = 'TemperatureCube_DendrogramObjects{0}_Piecewise.fits'.format(sm)
+    tcube = SpectralCube.read(hpath(outpath))
+
+    integ = tcube.mean(axis=0)
+    integ.hdu.writeto(hpath(outpath).replace(".fits","_integ.fits"),
+                      clobber=True)
+
+# integrated temperature maps weighted by 303 brightness
+for sm in ("","_smooth",'_321','_321smooth'):
+    outpath = 'TemperatureCube_DendrogramObjects{0}_Piecewise.fits'.format(sm)
+    weight_cube = cube303m if sm == "" else cube303msm
+    tcube = fits.getdata(hpath(outpath))
+    weights = weight_cube.filled_data[:]
+
+    integ = (tcube*weights).sum(axis=0) / weights.sum(axis=0)
+
+    integ.hdu.writeto(hpath(outpath).replace(".fits","_integ_weighted.fits"),
+                      clobber=True)
+
 
 # Try the same thing but on the dendrogrammed data.  Basically, this is 
 # dendro_temperature but *much* faster
@@ -101,3 +122,9 @@ for sm,cubeA,cubeB,objects in zip(("","_smooth",'_321','_321smooth'),
     max_temcube.hdu.writeto(hpath('TemperatureCube_DendrogramObjects{0}_Piecewise_max.fits'.format(sm)), clobber=True)
     max_rcube = rcube.max(axis=0)
     max_rcube.hdu.writeto(hpath('RatioCube_DendrogramObjects{0}_Piecewise_max.fits'.format(sm)), clobber=True)
+
+    mean_temcube = tcube.mean(axis=0)
+    mean_temcube.hdu.writeto(hpath('TemperatureCube_DendrogramObjects{0}_Piecewise_mean.fits'.format(sm)), clobber=True)
+    mean_rcube = rcube.mean(axis=0)
+    mean_rcube.hdu.writeto(hpath('RatioCube_DendrogramObjects{0}_Piecewise_mean.fits'.format(sm)), clobber=True)
+

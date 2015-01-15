@@ -242,6 +242,8 @@ def load_spectra(regs, cube):
 if __name__ == "__main__":
 
     pl.ioff()
+    pl.close(1)
+    pl.figure(1).clf()
 
     radexfit=False # not super useful...
 

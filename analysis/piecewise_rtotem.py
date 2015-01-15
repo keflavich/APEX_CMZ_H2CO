@@ -9,10 +9,12 @@ from paths import apath
 
 fit_table = Table.read(apath('piecewise_tvsratio_fit.ipac'), format='ascii.ipac')
 
-# Define a piecewise interpolated function...
-pwtem = lambda x: np.piecewise(x,
-                               [(x>r['MinBound']) & (x<r['MaxBound'])
-                                for r in fit_table],
-                               [Polynomial([r['const'], r['xcoef'], r['x2coef']])
-                                for r in fit_table] + [lambda y: np.nan]
-                               )
+# old, wrong version # Define a piecewise interpolated function...
+# old, wrong version pwtem = lambda x: np.piecewise(x,
+# old, wrong version                                [(x>r['MinBound']) & (x<r['MaxBound'])
+# old, wrong version                                 for r in fit_table],
+# old, wrong version                                [Polynomial([r['const'], r['xcoef'], r['x2coef']])
+# old, wrong version                                 for r in fit_table] + [lambda y: np.nan]
+
+# Grabbed from dendrotem_plot on Jan 15, 2015
+pwtem = lambda x: np.polyval([190.12665966, 276.45454806,  11.09564855], x)

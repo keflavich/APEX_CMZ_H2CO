@@ -71,8 +71,8 @@ molecules = molecules + ('H2CO_TemperatureFromRatio',
                          'H2CO_DendrogramTemperature_smooth')
 filenames.append(hpath('TemperatureCube_PiecewiseFromRatio.fits'))
 filenames.append(hpath('TemperatureCube_smooth_PiecewiseFromRatio.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects_Piecewise.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_Piecewise.fits'))
+filenames.append(hpath('TemperatureCube_DendrogramObjects.fits'))
+filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth.fits'))
 
 
 cmap = copy.copy(pl.cm.RdYlBu_r)
@@ -220,9 +220,9 @@ for molecule,fn in zip(molecules,filenames):
     ax3.plot(time-reftime, pv.data.T, 'k.', alpha=0.5, markersize=3)
     ax3.set_xlabel("Time since 1$^\\mathrm{st}$ pericenter passage [Myr]", size=24, labelpad=10)
     if 'Temperature' in fn:
-        ax3.set_ylim(0,150)
+        ax3.set_ylim(0,200)
         ax3.set_ylabel("Temperature [K]", size=24, labelpad=10)
-        ytext = 135
+        ytext = 180
     else:
         ax3.set_ylabel("$T_A^*$ [K]", size=24, labelpad=10)
         ytext = ax3.get_ylim()[1]*(14./15.)

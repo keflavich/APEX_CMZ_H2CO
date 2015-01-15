@@ -36,8 +36,8 @@ filenames = [molpath('APEX_{0}.fits'.format(molecule))
 
 molecules = molecules + ('H2CO_DendrogramTemperature',
                          'H2CO_DendrogramTemperature_smooth')
-filenames.append(hpath('TemperatureCube_DendrogramObjects_Piecewise.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_Piecewise.fits'))
+filenames.append(hpath('TemperatureCube_DendrogramObjects.fits'))
+filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth.fits'))
 
 def offset_to_point(ll, bb):
     """

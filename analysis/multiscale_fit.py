@@ -216,3 +216,8 @@ def all_multiscales():
     multiscale_fit_g08south_cool()
     multiscale_fit_g1pt6()
     multiscale_fit_brick()
+
+if __name__ == "__main__":
+    # Plots for paper
+    multiscale_fit_brick()
+    multiscale_fit_g1pt2_cool()
