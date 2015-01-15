@@ -26,6 +26,7 @@ indices = np.where(mask)
 usable = ((eratio303321*nsigma < ratio303321) & (eratio303321 > 0) &
           (ratio303321 > 0) & (noise_flat > 1e-10) & (noise_flat < 10) &
           (ratio303321 < 100))
+assert len(usable) == len(indices)
 ngood = np.count_nonzero(usable)
 usable_indices = [ind[usable] for ind in indices]
 uz,uy,ux = usable_indices

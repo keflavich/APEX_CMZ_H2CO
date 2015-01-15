@@ -168,6 +168,7 @@ class paraH2COmodel(object):
                         logh2column=None, elogh2column=None,
                         ratio303321=None, eratio303321=None,
                         ratio321322=None, eratio321322=None,
+                        mindens=None, emindens=0.2,
                         linewidth=None):
 
         argspec=inspect.getargvalues(inspect.currentframe())
@@ -214,8 +215,14 @@ class paraH2COmodel(object):
         if np.all(~np.isfinite(self.chi2_r321322)):
             self.chi2_r321322 = 0
 
+        if mindens is not None:
+            self.chi2_dens = (((self.densityarr - mindens)/emindens)**2
+                              * (self.densityarr < (mindens-emindens)))
+        else:
+            self.chi2_dens = 0
+
         self.chi2 = (self.chi2_X + self.chi2_h2 + self.chi2_ff1 + self.chi2_ff2
-                     + self.chi2_r321322 + self.chi2_r303321)
+                     + self.chi2_r321322 + self.chi2_r303321 + self.chi2_dens)
 
     def get_parconstraints(self):
         """
@@ -253,8 +260,8 @@ class paraH2COmodel(object):
         xlabel = self.labels[par1]
         ylabel = self.labels[par2]
         axis = {('dens','col'): 0,
-                ('dens','tem'): 1,
-                ('col','tem'): 2}[(par1,par2)]
+                ('dens','tem'): 2,
+                ('col','tem'): 1}[(par1,par2)]
 
 
         pl.clf()
@@ -291,13 +298,16 @@ class paraH2COmodel(object):
                    levels=self.chi2.min()+np.arange(nlevs))
         pl.xlabel(xlabel)
         pl.ylabel(ylabel)
-        pl.title("Total log$(N(\\mathrm{{H}}_2)) "
-                 "= {0:0.1f}\pm{1:0.1f}$".format(self.logh2column,
-                                                 self.elogh2column))
+        pl.title("Total log$(N(\\mathrm{{H}}_2))$ ")
+        #         "= {0:0.1f}\pm{1:0.1f}$".format(self.logh2column,
+        #                                         self.elogh2column))
         ax5 = pl.subplot(2,2,4)
-        if hasattr(self.chi2_ff1, 'size'):
-            pl.contourf(xax, yax, (self.chi2_ff1.min(axis=axis)),
-                        levels=self.chi2_ff1.min()+np.arange(nlevs), alpha=0.5)
+        #if hasattr(self.chi2_ff1, 'size'):
+        #    pl.contourf(xax, yax, (self.chi2_ff1.min(axis=axis)),
+        #                levels=self.chi2_ff1.min()+np.arange(nlevs), alpha=0.5)
+        if hasattr(self.chi2_dens, 'size'):
+            pl.contourf(xax, yax, (self.chi2_dens.min(axis=axis)),
+                        levels=self.chi2_dens.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
                    levels=self.chi2.min()+np.arange(nlevs))
         pl.contour(xax, yax, (self.tline303 < 10*self.taline303).max(axis=axis),
@@ -307,7 +317,8 @@ class paraH2COmodel(object):
         #pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
         pl.xlabel(xlabel)
         pl.ylabel(ylabel)
-        pl.title("Line Brightness + $ff\leq1$")
+        #pl.title("Line Brightness + $ff\leq1$")
+        pl.title("Minimum Density")
 
         if par1 == 'col':
             for ss in range(1,5):

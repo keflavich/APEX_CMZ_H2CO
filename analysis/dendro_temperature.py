@@ -9,12 +9,13 @@ from numpy.lib.stride_tricks import as_strided
 from astropy import wcs
 from astropy.io import fits
 from astropy import units as u
+from astropy import constants
 from astropy import log
 from astropy import table
 from astropy.utils.console import ProgressBar
 from astrodendro import Dendrogram,ppv_catalog
 
-from paths import hpath,mpath
+from paths import hpath,mpath,fpath
 from constrain_parameters import paraH2COmodel
 from masked_cubes import (cube303m,cube321m,cube303msm,cube321msm,
                           cube303,cube321,cube303sm,cube321sm,
@@ -101,6 +102,9 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             'lat',
             'vcen',
             'higaldusttem',
+            'reff',
+            'dustmass',
+            'dustmindens',
     ]
     columns = {k:[] for k in (keys+obs_keys)}
 
@@ -193,7 +197,6 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             r321303 = Stot321 / Stot303
             er321303 = (r321303**2 * (var/Smean303**2 + var/Smean321**2))**0.5
 
-
         for c in columns:
             assert len(columns[c]) == ii
 
@@ -231,6 +234,16 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         elogh2column = elogabundance
         columns['higaldusttem'].append(np.nanmean(dusttem_regridded.data[view[1:]][mask2d]))
 
+        r_arcsec = row['radius']*u.arcsec
+        reff = (r_arcsec*(8.5*u.kpc)).to(u.pc, u.dimensionless_angles())
+        mass = ((10**logh2column*u.cm**-2)*np.pi*reff**2*2.8*constants.m_p).to(u.M_sun)
+        density = (mass/(4/3.*np.pi*reff**3)/constants.m_p/2.8).to(u.cm**-3)
+
+        columns['reff'].append(reff.value)
+        columns['dustmass'].append(mass.value)
+        columns['dustmindens'].append(density.value)
+        mindens = np.log10(density.value)
+
         if (r321303 < 0 or np.isnan(r321303)) and line != '321':
             raise ValueError("Ratio <0: This can't happen any more because "
                              "if either num/denom is <0, an exception is "
@@ -251,6 +264,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                                logabundance=logabundance, elogabundance=elogabundance,
                                taline303=Smean303, etaline303=error,
                                taline321=Smean321, etaline321=error,
+                               mindens=mindens,
                                linewidth=5)
             row_data = mf.get_parconstraints()
             row_data['ratio303321'] = r321303
@@ -281,7 +295,9 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                 mf.denstemplot()
                 pl.draw()
                 pl.show()
-            except:
+                pl.savefig(fpath("dendrotem/diagnostics/{0}_{1}.png".format(suffix,ii)))
+            except Exception as ex:
+                print ex
                 pass
         else:
             pb.update(ii+1)

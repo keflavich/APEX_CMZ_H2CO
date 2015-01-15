@@ -322,8 +322,10 @@ for row in fittable:
     # shape is temperature, density, column
     # but we want the order shown here
     # so we're going to (very very very dangerously) swapaxes everything
-    chi2r = chi2r.swapaxes(1,2)
-    chi2r2 = chi2r2.swapaxes(1,2)
+    if hasattr(chi2r,'min'):
+        chi2r = chi2r.swapaxes(1,2)
+    if hasattr(chi2r2,'min'):
+        chi2r2 = chi2r2.swapaxes(1,2)
     chi2b = chi2b.swapaxes(1,2)
     chi2X = chi2X.swapaxes(1,2)
     chi2_h2 = chi2_h2.swapaxes(1,2)
