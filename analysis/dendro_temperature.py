@@ -334,13 +334,26 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                         )
 
     if write:
+        log.info("Writing TemperatureCube")
         outpath = 'TemperatureCube_DendrogramObjects{0}.fits'
         tcube.write(hpath(outpath.format(suffix)),
                     overwrite=True)
 
+        log.info("Writing Integrated TemperatureCube")
         integ = tcube.mean(axis=0)
         integ.hdu.writeto(hpath(outpath.format(suffix)).replace(".fits","_integ.fits"),
                           clobber=True)
+        hdu_template = integ.hdu
+
+        log.info("Writing Weighted Integrated TemperatureCube")
+        tcubed = tcube.filled_data[:].value
+        weight_cube = cube303msm if 'smooth' in suffix else cube303m
+        weights = weight_cube.filled_data[:].value
+        mean_tem = np.nansum(tcubed*weights,axis=0) / np.nansum(weights, axis=0)
+        hdu_template.data = mean_tem
+        hdu_template.writeto(hpath(outpath.format(suffix)).replace(".fits","_integ_weighted.fits"),
+                             clobber=True)
+
 
     return catalog, tcube
 

@@ -15,6 +15,7 @@ from __future__ import print_function
 import os
 import numpy as np
 from astropy.io import fits
+from astropy import log
 
 from paths import h2copath
 
@@ -53,6 +54,8 @@ def doratio(h2copath=h2copath, maxratio=1):
 
         f.writeto(h2copath+'H2CO_321220_to_303202{0}_integ.fits'.format(smooth),clobber=True)
 
+
+
     ##### cube #####
     for smooth in ('','_smooth','_bl','_smooth_bl'):
         top = fits.getdata(h2copath+'APEX_H2CO_303_202{0}.fits'.format(smooth))
@@ -69,6 +72,12 @@ def doratio(h2copath=h2copath, maxratio=1):
 
         f.writeto(h2copath+'H2CO_322221_to_303202_cube{0}.fits'.format(smooth),clobber=True)
 
+        weight = top
+        ratio_weighted = np.nansum(weight*ratio, axis=0) / np.nansum(weight, axis=0)
+        f[0].data = ratio_weighted
+        f.writeto(h2copath+'H2CO_322221_to_303202{0}_integ_weighted.fits'.format(smooth),clobber=True)
+
+
         bottom = fits.getdata(h2copath+'APEX_H2CO_321_220{0}.fits'.format(smooth))
 
         ratio = bottom/top
@@ -82,6 +91,11 @@ def doratio(h2copath=h2copath, maxratio=1):
         f[0].data = ratio * f[0].data.astype('bool')
 
         f.writeto(h2copath+'H2CO_321220_to_303202_cube{}.fits'.format(smooth),clobber=True)
+
+        weight = top
+        ratio_weighted = np.nansum(weight*ratio, axis=0) / np.nansum(weight, axis=0)
+        f[0].data = ratio_weighted
+        f.writeto(h2copath+'H2CO_322221_to_303202{0}_integ_weighted.fits'.format(smooth),clobber=True)
 
 def ph2cogrid(ntemp=50, trange=[10,200], abundances=(10**-8.5,10**-9),
               Nh2=(3e22,3e23), logdensities=(4,5)):
@@ -205,7 +219,7 @@ def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
 
     import scipy.stats
 
-    for suf_ in ('{0}','{0}_integ'):#,'_cube{0}'):
+    for suf_ in ('{0}','{0}_integ','{0}_integ_weighted'):#,'_cube{0}'):
         for smooth in ('','_smooth','_bl','_smooth_bl'):
 
             suf = suf_.format(smooth)

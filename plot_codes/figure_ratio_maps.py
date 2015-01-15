@@ -209,22 +209,23 @@ for bl in ("_bl",""):
                                 "big_"+ratio.replace(".fits",".pdf")))
 
 # Dendrogram mean ratios
-for smooth in ("","_smooth",):#"_vsmooth"):
-    ratio = 'RatioCube_DendrogramObjects{0}_Piecewise_mean.fits'.format(smooth)
+for weighted in ("","weighted"):
+    for smooth in ("","_smooth",):#"_vsmooth"):
+        ratio = 'RatioCube_DendrogramObjects{0}_Piecewise_{1}mean.fits'.format(smooth,weighted)
 
-    fig = pl.figure(1)
-    fig.clf()
-    F = aplpy.FITSFigure(os.path.join(h2copath, ratio),
-                         convention='calabretta', figure=fig)
-    F.show_colorscale(cmap=cm)
-    F.add_colorbar()
-    F.tick_labels.set_xformat('d.dd')
-    F.tick_labels.set_yformat('d.dd')
-    F.recenter(**small_recen)
-    F.save(os.path.join(figurepath,
-                        'big_maps',
-                        ratio.replace(".fits",".pdf")))
-    F.recenter(**big_recen)
-    F.save(os.path.join(figurepath,
-                        'big_maps',
-                        "big_"+ratio.replace(".fits",".pdf")))
+        fig = pl.figure(1)
+        fig.clf()
+        F = aplpy.FITSFigure(os.path.join(h2copath, ratio),
+                             convention='calabretta', figure=fig)
+        F.show_colorscale(cmap=cm)
+        F.add_colorbar()
+        F.tick_labels.set_xformat('d.dd')
+        F.tick_labels.set_yformat('d.dd')
+        F.recenter(**small_recen)
+        F.save(os.path.join(figurepath,
+                            'big_maps',
+                            ratio.replace(".fits",".pdf")))
+        F.recenter(**big_recen)
+        F.save(os.path.join(figurepath,
+                            'big_maps',
+                            "big_"+ratio.replace(".fits",".pdf")))

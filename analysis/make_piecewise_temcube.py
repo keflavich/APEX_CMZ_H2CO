@@ -44,17 +44,20 @@ for sm in ("","_smooth",'_321','_321smooth'):
     integ.hdu.writeto(hpath(outpath).replace(".fits","_integ.fits"),
                       clobber=True)
 
+hdu_template = integ.hdu
+
 # integrated temperature maps weighted by 303 brightness
 for sm in ("","_smooth",'_321','_321smooth'):
     outpath = 'TemperatureCube_DendrogramObjects{0}_Piecewise.fits'.format(sm)
-    weight_cube = cube303m if sm == "" else cube303msm
+    weight_cube = cube303msm if 'smooth' in sm else cube303m
+    weights = weight_cube.filled_data[:].value
     tcube = fits.getdata(hpath(outpath))
-    weights = weight_cube.filled_data[:]
 
-    integ = (tcube*weights).sum(axis=0) / weights.sum(axis=0)
+    integ = np.nansum(tcube*weights, axis=0) / np.nansum(weights, axis=0)
+    hdu_template.data = integ
 
-    integ.hdu.writeto(hpath(outpath).replace(".fits","_integ_weighted.fits"),
-                      clobber=True)
+    hdu_template.writeto(hpath(outpath).replace(".fits","_integ_weighted.fits"),
+                         clobber=True)
 
 
 # Try the same thing but on the dendrogrammed data.  Basically, this is 
@@ -128,3 +131,14 @@ for sm,cubeA,cubeB,objects in zip(("","_smooth",'_321','_321smooth'),
     mean_rcube = rcube.mean(axis=0)
     mean_rcube.hdu.writeto(hpath('RatioCube_DendrogramObjects{0}_Piecewise_mean.fits'.format(sm)), clobber=True)
 
+    hdu_template = mean_rcube.hdu
+    tcube = tcube.filled_data[:].value
+    weight_cube = cube303msm if 'smooth' in sm else cube303m
+    weights = weight_cube.filled_data[:].value
+
+    mean_temcube = np.nansum(tcube*weights, axis=0) / np.nansum(weights, axis=0)
+    hdu_template.data = mean_temcube
+    hdu_template.writeto(hpath('TemperatureCube_DendrogramObjects{0}_Piecewise_weightedmean.fits'.format(sm)), clobber=True)
+    mean_rcube = np.nansum(rcube*weights,axis=0) / np.nansum(weights, axis=0)
+    hdu_template.data = mean_rcube
+    hdu_template.writeto(hpath('RatioCube_DendrogramObjects{0}_Piecewise_weightedmean.fits'.format(sm)), clobber=True)
