@@ -347,8 +347,9 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
 
         log.info("Writing Weighted Integrated TemperatureCube")
         tcubed = tcube.filled_data[:].value
-        weight_cube = cube303msm if 'smooth' in suffix else cube303m
+        weight_cube = cube303sm if 'smooth' in suffix else cube303
         weights = weight_cube.filled_data[:].value
+        weights[weights < 0] = 0
         mean_tem = np.nansum(tcubed*weights,axis=0) / np.nansum(weights, axis=0)
         hdu_template.data = mean_tem
         hdu_template.writeto(hpath(outpath.format(suffix)).replace(".fits","_integ_weighted.fits"),

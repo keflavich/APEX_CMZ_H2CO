@@ -133,8 +133,9 @@ for sm,cubeA,cubeB,objects in zip(("","_smooth",'_321','_321smooth'),
 
     hdu_template = mean_rcube.hdu
     tcube = tcube.filled_data[:].value
-    weight_cube = cube303msm if 'smooth' in sm else cube303m
+    weight_cube = cube303sm if 'smooth' in sm else cube303
     weights = weight_cube.filled_data[:].value
+    weights[weights < 0] = 0
 
     mean_temcube = np.nansum(tcube*weights, axis=0) / np.nansum(weights, axis=0)
     hdu_template.data = mean_temcube

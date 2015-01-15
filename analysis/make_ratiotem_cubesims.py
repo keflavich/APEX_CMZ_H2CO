@@ -73,7 +73,9 @@ def doratio(h2copath=h2copath, maxratio=1):
         f.writeto(h2copath+'H2CO_322221_to_303202_cube{0}.fits'.format(smooth),clobber=True)
 
         weight = top
+        weight[weight < 0] = 0
         ratio_weighted = np.nansum(weight*ratio, axis=0) / np.nansum(weight, axis=0)
+        f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
         f[0].data = ratio_weighted
         f.writeto(h2copath+'H2CO_322221_to_303202{0}_integ_weighted.fits'.format(smooth),clobber=True)
 
@@ -93,9 +95,11 @@ def doratio(h2copath=h2copath, maxratio=1):
         f.writeto(h2copath+'H2CO_321220_to_303202_cube{}.fits'.format(smooth),clobber=True)
 
         weight = top
+        weight[weight < 0] = 0
         ratio_weighted = np.nansum(weight*ratio, axis=0) / np.nansum(weight, axis=0)
+        f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
         f[0].data = ratio_weighted
-        f.writeto(h2copath+'H2CO_322221_to_303202{0}_integ_weighted.fits'.format(smooth),clobber=True)
+        f.writeto(h2copath+'H2CO_321220_to_303202{0}_integ_weighted.fits'.format(smooth),clobber=True)
 
 def ph2cogrid(ntemp=50, trange=[10,200], abundances=(10**-8.5,10**-9),
               Nh2=(3e22,3e23), logdensities=(4,5)):
