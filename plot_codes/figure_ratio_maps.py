@@ -20,8 +20,10 @@ cm.set_bad('#888888')
 small_recen = dict(x=0.3, y=-0.03,width=1.05,height=0.27)
 big_recen = dict(x=0.55, y=-0.075,width=2.3,height=0.40)
 
+max_ratio = 0.46
+
 # Old version: integrated ratio maps (this is still used in publication)
-for weighted in ("","_weighted"):
+for weighted in ("","_weighted","_masked_weighted"):
     for bl in ("_bl",""):
         for smooth in ("","_smooth",):#"_vsmooth"):
             ratio1 = 'H2CO_321220_to_303202{0}{1}_integ{2}.fits'.format(smooth,bl,weighted)
@@ -34,7 +36,7 @@ for weighted in ("","_weighted"):
                 fig.clf()
                 F = aplpy.FITSFigure(os.path.join(h2copath, ratio),
                                      convention='calabretta', figure=fig)
-                F.show_colorscale(cmap=cm, vmin=0, vmax=0.8)
+                F.show_colorscale(cmap=cm, vmin=0, vmax=max_ratio)
                 F.add_colorbar()
                 F.tick_labels.set_xformat('d.dd')
                 F.tick_labels.set_yformat('d.dd')
@@ -57,7 +59,7 @@ for weighted in ("","weighted"):
         fig.clf()
         F = aplpy.FITSFigure(os.path.join(h2copath, ratio),
                              convention='calabretta', figure=fig)
-        F.show_colorscale(cmap=cm, vmin=0, vmax=0.8)
+        F.show_colorscale(cmap=cm, vmin=0, vmax=max_ratio)
         F.add_colorbar()
         F.tick_labels.set_xformat('d.dd')
         F.tick_labels.set_yformat('d.dd')

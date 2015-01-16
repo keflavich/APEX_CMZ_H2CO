@@ -26,13 +26,19 @@ for cat,dendro,smooth in zipped:
     sn25_50 = (sn > 25) & (sn < 50)
     ok = np.isfinite(sn) & (cat['Stot321'] < cat['Stot303'])
     gt5 = (sn>5)
+
+    is_leaf = cat['is_leaf']
     
 
     for ii in range(1,13): pl.figure(ii).clf()
 
-    masks_colors = zip((gt5 & ~sngt50 & ~sn25_50, sn25_50 & gt5, sngt50 & gt5, ok & ~gt5),
-                       ('b','g','r','k'),
-                       (0.2,0.3,0.4,0.1),
+    masks = (gt5 & ~sngt50 & ~sn25_50, sn25_50 & gt5, sngt50 & gt5, ok & ~gt5)
+    leaf_masks = [mm for mask in masks for mm in (mask & is_leaf, mask & ~is_leaf)]
+    # mask1 & leaf, mask1 & not leaf, mask2 & leaf, mask2 & not leaf....
+    # Make the not-leaves be half as bright
+    masks_colors = zip(leaf_masks,
+                       ('b','b','g','g','r','r','k','k'),
+                       (0.2,0.2/2, 0.3,0.3/2., 0.4, 0.4/2., 0.1, 0.1/2.),
                       )
 
     fig1, ax1 = pl.subplots(num=1)
@@ -317,10 +323,14 @@ for cat,dendro,smooth in zipped:
     ax13.set_axis_bgcolor((0.6,0.6,0.6))
 
 
+    brick_coords = [262/(2 if 'smooth' in smooth else 1),143,725]
+    sgra_coords = [239/(2 if 'smooth' in smooth else 1),97,907]
+    sgrb2_coords = [278/(2 if 'smooth' in smooth else 1),117,522]
+
     try:
-        brick = dendro.structure_at([262/(2 if 'smooth' in smooth else 1),143,725]).ancestor
-        sgra = dendro.structure_at([239/(2 if 'smooth' in smooth else 1),97,907]).ancestor
-        sgrb2 = dendro.structure_at([278/(2 if 'smooth' in smooth else 1),117,522]).ancestor
+        brick = dendro.structure_at(brick_coords).ancestor
+        sgra = dendro.structure_at(sgra_coords).ancestor
+        sgrb2 = dendro.structure_at(sgrb2_coords).ancestor
     except AttributeError:
         log.warning("Failed to find one of the sources.")
         continue
@@ -491,11 +501,21 @@ for cat,dendro,smooth in zipped:
     pl.close(26)
 
     dview = dendro.viewer()
-    structure = dendro.structure_at([262/(2 if 'smooth' in smooth else 1),143,725]).ancestor
+    structure = dendro.structure_at(brick_coords).ancestor
     dview.hub.select(1, structure)
     dview.ax_image.axis((710,740,131,154))
-    dview.slice_slider.set_val(262/(2 if 'smooth' in smooth else 1))
+    dview.slice_slider.set_val(brick_coords[0])
     dview.fig.savefig(fpath('dendrotem/dendrogram_viewer_brick{0}.pdf'.format(smooth)))
+
+    dview = dendro.viewer()
+    structure = dendro.structure_at(sgra_coords).ancestor
+    dview.hub.select(1, structure)
+    dview.ax_image.axis([sgra_coords[2]-20, sgra_coords[2]+20, sgra_coords[1]-20, sgra_coords[1]+20])
+    dview.slice_slider.set_val(sgra_coords[0])
+    dview.fig.savefig(fpath('dendrotem/dendrogram_viewer_sgra{0}.pdf'.format(smooth)))
+
+    # SgrA total, 20kms, 50kms
+    catalog_sm[np.array([126,247,346])]['_idx','ratio303321','dustmindens','temperature_chi2'].pprint()
 
     
 

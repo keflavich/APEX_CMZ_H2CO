@@ -96,6 +96,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             'c18omean',
             's_ntotal',
             'index',
+            'is_leaf',
             'parent',
             'root',
             'lon',
@@ -215,8 +216,9 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         columns['c18osum'].append(co18sum)
         columns['13comean'].append(co13sum/npix)
         columns['c18omean'].append(co18sum/npix)
+        columns['is_leaf'].append(structure.is_leaf)
         columns['parent'].append(structure.parent.idx if structure.parent else -1)
-        columns['root'].append(get_root(structure))
+        columns['root'].append(get_root(structure).idx)
         s_main = maincube._data[dend_inds]
         x,y,z = maincube.world[dend_inds]
         lon = ((z.value-(360*(z.value>180)))*s_main).sum()/s_main.sum()

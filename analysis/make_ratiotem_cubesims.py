@@ -53,6 +53,7 @@ def doratio(h2copath=h2copath, maxratio=1):
         f[0].data = ratio
 
         f.writeto(h2copath+'H2CO_321220_to_303202{0}_integ.fits'.format(smooth),clobber=True)
+        log.info("Completed integrated ratio maps using {0}".format(smooth))
 
 
 
@@ -66,9 +67,10 @@ def doratio(h2copath=h2copath, maxratio=1):
         ratio[ratio>maxratio] = np.nan
 
         f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth))
+        mask = f[0].data.astype('bool')
 
         # mask now!
-        f[0].data = ratio * f[0].data.astype('bool')
+        f[0].data = ratio * mask
 
         f.writeto(h2copath+'H2CO_322221_to_303202_cube{0}.fits'.format(smooth),clobber=True)
 
@@ -78,6 +80,9 @@ def doratio(h2copath=h2copath, maxratio=1):
         f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
         f[0].data = ratio_weighted
         f.writeto(h2copath+'H2CO_322221_to_303202{0}_integ_weighted.fits'.format(smooth),clobber=True)
+        ratio_masked_weighted = np.nansum(mask*weight*ratio, axis=0) / np.nansum(mask*weight, axis=0)
+        f[0].data = ratio_masked_weighted
+        f.writeto(h2copath+'H2CO_322221_to_303202{0}_integ_masked_weighted.fits'.format(smooth),clobber=True)
 
 
         bottom = fits.getdata(h2copath+'APEX_H2CO_321_220{0}.fits'.format(smooth))
@@ -90,7 +95,7 @@ def doratio(h2copath=h2copath, maxratio=1):
         f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth))
 
         # mask out...
-        f[0].data = ratio * f[0].data.astype('bool')
+        f[0].data = ratio * mask
 
         f.writeto(h2copath+'H2CO_321220_to_303202_cube{}.fits'.format(smooth),clobber=True)
 
@@ -100,6 +105,11 @@ def doratio(h2copath=h2copath, maxratio=1):
         f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
         f[0].data = ratio_weighted
         f.writeto(h2copath+'H2CO_321220_to_303202{0}_integ_weighted.fits'.format(smooth),clobber=True)
+        ratio_masked_weighted = np.nansum(mask*weight*ratio, axis=0) / np.nansum(mask*weight, axis=0)
+        f[0].data = ratio_masked_weighted
+        f.writeto(h2copath+'H2CO_321220_to_303202{0}_integ_masked_weighted.fits'.format(smooth),clobber=True)
+
+        log.info("Completed cube ratios using {0}".format(smooth))
 
 def ph2cogrid(ntemp=50, trange=[10,200], abundances=(10**-8.5,10**-9),
               Nh2=(3e22,3e23), logdensities=(4,5)):

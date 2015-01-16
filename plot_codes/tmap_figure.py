@@ -19,6 +19,9 @@ figsize = (20,10)
 small_recen = dict(x=0.3, y=-0.03,width=1.05,height=0.27)
 big_recen = dict(x=0.55, y=-0.075,width=2.3,height=0.40)
 
+sgrb2x = [000.6773, 0.6578, 0.6672]
+sgrb2y = [-00.0290, -00.0418, -00.0364]
+
 for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fits',
                               #'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature.fits',
                               'TemperatureCube_DendrogramObjects{0}_integ.fits',
@@ -56,7 +59,8 @@ for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fit
         F.colorbar.set_axis_label_text('T (K)')
         F.colorbar.set_axis_label_font(size=18)
         F.colorbar.set_label_properties(size=16)
-
+        F.show_markers(sgrb2x, sgrb2y, color='k', facecolor='k', s=250,
+                       edgecolor='k', alpha=0.9)
         F.save(os.path.join(figurepath, "big_maps", 'lores{0}{1}_tmap_withmask.pdf'.format(smooth, outtype)))
         F.recenter(**big_recen)
         F.save(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withmask.pdf'.format(smooth, outtype)))
@@ -117,6 +121,9 @@ F2.show_contour(h2copath+'H2CO_321220_to_303202_smooth_bl_integ_temperature.fits
                 cmap=pl.cm.BuGn)
 F2.recenter(**small_recen)
 
+F2.show_markers(sgrb2x, sgrb2y, color='k', facecolor='k', s=250,
+               edgecolor='k', alpha=0.9)
+
 F2.save(os.path.join(figurepath, "big_maps",'H2COtemperatureOnDust.pdf'))
 
 F2.recenter(**big_recen)
@@ -137,6 +144,9 @@ F.add_colorbar()
 F.colorbar.set_axis_label_text('T (K)')
 F.colorbar.set_axis_label_font(size=18)
 F.colorbar.set_label_properties(size=16)
+F.show_markers(sgrb2x, sgrb2y, color='k', facecolor='k', s=250,
+               edgecolor='k', alpha=0.9)
+
 F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to200.pdf'))
 F.show_colorscale(cmap=cm,vmin=15,vmax=80)
 F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to80.pdf'))
