@@ -1905,7 +1905,7 @@ def do_sncube_masking_hi(prefix=h2copath+'APEX_H2CO_303_202'):
     integrate_slices_high(prefix+'_snmasked')
 
 def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
-                    debug=False, smooth=False, vsmooth=False, naxis3=500,
+                    debug=False, smooth=False, vsmooth=False, naxis3=300,
                     vmin=-155*u.km/u.s, vmax=155*u.km/u.s):
                     #  Picked a tighter range to avoid other lines contaminating H2CO
                     #vmin=-225*u.km/u.s, vmax=275*u.km/u.s):
@@ -1951,7 +1951,7 @@ def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
         outheader['CRPIX3'] = crpix3
 
     # Now that we've written this out, we use interpolation to force the cube
-    # onto a grid that starts at *exactly* -150 km/s
+    # onto a grid that starts at *exactly* vmin
     newhdu = cube_regrid.regrid_cube_hdu(svcube.hdu, outheader, order=1, prefilter=False)
     newhdu.writeto(outfilename, output_verify='fix', clobber=True)
 

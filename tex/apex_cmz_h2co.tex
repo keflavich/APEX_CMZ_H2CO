@@ -278,7 +278,7 @@ After performing this baselining, the signal was re-extracted using the same
 method.  A more detailed examination of the baseline removal process is
 described in Appendix \ref{sec:baselineappendix}.
 
-\section{Signal Extraction \& Analysis}
+\section{Signal Extraction \& Masking}
 \label{sec:signal}
 We use the method described partially in \citet{Ao2013a} and more thoroughly in
 \citet{Dame2011b} to mask the data cubes at locations of significant signal in 
@@ -291,7 +291,7 @@ the following procedure:
 \begin{enumerate}
     \item Smooth the data with a gaussian of width 2 pixels in each direction
         (spatial and spectral)
-    \item Identify all pixels with brightness $T_A > 3\sigma$ in the smoothed
+    \item Identify all pixels with brightness $T_A > 2\sigma$ in the smoothed
         map
     \item Grow the mask from the previous step by 1 pixel in each direction
         (this is known in image processing as binary dilation)
@@ -302,15 +302,44 @@ The \para \threeohthree mask was then applied to the \threetwoone and
 between the \methanol \fourtwotwo line and the \para \threetwotwo line in PPV
 space, so we shifted the \para mask to the velocity of the \methanol line in
 the \para \threetwotwo cube and excluded all pixels with \para detections.
+However, inspection of the \threetwotwo cube revealed that significant chunks
+of the \threetwotwo signal were excised by this masking, so all further
+analysis excludes the \threetwotwo line.
 
-\subsection{Ratio and Temperature Maps}
-\label{sec:h2co}
-We created two independent ratio maps, \threetwotwo/\threeohthree and
-\threetwoone/\threeohthree, so that the two ratios (which are expected to be
-nearly the same) can be used as a sanity check.  However, in many regions,
-especially those with the greatest signal, the \threetwotwo line is strongly
-affected by contamination from a \methanol line, so that ratio is not
-usable for integrated maps.  The \Rone maps are used for all further analysis.
+We found that much of the cube included marginal detections at the original
+resolution, FWHM=$30\arcsec$ and $\Delta v=1$\kms.  We therefore created
+smoothed cubes, smoothing in the spatial dimensions with a
+$\sigma_{FWHM}=33.84\arcsec$ gaussian to achieve a resolution 45\arcsec, and
+$\sigma_{v, FWMH} = 3$ \kms in the spectral direction.  The smoothed cubes were
+also downsampled by a factor of 2 in the spectral direction.  We then performed
+the same signal extraction analysis described above, but with a threshold $T_A
+> 3\sigma$.
+
+\subsection{Ratio Maps}
+\label{sec:ratio}
+We have created \Rone ratio maps as a first step toward building temperature
+maps.  In general, a higher \Rone indicates a higher temperature, and therefore
+the ratio maps are a good proxy for \emph{relative} temperature.  We display
+four different varieties of ratio map in Figures \ref{fig:ratiomaps} and
+\ref{fig:ratiomapssm}.
+
+Figure \ref{fig:ratiomaps} shows maps created by creating ratio cubes, in which
+each voxel has the value $R_1=\Rone$, then averaging across velocity with
+constant weight for each voxel in Figure \ref{ratiomaps}a and with the weight
+set by the \threeohthree brightness value in Fiure \ref{ratiomaps}b.  In both
+cases, the mask described in Section \ref{sec:signal} was applied to the cubes
+before averaging over velocity.
+
+Figure \ref{fig:ratiomapssm} shows the same process performed on the smoothed
+data cubes described in Section \ref{sec:signal}.
+
+
+%We created two independent ratio maps, \threetwotwo/\threeohthree and
+%\threetwoone/\threeohthree, so that the two ratios (which are expected to be
+%nearly the same) can be used as a sanity check.  However, in many regions,
+%especially those with the greatest signal, the \threetwotwo line is strongly
+%affected by contamination from a \methanol line, so that ratio is not
+%usable for integrated maps.  The \Rone maps are used for all further analysis.
 
 Ratio maps are subject to dramatic uncertainties in the low signal-to-noise
 regime, which is inevitably reached in some parts of the map.  The error
@@ -336,11 +365,12 @@ indicating nondetections.  The Sgr B2 peaks exhibit \formaldehyde
 absorption and therefore are not reliable.  Higher ratios (red) correspond
 to higher temperatures.
 \newline
-(b) The same as (a), but weighted by the \threeohthree brightness
+(b) The same as (a), but the average along velocity has been
+weighted by the \threeohthree brightness
 \newline
+}
 %(c) The temperature map derived from (a).  The modeling used to derive
 %temperature is discussed in Section \ref{sec:linemodeling}.
-}
 %{fig:ratiomaps}{1}{7in}
 %{fig:ratiomaps}{0.6}{0}
 {fig:ratiomaps}{1}{9.5in}
@@ -351,7 +381,7 @@ to higher temperatures.
 {figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
 {figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ_masked_weighted.pdf}
 %{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf} % tmap_figure
-{Same as figure \ref{fig:ratiomaps}, but smoothed with a \todo{2-pixel} gaussian
+{Same as figure \ref{fig:ratiomaps}, but smoothed with a 34\arcsec gaussian.
 (a) Map of the ratio of the integrated emission of
 \Rone.  The data cubes were masked by
 signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
@@ -359,7 +389,8 @@ indicating nondetections.  The Sgr B2 peaks exhibit \formaldehyde
 absorption and therefore are not reliable.  Higher ratios (red) correspond
 to higher temperatures.
 \newline
-(b) The same as (a), but weighted by the \threeohthree brightness
+(b) The same as (a), but the average along velocity has been
+weighted by the \threeohthree brightness
 \newline
 %(c) The temperature map derived from (a).  The modeling used to derive
 %temperature is discussed in Section \ref{sec:linemodeling}.
@@ -367,45 +398,6 @@ to higher temperatures.
 %{fig:ratiomaps}{1}{7in}
 %{fig:ratiomaps}{0.6}{0}
 {fig:ratiomapssm}{1}{9.5in}
-
-\subsection{Region Extraction}
-In order to extract higher signal-to-noise measurements on selected regions, we
-broke the data down into subsets using both a by-eye region selection drawing
-regions using ds9 and a more systematic approach using a dendrogram-based clump
-finding algorithm \citep[][\url{http://dendrograms.org/}]{Rosolowsky2008c}.
-
-% dendro_temperature.py
-% TODO: decide whether we used the full resolution or the smoothed version.
-% Presently (Jan 5), we are using the smoothed version
-We ran the dendrogram/clumpfind extraction analysis on the smoothed
-\threeohthree cube data.  We enforced thresholds of a minimum number of pixels
-$N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting threshold
-$\Delta = 2\sigma$.  The exact values of these parameters is not particularly
-important, as we are interested in general trends with size-scale and
-galactocentric distance, but we caution against overinterpretation of the
-resulting catalog as the number of sources and their size and distribution can
-change dramatically with small changes in the selected parameters.  The number
-and location of pixels included in the catalog is, however, relatively robust
-against small parameter changes.
-
-For each extracted blob, we measured the corresponding integrated and peak
-emission in the \threetwoone and \thirteenco cubes.  We also extracted the mean
-dust temperature and column density from SED fits to Herschel HiGal 170-500\um
-maps.  The SED fits were performed on background-subtracted data using an
-approach originally described in \citet{Battersby2011a}, which includes details
-of the fitting process and specification of assumed physical parameters.  We
-also extracted dust column density and temperature using a more naive
-pixel-by-pixel approach with no background subtraction
-(\url{http://hi-gal-sed-fitter.readthedocs.org/en/latest/}) and found the two
-to be consistent.
-
-The by-eye selected regions were extracted less systematically, instead
-focusing on peaks in the \threeohthree or \threetwoone emission.  We also
-included a series of large square $8\arcmin \times 8\arcmin$ `apertures'
-corresponding to each observed field.  For each region extracted in this
-fashion, we fit a 1-3 component model as described in Section
-\ref{sec:linemodeling}.  An example spectrum extracted from a small region
-around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
 
 
 \subsection{Line Modeling}
@@ -425,7 +417,7 @@ high-resolution ($T\times n \times N = 250\times100\times100$) grid covering
 $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N < 10^{15.1}$
 \persc\perkmspc.
 
-We extracted spectra averaged over each `by-eye' selected region and fitted
+We extracted spectra averaged over selected regions and fitted
 a 6-parameter model to the full 218-219 GHz spectral range using
 \texttt{pyspeckit} \citep{Ginsburg2011c}.  The fitted parameters are the amplitude of the
 \formaldehyde \threeohthree line, the centroid velocity, the line width
@@ -454,8 +446,9 @@ used to remove baseline ripples.}
 
 
 For each extracted region, we created $\chi^2$ grids using independent
-constraints from the line ratio, the \formaldehyde abundance, and the total
-column density of \hh.  We use the line \emph{ratio} rather than line
+constraints from the line ratio, the \formaldehyde abundance, the total column
+density of \hh, and a lower limit on the \hh volume density.  We use the line
+\emph{ratio} rather than line
 brightnesses to avoid uncertainties due to the ``filling factor'' of the
 emitting gas: even for diffuse clouds, the filling factor of the emitting
 regions may be $ff<<1$ if the emission is isolated to compact shocked regions,
@@ -469,7 +462,10 @@ density, which has a nominal $\sim2-3\times$ uncertainty.  We treat the error
 as $10\times$ to account for the abundance uncertainty.  This large assumed
 error also accounts for factor $\sim2-3$ uncertainty due to line-of-sight
 confusion, since the dust column density cannot be associated with any specific
-velocity component.
+velocity component.  To constrain the dust density, we assume the selected area
+has a mass given by the Herschel dust-derived mass and a spherical volume,
+which sets a conservative (but nonetheless highly constraining) lower limit on
+the volume density.
 
 These constraints are shown projected onto the three planes of our fitted
 parameter space in the multi-paneled Figures
@@ -503,9 +499,10 @@ the \methanol \fourtwotwo line.  }
 projected (marginalized) onto the temperature/column density plane.\newline
 (top left) Constraints imposed by the measured ratio \Rone are shown in filled contours,
 with blue corresponding to $\Delta\chi^2 < 1$, cyan $1 < \Delta\chi^2 < 2$,
-yellow $2 < \Delta\chi^2 < 3$, and red $3 < \Delta\chi^2 < 4$.  The solid
+yellow $2 < \Delta\chi^2 < 3$, and red $3 < \Delta\chi^2 < 4$.  The colored line
 contours show the joint constraints imposed by including restrictions on the
-total column density, filling factor, and abundance, following the same color
+total column density, volume density,  filling factor, and abundance, following
+the same color
 scheme.  The solid grayscale contours show the constraints imposed by
 $R_2=\Rtwo$, from black ($\Delta\chi^2 < 1$) to white.  In this case, $R_2$
 is weakly inconsistent with the joint constraints from the other parameters.
@@ -545,31 +542,72 @@ marginalized regions in each parameter space as described in the
 Figure \ref{fig:coltemconstraints} caption.}
 {fig:parsonbrightness}{0.5}{0}
 
-\subsection{Blob modeling}
-\label{sec:dendromod}
-Similar to the line modeling approach, we derived temperatures for each
-dendrogram catalog blob using the measured line ratio and dust column density.
-The $\chi^2$ grid approach described in Section \ref{sec:linemodeling} was used
-to extract the temperature and associated error.
+% \section{Region Extraction}
+% \label{sec:region}
+% In order to extract higher signal-to-noise measurements on selected regions, we
+% broke the data down into subsets using both a by-eye region selection drawing
+% regions using ds9 and a more systematic approach using a dendrogram-based clump
+% finding algorithm \citep[][\url{http://dendrograms.org/}]{Rosolowsky2008c}.
+% 
+% % dendro_temperature.py
+% % TODO: decide whether we used the full resolution or the smoothed version.
+% % Presently (Jan 5), we are using the smoothed version
+% We ran the dendrogram/clumpfind extraction analysis on the smoothed
+% \threeohthree cube data.  We enforced thresholds of a minimum number of pixels
+% $N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting threshold
+% $\Delta = 2\sigma$.  The exact values of these parameters is not particularly
+% important, as we are interested in general trends with size-scale and
+% galactocentric distance, but we caution against overinterpretation of the
+% resulting catalog as the number of sources and their size and distribution can
+% change dramatically with small changes in the selected parameters.  The number
+% and location of pixels included in the catalog is, however, relatively robust
+% against small parameter changes.
+% 
+% For each extracted blob, we measured the corresponding integrated and peak
+% emission in the \threetwoone and \thirteenco cubes.  We also extracted the mean
+% dust temperature and column density from SED fits to Herschel HiGal 170-500\um
+% maps.  The SED fits were performed on background-subtracted data using an
+% approach originally described in \citet{Battersby2011a}, which includes details
+% of the fitting process and specification of assumed physical parameters.  We
+% also extracted dust column density and temperature using a more naive
+% pixel-by-pixel approach with no background subtraction
+% (\url{http://hi-gal-sed-fitter.readthedocs.org/en/latest/}) and found the two
+% to be consistent.
+% 
+% The by-eye selected regions were extracted less systematically, instead
+% focusing on peaks in the \threeohthree or \threetwoone emission.  We also
+% included a series of large square $8\arcmin \times 8\arcmin$ `apertures'
+% corresponding to each observed field.  For each region extracted in this
+% fashion, we fit a 1-3 component model as described in Section
+% \ref{sec:linemodeling}.  An example spectrum extracted from a small region
+% around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
 
-We plot the derived temperature for all clumps against the measured line ratio
-in Figure \ref{fig:ratiovstem}.  The relation is nearly monotonic for the vast
-majority of sources.  To simplify further analysis, we fit a three-element
-piecewise linear model for temperature as a function of $R_1$.  We use this
-function for further derivations of the temperature.  There is noticeable
-scatter above $R_1 > 0.4$ and $T>150$ K, but in this regime the modeling is
-already intrinsically uncertain and these ratios are best treated as lower
-limits on the gas temperature.
 
-% dendrotem_plots
-\Figure{figures/dendrotem/ratio_vs_temperature_powerlaw_smooth.pdf}
-{The derived temperature vs the measured ratio \Rone.  The temperature
-includes constraints from the assumed fixed \formaldehyde abundance and the 
-varying column density.  The points are color coded by signal-to-noise in the
-ratio $R_1$, with black $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$,
-and red $S/N > 50$.  The black line shows a 2nd order polynomial fit.
-}
-{fig:ratiovstem}{0.6}{0}
+% \subsection{Blob modeling}
+% \label{sec:dendromod}
+% Similar to the line modeling approach, we derived temperatures for each
+% dendrogram catalog blob using the measured line ratio and dust column density.
+% The $\chi^2$ grid approach described in Section \ref{sec:linemodeling} was used
+% to extract the temperature and associated error.
+% 
+% We plot the derived temperature for all clumps against the measured line ratio
+% in Figure \ref{fig:ratiovstem}.  The relation is nearly monotonic for the vast
+% majority of sources.  To simplify further analysis, we fit a three-element
+% piecewise linear model for temperature as a function of $R_1$.  We use this
+% function for further derivations of the temperature.  There is noticeable
+% scatter above $R_1 > 0.4$ and $T>150$ K, but in this regime the modeling is
+% already intrinsically uncertain and these ratios are best treated as lower
+% limits on the gas temperature.
+% 
+% % dendrotem_plots
+% \Figure{figures/dendrotem/ratio_vs_temperature_powerlaw_smooth.pdf}
+% {The derived temperature vs the measured ratio \Rone.  The temperature
+% includes constraints from the assumed fixed \formaldehyde abundance and the 
+% varying column density.  The points are color coded by signal-to-noise in the
+% ratio $R_1$, with black $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$,
+% and red $S/N > 50$.  The black line shows a 2nd order polynomial fit.
+% }
+% {fig:ratiovstem}{0.6}{0}
 
 \subsection{Temperature Maps}
 \label{sec:formaldehydetemmap}
@@ -619,6 +657,18 @@ temperatures as can be seen in Figure \ref{fig:parsonbrightness}.
 %\RotFigureTwoAA
 \RotFigureThreeAA
 %{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
+{figures/big_maps/big_lores_smoothdens1e4_col5e22_weighted_masked_tmap_withcontours.pdf}
+{figures/big_maps/big_lores_smoothdens1e5_col5e22_weighted_masked_tmap_withcontours.pdf}
+{figures/big_maps/big_lores_smoothdens1e5_col3e23_weighted_masked_tmap_withcontours.pdf}
+{\todo{Temperature maps assuming a fixed $N(\hh)$ and $n(\hh)$}
+}
+{fig:temmap}{1}{9.5in}
+
+
+% tmap_figure
+%\RotFigureTwoAA
+\RotFigureThreeAA
+%{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
 {figures/big_maps/big_RatioCube_DendrogramObjects_smooth_Piecewise_mean.pdf}
 {figures/big_maps/big_RatioCube_DendrogramObjects_smooth_Piecewise_weightedmean.pdf}
 {figures/big_maps/big_lores_smoothdendro_tmap_withcontours.pdf}
@@ -642,7 +692,7 @@ maps.
 %The contours correspond to the integrated \threeohthree
 %line intensity at levels [4,7,11,20,38] K \kms.
 }
-{fig:temmap}{1}{9.5in}
+{fig:dendrotemmap}{1}{9.5in}
 
 % tmap_figure
 \RotFigureTwoAA

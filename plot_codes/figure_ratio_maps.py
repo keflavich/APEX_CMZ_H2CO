@@ -11,16 +11,21 @@ from masked_cubes import cube303m, cube321m, cube303msm, cube321msm, sncube, snc
 from ratio_cubes import ratiocube_303321, ratiocubesm_303321
 from piecewise_rtotem import pwtem
 from astropy import log
+import paths
+matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 pl.ioff()
+pl.close(1)
+pl.close(2)
 
 cm = matplotlib.cm.RdYlBu_r
 cm.set_bad('#888888')
+figsize = (20,10)
 
 small_recen = dict(x=0.3, y=-0.03,width=1.05,height=0.27)
 big_recen = dict(x=0.55, y=-0.075,width=2.3,height=0.40)
 
-max_ratio = 0.46
+max_ratio = 0.51
 
 # Old version: integrated ratio maps (this is still used in publication)
 for weighted in ("","_weighted","_masked_weighted"):
@@ -32,7 +37,7 @@ for weighted in ("","_weighted","_masked_weighted"):
 
             for ii,ratio in enumerate((ratio1, ratio2)):
                 log.info(ratio)
-                fig = pl.figure(ii+1)
+                fig = pl.figure(ii+1, figsize=figsize)
                 fig.clf()
                 F = aplpy.FITSFigure(os.path.join(h2copath, ratio),
                                      convention='calabretta', figure=fig)
@@ -66,7 +71,7 @@ for weighted in ("","weighted"):
         ratio = 'RatioCube_DendrogramObjects{0}_Piecewise_{1}mean.fits'.format(smooth,weighted)
         log.info(ratio)
 
-        fig = pl.figure(1)
+        fig = pl.figure(1, figsize=figsize)
         fig.clf()
         F = aplpy.FITSFigure(os.path.join(h2copath, ratio),
                              convention='calabretta', figure=fig)
@@ -90,7 +95,7 @@ for weighted in ("","weighted"):
 
 vcuts = np.arange(-60,141,20)
 
-fig = pl.figure(1, figsize=(14,6))
+fig = pl.figure(1, figsize=figsize)
 for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
                           (sncube, sncubesm),
                           ("","_smooth",)):#"_vsmooth"):
@@ -116,7 +121,7 @@ for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
                            )
               )
 
-fig = pl.figure(1, figsize=(14,6))
+fig = pl.figure(1, figsize=figsize)
 for (cubehi,cubelo),sn,smooth in zip(((cube303m,cube321m),
                                       (cube303msm,cube321msm)),
                                      (sncube, sncubesm),
@@ -194,7 +199,7 @@ for (cubehi,cubelo),sn,smooth in zip(((cube303m,cube321m),
                                                                              int(vrange[1]))))
 
 
-fig = pl.figure(1)
+fig = pl.figure(1, figsize=figsize)
 for cube,sn,smooth in zip((ratiocube_303321, ratiocubesm_303321),
                           (sncube, sncubesm),
                           ("","_smooth",)):#"_vsmooth"):

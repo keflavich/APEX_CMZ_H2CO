@@ -20,7 +20,7 @@ ntemp,ndens,ncol = 50,20,30
 
 temperatures = np.linspace(10,350,ntemp)
 densities = np.linspace(2.5,7,ndens)
-columns = np.linspace(11, 17, ncol)
+columns = np.linspace(11, 15.1, ncol)
 abundance = 10**-8.5
 abundance = 1.2e-9 # Johnston / Ao
 opr = 0.01 # assume primarily para

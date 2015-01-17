@@ -9,6 +9,7 @@ import paths
 import matplotlib
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
+pl.ioff()
 # Close these figures so we can remake them in the appropriate size
 for fignum in (4,5,6,7):
     pl.close(fignum)
@@ -22,20 +23,36 @@ big_recen = dict(x=0.55, y=-0.075,width=2.3,height=0.40)
 sgrb2x = [000.6773, 0.6578, 0.6672]
 sgrb2y = [-00.0290, -00.0418, -00.0364]
 
-for ftemplate,outtype in zip((
-                              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens3e4_col5e22.fits',
-                              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens3e4_col5e22.fits',
-                              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens3e4_col5e22_masked.fits',
-                              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens3e4_col5e22_masked.fits',
-                              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens1e5_col3e23_masked.fits',
-                              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e5_col3e23_masked.fits',
-                              'TemperatureCube_DendrogramObjects{0}_integ.fits',
-                              'TemperatureCube_DendrogramObjects{0}_integ_weighted.fits'),
-                             ('','',
-                              '','',
-                              'dendro','dendro')):
+vmax = 150
+
+toloop = zip((
+              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens3e4_col5e22.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens3e4_col5e22.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens1e4_col5e22_masked.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e4_col5e22_masked.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens3e4_col5e22_masked.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens3e4_col5e22_masked.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens1e5_col5e22_masked.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e5_col5e22_masked.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens1e5_col3e23_masked.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e5_col3e23_masked.fits',
+              'TemperatureCube_DendrogramObjects{0}_leaves_integ.fits',
+              'TemperatureCube_DendrogramObjects{0}_leaves_integ_weighted.fits',
+              'TemperatureCube_DendrogramObjects{0}_integ.fits',
+              'TemperatureCube_DendrogramObjects{0}_integ_weighted.fits'),
+             ('dens3e4_col5e22','dens3e4_col5e22_weighted',
+              'dens1e4_col5e22_masked','dens1e4_col5e22_weighted_masked',
+              'dens3e4_col5e22_masked','dens3e4_col5e22_weighted_masked',
+              'dens1e5_col5e22_masked','dens1e5_col5e22_weighted_masked',
+              'dens1e5_col3e23_masked','dens1e5_col3e23_weighted_masked',
+              'dendro_leaf','dendro_leaf_weighted',
+              'dendro','dendro_weighted'))
+
+
+for ftemplate,outtype in toloop:
 
     for smooth in ("","_smooth",):#"_vsmooth"):
+        log.info(ftemplate.format(smooth)+outtype)
         fig = pl.figure(4, figsize=figsize)
         fig.clf()
         F = aplpy.FITSFigure(h2copath+ftemplate.format(smooth),
@@ -44,7 +61,7 @@ for ftemplate,outtype in zip((
 
         cm = copy.copy(cmap)
         cm.set_bad((0.5,)*3)
-        F.show_colorscale(cmap=cm,vmin=15,vmax=200)
+        F.show_colorscale(cmap=cm,vmin=15,vmax=vmax)
         F.set_tick_labels_format('d.dd','d.dd')
         F.recenter(**small_recen)
         peaksn = os.path.join(h2copath,'APEX_H2CO_303_202{0}_bl_mask_integ.fits'.format(smooth))
@@ -144,7 +161,7 @@ F = aplpy.FITSFigure('/Users/adam/work/gc/Tkin-GC.fits.gz',
 
 cm = copy.copy(cmap)
 cm.set_bad((0.5,)*3)
-F.show_colorscale(cmap=cm,vmin=15,vmax=200)
+F.show_colorscale(cmap=cm,vmin=15,vmax=vmax)
 F.set_tick_labels_format('d.dd','d.dd')
 F.recenter(**small_recen)
 F.add_colorbar()
@@ -154,7 +171,7 @@ F.colorbar.set_label_properties(size=16)
 F.show_markers(sgrb2x, sgrb2y, color='k', facecolor='k', s=250,
                edgecolor='k', alpha=0.9)
 
-F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to200.pdf'))
+F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to{0}.pdf'.format(vmax)))
 F.show_colorscale(cmap=cm,vmin=15,vmax=80)
 F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to80.pdf'))
 

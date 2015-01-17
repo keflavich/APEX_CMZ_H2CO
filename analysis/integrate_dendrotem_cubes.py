@@ -29,16 +29,17 @@ for suffix in ("","_smooth"):
     weight_cube = cube303sm if 'smooth' in suffix else cube303
     weights = weight_cube.filled_data[:].value
     weights[weights < 0] = 0
+    weights[np.isnan(tcubed)] = 0
     assert tcubed.shape == weights.shape
-    weightmap = np.nansum(weights, axis=0)
-    mean_tem = np.nansum(tcubed*weights,axis=0) / weightmap
+    mean_tem = np.nansum(tcubed*weights,axis=0) / np.nansum(weights, axis=0)
     hdu_template.data = mean_tem
     hdu_template.writeto(hpath(outpath.format(suffix)).replace(".fits","_integ_weighted.fits"),
                          clobber=True)
 
     log.info("Writing Weighted Integrated TemperatureCube (leaves only)")
     tcubedleaf = tcubeleaf.filled_data[:].value
-    mean_tem_leaf = np.nansum(tcubedleaf*weights,axis=0) / weightmap
+    weights[np.isnan(tcubedleaf)] = 0
+    mean_tem_leaf = np.nansum(tcubedleaf*weights,axis=0) / np.nansum(weights, axis=0)
     hdu_template.data = mean_tem_leaf
     hdu_template.writeto(hpath(outpath_leaf.format(suffix)).replace(".fits","_integ_weighted.fits"),
                          clobber=True)

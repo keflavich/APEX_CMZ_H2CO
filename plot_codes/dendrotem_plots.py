@@ -57,7 +57,7 @@ for cat,dendro,smooth in zipped:
                      #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                      #xerr=[cat['eratio303321'][mask], cat['eratio303321'][mask]],
                      linestyle='none', capsize=0, alpha=alpha, marker='.',
-                     markersize=10,
+                     markersize=10 if any(mask & is_leaf) else 5,
                      color=color, linewidth=0.3)
         ax2.set_xlabel("Ratio $S(3_{2,1}-2_{2,0})/S(3_{0,3}-2_{0,2})$")
         ax2.set_ylabel("Temperature [K]")

@@ -68,11 +68,15 @@ filenames = [molpath('APEX_{0}.fits'.format(molecule))
 molecules = molecules + ('H2CO_TemperatureFromRatio',
                          'H2CO_TemperatureFromRatio_smooth',
                          'H2CO_DendrogramTemperature',
-                         'H2CO_DendrogramTemperature_smooth')
+                         'H2CO_DendrogramTemperature_smooth',
+                         'H2CO_DendrogramTemperature_Leaves',
+                         'H2CO_DendrogramTemperature_Leaves_smooth')
 filenames.append(hpath('TemperatureCube_PiecewiseFromRatio.fits'))
 filenames.append(hpath('TemperatureCube_smooth_PiecewiseFromRatio.fits'))
 filenames.append(hpath('TemperatureCube_DendrogramObjects.fits'))
 filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth.fits'))
+filenames.append(hpath('TemperatureCube_DendrogramObjects_leaves.fits'))
+filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_leaves.fits'))
 
 
 cmap = copy.copy(pl.cm.RdYlBu_r)
