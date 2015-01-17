@@ -13,6 +13,10 @@ from noise import (noise, noise_cube, sm_noise, cube303nm, cube303nmsm,
 
 
 def make_ratio_integ():
+    """
+    This is an alternate implementation to that already included in
+    make_ratiotem_cubesims
+    """
     npixflat = bmasksm_rs.include().sum(axis=0)
     sum321 = cube321.with_mask(bmasksm_rs).sum(axis=0)
     sum303 = cube303.with_mask(bmasksm_rs).sum(axis=0)

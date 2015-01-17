@@ -2099,17 +2099,16 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
                               sigmacut=2,
                               grow=2,
                               mask_hc3n=False) # unfortunately, flagged out brick & Sgr A
+    signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_smooth',
+                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
+                              sigmacut=3,
+                              mask_hc3n=False)
 
     signal_to_noise_mask_cube(os.path.join(molpath,'APEX_H2CO_321_220'),
                               noise=fits.getdata(os.path.join(mergepath,
                                                               'APEX_H2CO_merge_high_plait_all_noise.fits')),
                               sigmacut=2,
                               grow=2)
-    
-    signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_smooth',
-                              noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
-                              sigmacut=3,
-                              mask_hc3n=False)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_321_220_smooth',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
                               sigmacut=2)
@@ -2175,6 +2174,7 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits'),
                               grow=2,
+                              sigmacut=2,
                               mask_hc3n=False)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_smooth_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),

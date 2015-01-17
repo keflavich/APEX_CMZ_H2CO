@@ -236,7 +236,7 @@ def do_temperature(ratio=True, h2copath=h2copath):
     temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4_col5e22',
                    density=1e4)
     # Higher column, higher density for Brick, 20/50 kms cloud, Sgr B2 regino
-    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4_col3e23',
+    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e5_col3e23',
                    density=1e5)
 
 def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,

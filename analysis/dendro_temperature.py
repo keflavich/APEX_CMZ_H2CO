@@ -364,33 +364,6 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         tcubeleaf.write(hpath(outpath_leaf.format(suffix)),
                     overwrite=True)
 
-        log.info("Writing Integrated TemperatureCube")
-        integ = tcube.mean(axis=0)
-        integ.hdu.writeto(hpath(outpath.format(suffix)).replace(".fits","_integ.fits"),
-                          clobber=True)
-        integleaf = tcubeleaf.mean(axis=0)
-        integleaf.hdu.writeto(hpath(outpath_leaf.format(suffix)).replace(".fits","_integ.fits"),
-                              clobber=True)
-
-        hdu_template = integ.hdu
-
-        log.info("Writing Weighted Integrated TemperatureCube")
-        tcubed = tcube.filled_data[:].value
-        weight_cube = cube303sm if 'smooth' in suffix else cube303
-        weights = weight_cube.filled_data[:].value
-        weights[weights < 0] = 0
-        mean_tem = np.nansum(tcubed*weights,axis=0) / np.nansum(weights, axis=0)
-        hdu_template.data = mean_tem
-        hdu_template.writeto(hpath(outpath.format(suffix)).replace(".fits","_integ_weighted.fits"),
-                             clobber=True)
-
-        log.info("Writing Weighted Integrated TemperatureCube (leaves only)")
-        tcubedleaf = tcubeleaf.filled_data[:].value
-        mean_tem_leaf = np.nansum(tcubedleaf*weights,axis=0) / np.nansum(weights, axis=0)
-        hdu_template.data = mean_tem_leaf
-        hdu_template.writeto(hpath(outpath_leaf.format(suffix)).replace(".fits","_integ_weighted.fits"),
-                             clobber=True)
-
 
     return catalog, tcube
 
