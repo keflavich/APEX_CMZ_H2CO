@@ -22,11 +22,16 @@ big_recen = dict(x=0.55, y=-0.075,width=2.3,height=0.40)
 sgrb2x = [000.6773, 0.6578, 0.6672]
 sgrb2y = [-00.0290, -00.0418, -00.0364]
 
-for ftemplate,outtype in zip(('H2CO_321220_to_303202{0}_bl_integ_temperature.fits',
-                              #'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature.fits',
+for ftemplate,outtype in zip((
+                              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens3e4_col5e22.fits',
+                              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens3e4_col5e22.fits',
+                              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens3e4_col5e22_masked.fits',
+                              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens3e4_col5e22_masked.fits',
                               'TemperatureCube_DendrogramObjects{0}_integ.fits',
                               'TemperatureCube_DendrogramObjects{0}_integ_weighted.fits'),
-                             ('','dendro')):
+                             ('','',
+                              '','',
+                              'dendro','dendro')):
 
     for smooth in ("","_smooth",):#"_vsmooth"):
         fig = pl.figure(4, figsize=figsize)

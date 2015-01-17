@@ -187,15 +187,15 @@ class TemperatureMapper(object):
 
     def init(self):
         self.Xarr = ph2cogrid(trange=self.trange, ntemp=self.ntemp,
-                              logdensities=(4,5), abundances=(10**-8.5,),
-                              Nh2=(3e22,3e23), **self.kwargs)
+                              logdensities=(4,4.5,5), abundances=(1.2e-9,),
+                              Nh2=(5e22,5e22), **self.kwargs)
         self.temperatures = np.linspace(self.trange[0], self.trange[1],
                                         self.ntemp)
 
 
     def get_mapper(self, lineid, tmin=np.nan, tmax=np.nan,
                    density=1e4,
-                   column=3e22):
+                   column=5e22):
         if not hasattr(self,'temperatures'):
             self.init()
 
@@ -220,11 +220,21 @@ if 'tm' not in locals():
     tm = TemperatureMapper(trange=[10,300],ntemp=100)
 
 def do_temperature(ratio=True, h2copath=h2copath):
-    temperaturemap(tm, path=h2copath, ratio=ratio)
-    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e5_col3e22',
+    #temperaturemap(tm, path=h2copath, ratio=ratio) # Defaults - unlabeled, useless
+    # Why 5e22?
+    # import masked_cubes
+    # from higal_gridded import column_regridded
+    # flatmask = masked_cubes.bmask._mask.max(axis=0)
+    # np.median(column_regridded.data[flatmask])
+    #
+    # Why 3 densities?  There is probably a range from 1e4-1e5
+    #
+    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e5_col5e22',
                    density=1e5)
-    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4_col3e23',
-                   density=1e4, column=3e23)
+    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens3e4_col5e22',
+                   density=10**4.5)
+    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4_col5e22',
+                   density=1e4)
 
 def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
                    **kwargs):

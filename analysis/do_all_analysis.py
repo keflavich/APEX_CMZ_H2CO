@@ -1,5 +1,8 @@
 execfile("make_apex_cubes.py")
 do_postprocessing()
+
+execfile("pyradex_h2comm_grid.py")
+
 execfile("redo_dendro.py")
 # execfile("dendro_mask.py")
 # make_dend_303()

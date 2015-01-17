@@ -147,6 +147,7 @@ def makefits(data, btype, densities=densities, temperatures=temperatures,
 
 if __name__ == "__main__":
     import re
+    from paths import gpath
     bt = re.compile("tex|tau|flux")
 
     (fTI, fpars, fbad_pars) = compute_grid(Radex=pyradex.fjdu.Fjdu,
@@ -159,7 +160,7 @@ if __name__ == "__main__":
         outfile = 'fjdu_pH2CO_{line}_{type}_{dv}.fits'.format(line=pn[-3:],
                                                               type=btype,
                                                               dv='5kms')
-        ff.writeto(outfile,
+        ff.writeto(gpath(outfile),
                    clobber=True)
         print outfile
 
@@ -169,7 +170,7 @@ if __name__ == "__main__":
     outfile = 'fjdu_pH2CO_{line}_{type}_{dv}.fits'.format(line='321to303',
                                                           type='ratio',
                                                           dv='5kms')
-    ff.writeto(outfile, clobber=True)
+    ff.writeto(gpath(outfile), clobber=True)
 
     (TI, pars, bad_pars) = compute_grid()
 
@@ -180,7 +181,7 @@ if __name__ == "__main__":
         outfile = 'pH2CO_{line}_{type}_{dv}.fits'.format(line=pn[-3:],
                                                           type=btype,
                                                           dv='5kms')
-        ff.writeto(outfile,
+        ff.writeto(gpath(outfile),
                    clobber=True)
         print outfile
 
@@ -189,7 +190,7 @@ if __name__ == "__main__":
     outfile = 'pH2CO_{line}_{type}_{dv}.fits'.format(line='321to303',
                                                           type='ratio',
                                                           dv='5kms')
-    ff.writeto(outfile, clobber=True)
+    ff.writeto(gpath(outfile), clobber=True)
 
     log.info("FJDU had {0} bad pars".format(len(fbad_pars)))
     log.info("RADEX had {0} bad pars".format(len(bad_pars)))
@@ -205,5 +206,5 @@ if __name__ == "__main__":
         im1 = fits.getdata('fjdu_'+outfile)
         im2 = fits.getdata(outfile)
         hdu = fits.PrimaryHDU(data=im1-im2, header=header)
-        hdu.writeto('diff_fjdu-radex_'+outfile, clobber=True)
+        hdu.writeto(gpath('diff_fjdu-radex_'+outfile), clobber=True)
 
