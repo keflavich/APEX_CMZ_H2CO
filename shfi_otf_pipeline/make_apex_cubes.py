@@ -1906,7 +1906,9 @@ def do_sncube_masking_hi(prefix=h2copath+'APEX_H2CO_303_202'):
 
 def extract_subcube(cubefilename, outfilename, linefreq=218.22219*u.GHz,
                     debug=False, smooth=False, vsmooth=False, naxis3=500,
-                    vmin=-225*u.km/u.s, vmax=275*u.km/u.s):
+                    vmin=-155*u.km/u.s, vmax=155*u.km/u.s):
+                    #  Picked a tighter range to avoid other lines contaminating H2CO
+                    #vmin=-225*u.km/u.s, vmax=275*u.km/u.s):
     t0 = time.time()
     log.info(("Extracting subcube at {0} from {1}"
               " with smooth={2} and vsmooth={3}").format(linefreq,
@@ -2096,7 +2098,7 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
                                                               'APEX_H2CO_merge_high_plait_all_noise.fits')),
                               sigmacut=2,
                               grow=2,
-                              mask_hc3n=True)
+                              mask_hc3n=False) # unfortunately, flagged out brick & Sgr A
 
     signal_to_noise_mask_cube(os.path.join(molpath,'APEX_H2CO_321_220'),
                               noise=fits.getdata(os.path.join(mergepath,
@@ -2107,7 +2109,7 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_smooth',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
                               sigmacut=3,
-                              mask_hc3n=True)
+                              mask_hc3n=False)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_321_220_smooth',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
                               sigmacut=2)
@@ -2173,11 +2175,11 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits'),
                               grow=2,
-                              mask_hc3n=True)
+                              mask_hc3n=False)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_smooth_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
                               sigmacut=3,
-                              mask_hc3n=True)
+                              mask_hc3n=False)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_321_220_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits'),
                               sigmacut=2,

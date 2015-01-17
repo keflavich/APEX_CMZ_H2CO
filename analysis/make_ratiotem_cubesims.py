@@ -235,6 +235,9 @@ def do_temperature(ratio=True, h2copath=h2copath):
                    density=10**4.5)
     temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4_col5e22',
                    density=1e4)
+    # Higher column, higher density for Brick, 20/50 kms cloud, Sgr B2 regino
+    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4_col3e23',
+                   density=1e5)
 
 def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
                    **kwargs):
@@ -264,12 +267,12 @@ def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
                 del rf[0].header['LATPOLE']
                 rf[0].data = tmap
                 rf.writeto(pfx+'_temperature{suffix}.fits'.format(suffix=Nnsuffix),clobber=True)
-                #mask = fits.getdata('APEX_H2CO_303_202_smooth_mask_integ.fits') > 0.018
                 if 'cube' not in suf:
-                    mask = fits.getdata(path+'APEX_H2CO_322_221{0}_mask_integ.fits'.format(smooth)) > 0.0025
+                    #mask = fits.getdata(path+'APEX_H2CO_322_221{0}_mask_integ.fits'.format(smooth)) > 0.0025
+                    mask = fits.getdata(path+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth)) > 1.25
                 else:
                     mask = fits.getdata(path+'APEX_H2CO_303_202{0}_mask.fits'.format(smooth.rstrip('_bl'))).astype('bool')
-                tmap[True-mask] = np.nan
+                tmap[~mask] = np.nan
                 rf[0].data = tmap
                 rf.writeto(pfx+'_temperature{suffix}_masked.fits'.format(suffix=Nnsuffix),
                            clobber=True)
@@ -287,4 +290,4 @@ def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
 
 if __name__ == '__main__':
     doratio()
-    do_temperature()
+    do_temperature(ratio=False)

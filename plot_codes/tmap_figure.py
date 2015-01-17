@@ -27,6 +27,8 @@ for ftemplate,outtype in zip((
                               'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens3e4_col5e22.fits',
                               'H2CO_321220_to_303202{0}_bl_integ_temperature_dens3e4_col5e22_masked.fits',
                               'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens3e4_col5e22_masked.fits',
+                              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens1e5_col3e23_masked.fits',
+                              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e5_col3e23_masked.fits',
                               'TemperatureCube_DendrogramObjects{0}_integ.fits',
                               'TemperatureCube_DendrogramObjects{0}_integ_weighted.fits'),
                              ('','',
