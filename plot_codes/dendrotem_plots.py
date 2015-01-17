@@ -24,10 +24,10 @@ for cat,dendro,smooth in zipped:
     sn = (cat['ratio303321']/cat['eratio303321'])
     sngt50 = sn > 50
     sn25_50 = (sn > 25) & (sn < 50)
-    ok = np.isfinite(sn) & (cat['Stot321'] < cat['Stot303'])
+    ok = np.isfinite(sn) & (cat['Stot321'] < cat['Stot303']) & ~(cat['bad'] == 'True')
     gt5 = (sn>5)
 
-    is_leaf = cat['is_leaf']
+    is_leaf = np.array(cat['is_leaf'] == 'True')
     
 
     for ii in range(1,13): pl.figure(ii).clf()
@@ -38,7 +38,7 @@ for cat,dendro,smooth in zipped:
     # Make the not-leaves be half as bright
     masks_colors = zip(leaf_masks,
                        ('b','b','g','g','r','r','k','k'),
-                       (0.2,0.2/2, 0.3,0.3/2., 0.4, 0.4/2., 0.1, 0.1/2.),
+                       (0.2*2,0.2/2, 0.3*2,0.3/2., 0.4*2,0.4/2., 0.1*2,0.1/2.),
                       )
 
     fig1, ax1 = pl.subplots(num=1)
@@ -64,67 +64,67 @@ for cat,dendro,smooth in zipped:
     fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}.pdf'.format(smooth)))
         
     if cat is catalog:
-        # Determine approximate best-fit
-        sel = cat['temperature_chi2'][ok] < 70
-        fparslt60 = np.polyfit(cat['ratio303321'][ok][sel],
-                               cat['temperature_chi2'][ok][sel], 2)
-        p1 = np.polynomial.polynomial.Polynomial(fparslt60[::-1])
+        ## Determine approximate best-fit
+        #sel = cat['temperature_chi2'][ok] < 70
+        #fparslt60 = np.polyfit(cat['ratio303321'][ok][sel],
+        #                       cat['temperature_chi2'][ok][sel], 2)
+        #p1 = np.polynomial.polynomial.Polynomial(fparslt60[::-1])
 
-        sel = ((cat['temperature_chi2'][ok] > 70) &
-               (cat['temperature_chi2'][ok] < 120) &
-               (cat['ratio303321'][ok] < 0.6))
-        fparsgt60 = np.polyfit(cat['ratio303321'][ok][sel],
-                               cat['temperature_chi2'][ok][sel], 1)
-        p2 = np.polynomial.polynomial.Polynomial(fparsgt60[::-1])
+        #sel = ((cat['temperature_chi2'][ok] > 70) &
+        #       (cat['temperature_chi2'][ok] < 120) &
+        #       (cat['ratio303321'][ok] < 0.6))
+        #fparsgt60 = np.polyfit(cat['ratio303321'][ok][sel],
+        #                       cat['temperature_chi2'][ok][sel], 1)
+        #p2 = np.polynomial.polynomial.Polynomial(fparsgt60[::-1])
 
-        sel = ((cat['temperature_chi2'][ok] > 120) &
-               (cat['temperature_chi2'][ok] < 355) &
-               (cat['ratio303321'][ok] < 0.6))
-        fparsgt150 = np.polyfit(cat['ratio303321'][ok][sel],
-                                cat['temperature_chi2'][ok][sel], 1)
-        p3 = np.polynomial.polynomial.Polynomial(fparsgt150[::-1])
+        #sel = ((cat['temperature_chi2'][ok] > 120) &
+        #       (cat['temperature_chi2'][ok] < 355) &
+        #       (cat['ratio303321'][ok] < 0.6))
+        #fparsgt150 = np.polyfit(cat['ratio303321'][ok][sel],
+        #                        cat['temperature_chi2'][ok][sel], 1)
+        #p3 = np.polynomial.polynomial.Polynomial(fparsgt150[::-1])
 
-        root1 = np.polynomial.polynomial.polyroots((p1-p2).coef)
-        root1 = root1[(root1>0) & (root1<0.6)][0]
-        root2 = np.polynomial.polynomial.polyroots((p2-p3).coef)
-        root2 = root2[(root2>0) & (root2<0.6)][0]
-        #func = PiecewisePolynomial([0, root1, root2, 0.6],
-        #                           [p1.coef, p1.coef, p2.coef, p3.coef],)
-        func = lambda x: np.piecewise(x, [x<root1, (x>root1)&(x<root2), x>root2],
-                                      [p1, p2, p3])
-        log.info(" < {0}: {1}".format(root1, p1.coef))
-        log.info(" [{0}, {1}]: {2}".format(root1, root2, p2.coef))
-        log.info(" > {0}: {1}".format(root2, p3.coef))
-        # debug func = lambda x:x
+        #root1 = np.polynomial.polynomial.polyroots((p1-p2).coef)
+        #root1 = root1[(root1>0) & (root1<0.6)][0]
+        #root2 = np.polynomial.polynomial.polyroots((p2-p3).coef)
+        #root2 = root2[(root2>0) & (root2<0.6)][0]
+        ##func = PiecewisePolynomial([0, root1, root2, 0.6],
+        ##                           [p1.coef, p1.coef, p2.coef, p3.coef],)
+        #func = lambda x: np.piecewise(x, [x<root1, (x>root1)&(x<root2), x>root2],
+        #                              [p1, p2, p3])
+        #log.info(" < {0}: {1}".format(root1, p1.coef))
+        #log.info(" [{0}, {1}]: {2}".format(root1, root2, p2.coef))
+        #log.info(" > {0}: {1}".format(root2, p3.coef))
+        ## debug func = lambda x:x
 
-        fit_table = Table(
-            [Column(name='MinBound', data=[0,root1,root2]),
-             Column(name='MaxBound', data=[root1,root2,0.6]),
-             Column(name='const',    data=[p.coef[0] if len(p.coef)>= 1 else 0
-                                           for p in (p1,p2,p3)]),
-             Column(name='xcoef',    data=[p.coef[1] if len(p.coef)>= 2 else 0
-                                           for p in (p1,p2,p3)]),
-             Column(name='x2coef',   data=[p.coef[2] if len(p.coef)>= 3 else 0
-                                           for p in (p1,p2,p3)]),
-            ])
-        fit_table.write(apath('piecewise_tvsratio_fit.ipac'), format='ascii.ipac')
+        #fit_table = Table(
+        #    [Column(name='MinBound', data=[0,root1,root2]),
+        #     Column(name='MaxBound', data=[root1,root2,0.6]),
+        #     Column(name='const',    data=[p.coef[0] if len(p.coef)>= 1 else 0
+        #                                   for p in (p1,p2,p3)]),
+        #     Column(name='xcoef',    data=[p.coef[1] if len(p.coef)>= 2 else 0
+        #                                   for p in (p1,p2,p3)]),
+        #     Column(name='x2coef',   data=[p.coef[2] if len(p.coef)>= 3 else 0
+        #                                   for p in (p1,p2,p3)]),
+        #    ])
+        #fit_table.write(apath('piecewise_tvsratio_fit.ipac'), format='ascii.ipac')
 
         x = np.linspace(0,0.6,100)
-        l0, = ax2.plot(x, func(x), 'k-', alpha=0.5, zorder=-10)
-        ax2.set_xlim(0.,0.6)
-        ax2.set_ylim(0.,350)
-        fig2.savefig(fpath('dendrotem/ratio_vs_temperature_piecewise{0}.pdf'.format(smooth)))
-        l1, = ax2.plot(x, p1(x), 'k--', alpha=0.5)
-        l2, = ax2.plot(x, p2(x), 'k:', alpha=0.5)
-        l3, = ax2.plot(x, p3(x), 'k-.', alpha=0.5)
-        fig2.savefig(fpath('dendrotem/ratio_vs_temperature_piecewise_pieces{0}.pdf'.format(smooth)))
+        #l0, = ax2.plot(x, func(x), 'k-', alpha=0.5, zorder=-10)
+        #ax2.set_xlim(0.,0.6)
+        #ax2.set_ylim(0.,350)
+        #fig2.savefig(fpath('dendrotem/ratio_vs_temperature_piecewise{0}.pdf'.format(smooth)))
+        #l1, = ax2.plot(x, p1(x), 'k--', alpha=0.5)
+        #l2, = ax2.plot(x, p2(x), 'k:', alpha=0.5)
+        #l3, = ax2.plot(x, p3(x), 'k-.', alpha=0.5)
+        #fig2.savefig(fpath('dendrotem/ratio_vs_temperature_piecewise_pieces{0}.pdf'.format(smooth)))
+        #for ll in l1,l2,l3,l0:
+        #    ll.set_visible(False)
 
         sel = cat['ratio303321'][ok] < 0.6
         pars = np.polyfit(cat['ratio303321'][ok][sel],
                           cat['temperature_chi2'][ok][sel],2)
         log.info("Polynomial parameters: {0}".format(pars))
-        for ll in l1,l2,l3,l0:
-            ll.set_visible(False)
         ax2.plot(x, np.polyval(pars, x), 'r--', alpha=0.5)
         ax2.axis([0,0.55,0,200])
         fig2.savefig(fpath('dendrotem/ratio_vs_temperature_powerlaw.pdf'))
@@ -281,14 +281,18 @@ for cat,dendro,smooth in zipped:
     fig25.clf()
     ax25 = fig25.gca()
     tem_to_color = pl.cm.RdYlBu_r((cat['temperature_chi2']-15)/(200-15.))
-    sc = ax25.scatter(cat['ratio303321'], np.log10(cat['dustmindens']),
-                      c=cat['temperature_chi2'], cmap=pl.cm.RdYlBu_r,
+    sc = ax25.scatter(cat['ratio303321'][is_leaf], np.log10(cat['dustmindens'][is_leaf]),
+                      c=cat['temperature_chi2'][is_leaf], cmap=pl.cm.RdYlBu_r,
                       marker='o', vmin=15, vmax=200, alpha=0.8,
-                      lw=0, s=40, edgecolors='none')
+                      lw=0, s=40, edgecolors='k')
+    sc2 = ax25.scatter(cat['ratio303321'][~is_leaf], np.log10(cat['dustmindens'][~is_leaf]),
+                       c=cat['temperature_chi2'][~is_leaf], cmap=pl.cm.RdYlBu_r,
+                       marker='o', vmin=15, vmax=200, alpha=0.2,
+                       lw=0, s=25, edgecolors='k')
     ax25.set_xlim(0, 0.6)
     ax25.set_ylabel("HiGal Dust-derived Density")
     ax25.set_xlabel("Ratio $R_1$")
-    ax25.set_axis_bgcolor((0.6,0.6,0.6))
+    #ax25.set_axis_bgcolor((0.6,0.6,0.6))
     pl.colorbar(sc)
     fig25.savefig(fpath('dendrotem/ratio_vs_density{0}.pdf'.format(smooth)))
 

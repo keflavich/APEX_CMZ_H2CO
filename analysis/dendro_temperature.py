@@ -106,6 +106,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             'reff',
             'dustmass',
             'dustmindens',
+            'bad',
     ]
     columns = {k:[] for k in (keys+obs_keys)}
 
@@ -126,8 +127,11 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
     # Prepare an array to hold the fitted temperatures
     tcubedata = np.empty(maincube.shape, dtype='float32')
     tcubedata[:] = np.nan
+    tcubeleafdata = np.empty(maincube.shape, dtype='float32')
+    tcubeleafdata[:] = np.nan
 
 
+    nbad = 0
 
     catalog = ppv_catalog(dend, metadata)
     pb = ProgressBar(len(catalog))
@@ -277,7 +281,18 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             for k in row_data:
                 columns[k].append(row_data[k])
 
-            tcubedata[dend_obj_mask.include()] = row_data['temperature_chi2']
+            # Exclude bad velocities from cubes
+            if row['v_cen'] < -80e3 or row['v_cen'] > 180e3:
+                # Skip: there is no real structure down here
+                nbad += 1
+                is_bad = True
+            else:
+                is_bad = False
+                tcubedata[dend_obj_mask.include()] = row_data['temperature_chi2']
+                if structure.is_leaf:
+                    tcubeleafdata[dend_obj_mask.include()] = row_data['temperature_chi2']
+
+            columns['bad'].append(is_bad)
 
         if len(set(len(c) for k,c in columns.iteritems())) != 1:
             print("Columns are different lengths.  This is not allowed.")
@@ -286,7 +301,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         for c in columns:
             assert len(columns[c]) == ii+1
 
-        if plot_some and (ii % 100 == 0 or ii < 50):
+        if plot_some and not is_bad and (ii-nbad % 100 == 0 or ii-nbad < 50):
             try:
                 log.info("T: [{tmin1sig_chi2:7.2f},{temperature_chi2:7.2f},{tmax1sig_chi2:7.2f}]"
                          "  R={ratio303321:8.4f}+/-{eratio303321:8.4f}"
@@ -334,6 +349,10 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                          mask=cube303.mask, meta={'unit':'K'},
                          header=cube303.header,
                         )
+    tcubeleaf = SpectralCube(data=tcubeleafdata, wcs=cube303.wcs,
+                         mask=cube303.mask, meta={'unit':'K'},
+                         header=cube303.header,
+                        )
 
     if write:
         log.info("Writing TemperatureCube")
@@ -341,10 +360,18 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         tcube.write(hpath(outpath.format(suffix)),
                     overwrite=True)
 
+        outpath_leaf = 'TemperatureCube_DendrogramObjects{0}_leaves.fits'
+        tcubeleaf.write(hpath(outpath_leaf.format(suffix)),
+                    overwrite=True)
+
         log.info("Writing Integrated TemperatureCube")
         integ = tcube.mean(axis=0)
         integ.hdu.writeto(hpath(outpath.format(suffix)).replace(".fits","_integ.fits"),
                           clobber=True)
+        integleaf = tcubeleaf.mean(axis=0)
+        integleaf.hdu.writeto(hpath(outpath_leaf.format(suffix)).replace(".fits","_integ.fits"),
+                              clobber=True)
+
         hdu_template = integ.hdu
 
         log.info("Writing Weighted Integrated TemperatureCube")
@@ -355,6 +382,13 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         mean_tem = np.nansum(tcubed*weights,axis=0) / np.nansum(weights, axis=0)
         hdu_template.data = mean_tem
         hdu_template.writeto(hpath(outpath.format(suffix)).replace(".fits","_integ_weighted.fits"),
+                             clobber=True)
+
+        log.info("Writing Weighted Integrated TemperatureCube (leaves only)")
+        tcubedleaf = tcubeleaf.filled_data[:].value
+        mean_tem_leaf = np.nansum(tcubedleaf*weights,axis=0) / np.nansum(weights, axis=0)
+        hdu_template.data = mean_tem_leaf
+        hdu_template.writeto(hpath(outpath_leaf.format(suffix)).replace(".fits","_integ_weighted.fits"),
                              clobber=True)
 
 

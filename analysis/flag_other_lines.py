@@ -4,6 +4,9 @@ import numpy as np
 def flag_dendro(dend, catalog=None, smooth=False):
     """
     Remove / flag as "bad" objects in the dendrogram that are not H2CO
+
+    This was done manually; there is now (Jan 17, 2015) an automated approach
+    in dendro_temperature
     """
 
     pixels_with_bad = [(518,122,142),

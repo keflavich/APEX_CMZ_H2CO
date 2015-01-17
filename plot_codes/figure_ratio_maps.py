@@ -49,6 +49,17 @@ for weighted in ("","_weighted","_masked_weighted"):
                                     'big_maps',
                                     "big_"+ratio.replace(".fits",".pdf")))
 
+                dustcolumn = '/Users/adam/work/gc/gcmosaic_column_conv36.fits'
+                F.show_contour(dustcolumn,
+                               levels=[5], colors=[(0,0,0,0.5)], zorder=15,
+                               alpha=0.5,
+                               linewidths=[0.5],
+                               layer='dustcontour')
+
+                F.save(os.path.join(figurepath,
+                                    'big_maps',
+                                    "big_"+ratio.replace(".fits","_withcontours.pdf")))
+
 # Dendrogram mean ratios
 for weighted in ("","weighted"):
     for smooth in ("","_smooth",):#"_vsmooth"):

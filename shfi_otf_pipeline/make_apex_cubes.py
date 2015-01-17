@@ -1838,7 +1838,8 @@ def compute_noise_extras(prefix=june2013path+'APEX_H2CO_2013_%s_sub',
     hdu1.writeto(prefix+"_noise.fits", clobber=True)
 
 def signal_to_noise_mask_cube(prefix=None, cube=None, noise=None,
-                              kernelsize=[2,2,2], grow=1, sigmacut=3):
+                              kernelsize=[2,2,2], grow=1, sigmacut=3,
+                              mask_hc3n=False):
     """
     Generate a signal-to-noise mask and use it to select the detected pixels in
     a cube.
@@ -1890,7 +1891,12 @@ def signal_to_noise_mask_cube(prefix=None, cube=None, noise=None,
     ffile[0].writeto(prefix+"_snmasked.fits", clobber=True)
 
     ffile[0].data = mask_grow.astype('int')
-    ffile[0].writeto(prefix+"_mask.fits", clobber=True)
+
+    if mask_hc3n:
+        maskhdu = mask_out_hc3n(ffile[0])
+        maskhdu.writeto(prefix+"_mask.fits", clobber=True)
+    else:
+        ffile[0].writeto(prefix+"_mask.fits", clobber=True)
 
 def do_sncube_masking_hi(prefix=h2copath+'APEX_H2CO_303_202'):
     # 0-25 not checked! arbitrary choice.
@@ -2089,7 +2095,8 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
                               noise=fits.getdata(os.path.join(mergepath,
                                                               'APEX_H2CO_merge_high_plait_all_noise.fits')),
                               sigmacut=2,
-                              grow=2)
+                              grow=2,
+                              mask_hc3n=True)
 
     signal_to_noise_mask_cube(os.path.join(molpath,'APEX_H2CO_321_220'),
                               noise=fits.getdata(os.path.join(mergepath,
@@ -2099,7 +2106,8 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
     
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_smooth',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
-                              sigmacut=3)
+                              sigmacut=3,
+                              mask_hc3n=True)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_321_220_smooth',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
                               sigmacut=2)
@@ -2164,10 +2172,12 @@ def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):
     #compute_noise_high(molpath+'APEX_H2CO_303_202_vsmooth_bl',[80,100])
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits'),
-                              grow=2)
+                              grow=2,
+                              mask_hc3n=True)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_303_202_smooth_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_smooth_noise.fits'),
-                              sigmacut=3)
+                              sigmacut=3,
+                              mask_hc3n=True)
     signal_to_noise_mask_cube(molpath+'APEX_H2CO_321_220_bl',
                               noise=fits.getdata(mergepath+'APEX_H2CO_merge_high_plait_all_noise.fits'),
                               sigmacut=2,
@@ -2304,6 +2314,26 @@ def docleannhits():
     f[0].data = nhm
 
 
+def mask_out_hc3n(maskhdu):
+    """
+    HC3N shows up in some of the H2CO 303 cubes.  We can exclude it from the
+    signal masks by shifting the mask to HC3N velocities and excluding any
+    regions detected in H2CO
+    """
+    nu_hc3n = all_lines['HC3N_24-23']
+    nu_h2co = all_lines['H2CO_303_202']
+    v_hc3n = ((nu_hc3n - nu_h2co)/nu_h2co * constants.c).to(u.km/u.s).value
+
+    mask = maskhdu.data
+    dv = maskhdu.header['CDELT3']
+    shift = v_hc3n / dv
+    newmask = np.zeros_like(mask, dtype='bool')
+    newmask[np.abs(shift):,:,:] = mask[:-np.abs(shift),:,:].astype('bool')
+    maskhdu.data[newmask] = 0
+    # Need to convert to int because fits doesn't support bool
+    maskhdu.data = maskhdu.data.astype('int')
+
+    return maskhdu
 
 def mask_out_ch3oh(smooth='_smooth', dpath=mergepath):
     nu_ch3oh = all_lines['CH3OH_422_312']
