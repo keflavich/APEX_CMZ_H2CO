@@ -202,9 +202,9 @@ if __name__ == "__main__":
         outfile = 'pH2CO_{line}_{type}_{dv}.fits'.format(line=pn[-3:],
                                                           type=btype,
                                                           dv='5kms')
-        header = fits.getheader(outfile)
-        im1 = fits.getdata('fjdu_'+outfile)
-        im2 = fits.getdata(outfile)
+        header = fits.getheader(gpath(outfile))
+        im1 = fits.getdata(gpath('fjdu_'+outfile))
+        im2 = fits.getdata(gpath(outfile))
         hdu = fits.PrimaryHDU(data=im1-im2, header=header)
         hdu.writeto(gpath('diff_fjdu-radex_'+outfile), clobber=True)
 

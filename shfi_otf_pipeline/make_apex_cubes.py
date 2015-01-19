@@ -2069,6 +2069,7 @@ def do_everything(pca_clean={'2014':False, '2013':False, 'ao':False},
                         scanblsub=scanblsub, timewise_pca=timewise_pca)
 
     do_postprocessing(mergepath=mergepath, molpath=molpath, h2copath=h2copath)
+    extract_co_subcubes()
 
 
 def do_postprocessing(molpath=molpath, mergepath=mergepath, h2copath=h2copath):

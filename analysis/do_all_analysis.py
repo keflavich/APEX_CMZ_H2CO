@@ -9,6 +9,7 @@ with log.log_to_file("all_analysis_{0}.log".format(datetime.now().isoformat())):
     log.info("Starting make_apex_cubes postprocessing")
     execfile("make_apex_cubes.py")
     do_postprocessing()
+    extract_co_subcubes(mergepath=mergepath)
 
     log.info("Creating pyradex grid.  dt={0}".format(time.time()-t0))
     execfile("pyradex_h2comm_grid.py")

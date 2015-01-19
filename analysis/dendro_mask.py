@@ -9,17 +9,20 @@ from astropy.io import fits
 
 from paths import hpath,mpath
 from astrodendro import Dendrogram
-from noise import (noise, noise_cube, sm_noise, cube303nm, cube303nmsm, cube321nm, cube321nmsm)
+from noise import (noise, noise_cube, sm_noise, cube303nm, cube303nmsm,
+                   cube321nm, cube321nmsm)
 import masked_cubes
 
 def make_sncube(write=True, smooth=False, line='303_202'):
     """
+    Not entirely obsolete: the "total" signal to noise is recorded in the
+    dendrogram catalog in dendro-temperature
+
     Obsolete: I make dendrograms directly on the data, not on the signal to
     noise, based on Erik's suggestion.  It makes sense, because a varying noise
     field makes structure impossible to interpret: it's better to just raise
     the noise floor.
     """
-    raise DeprecationWarning("Obsolete")
 
     suff = 'smooth_' if smooth else ''
     fn = 'APEX_H2CO_{1}_{0}bl.fits'.format(suff, line)
@@ -83,19 +86,19 @@ def make_dend(cube, noise, view=True, write=True,
     return dend
 
 def make_dend_303():
-    #t0 = time.time()
-    #sncube = make_sncube()
+    t0 = time.time()
+    sncube = make_sncube()
     t1 = time.time()
-    #log.info("S/N cubemaking took {0:0.1f} seconds".format(t1-t0))
+    log.info("S/N cubemaking took {0:0.1f} seconds".format(t1-t0))
     dend = make_dend(cube303nm, noise)
     t2 = time.time()
     log.info("Dendrogramming {1} objects took {0:0.1f} seconds".format(t2-t1,
                                                                        len(dend)))
 
-    #t0 = time.time()
-    #sncube_sm = make_sncube(smooth=True)
+    t0 = time.time()
+    sncube_sm = make_sncube(smooth=True)
     t1 = time.time()
-    #log.info("Smooth S/N cubemaking took {0:0.1f} seconds".format(t1-t0))
+    log.info("Smooth S/N cubemaking took {0:0.1f} seconds".format(t1-t0))
     # I think the noise is higher than reported in the noise mask by some fraction;
     # there are "chunks" at the top of the map that are no good.
     dendsm = make_dend(cube303nmsm, sm_noise*1.5, min_npix=200,
