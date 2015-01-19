@@ -358,8 +358,8 @@ for row in fittable:
                                                 (0, 1, 2),
                                                 ('dens_col','dens_tem','col_tem')):
         # Show the constraints provided by individual parameters
-        pl.figure(3)
-        pl.clf()
+        fig3 = pl.figure(3)
+        fig3.clf()
         # chi2b = chi2r + chi2_1 + chi2_2 + chi2X + chi2_h2
         ax1 = pl.subplot(2,2,1)
         if hasattr(chi2r, 'min'):
@@ -369,22 +369,16 @@ for row in fittable:
             pl.contour(xax, yax, chi2r2.min(axis=axis),
                        levels=chi2r2.min()+np.arange(nlevs),
                        cmap=pl.cm.bone)
-        pl.xlabel(xlabel)
-        pl.ylabel(ylabel)
         pl.title(r"Ratio $R_1={0:0.3f}\pm{1:0.3f}$"
                  .format(ratio,eratio))
         ax4 = pl.subplot(2,2,2)
         pl.contourf(xax, yax, chi2X.min(axis=axis), levels=chi2X.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
-        pl.ylabel(ylabel)
-        pl.xlabel(xlabel)
         pl.title("log(p-H$_2$CO/H$_2$) $= {0:0.1f}\pm{1:0.1f}$".format(logabundance, elogabundance))
         ax3 = pl.subplot(2,2,3)
         #pl.contourf(xax, yax, chi2_h2.min(axis=axis), levels=chi2_h2.min()+np.arange(nlevs), alpha=0.5)
         pl.contourf(xax, yax, chi2_dens.min(axis=axis), levels=chi2_dens.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
-        pl.xlabel(xlabel)
-        pl.ylabel(ylabel)
         #pl.title("Total log$(N(\\mathrm{{H}}_2)) = {0:0.1f}\pm{1:0.1f}$".format(logh2column,
         #                                                                        elogh2column))
         pl.title("Density $n>10^{{{0:0.1f}}}$cm$^{{-3}}$".format(mindens))
@@ -404,17 +398,20 @@ for row in fittable:
         ax5 = pl.subplot(2,2,4)
         ax5.contourf(xax, yax, chi2_h2.min(axis=axis), levels=chi2_h2.min()+np.arange(nlevs), alpha=0.5)
         ax5.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
-        ax5.set_xlabel(xlabel)
-        ax5.set_ylabel(ylabel)
         ax5.set_title("Total log$(N(\\mathrm{{H}}_2)) = {0:0.1f}\pm{1:0.1f}$"
                       .format(logh2column, elogh2column))
+
+        pl.text(0.05, 0.5, ylabel, horizontalalignment='center',
+                verticalalignment='center',
+                rotation='vertical', transform=fig3.transFigure)
+        pl.text(0.5, 0.02, xlabel, horizontalalignment='center', transform=fig3.transFigure)
 
         if xax is mf.carr:
             for ss in range(1,5):
                 ax = pl.subplot(2,2,ss)
                 ax.xaxis.set_ticks(np.arange(mf.carr.min(), mf.carr.max()))
 
-        pl.subplots_adjust(wspace=0.4, hspace=0.4)
+        pl.subplots_adjust(wspace=0.2, hspace=0.4)
         outf = paths.fpath('param_fits/{name}_{ptype}_{num}_parameter_constraints.pdf'.format(name=row['Source_Name'],
                                                                                               ptype=ptype,
                                                                                               num=num))

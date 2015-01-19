@@ -21,19 +21,20 @@ if 'dendsm' not in locals():
     log.info("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
     dendsm.wcs = cube303sm.wcs
 
-if 'dend321' not in locals():
-    t0 = time.time()
-    log.info("Loading dendrogram from file.")
-    dend321 = Dendrogram.load_from(hpath("DendroMask_H2CO321220.hdf5"))
-    log.info("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
-    dend321.wcs = cube321.wcs
-
-if 'dend321sm' not in locals():
-    t0 = time.time()
-    log.info("Loading dendrogram from file.")
-    dend321sm = Dendrogram.load_from(hpath("DendroMask_H2CO321220sm.hdf5"))
-    log.info("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
-    dend321sm.wcs = cube321sm.wcs
+# Removed: the 321 signal extraction approach never worked nicely
+# if 'dend321' not in locals():
+#     t0 = time.time()
+#     log.info("Loading dendrogram from file.")
+#     dend321 = Dendrogram.load_from(hpath("DendroMask_H2CO321220.hdf5"))
+#     log.info("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
+#     dend321.wcs = cube321.wcs
+# 
+# if 'dend321sm' not in locals():
+#     t0 = time.time()
+#     log.info("Loading dendrogram from file.")
+#     dend321sm = Dendrogram.load_from(hpath("DendroMask_H2CO321220sm.hdf5"))
+#     log.info("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
+#     dend321sm.wcs = cube321sm.wcs
 
 
 dend_sm = dendsm
@@ -50,16 +51,16 @@ except IOError:
                   " to get the PPV H2CO catalogs first")
 
 
-try:
-    catalog321 = Table.read(hpath('PPV_H2CO_Temperature_321selected.ipac'),
-                            format='ascii.ipac', guess=False)
-    catalog321_sm = Table.read(hpath('PPV_H2CO_Temperature_321selected_smooth.ipac'),
-                               format='ascii.ipac', guess=False)
-    catalog321sm = catalog321_sm
-
-except IOError:
-    warnings.warn("Need to run dendro_temperature:do_321_dendro_temperatures_both"
-                  " to get the PPV H2CO catalogs first")
+#try:
+#    catalog321 = Table.read(hpath('PPV_H2CO_Temperature_321selected.ipac'),
+#                            format='ascii.ipac', guess=False)
+#    catalog321_sm = Table.read(hpath('PPV_H2CO_Temperature_321selected_smooth.ipac'),
+#                               format='ascii.ipac', guess=False)
+#    catalog321sm = catalog321_sm
+#
+#except IOError:
+#    warnings.warn("Need to run dendro_temperature:do_321_dendro_temperatures_both"
+#                  " to get the PPV H2CO catalogs first")
 
 # Mark all non-H2CO lines as 'bad'
 # This is done manually since there is overlap between HC3N and H2CO 303 in

@@ -2,15 +2,17 @@ import numpy as np
 import pylab as pl
 import matplotlib
 
-from paths import hpath, apath, fpath, pcpath
 from astropy.table import Table, Column
 from astropy import log
 from scipy.interpolate import PiecewisePolynomial
 
-from dendrograms import (catalog, catalog_sm, dend, dendsm, dend321, dend321sm,
-                         catalog321, catalog321_sm)
+from paths import hpath, apath, fpath, pcpath
+from temperature_mapper import ph2cogrid, TemperatureMapper
+from dendrograms import (catalog, catalog_sm, dend, dendsm)
 
 matplotlib.rc_file(pcpath('pubfiguresrc'))
+
+tm = TemperatureMapper(logdensities=[3,4,5])
 
 zipped = zip((catalog,catalog_sm,),#catalog321,catalog321_sm),
              (dend,dendsm,),#dend321,dend321sm),
@@ -62,6 +64,23 @@ for cat,dendro,smooth in zipped:
         ax2.set_xlabel("Ratio $S(3_{2,1}-2_{2,0})/S(3_{0,3}-2_{0,2})$")
         ax2.set_ylabel("Temperature [K]")
     fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}.pdf'.format(smooth)))
+
+    if not hasattr(tm, 'temperatures'):
+        tm.init()
+    L1, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e3], tm.temperatures, 'k-.', label=r'$n(H_2)=10^3$ cm$^{-3}$', zorder=-5)
+    L1, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e4], tm.temperatures, 'k--', label=r'$n(H_2)=10^4$ cm$^{-3}$', zorder=-5)
+    L2, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e5], tm.temperatures, 'k:',  label=r'$n(H_2)=10^5$ cm$^{-3}$', zorder=-5)
+    leg = pl.legend(loc='best')
+    ax2.axis([0,0.55,10,200])
+    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay.pdf'.format(smooth)))
+
+    ax2.set_yscale('log')
+    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_log.pdf'.format(smooth)))
+    ax2.set_yscale('linear')
+
+    L1.set_visible(False)
+    L2.set_visible(False)
+
         
     if cat is catalog:
         ## Determine approximate best-fit

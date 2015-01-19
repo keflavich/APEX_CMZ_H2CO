@@ -4,6 +4,7 @@ import aplpy
 import os
 import copy
 from astropy import log
+from astropy.io import fits
 import paths
 from paths import h2copath, figurepath, hpath, fpath
 from spectral_cube import SpectralCube
@@ -25,26 +26,35 @@ for smooth in ("","_smooth",):#"_vsmooth"):
     snhdu = snproj.hdu
     snhdu.header['CTYPE1'] = 'GLON'
 
+    fig5 = pl.figure(5, figsize=figsize)
+    fig5.clf()
+    Fsn = aplpy.FITSFigure(snhdu, convention='calabretta', figure=fig5)
+    Fsn.show_grayscale(vmin=0, vmax=10, stretch='linear', invert=True)
+    Fsn.add_colorbar()
+    Fsn.colorbar.set_axis_label_text('Peak S/N')
+    Fsn.recenter(0.55, 50e3, width=2.3, height=300e3)
+    Fsn.tick_labels.set_xformat('d.dd')
+    Fsn.save(fpath("big_maps/pv_peaksn{0}.pdf".format(smooth)))
+
     for ftemplate,outtype in zip(('TemperatureCube{0}_PiecewiseFromRatio.fits',
-                                  'TemperatureCube_DendrogramObjects{0}.fits'),
-                                 ('','dendro')):
+                                  'TemperatureCube_DendrogramObjects{0}.fits',
+                                  'pv_H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e4.fits',
+                                  'pv_H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e5.fits',
+                                  'pv_H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens3e4.fits',
+                                 ),
+                                 ('','_dendro','_directpv1e4','_directpv1e5','_directpv3e4')):
 
         log.info("Starting "+ftemplate.format(smooth))
-        cube = SpectralCube.read(hpath(ftemplate.format(smooth)))
-        tproj = cube.mean(axis=1)
-        tproj.wcs.wcs.ctype[0] = 'OFFSET'
-        hdu = tproj.hdu
+
+        if 'pv' not in ftemplate:
+            cube = SpectralCube.read(hpath(ftemplate.format(smooth)))
+            tproj = cube.mean(axis=1)
+            tproj.wcs.wcs.ctype[0] = 'OFFSET'
+            hdu = tproj.hdu
+        else:
+            hdu = fits.open(hpath(ftemplate.format(smooth)))[0]
         hdu.header['CTYPE1'] = 'GLON'
 
-        fig5 = pl.figure(5, figsize=figsize)
-        fig5.clf()
-        Fsn = aplpy.FITSFigure(snhdu, convention='calabretta', figure=fig5)
-        Fsn.show_grayscale(vmin=0, vmax=10, stretch='linear', invert=True)
-        Fsn.add_colorbar()
-        Fsn.colorbar.set_axis_label_text('Peak S/N')
-        Fsn.recenter(0.55, 50e3, width=2.3, height=300e3)
-        Fsn.tick_labels.set_xformat('d.dd')
-        Fsn.save(fpath("big_maps/pv_peaksn{0}_{1}.pdf".format(smooth, outtype)))
 
 
         fig = pl.figure(4, figsize=figsize)
@@ -61,7 +71,7 @@ for smooth in ("","_smooth",):#"_vsmooth"):
         F.tick_labels.set_xformat('d.dd')
         F.add_colorbar()
         F.colorbar.set_axis_label_text('T (K)')
-        F.save(fpath("big_maps/pv_tmap{0}_{1}.pdf".format(smooth, outtype)))
+        F.save(fpath("big_maps/pv_tmap{0}{1}.pdf".format(smooth, outtype)))
 
 
         color = (0.5,)*3 # should be same as background #888
@@ -75,5 +85,5 @@ for smooth in ("","_smooth",):#"_vsmooth"):
                        zorder=10, convention='calabretta')
 
 
-        log.info("Saving "+fpath("big_maps/pv_tmap{0}_{1}_masked.pdf".format(smooth, outtype)))
-        F.save(fpath("big_maps/pv_tmap{0}_{1}_masked.pdf".format(smooth, outtype)))
+        log.info("Saving "+fpath("big_maps/pv_tmap{0}{1}_masked.pdf".format(smooth, outtype)))
+        F.save(fpath("big_maps/pv_tmap{0}{1}_masked.pdf".format(smooth, outtype)))

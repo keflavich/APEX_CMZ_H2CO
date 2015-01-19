@@ -154,6 +154,8 @@ class paraH2COmodel(object):
                    'elogabundance':'elogabundance',
                    'logh2column':'logh2column',
                    'elogh2column':'elogh2column',
+                   'dustmindens':'linmindens',
+                   'v_rms':'linewidth',
                   }
         pars = {mapping[k]: row[k] for k in row.colnames if k in mapping}
         pars.update(**kwargs)
@@ -168,6 +170,7 @@ class paraH2COmodel(object):
                         logh2column=None, elogh2column=None,
                         ratio303321=None, eratio303321=None,
                         ratio321322=None, eratio321322=None,
+                        linmindens=None,
                         mindens=None, emindens=0.2,
                         linewidth=None):
 
@@ -215,14 +218,26 @@ class paraH2COmodel(object):
         if np.all(~np.isfinite(self.chi2_r321322)):
             self.chi2_r321322 = 0
 
+        if linmindens is not None:
+            if mindens is not None:
+                raise ValueError("Both linmindens and logmindens were set.")
+            mindens = np.log10(linmindens)
+
         if mindens is not None:
             self.chi2_dens = (((self.densityarr - mindens)/emindens)**2
                               * (self.densityarr < (mindens-emindens)))
         else:
             self.chi2_dens = 0
 
+        self.compute_chi2_fromcomponents()
+
+    def compute_chi2_fromcomponents(self):
+        """
+        Compute the total chi2 from the individual chi2 components
+        """
         self.chi2 = (self.chi2_X + self.chi2_h2 + self.chi2_ff1 + self.chi2_ff2
                      + self.chi2_r321322 + self.chi2_r303321 + self.chi2_dens)
+
 
     def get_parconstraints(self):
         """
@@ -259,12 +274,13 @@ class paraH2COmodel(object):
         yax = self.axes[par2]
         xlabel = self.labels[par1]
         ylabel = self.labels[par2]
-        axis = {('dens','col'): 0,
+        axis = {('col','dens'): 0,
                 ('dens','tem'): 2,
                 ('col','tem'): 1}[(par1,par2)]
 
 
-        pl.clf()
+        fig = pl.gcf()
+        fig.clf()
         ax1 = pl.subplot(2,2,1)
         pl.contourf(xax, yax, self.chi2_r303321.min(axis=axis),
                     levels=self.chi2_r303321.min()+np.arange(nlevs), alpha=0.5)
@@ -274,8 +290,6 @@ class paraH2COmodel(object):
             pl.contour(xax, yax, self.chi2_r321322.min(axis=axis),
                        levels=self.chi2_r321322.min()+np.arange(nlevs),
                        cmap=pl.cm.bone)
-        pl.xlabel(xlabel)
-        pl.ylabel(ylabel)
         pl.title("Ratio $3_{0,3}-2_{0,2}/3_{2,1}-2_{2,0}$")
 
         ax4 = pl.subplot(2,2,2)
@@ -284,8 +298,6 @@ class paraH2COmodel(object):
                         levels=self.chi2_X.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
                    levels=self.chi2.min()+np.arange(nlevs))
-        pl.ylabel(ylabel)
-        pl.xlabel(xlabel)
         pl.title("log(p-H$_2$CO/H$_2$) "
                  "$= {0:0.1f}\pm{1:0.1f}$".format(self.logabundance,
                                                   self.elogabundance))
@@ -296,8 +308,6 @@ class paraH2COmodel(object):
                         levels=self.chi2_h2.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
                    levels=self.chi2.min()+np.arange(nlevs))
-        pl.xlabel(xlabel)
-        pl.ylabel(ylabel)
         pl.title("Total log$(N(\\mathrm{{H}}_2))$ ")
         #         "= {0:0.1f}\pm{1:0.1f}$".format(self.logh2column,
         #                                         self.elogh2column))
@@ -315,23 +325,26 @@ class paraH2COmodel(object):
         #pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis), levels=[0.5], colors='k')
         #pl.contour(xax, yax, (tline321 < 10*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
         #pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
-        pl.xlabel(xlabel)
-        pl.ylabel(ylabel)
         #pl.title("Line Brightness + $ff\leq1$")
         pl.title("Minimum Density")
+        fig.text(0.05, 0.5, ylabel, horizontalalignment='center',
+                verticalalignment='center',
+                rotation='vertical', transform=fig.transFigure)
+        fig.text(0.5, 0.02, xlabel, horizontalalignment='center', transform=fig.transFigure)
+
 
         if par1 == 'col':
             for ss in range(1,5):
                 ax = pl.subplot(2,2,ss)
                 ax.xaxis.set_ticks(np.arange(self.carr.min(), self.carr.max()))
 
-        pl.subplots_adjust(wspace=0.4, hspace=0.4)
+        pl.subplots_adjust(wspace=0.25, hspace=0.45)
 
     def denstemplot(self):
         self.parplot('dens','tem')
 
     def denscolplot(self):
-        self.parplot('dens','col')
+        self.parplot('col','dens')
 
     def coltemplot(self):
         self.parplot('col','tem')

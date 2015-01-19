@@ -542,94 +542,95 @@ marginalized regions in each parameter space as described in the
 Figure \ref{fig:coltemconstraints} caption.}
 {fig:parsonbrightness}{0.5}{0}
 
-% \section{Region Extraction}
-% \label{sec:region}
-% In order to extract higher signal-to-noise measurements on selected regions, we
-% broke the data down into subsets using both a by-eye region selection drawing
-% regions using ds9 and a more systematic approach using a dendrogram-based clump
-% finding algorithm \citep[][\url{http://dendrograms.org/}]{Rosolowsky2008c}.
-% 
-% % dendro_temperature.py
-% % TODO: decide whether we used the full resolution or the smoothed version.
-% % Presently (Jan 5), we are using the smoothed version
-% We ran the dendrogram/clumpfind extraction analysis on the smoothed
-% \threeohthree cube data.  We enforced thresholds of a minimum number of pixels
-% $N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting threshold
-% $\Delta = 2\sigma$.  The exact values of these parameters is not particularly
-% important, as we are interested in general trends with size-scale and
-% galactocentric distance, but we caution against overinterpretation of the
-% resulting catalog as the number of sources and their size and distribution can
-% change dramatically with small changes in the selected parameters.  The number
-% and location of pixels included in the catalog is, however, relatively robust
-% against small parameter changes.
-% 
-% For each extracted blob, we measured the corresponding integrated and peak
-% emission in the \threetwoone and \thirteenco cubes.  We also extracted the mean
-% dust temperature and column density from SED fits to Herschel HiGal 170-500\um
-% maps.  The SED fits were performed on background-subtracted data using an
-% approach originally described in \citet{Battersby2011a}, which includes details
-% of the fitting process and specification of assumed physical parameters.  We
-% also extracted dust column density and temperature using a more naive
-% pixel-by-pixel approach with no background subtraction
-% (\url{http://hi-gal-sed-fitter.readthedocs.org/en/latest/}) and found the two
-% to be consistent.
-% 
-% The by-eye selected regions were extracted less systematically, instead
-% focusing on peaks in the \threeohthree or \threetwoone emission.  We also
-% included a series of large square $8\arcmin \times 8\arcmin$ `apertures'
-% corresponding to each observed field.  For each region extracted in this
-% fashion, we fit a 1-3 component model as described in Section
-% \ref{sec:linemodeling}.  An example spectrum extracted from a small region
-% around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
+\section{Region Extraction}
+\label{sec:region}
+In order to extract higher signal-to-noise measurements on selected regions, we
+broke the data down into subsets using both a by-eye region selection drawing
+regions using ds9 and a more systematic approach using a dendrogram-based clump
+finding algorithm \citep[][\url{http://dendrograms.org/}]{Rosolowsky2008c}.
+
+% dendro_temperature.py
+% TODO: decide whether we used the full resolution or the smoothed version.
+% Presently (Jan 5), we are using the smoothed version
+We ran the dendrogram/clumpfind extraction analysis on the smoothed
+\threeohthree cube data.  We enforced thresholds of a minimum number of pixels
+$N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting threshold
+$\Delta = 2\sigma$.  The exact values of these parameters is not particularly
+important, as we are interested in general trends with size-scale and
+galactocentric distance, but we caution against overinterpretation of the
+resulting catalog as the number of sources and their size and distribution can
+change dramatically with small changes in the selected parameters.  The number
+and location of pixels included in the catalog is, however, relatively robust
+against small parameter changes.
+
+For each extracted blob, we measured the corresponding integrated and peak
+emission in the \threetwoone and \thirteenco cubes.  We also extracted the mean
+dust temperature and column density from SED fits to Herschel HiGal 170-500\um
+maps.  The SED fits were performed on background-subtracted data using an
+approach originally described in \citet{Battersby2011a}, which includes details
+of the fitting process and specification of assumed physical parameters.  We
+also extracted dust column density and temperature using a more naive
+pixel-by-pixel approach with no background subtraction
+(\url{http://hi-gal-sed-fitter.readthedocs.org/en/latest/}) and found the two
+to be consistent.
+
+The by-eye selected regions were extracted less systematically, instead
+focusing on peaks in the \threeohthree or \threetwoone emission.  We also
+included a series of large square $8\arcmin \times 8\arcmin$ `apertures'
+corresponding to each observed field.  For each region extracted in this
+fashion, we fit a 1-3 component model as described in Section
+\ref{sec:linemodeling}.  An example spectrum extracted from a small region
+around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
 
 
-% \subsection{Blob modeling}
-% \label{sec:dendromod}
-% Similar to the line modeling approach, we derived temperatures for each
-% dendrogram catalog blob using the measured line ratio and dust column density.
-% The $\chi^2$ grid approach described in Section \ref{sec:linemodeling} was used
-% to extract the temperature and associated error.
-% 
-% We plot the derived temperature for all clumps against the measured line ratio
-% in Figure \ref{fig:ratiovstem}.  The relation is nearly monotonic for the vast
-% majority of sources.  To simplify further analysis, we fit a three-element
-% piecewise linear model for temperature as a function of $R_1$.  We use this
-% function for further derivations of the temperature.  There is noticeable
-% scatter above $R_1 > 0.4$ and $T>150$ K, but in this regime the modeling is
-% already intrinsically uncertain and these ratios are best treated as lower
-% limits on the gas temperature.
-% 
-% % dendrotem_plots
-% \Figure{figures/dendrotem/ratio_vs_temperature_powerlaw_smooth.pdf}
-% {The derived temperature vs the measured ratio \Rone.  The temperature
-% includes constraints from the assumed fixed \formaldehyde abundance and the 
-% varying column density.  The points are color coded by signal-to-noise in the
-% ratio $R_1$, with black $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$,
-% and red $S/N > 50$.  The black line shows a 2nd order polynomial fit.
-% }
-% {fig:ratiovstem}{0.6}{0}
+\subsection{Blob modeling}
+\label{sec:dendromod}
+Similar to the line modeling approach, we derived temperatures for each
+dendrogram catalog blob using the measured line ratio, dust column density, 
+and a dust-derived lower limit on the volume density as constraints.
+The $\chi^2$ grid approach described in Section \ref{sec:linemodeling} was used
+to extract the temperature and associated error.
+
+We plot the derived temperature for all clumps against the measured line ratio
+in Figure \ref{fig:ratiovstem}.  The figure illustrates the effects of assuming
+higher or lower density on the temperature. The lower density models are
+excluded by the observed volume density lower limit from the dust.
+
+% dendrotem_plots
+\Figure{figures/dendrotem/ratio_vs_temperature_modeloverlay.pdf}
+{The derived temperature vs the measured ratio \Rone for the dendrogram clumps.
+The big symbols represent leaves (compact clumps) and the small symbols
+represent larger parent structures.
+The temperature includes constraints from the assumed fixed \formaldehyde
+abundance and the 
+varying column density.  The points are color coded by signal-to-noise in the
+ratio $R_1$, with black $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$,
+and red $S/N > 50$.  The black lines show the modeled temperature as a function of
+$R_1$ for three different assumed densities with a constant assumed abundance.
+}
+{fig:ratiovstem}{0.6}{0}
 
 \subsection{Temperature Maps}
 \label{sec:formaldehydetemmap}
-Using the piecewise relation derived in Section \ref{sec:dendromod}, we
+Using the relation described in Section \ref{sec:dendromod}, we
 converted the ratio map shown in Figure \ref{fig:ratiomaps} to a temperature
 map in Figure \ref{fig:temmap}a.  Because this map includes the full line-of-sight
 integrated emission, there are many regions where multiple independent components
 are being mixed.
 
-Figure \ref{fig:temmap}b shows a temperature map created by measuring the
-temperature in each clump from the dendrogram clump extraction based on the
-smoothed data cube and averaging over the velocity axis.  Because there are
-hierarchically nested clumps in the dendrogram-based clumpfind, and because
-there are genuinely independent clumps along common lines of sight, there is
-still overlap and confusion.  The nested clumps in the dendrogram can provide
-more than one temperature measurement per voxel; we therefore use the most
-compact clump's temperature measurement for each voxel.
+%Figure \ref{fig:temmap}b shows a temperature map created by measuring the
+%temperature in each clump from the dendrogram clump extraction based on the
+%smoothed data cube and averaging over the velocity axis.  Because there are
+%hierarchically nested clumps in the dendrogram-based clumpfind, and because
+%there are genuinely independent clumps along common lines of sight, there is
+%still overlap and confusion.  The nested clumps in the dendrogram can provide
+%more than one temperature measurement per voxel; we therefore use the most
+%compact clump's temperature measurement for each voxel.
 
-The two temperature maps broadly agree, but the dendrogram map is smoother and
-aesthetically superior.  The noisy edges of regions in Figure \ref{fig:temmap}a
-are unlikely to be real temperature features, so the dendrogram map is
-preferred.
+%The two temperature maps broadly agree, but the dendrogram map is smoother and
+%aesthetically superior.  The noisy edges of regions in Figure \ref{fig:temmap}a
+%are unlikely to be real temperature features, so the dendrogram map is
+%preferred.
 
 These temperature maps do not have uniform reliability.  There
 is some spatial variation in the noise, but the variation in the signal is much
@@ -658,42 +659,47 @@ temperatures as can be seen in Figure \ref{fig:parsonbrightness}.
 %\RotFigureTwoAA
 \RotFigureThreeAA
 %{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
-{figures/big_maps/big_lores_smoothdens1e4_col5e22_weighted_masked_tmap_withcontours.pdf}
-{figures/big_maps/big_lores_smoothdens1e5_col5e22_weighted_masked_tmap_withcontours.pdf}
-{figures/big_maps/big_lores_smoothdens1e5_col3e23_weighted_masked_tmap_withcontours.pdf}
-{\todo{Temperature maps assuming a fixed $N(\hh)$ and $n(\hh)$}
+{figures/big_maps/big_lores_smoothdens1e4_weighted_masked_tmap_withcontours.pdf}
+{figures/big_maps/big_lores_smoothdens3e4_weighted_masked_tmap_withcontours.pdf}
+{figures/big_maps/big_lores_smoothdens1e5_weighted_masked_tmap_withcontours.pdf}
+{Temperature maps using the smoothed data assuming fixed $X_{\para}=1.2\ee{9}$
+and $n(\hh)$.  The maps are masked by signal-to-noise as in Figure
+\ref{fig:ratiomaps}.
+(a) $n(\hh) = 10^4$ \percc
+(b) $n(\hh) = 10^{4.5}$ \percc
+(c) $n(\hh) = 10^5$ \percc
 }
 {fig:temmap}{1}{9.5in}
 
 
-% tmap_figure
-%\RotFigureTwoAA
-\RotFigureThreeAA
-%{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
-{figures/big_maps/big_RatioCube_DendrogramObjects_smooth_Piecewise_mean.pdf}
-{figures/big_maps/big_RatioCube_DendrogramObjects_smooth_Piecewise_weightedmean.pdf}
-{figures/big_maps/big_lores_smoothdendro_tmap_withcontours.pdf}
-{(top) The mean ratio along each line of sight through the dendrogram-extracted
-cube
-\newline
-(middle) The same as the top figure, but weighted by \threeohthree brightness
-\newline
-(bottom) 
-%A temperature map derived from the \Rone ratio map shown
-%in Figure \ref{fig:ratiomaps}.
-A temperature map created by averaging the dendrogram-derived clump temperature
-along each line-of-sight.
-Regions of lower signal-to-noise, and therefore less
-reliable temperature, are grayed out with a filter that gets more opaque
-toward lower signal-to-noise.  Temperatures above $\gtrsim150$ K should be
-treated as lower limits in the 100-150 K range.
-The thin contours are from the Herschel HiGal dust SED fit at a level $N(\hh)=5\ee{22}$
-and are included to provide a visual reference for comparison between the temperature
-maps.
-%The contours correspond to the integrated \threeohthree
-%line intensity at levels [4,7,11,20,38] K \kms.
-}
-{fig:dendrotemmap}{1}{9.5in}
+% % tmap_figure
+% %\RotFigureTwoAA
+% \RotFigureThreeAA
+% %{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
+% {figures/big_maps/big_RatioCube_DendrogramObjects_smooth_Piecewise_mean.pdf}
+% {figures/big_maps/big_RatioCube_DendrogramObjects_smooth_Piecewise_weightedmean.pdf}
+% {figures/big_maps/big_lores_smoothdendro_tmap_withcontours.pdf}
+% {(top) The mean ratio along each line of sight through the dendrogram-extracted
+% cube
+% \newline
+% (middle) The same as the top figure, but weighted by \threeohthree brightness
+% \newline
+% (bottom) 
+% %A temperature map derived from the \Rone ratio map shown
+% %in Figure \ref{fig:ratiomaps}.
+% A temperature map created by averaging the dendrogram-derived clump temperature
+% along each line-of-sight.
+% Regions of lower signal-to-noise, and therefore less
+% reliable temperature, are grayed out with a filter that gets more opaque
+% toward lower signal-to-noise.  Temperatures above $\gtrsim150$ K should be
+% treated as lower limits in the 100-150 K range.
+% The thin contours are from the Herschel HiGal dust SED fit at a level $N(\hh)=5\ee{22}$
+% and are included to provide a visual reference for comparison between the temperature
+% maps.
+% %The contours correspond to the integrated \threeohthree
+% %line intensity at levels [4,7,11,20,38] K \kms.
+% }
+% {fig:dendrotemmap}{1}{9.5in}
 
 % tmap_figure
 \RotFigureTwoAA
