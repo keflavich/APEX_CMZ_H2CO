@@ -15,6 +15,8 @@ matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 for fignum in (4,5):
     pl.close(fignum)
 
+recen = dict(x=0.57, y=20e3, width=2.26, height=250e3)
+vmax = 150
 cmap = pl.cm.RdYlBu_r
 figsize = (20,10)
 
@@ -32,7 +34,7 @@ for smooth in ("","_smooth",):#"_vsmooth"):
     Fsn.show_grayscale(vmin=0, vmax=10, stretch='linear', invert=True)
     Fsn.add_colorbar()
     Fsn.colorbar.set_axis_label_text('Peak S/N')
-    Fsn.recenter(0.55, 50e3, width=2.3, height=300e3)
+    Fsn.recenter(**recen)
     Fsn.tick_labels.set_xformat('d.dd')
     Fsn.save(fpath("big_maps/pv_peaksn{0}.pdf".format(smooth)))
 
@@ -66,8 +68,8 @@ for smooth in ("","_smooth",):#"_vsmooth"):
 
         cm = copy.copy(cmap)
         cm.set_bad((0.5,)*3)
-        F.show_colorscale(cmap=cm,vmin=15,vmax=200)
-        F.recenter(0.55, 50e3, width=2.3, height=300e3)
+        F.show_colorscale(cmap=cm,vmin=15,vmax=vmax)
+        F.recenter(**recen)
         F.tick_labels.set_xformat('d.dd')
         F.add_colorbar()
         F.colorbar.set_axis_label_text('T (K)')

@@ -17,7 +17,8 @@ var_flat = noise_flat**2
 ratio303321 = cube321m.flattened().value / cube303m.flattened().value
 eratio303321 = ((ratio303321**2 * (var_flat/cube303m.flattened().value**2 +
                                    var_flat/cube321m.flattened().value**2))**0.5)
-ratioOK = ratio303321 > eratio303321*3
+ratioOK = ratio303321 > eratio303321*1
+#ratioOK = cube303m.mask.include()
 
 data = np.zeros(cube303m.shape, dtype='float32')*np.nan
 mask[mask] = ratioOK
@@ -34,7 +35,8 @@ var_flat_sm = noise_flat_sm**2
 ratio303321sm = cube321msm.flattened().value / cube303msm.flattened().value
 eratio303321sm = ((ratio303321sm**2 * (var_flat_sm/cube303msm.flattened().value**2 +
                                        var_flat_sm/cube321msm.flattened().value**2))**0.5)
-ratioOKsm = ratio303321sm > eratio303321sm*4
+ratioOKsm = ratio303321sm > eratio303321sm*1
+#ratioOKsm = cube303msm.mask.include()
 
 datasm = np.zeros(cube303msm.shape, dtype='float32')*np.nan
 masksm[masksm] = ratioOKsm

@@ -14,7 +14,7 @@ from masked_cubes import (cube303m,cube321m,cube303msm,cube321msm,
 from astropy.utils.console import ProgressBar
 from astrodendro import Dendrogram,ppv_catalog
 from astropy.io import fits
-from dendrograms import dend, dendsm, dend321, dend321sm
+from dendrograms import dend, dendsm
 from piecewise_rtotem import pwtem
 from temperature_cubes import tcubesm_direct, tcube_direct
 

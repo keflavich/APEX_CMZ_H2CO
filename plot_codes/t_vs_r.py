@@ -13,7 +13,7 @@ from astropy import units as u
 if not os.path.isdir(paths.fpath('temvslon')):
     os.mkdir(paths.fpath('temvslon'))
 
-vmin,vmax = -150.,190.
+vmin,vmax = -150.,150.
 cbvmin,cbvmax = -80, 120
 dv = 20.
 vranges = np.arange(vmin, vmax, dv)
@@ -53,6 +53,9 @@ for tcube,name in zip((tcube_dend, tcube_dend_smooth, tcube_direct, tcubesm_dire
     xax -= 360*(xax>180)
     specax = tcube.spectral_axis.to(u.km/u.s).value
 
+    gnoisescale = 5 if 'dend' in name else 0
+    unoisescale = 1 if 'dend' in name else 0
+
     for v in vranges:
         color = cm((v-cbvmin)/(cbvmax-cbvmin))
         sel = (specax > v) & (specax < v+dv)
@@ -63,7 +66,7 @@ for tcube,name in zip((tcube_dend, tcube_dend_smooth, tcube_direct, tcubesm_dire
                 .T.reshape([xax.size,tcube.filled_data[x1:x2,:,:].size/xax.size]))
 
         ax3.plot(xax,
-                 data+np.random.randn(*data.shape)*5,
+                 data+np.random.randn(*data.shape)*gnoisescale,
                  marker=',', color=color,
                  linestyle='none', alpha=0.75)
         ax1.plot(xax, bmean[sel,:].T, marker=',', color=color,
@@ -71,12 +74,12 @@ for tcube,name in zip((tcube_dend, tcube_dend_smooth, tcube_direct, tcubesm_dire
         ax2.plot(np.abs(xax), bmean[sel,:].T, marker=',', color=color,
                  linestyle='none', alpha=0.75)
         ax4.plot(np.abs(xax),
-                 data+np.random.rand(*data.shape)*2-1,
+                 data+(np.random.rand(*data.shape)*2-1)*unoisescale,
                  marker=',', color=color,
                  linestyle='none', alpha=0.75)
 
     ax1.set_xlim(1.6, -0.6)
-    ax1.set_ylim(20,150)
+    ax1.set_ylim(10,150)
     # http://stackoverflow.com/a/11558629/814354
     sm = matplotlib.cm.ScalarMappable(norm=matplotlib.colors.Normalize(vmin=cbvmin, vmax=cbvmax),
                                       cmap=cm)
