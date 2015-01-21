@@ -313,7 +313,27 @@ $\sigma_{FWHM}=33.84\arcsec$ gaussian to achieve a resolution 45\arcsec, and
 $\sigma_{v, FWMH} = 3$ \kms in the spectral direction.  The smoothed cubes were
 also downsampled by a factor of 2 in the spectral direction.  We then performed
 the same signal extraction analysis described above, but with a threshold $T_A
-> 3\sigma$.
+> 3\sigma$.  Integrated intensity maps of both the original and the smoothed
+data are shown in Figure \ref{fig:integ303} for the \threeohthree map masked
+with the above method in and Figure \ref{fig:integ321} for the \threetwoone map
+using the mask created from the \threeohthree data.
+
+\RotFigureTwoAA
+{figures/integrated/APEX_H2CO_303_202_masked_moment0}
+{figures/integrated/APEX_H2CO_303_202_masked_smooth_moment0}
+{Integrated intensity (moment 0) maps of the \para \threeohthree line in the
+original (a) and smoothed (b) data.  The cubes were masked prior to integration
+using the method described in Section \ref{sec:signal}.}
+{fig:integ303}{1}{9.5in}
+
+\RotFigureTwoAA
+{figures/integrated/APEX_H2CO_321_220_masked_moment0}
+{figures/integrated/APEX_H2CO_321_220_masked_smooth_moment0}
+{Integrated intensity (moment 0) maps of the \para \threetwoone line in the
+original (a) and smoothed (b) data.  The cubes were masked prior to integration
+using the mask generated from the \threeohthree line as described in Section
+\ref{sec:signal}.}
+{fig:integ321}{1}{9.5in}
 
 \subsection{Ratio Maps}
 \label{sec:ratio}
@@ -725,6 +745,8 @@ they are in the $T<150$ K regime.
 Galactic latitude and using the $n=10^4$ \percc curve from Figure
 \ref{fig:ratiovstem}.  (b) The peak signal-to-noise along Galactic latitude,
 which is used as a mask in (a).
+\todo{The excessive whitespace in panel (a) is a bug that has not yet been
+resolved but it is known.}
 }
 {fig:pvtem}
 {1}{9.5in}
@@ -732,7 +754,10 @@ which is used as a mask in (a).
 \RotFigureTwoAA
 {figures/big_maps/pv_tmap_smooth_weight_masked.pdf}
 {figures/big_maps/pv_peaksn_smooth.pdf}
-{Smoothed version of Figure \ref{fig:pvtem}.}
+{Smoothed version of Figure \ref{fig:pvtem}.
+\todo{The excessive whitespace in panel (a) is a bug that has not yet been
+resolved but it is known.}
+}
 {fig:pvtemsm}
 {1}{9.5in}
 

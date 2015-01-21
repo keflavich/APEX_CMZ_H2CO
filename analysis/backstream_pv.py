@@ -67,7 +67,7 @@ cmap.set_bad((0.5,)*3)
 cmap.set_under((0.5,)*3)
 
 vmin=10
-vmax=150
+vmax=200
 
 for weight in ("_weighted",""):
     for molecule,fn in zip(molecules[-2:],filenames[-2:]):
