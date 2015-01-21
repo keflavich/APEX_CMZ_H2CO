@@ -411,7 +411,8 @@ for the p-\formaldehyde lines over a grid of 20 density ($n=10^{2.5}$-$10^{7}$
 \percc), a fixed assumed line gradient of 5 \kms / pc, 20 \formaldehyde column
 densities $N(\formaldehyde) = 1\ee{11}-1\ee{15.1}$ \persc, and 50 temperatures
 from 10 to 350 K.  The grid was created using the \texttt{pyradex} wrapper of
-RADEX\footnote{\url{https://github.com/adamginsburg/pyradex}}.  We then
+RADEX\footnote{\url{https://github.com/adamginsburg/pyradex}} and collision rates
+retrieved from LAMDA \citep{Wiesenfeld2003a}.  We then
 upsampled these grids by spline interpolating between grid points to acquire a
 high-resolution ($T\times n \times N = 250\times100\times100$) grid covering
 $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N < 10^{15.1}$
@@ -718,7 +719,7 @@ they are in the $T<150$ K regime.
 
 % tmap_pv
 \RotFigureTwoAA
-{figures/big_maps/pv_tmap_directpv1e4_masked.pdf}
+{figures/big_maps/pv_tmap_weight_masked.pdf}
 {figures/big_maps/pv_peaksn.pdf}
 {(a) A position-velocity diagram made by averaging the ratio cube along
 Galactic latitude and using the $n=10^4$ \percc curve from Figure
@@ -729,20 +730,20 @@ which is used as a mask in (a).
 {1}{9.5in}
 
 \RotFigureTwoAA
-{figures/big_maps/pv_tmap_smooth_directpv1e4_masked.pdf}
+{figures/big_maps/pv_tmap_smooth_weight_masked.pdf}
 {figures/big_maps/pv_peaksn_smooth.pdf}
 {Smoothed version of Figure \ref{fig:pvtem}.}
 {fig:pvtemsm}
 {1}{9.5in}
 
 % t_vs_r
-\Figure
-{figures/temvslon/temperature_vs_longitude_bmean_dendsm}
-{A plot of the latitude-averaged temperature in each pixel as a function of
-longitude.  This plot shows the temperature distribution across the CMZ and is
-meant to better-quantify Figure \ref{fig:temmap}.  The pixels are colored by
-velocity in 20 \kms velocity bins.}
-{fig:tempoints}{0.5}{0}
+%\Figure
+%{figures/temvslon/temperature_vs_longitude_bmean_dendsm}
+%{A plot of the latitude-averaged temperature in each pixel as a function of
+%longitude.  This plot shows the temperature distribution across the CMZ and is
+%meant to better-quantify Figure \ref{fig:temmap}.  The pixels are colored by
+%velocity in 20 \kms velocity bins.}
+%{fig:tempoints}{0.5}{0}
 
 \section{Discussion}
 \label{sec:discussion}
@@ -898,8 +899,8 @@ Perhaps, instead, this temperature increase is driven by increased star
 formation and internal heating along the dust ridge.
 
 \RotFigureTwoAA
-{figures/orbits/KDL2014_orbit_on_H2CO_DendrogramTemperature_smooth.pdf}
-{figures/orbits/KDL2014_orbitpath_on_H2CO_DendrogramTemperature_smooth.pdf}
+{figures/orbits/KDL2014_orbit_on_H2CO_TemperatureFromRatio_weighted.pdf}
+{figures/orbits/KDL2014_orbitpath_on_H2CO_TemperatureFromRatio_weighted.pdf}
 {(a) A position-velocity slice through the dendrogram clumpfind generated
 temperature cube along the \citet{Kruijssen2014d} orbit.  White regions are
 outside the mapped area, while grey regions have no gas detected or inadequate
@@ -910,14 +911,13 @@ $\ell=359.3$ indicates the starting point (offset$=0$) of the position-velocity
 slice.  The orbit is outside of our observed field to the west of Sgr C.  
 The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
 }
-{fig:kdlorbit}{1}{9.5in}
+{fig:kdlorbit}{1}{8.5in}
 
 \Figure
-{figures/orbits/KDL2014_H2CO_DendrogramTemperature_smooth_vs_time.pdf}
+{figures/orbits/dendro_smooth_temperature_vs_time_firstMyr.pdf}
 {The observed temperature vs time since the most recent pericenter passage of
-The Brick on the \citet{Kruijssen2014d} orbit.  The Brick and Sgr B2 are
-highlighted as `hot points' along the plot.  Prior to Sgr B2, there appears to
-be a linear increase in temperature with time, from an initial temperature
+The Brick on the \citet{Kruijssen2014d} orbit.  There is a hint of 
+a linear increase in temperature with time, from an initial temperature
 $T\sim40-60$ K to $T\sim120$ K over a period $\tau\sim0.5-1$ Myr.}
 {fig:kdltemvstime}{0.4}{0}
 
@@ -951,14 +951,14 @@ massive, cool, diffuse component being detected in \ammonia, while
 \formaldehyde is detecting a hotter, denser component.
 
 \RotFigureTwoAA
-{figures/big_maps/ott2014_nh3_tmap_15to80_withcontours.pdf}
-{figures/big_maps/lores_smoothdendro_tmap_withcontours.pdf}
+{figures/big_maps/ott2014_nh3_tmap_15to150_withcontours.pdf}
+{figures/big_maps/lores_smoothdens1e4_weighted_masked_tmap_withcontours.pdf}
 {(a) A temperature map derived from the \ammonia 1-1/2-2 line ratio from
 \citet{Ott2014a}.  The \ammonia thermometer has a more limited temperature
 range when using only these two lines, so the map is cut off at $T=80$ K.
 %This map can be compared to Figure \ref{fig:temmap}.
 (b) The \para-derived temperature map over the same region from Figure
-\ref{fig:temmap}b
+\ref{fig:temmap}a
 }
 {fig:nh3tmap}
 {1}{9.5in}

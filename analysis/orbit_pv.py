@@ -1,6 +1,8 @@
 import numpy as np
 import pvextractor
+from pvextractor.geometry.poly_slices import extract_poly_slice
 import spectral_cube
+from spectral_cube import SpectralCube, BooleanArrayMask
 import aplpy
 import pylab as pl
 import matplotlib
@@ -8,9 +10,10 @@ import copy
 from paths import mpath,apath,fpath,molpath,hpath
 from astropy import units as u
 from astropy import coordinates
-from astropy.io import ascii
+from astropy.io import ascii, fits
 from astropy import log
 from astropy.wcs import WCS
+from astropy import wcs
 import paths
 import matplotlib
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
@@ -26,6 +29,9 @@ dist = (dl**2+db**2)**0.5
 cdist = np.zeros(dist.size+1)
 cdist[1:] = dist.cumsum()
 
+figsize=(20,10)
+
+vmin,vmax=10,200
 
 def offset_to_point(glon, glat):
     """
@@ -37,28 +43,6 @@ def offset_to_point(glon, glat):
     line = geom.LineString(table['l','b'])
     point = geom.Point(glon, glat)
     return line.project(point)
-    point_on_line = line.interpolate(line.project(point))
-    cl, cb = point_on_line.x, point_on_line.y
-
-    # distance from point to each vertex
-    vertex_distances = ((cl-table['l'])**2+(cb-table['b'])**2)
-    closest_vertex = vertex_distances.argmin()
-    after = vertex_distances[closest_vertex-1] < vertex_distances[closest_vertex+1]
-    if after:
-        i1 = closest_vertex
-    else:
-        i1 = closest_vertex-1
-    i2 = i1+1
-
-    line = geom.LineString(table['l','b'][i1:i2+1])
-    point = geom.Point(glon, glat)
-    point_on_line = line.interpolate(line.project(point))
-
-    total_offset = ((((table['l'][1:i2] - table['l'][0:i1])**2 + 
-                      (table['b'][1:i2] - table['b'][0:i1])**2)**0.5).sum() + 
-                    ((point_on_line.x-table['l'][i2])**2 + (point_on_line.y-table['b'][i2])**2)**0.5)
-    
-    return total_offset
 
 molecules = ('13CO_2014_merge', 'C18O_2014_merge', 'H2CO_303_202_bl', 'SiO_54_bl')
 
@@ -84,28 +68,61 @@ filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_leaves.fits'))
 
 
 cmap = copy.copy(pl.cm.RdYlBu_r)
-cmap.set_bad((1.0,)*3)
+#cmap.set_bad((1.0,)*3)
 cmap.set_under((0.9,0.9,0.9,0.5))
+cmap.set_bad((0.9,0.9,0.9,0.5))
 
-for weight in  ("", "weight"):
+for weight in ("_weighted",""):
     for molecule,fn in zip(molecules,filenames):
         log.info(molecule)
         cube = spectral_cube.SpectralCube.read(fn)
 
         if weight:
 
-            wcube = (spectral_cube.SpectralCube.read('APEX_H2CO_303_202_smooth_bl.fits')
+            wcube = (spectral_cube.SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_bl.fits'))
                      if 'smooth' in fn
-                     else spectral_cube.SpectralCube.read('APEX_H2CO_303_202_bl.fits'))
+                     else spectral_cube.SpectralCube.read(hpath('APEX_H2CO_303_202_bl.fits')))
+            mcube = (SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_bl_mask.fits'))
+                     if 'smooth' in fn
+                     else SpectralCube.read(hpath('APEX_H2CO_303_202_bl_mask.fits')))
             if cube.shape != wcube.shape:
                 log.info("Not weighting {0}".format(fn))
                 continue
             weighted = copy.copy(cube)
             weighted._data = wcube._data * cube._data
+            mask = (wcube.mask & cube.mask &
+                    BooleanArrayMask(weighted.filled_data[...] != 0, weighted.wcs) &
+                    BooleanArrayMask(wcube.filled_data[...] != 0, wcube.wcs) &
+                    BooleanArrayMask(mcube._data==1, mcube.wcs)
+                   )
+            weighted = weighted.with_mask(mask)
+            wcube = wcube.with_mask(mask)
 
-            pv1 = pvextractor.extract_pv_slice(weighted, P, respect_nan=True)
-            pv2 = pvextractor.extract_pv_slice(wcube.with_mask(cube.mask), P, respect_nan=True)
-            pv = pv1/pv2
+            #pv1a = pvextractor.extract_pv_slice(cube, P, respect_nan=True)
+            pv1,apv1 = extract_poly_slice(weighted.filled_data[...].value,
+                                     P.sample_polygons(spacing=1.0,
+                                                       wcs=cube.wcs),
+                                     return_area=True)
+            print()
+            pv2,apv2 = extract_poly_slice(wcube.filled_data[...].value,
+                                     P.sample_polygons(spacing=1.0, wcs=cube.wcs),
+                                     return_area=True)
+
+            assert np.count_nonzero(pv1) == np.count_nonzero(pv2)
+            assert np.all((pv1 != 0) == (pv2 != 0))
+            assert np.all(apv1==apv2)
+
+            # Some of this header manipulation seems unnecessary but isn't.
+            header = copy.copy(cube.header)
+            for kw in ('CRPIX','CRVAL','CDELT','CUNIT','CTYPE',):
+                header[kw+"2"] = header[kw+"3"]
+                del header[kw+"3"]
+            header['CTYPE1'] = 'OFFSET'
+            header = pvextractor.utils.wcs_slicing.slice_wcs(WCS(header),
+                                                             spatial_scale=7.2*u.arcsec).to_header()
+            pv = fits.PrimaryHDU(data=pv1/pv2,
+                                 header=header)
+            pv2hdu = fits.PrimaryHDU(data=pv2, header=header)
         else:
             # respect_nan = False so that the background is zeros where there is data
             # and nan where there is not data
@@ -114,24 +131,25 @@ for weight in  ("", "weight"):
             # fashion!)
             #pv = pvextractor.extract_pv_slice(cube, P, respect_nan=False)
             pv = pvextractor.extract_pv_slice(cube, P, respect_nan=True)
-            bad_cols = np.isnan(np.nanmax(pv.data, axis=0))
-            nandata = np.isnan(pv.data)
-            pv.data[nandata & ~bad_cols] = 0
+        bad_cols = np.isnan(np.nanmax(pv.data, axis=0))
+        nandata = np.isnan(pv.data)
+        pv.data[nandata & ~bad_cols] = 0
 
-        fig1 = pl.figure(1, figsize=(14,8))
+        fig1 = pl.figure(1, figsize=figsize)
         fig1.clf()
         F = aplpy.FITSFigure(pv, figure=fig1)
+        actual_aspect = pv.shape[0]/float(pv.shape[1])
         if 'Temperature' in fn:
-            F.show_colorscale(cmap=cmap, aspect=5, vmin=20, vmax=200)
+            F.show_colorscale(cmap=cmap, aspect=0.5/actual_aspect, vmin=vmin, vmax=vmax)
             # This is where it fails...
             #F.add_colorbar()
             #divider = make_axes_locatable(F._ax1)
             #cax = divider.append_axes("right", size="5%", pad=0.05)
             #pl.colorbar(F._ax1.images[0], cax=cax)
         elif 'Ratio' in fn:
-            F.show_colorscale(cmap=cmap, aspect=5, vmin=0, vmax=0.5)
+            F.show_colorscale(cmap=cmap, aspect=0.5/actual_aspect, vmin=0, vmax=0.5)
         else:
-            F.show_grayscale(aspect=5)
+            F.show_grayscale(aspect=0.5/actual_aspect)
 
         for color, segment in zip(('red','green','blue','black','purple'),
                                   ('abcde')):
@@ -144,21 +162,43 @@ for weight in  ("", "weight"):
                          color=color, linewidth=3, alpha=0.25)
             #F.show_markers(cdist[selection], table["v'los"][selection]*1e3, zorder=1000,
             #             color=color, marker='+')
-        F.recenter(x=4.5/2., y=0., width=4.5, height=300000)
+        F.recenter(x=4.5/2., y=20., width=4.5, height=240000)
         #F.show_markers([offset_to_point(0.47,-0.01)], [30.404e3], color=['r'])
         #F.show_markers([offset_to_point(0.38,+0.04)], [39.195e3], color=['b'])
         F.show_markers([offset_to_point(0.47, -0.01)],[30.404e3], edgecolor='r', marker='x')
         F.show_markers([offset_to_point(0.38, 0.04)], [39.195e3], edgecolor='b', marker='x')
         F.show_markers([offset_to_point(0.253, 0.016)], [36.5e3], edgecolor='purple', marker='x')
-        F.save(fpath('orbits/KDL2014_orbit_on_{0}.pdf'.format(molecule)))
+
+        F.save(fpath('orbits/KDL2014_orbit_on_{0}{1}.pdf'.format(molecule, weight)))
+
+        if weight:
+            color = (0.5,)*3 # should be same as background #888
+            F.show_contour(pv2hdu,
+                           levels=[-1,0]+np.logspace(0.20,2).tolist(),
+                           colors=([(0.5,0.5,0.5,1)]*2 + 
+                                   [color + (alpha,) for alpha in
+                                    np.exp(-(np.logspace(0.20,2)-1.7)**2/(2.5**2*2.))]),
+                           filled=True,
+                           smooth=3,
+                           zorder=10, convention='calabretta')
+            F.save(fpath('orbits/KDL2014_orbit_on_{0}{1}_masked.pdf'.format(molecule, weight)))
+
 
         fig2 = pl.figure(2)
         pl.clf()
-        img = cube.mean(axis=0).hdu
+        if weight:
+            im1 = weighted.sum(axis=0)
+            im2 = wcube.sum(axis=0)
+            im = im1.value / im2.value
+            img = im1.hdu
+            img.data = im
+
+        else:
+            img = cube.mean(axis=0).hdu
         img.data[np.isnan(img.data)] = 0
         F2 = aplpy.FITSFigure(img, convention='calabretta', figure=fig2)
         if 'Temperature' in fn:
-            F2.show_colorscale(cmap=cmap, vmin=20, vmax=200)
+            F2.show_colorscale(cmap=cmap, vmin=vmin, vmax=vmax)
             F2.add_colorbar()
         else:
             F2.show_grayscale()
@@ -205,7 +245,7 @@ for weight in  ("", "weight"):
         F2.show_markers([0.38], [0.04], edgecolor='b', marker='x', zorder=1500)
         F2.show_markers([0.253], [0.016], edgecolor='purple', marker='x', zorder=1500)
 
-        F2.save(fpath('orbits/KDL2014_orbitpath_on_{0}.pdf'.format(molecule)))
+        F2.save(fpath('orbits/KDL2014_orbitpath_on_{0}{1}.pdf'.format(molecule, weight)))
 
         # Compute the temperature as a function of time in a ppv tube
         offset = np.linspace(0, cdist.max(), pv.shape[1])
@@ -237,7 +277,7 @@ for weight in  ("", "weight"):
 
         #ax3.plot(time, mean_tem, color='b', alpha=0.2)
 
-        fig3 = pl.figure(3)
+        fig3 = pl.figure(3, figsize=figsize)
         fig3.clf()
         ax3 = fig3.gca()
 
@@ -246,7 +286,7 @@ for weight in  ("", "weight"):
         ax3.plot(time-reftime, pv.data.T, 'k.', alpha=0.5, markersize=3)
         ax3.set_xlabel("Time since 1$^\\mathrm{st}$ pericenter passage [Myr]", size=24, labelpad=10)
         if 'Temperature' in fn:
-            ax3.set_ylim(0,200)
+            ax3.set_ylim(0,vmax)
             ax3.set_ylabel("Temperature [K]", size=24, labelpad=10)
             ytext = 180
         elif 'Ratio' in fn:
@@ -270,5 +310,5 @@ for weight in  ("", "weight"):
         pl.setp(ax3.get_xticklabels(), fontsize=20)
         pl.setp(ax3.get_yticklabels(), fontsize=20)
         ax3.set_xlim(-0.1,4.6)
-        fig3.savefig(fpath('orbits/KDL2014_{0}_vs_time.pdf'.format(molecule)),
+        fig3.savefig(fpath('orbits/KDL2014_{0}_vs_time_{1}.pdf'.format(molecule, weight)),
                      bbox_inches='tight')

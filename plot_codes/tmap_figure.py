@@ -23,7 +23,10 @@ big_recen = dict(x=0.55, y=-0.075,width=2.3,height=0.40)
 sgrb2x = [000.6773, 0.6578, 0.6672]
 sgrb2y = [-00.0290, -00.0418, -00.0364]
 
-vmax = 150
+vmin=10
+vmax = 200
+
+dustcolumn = '/Users/adam/work/gc/gcmosaic_column_conv36.fits'
 
 toloop = zip((
               'H2CO_321220_to_303202{0}_bl_integ_temperature_dens3e4.fits',
@@ -64,7 +67,7 @@ for ftemplate,outtype in toloop:
 
         cm = copy.copy(cmap)
         cm.set_bad((0.5,)*3)
-        F.show_colorscale(cmap=cm,vmin=15,vmax=vmax)
+        F.show_colorscale(cmap=cm,vmin=vmin,vmax=vmax)
         F.set_tick_labels_format('d.dd','d.dd')
         F.recenter(**small_recen)
         peaksn = os.path.join(h2copath,'APEX_H2CO_303_202{0}_bl_mask_integ.fits'.format(smooth))
@@ -93,7 +96,6 @@ for ftemplate,outtype in toloop:
         F.save(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withmask.pdf'.format(smooth, outtype)))
         log.info(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withmask.pdf'.format(smooth, outtype)))
 
-        dustcolumn = '/Users/adam/work/gc/gcmosaic_column_conv36.fits'
         F.show_contour(dustcolumn,
                        levels=[5], colors=[(0,0,0,0.5)], zorder=15,
                        alpha=0.5,
@@ -164,7 +166,7 @@ F = aplpy.FITSFigure('/Users/adam/work/gc/Tkin-GC.fits.gz',
 
 cm = copy.copy(cmap)
 cm.set_bad((0.5,)*3)
-F.show_colorscale(cmap=cm,vmin=15,vmax=vmax)
+F.show_colorscale(cmap=cm,vmin=vmin,vmax=vmax)
 F.set_tick_labels_format('d.dd','d.dd')
 F.recenter(**small_recen)
 F.add_colorbar()
@@ -175,7 +177,7 @@ F.show_markers(sgrb2x, sgrb2y, color='k', facecolor='k', s=250,
                edgecolor='k', alpha=0.9)
 
 F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to{0}.pdf'.format(vmax)))
-F.show_colorscale(cmap=cm,vmin=15,vmax=80)
+F.show_colorscale(cmap=cm,vmin=vmin,vmax=80)
 F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to80.pdf'))
 
 F.show_contour(dustcolumn,
@@ -184,3 +186,5 @@ F.show_contour(dustcolumn,
                linewidths=[0.5],
                layer='dustcontour')
 F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to80_withcontours.pdf'))
+F.show_colorscale(cmap=cm,vmin=vmin,vmax=vmax)
+F.save(os.path.join(figurepath, "big_maps", 'ott2014_nh3_tmap_15to{0}_withcontours.pdf'.format(vmax)))

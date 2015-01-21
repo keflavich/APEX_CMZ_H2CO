@@ -78,6 +78,7 @@ def doratio(h2copath=h2copath, maxratio=1):
 
         weight = top
         weight[weight < 0] = 0
+        weight[~mask] = 0
         ratio_weighted = np.nansum(weight*ratio, axis=0) / np.nansum(weight, axis=0)
         f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
         f[0].data = ratio_weighted
@@ -103,6 +104,7 @@ def doratio(h2copath=h2copath, maxratio=1):
 
         weight = top
         weight[weight < 0] = 0
+        weight[~mask] = 0
         ratio_weighted = np.nansum(weight*ratio, axis=0) / np.nansum(weight, axis=0)
         f = fits.open(h2copath+'APEX_H2CO_303_202{0}_mask_integ.fits'.format(smooth))
         f[0].data = ratio_weighted
@@ -120,6 +122,7 @@ def doratio(h2copath=h2copath, maxratio=1):
         del f[0].header['LATPOLE']
          
         weight[weight < 0] = 0
+        weight[~mask] = 0
         ratio_weighted = np.nansum(weight*ratio, axis=1) / np.nansum(weight, axis=1)
         f[0].data = ratio_weighted
         f.writeto(h2copath+'pv_H2CO_321220_to_303202{0}_integ_weighted.fits'.format(smooth),clobber=True)
@@ -156,7 +159,7 @@ def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
     import scipy.stats
 
     for pre_ in ("pv_",""):
-        for suf_ in ('{0}','{0}_integ','{0}_integ_weighted'):#,'_cube{0}'):
+        for suf_ in ('{0}','{0}_integ','{0}_integ_weighted',"{0}_integ_masked_weighted"):#,'_cube{0}'):
             for smooth in ('','_smooth','_bl','_smooth_bl'):
 
                 suf = suf_.format(smooth)

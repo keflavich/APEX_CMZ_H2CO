@@ -19,4 +19,4 @@ fit_table = Table.read(apath('piecewise_tvsratio_fit.ipac'), format='ascii.ipac'
 
 # Grabbed from dendrotem_plot on Jan 15, 2015
 #pwtem = lambda x: np.polyval([190.12665966, 276.45454806,  11.09564855], x)
-pwtem = lambda x: tm(x, density=10**4.5)
+pwtem = lambda x: tm(x, density=1e4)
