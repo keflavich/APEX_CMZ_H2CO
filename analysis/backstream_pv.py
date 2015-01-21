@@ -70,7 +70,7 @@ vmin=10
 vmax=200
 
 for weight in ("_weighted",""):
-    for molecule,fn in zip(molecules[-2:],filenames[-2:]):
+    for molecule,fn in zip(molecules[-8:],filenames[-8:]):
         log.info(molecule)
         cube = spectral_cube.SpectralCube.read(fn)
 

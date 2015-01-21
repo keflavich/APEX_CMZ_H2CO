@@ -346,7 +346,9 @@ four different varieties of ratio map in Figures \ref{fig:ratiomaps} and
 Figure \ref{fig:ratiomaps} shows maps created by creating ratio cubes, in which
 each voxel has the value $R_1=\Rone$, then averaging across velocity with
 constant weight for each voxel in Figure \ref{ratiomaps}a and with the weight
-set by the \threeohthree brightness value in Fiure \ref{ratiomaps}b.  In both
+set by the \threeohthree brightness value in Fiure \ref{ratiomaps}b; the latter is
+equivalent to the ratio of the moment 0 maps shown in Figures
+\ref{fig:integ303} and \ref{fig:integ321}.  In both
 cases, the mask described in Section \ref{sec:signal} was applied to the cubes
 before averaging over velocity.
 
@@ -739,14 +741,13 @@ they are in the $T<150$ K regime.
 
 % tmap_pv
 \RotFigureTwoAA
-{figures/big_maps/pv_tmap_weight_masked.pdf}
-{figures/big_maps/pv_peaksn.pdf}
-{(a) A position-velocity diagram made by averaging the ratio cube along
+{figures/big_maps/pv_tmap_smooth_weight_masked.pdf}
+{figures/big_maps/pv_peaksn_smooth.pdf}
+{(a) A position-velocity diagram made by averaging the smooth ratio cube along
 Galactic latitude and using the $n=10^4$ \percc curve from Figure
 \ref{fig:ratiovstem}.  (b) The peak signal-to-noise along Galactic latitude,
-which is used as a mask in (a).
-\todo{The excessive whitespace in panel (a) is a bug that has not yet been
-resolved but it is known.}
+which is used as a mask in (a).  The apparently cold blobs at -80 \kms in Sgr
+B2 and -90 \kms in Sgr A is a different line, HC$_3$N 24-23.
 }
 {fig:pvtem}
 {1}{9.5in}
@@ -923,9 +924,10 @@ turbulence decay alone, since The Brick should follow the general trend.
 Perhaps, instead, this temperature increase is driven by increased star
 formation and internal heating along the dust ridge.
 
+% orbit_pv
 \RotFigureTwoAA
-{figures/orbits/KDL2014_orbit_on_H2CO_TemperatureFromRatio_weighted.pdf}
-{figures/orbits/KDL2014_orbitpath_on_H2CO_TemperatureFromRatio_weighted.pdf}
+{figures/orbits/KDL2014_orbit_on_H2CO_TemperatureFromRatio_smooth_weighted.pdf}
+{figures/orbits/KDL2014_orbitpath_on_H2CO_TemperatureFromRatio_smooth_weighted.pdf}
 {(a) A position-velocity slice through the dendrogram clumpfind generated
 temperature cube along the \citet{Kruijssen2014d} orbit.  White regions are
 outside the mapped area, while grey regions have no gas detected or inadequate
@@ -938,6 +940,7 @@ The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
 }
 {fig:kdlorbit}{1}{8.5in}
 
+% dendro_vs_time
 \Figure
 {figures/orbits/dendro_smooth_temperature_vs_time_firstMyr.pdf}
 {The observed temperature vs time since the most recent pericenter passage of
@@ -1081,12 +1084,13 @@ between 70 and 120 K (with many lower limits in Sgr B2).  There are hints that
 the cooler gas that is observed in this range may actually be at larger
 galactocentric radii and simply be projected onto the $R=0$ region.
 
-\Figure
-{figures/temvslon/temperature_vs_radius_bmean_dendsm}
-{A plot of the latitude-averaged temperature in each pixel as a function of
-projected radius. As in Figure \ref{fig:tempoints}, the pixels are colored by
-velocity in 20 \kms velocity bins.}
-{fig:temvsrad}{0.5}{0}
+%% t_vs_r
+%\Figure
+%{figures/temvslon/temperature_vs_radius_bmean_dendsm}
+%{A plot of the latitude-averaged temperature in each pixel as a function of
+%projected radius. As in Figure \ref{fig:tempoints}, the pixels are colored by
+%velocity in 20 \kms velocity bins.}
+%{fig:temvsrad}{0.5}{0}
 
 
 \subsection{A stream of fresh gas falling into the CMZ?}
@@ -1113,9 +1117,10 @@ projected 200 pc is still dominated by the `ring' clouds and Sgr B2, so at
 least some deficit remains.
 
 
+% backstream_pv
 \RotFigureTwoAA
-{figures/orbits/mydrawnpathpv_on_H2CO_DendrogramTemperature_smooth.pdf}
-{figures/orbits/mydrawnpath_on_H2CO_DendrogramTemperature_smooth.pdf}
+{figures/orbits/mydrawnpathpv_on_H2CO_TemperatureFromRatio_smooth_weighted.pdf}
+{figures/orbits/mydrawnpath_on_H2CO_TemperatureFromRatio_smooth_weighted.pdf}
 {Position-velocity slice tracing the ``fresh stream'' of cooler molecular
 gas from Section \ref{sec:coolstream}.}
 {fig:coolstream}{1}{9.5in}
