@@ -258,8 +258,10 @@ for cat,dendro,smooth in zipped:
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax12.set_xlabel(r"Line FWHM (km s$^{-1}$)")
         ax12.set_ylabel("Temperature [K]")
-    ax12.set_ylim([0,150])
+    ax12.set_ylim([0,200])
     fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
+    ax12.set_xlim([0,15])
+    fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity_xzoom{0}.pdf'.format(smooth)))
 
     fig22 = pl.figure(22)
     fig22.clf()

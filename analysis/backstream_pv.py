@@ -129,6 +129,9 @@ for weight in ("_weighted",""):
         #F.show_markers([offset_to_point(0.253, 0.016)], [36.5e3], edgecolor='purple', marker='x')
         F.save(fpath('orbits/mydrawnpathpv_on_{0}{1}.pdf'.format(molecule,weight)))
 
+
+        peaksn = os.path.join(h2copath,'APEX_H2CO_303_202{0}_bl_mask_integ.fits'.format(smooth))
+
         fig2 = pl.figure(2)
         pl.clf()
         img = cube.mean(axis=0).hdu
@@ -175,3 +178,11 @@ for weight in ("_weighted",""):
         #F2.show_markers([0.253], [0.016], edgecolor='purple', marker='x', zorder=1500)
 
         F2.save(fpath('orbits/mydrawnpath_on_{0}{1}.pdf'.format(molecule,weight)))
+
+        color = (0.5,)*3 # should be same as background #888
+        F2.show_contour(peaksn, levels=[-1,0]+np.logspace(0.20,2).tolist(),
+                        colors=[(0.5,0.5,0.5,1)]*2 + [color + (alpha,) for alpha in np.exp(-(np.logspace(0.20,2)-1.7)**2/(2.5**2*2.))], #smooth=3,
+                        filled=True,
+                        #linewidths=[1.0]*5,
+                        zorder=10, convention='calabretta')
+        F2.save(fpath('orbits/mydrawnpath_on_{0}{1}_masked.pdf'.format(molecule,weight)))

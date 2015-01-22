@@ -68,9 +68,9 @@ filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_leaves.fits'))
 
 
 cmap = copy.copy(pl.cm.RdYlBu_r)
-#cmap.set_bad((1.0,)*3)
+cmap.set_bad((1.0,)*3)
 cmap.set_under((0.9,0.9,0.9,0.5))
-cmap.set_bad((0.9,0.9,0.9,0.5))
+#cmap.set_bad((0.9,0.9,0.9,0.5))
 
 for weight in ("_weighted",""):
     for molecule,fn in zip(molecules,filenames):

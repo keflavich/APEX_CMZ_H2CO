@@ -70,6 +70,7 @@ def make_dend(cube, noise, view=True, write=True,
     err_estimate = noise[(noise > (noise_mean-noise_std)) &
                          (noise < (noise_mean+noise_std))].mean()
     bad_noise = np.isnan(noise)
+    log.info("{1} Estimated error: {0}".format(err_estimate, outfn))
 
     dend = Dendrogram.compute(cube.filled_data[:].value,
                               min_value=min_nsig_value*err_estimate,

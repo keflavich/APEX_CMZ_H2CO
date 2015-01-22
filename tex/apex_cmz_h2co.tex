@@ -54,6 +54,10 @@ large, but unrealized, star-forming potential
 The star formation in this region is suppressed relative to expectations based
 on nearby star-forming regions and nearby (on a different scale) Galactic disks
 \citep{Kennicutt1998a,Kennicutt2012a,Leroy2013a,Heiderman2010a}.
+\citet{Longmore2013a} recently propose that the clouds along the ring represent
+a time-ordered path from starless to star-forming clouds, from `The Brick'
+(G0.253+0.016, cloud a) through the lettered clouds \citep[cloud
+b,c,d,e,f][]{Lis199a}, ending at Sgr B2.
 
 Variations in star formation rate at a fixed gas surface density are observed
 in galactic nuclear regions even without AGN.  For example in the nuclei of NGC
@@ -422,7 +426,47 @@ weighted by the \threeohthree brightness
 {fig:ratiomapssm}{1}{9.5in}
 
 
-\subsection{Line Modeling}
+\subsection{Region Extraction}
+\label{sec:region}
+In order to extract higher signal-to-noise measurements on selected regions, we
+broke the data down into subsets using both a by-eye region selection drawing
+regions using ds9 and a more systematic approach using a dendrogram-based clump
+finding algorithm \citep[][\url{http://dendrograms.org/}]{Rosolowsky2008c}.
+
+% dendro_temperature.py
+% TODO: decide whether we used the full resolution or the smoothed version.
+% Presently (Jan 5), we are using the smoothed version
+We ran the dendrogram/clumpfind extraction analysis on the smoothed
+\threeohthree cube data.  We enforced thresholds of a minimum number of pixels
+$N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting threshold
+$\Delta = 2\sigma$.  The exact values of these parameters is not particularly
+important, as we are interested in general trends with size-scale and
+galactocentric distance, but we caution against overinterpretation of the
+resulting catalog as the number of sources and their size and distribution can
+change dramatically with small changes in the selected parameters.  The number
+and location of pixels included in the catalog is, however, relatively robust
+against small parameter changes.
+
+For each extracted blob, we measured the corresponding integrated and peak
+emission in the \threetwoone and \thirteenco cubes.  We also extracted the mean
+dust temperature and column density from SED fits to Herschel HiGal 170-500\um
+maps.  The SED fits were performed on background-subtracted data using an
+approach originally described in \citet{Battersby2011a}, which includes details
+of the fitting process and specification of assumed physical parameters.  We
+also extracted dust column density and temperature using a more naive
+pixel-by-pixel approach with no background subtraction
+(\url{http://hi-gal-sed-fitter.readthedocs.org/en/latest/}) and found the two
+to be consistent.
+
+The by-eye selected regions were extracted less systematically, instead
+focusing on peaks in the \threeohthree or \threetwoone emission.  We also
+included a series of large square $8\arcmin \times 8\arcmin$ `apertures'
+corresponding to each observed field.  For each region extracted in this
+fashion, we fit a 1-3 component model as described in Section
+\ref{sec:linemodeling}.  An example spectrum extracted from a small region
+around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
+
+\section{Line Modeling and Temperature Derivation}
 \label{sec:linemodeling}
 % TODO: I switched from 15.1 to 17 in column on Jan 14.  This may break all
 % of the code when I re-run it because it is changing the underlying prior!
@@ -477,7 +521,7 @@ emitting gas: even for diffuse clouds, the filling factor of the emitting
 regions may be $ff<<1$ if the emission is isolated to compact shocked regions,
 as expected if highly supersonic $\mathcal{M}>10$ turbulence is energetically
 dominant in the clouds.  We use an abundance $N(\para)/N(\hh) = X(\para) =
-10^{9.08\pm1} = 1.2\ee{9} \times/\div 10$, allowing for dramatic uncertainty in
+10^{9.08\pm1} = 1.2\ee{-9} \times/\div 10$, allowing for dramatic uncertainty in
 the \formaldehyde abundance
 \citep{Ginsburg2013a,Carey1998a,Wootten1978a,Mundy1987a}.  To constrain the
 total column density, we use the Herschel dust maps to derive an \hh column
@@ -565,46 +609,6 @@ marginalized regions in each parameter space as described in the
 Figure \ref{fig:coltemconstraints} caption.}
 {fig:parsonbrightness}{0.5}{0}
 
-\section{Region Extraction}
-\label{sec:region}
-In order to extract higher signal-to-noise measurements on selected regions, we
-broke the data down into subsets using both a by-eye region selection drawing
-regions using ds9 and a more systematic approach using a dendrogram-based clump
-finding algorithm \citep[][\url{http://dendrograms.org/}]{Rosolowsky2008c}.
-
-% dendro_temperature.py
-% TODO: decide whether we used the full resolution or the smoothed version.
-% Presently (Jan 5), we are using the smoothed version
-We ran the dendrogram/clumpfind extraction analysis on the smoothed
-\threeohthree cube data.  We enforced thresholds of a minimum number of pixels
-$N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting threshold
-$\Delta = 2\sigma$.  The exact values of these parameters is not particularly
-important, as we are interested in general trends with size-scale and
-galactocentric distance, but we caution against overinterpretation of the
-resulting catalog as the number of sources and their size and distribution can
-change dramatically with small changes in the selected parameters.  The number
-and location of pixels included in the catalog is, however, relatively robust
-against small parameter changes.
-
-For each extracted blob, we measured the corresponding integrated and peak
-emission in the \threetwoone and \thirteenco cubes.  We also extracted the mean
-dust temperature and column density from SED fits to Herschel HiGal 170-500\um
-maps.  The SED fits were performed on background-subtracted data using an
-approach originally described in \citet{Battersby2011a}, which includes details
-of the fitting process and specification of assumed physical parameters.  We
-also extracted dust column density and temperature using a more naive
-pixel-by-pixel approach with no background subtraction
-(\url{http://hi-gal-sed-fitter.readthedocs.org/en/latest/}) and found the two
-to be consistent.
-
-The by-eye selected regions were extracted less systematically, instead
-focusing on peaks in the \threeohthree or \threetwoone emission.  We also
-included a series of large square $8\arcmin \times 8\arcmin$ `apertures'
-corresponding to each observed field.  For each region extracted in this
-fashion, we fit a 1-3 component model as described in Section
-\ref{sec:linemodeling}.  An example spectrum extracted from a small region
-around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
-
 
 \subsection{Blob modeling}
 \label{sec:dendromod}
@@ -685,7 +689,7 @@ temperatures as can be seen in Figure \ref{fig:parsonbrightness}.
 {figures/big_maps/big_lores_smoothdens1e4_weighted_masked_tmap_withcontours.pdf}
 {figures/big_maps/big_lores_smoothdens3e4_weighted_masked_tmap_withcontours.pdf}
 {figures/big_maps/big_lores_smoothdens1e5_weighted_masked_tmap_withcontours.pdf}
-{Temperature maps using the smoothed data assuming fixed $X_{\para}=1.2\ee{9}$
+{Temperature maps using the smoothed data assuming fixed $X_{\para}=1.2\ee{-9}$
 and $n(\hh)$.  The maps are masked by signal-to-noise as in Figure
 \ref{fig:ratiomaps}.
 (a) $n(\hh) = 10^4$ \percc
@@ -748,19 +752,21 @@ Galactic latitude and using the $n=10^4$ \percc curve from Figure
 \ref{fig:ratiovstem}.  (b) The peak signal-to-noise along Galactic latitude,
 which is used as a mask in (a).  The apparently cold blobs at -80 \kms in Sgr
 B2 and -90 \kms in Sgr A is a different line, HC$_3$N 24-23.
+\todo{The excessive whitespace in panel (a) is a bug that has not yet been
+resolved but it is known.}
 }
 {fig:pvtem}
 {1}{9.5in}
 
-\RotFigureTwoAA
-{figures/big_maps/pv_tmap_smooth_weight_masked.pdf}
-{figures/big_maps/pv_peaksn_smooth.pdf}
-{Smoothed version of Figure \ref{fig:pvtem}.
-\todo{The excessive whitespace in panel (a) is a bug that has not yet been
-resolved but it is known.}
-}
-{fig:pvtemsm}
-{1}{9.5in}
+%\RotFigureTwoAA
+%{figures/big_maps/pv_tmap_smooth_weight_masked.pdf}
+%{figures/big_maps/pv_peaksn_smooth.pdf}
+%{Smoothed version of Figure \ref{fig:pvtem}.
+%\todo{The excessive whitespace in panel (a) is a bug that has not yet been
+%resolved but it is known.}
+%}
+%{fig:pvtemsm}
+%{1}{9.5in}
 
 % t_vs_r
 %\Figure
@@ -911,18 +917,11 @@ as the massive star-forming Sgr B2 complex and the clouds closest to the central
 black hole.
 
 There is some evolution of temperature over time evident in Figure
-\ref{fig:kdltemvstime}, which shows the temperature at each voxel within 15
-\kms and 6 pc of the \citet{Kruijssen2014d} orbit extracted from the
-dendrogram-based temperature cube.  The linear increase in temperature seems to
-support the \citet{Kruijssen2014d} hypothesis that the `ring' represents a
-single gas stream on its first passage by Sgr A*, though The Brick stands out
-as a significant outlier in this data.  The Brick has had the most recent
-pericenter passage, so it is possible that it is presently overheated from
-additional turbulence driven by this most recent passage.  In that case, the
-overall temperature rise observed from Sgr A to Sgr B2 cannot be caused by
-turbulence decay alone, since The Brick should follow the general trend.
-Perhaps, instead, this temperature increase is driven by increased star
-formation and internal heating along the dust ridge.
+\ref{fig:kdltemvstime}, which shows the temperature within each
+dendrogram-extracted clump within 20 \kms and 6 pc of the
+\citet{Kruijssen2014d} orbit.  The linear increase in temperature over the
+first $\sim0.5$ Myr seems to support the \citet{Kruijssen2014d} hypothesis that
+the `ring' represents a single gas stream on its first passage by Sgr A*.
 
 % orbit_pv
 \RotFigureTwoAA
@@ -934,7 +933,7 @@ outside the mapped area, while grey regions have no gas detected or inadequate
 signal to measure a temperature.
 (b) The path used to create the slice shown in (a).  Each element is a small
 rectangle over which the temperature has been averaged.  The green rectangle at
-$\ell=359.3$ indicates the starting point (offset$=0$) of the position-velocity
+$\ell=359.3\arcdeg$ indicates the starting point (offset$=0$) of the position-velocity
 slice.  The orbit is outside of our observed field to the west of Sgr C.  
 The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
 }
@@ -944,15 +943,21 @@ The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
 \Figure
 {figures/orbits/dendro_smooth_temperature_vs_time_firstMyr.pdf}
 {The observed temperature vs time since the most recent pericenter passage of
-The Brick on the \citet{Kruijssen2014d} orbit.  There is a hint of 
-a linear increase in temperature with time, from an initial temperature
-$T\sim40-60$ K to $T\sim120$ K over a period $\tau\sim0.5-1$ Myr.}
+The Brick on the \citet{Kruijssen2014d} orbit for dendrogram-extracted clumps with
+20 \kms and 12 pc of the orbital path.  There is a hint of a linear
+increase in temperature with time, from an initial temperature $T\lesssim50$ K
+to $T\gtrsim100$ K over a period $\tau\sim0.5-1$ Myr.  The symbol sizes are
+proportional to the integrated \thirteenco 2-1 brightness and are meant to give
+an inidication of how reliable the detections are; most of the detections below
+$\lesssim40$ K are questionable.  The grey vertical lines through the circles
+indicate the formal $1-\sigma$ errors on the temperature.}
 {fig:kdltemvstime}{0.4}{0}
 
 \subsection{Comparison to \citet{Ott2014a} \ammonia temperature map}
 \label{sec:ammoniacompare}
 \citet{Ott2014a} measured the \ammonia 1-1 and 2-2 lines over a subset of the
-region we mapped, from $-0.2 < \ell < 0.8$.  These two lines are a frequently
+region we mapped, from $-0.2\arcdeg < \ell < 0.8\arcdeg$.  These two lines are
+a frequently
 used thermometer sensitive to gas temperatures $5 \lesssim T \lesssim 40$ K,
 with weak sensitivity up to $\sim80$ K \citep[][Figure 1]{Mangum2013a}.  The
 \ammonia lines also have lower critical densities by about 2 orders of
@@ -961,12 +966,12 @@ derived from this line ratio are necessarily lower than those we have measured.
 Nonetheless, we compare our temperature map to that of \citet{Ott2014a} to look
 for common trends and significant differences.
 
-Figure \ref{fig:nh3tmap} shows the \citet{Ott2014a} temperature map in a
-similar color scheme to that we have used in Figure \ref{fig:temmap}, but with
-different limits.  There are some trends that are common between the two maps:
-the Sgr A complex and Sgr B2 complex are the warmest regions, the `diffuse' gas
-surrounding these is somewhat cooler, and the positive latitude component of
-the \citet{Molinari2011a} `ring' is warmer than the negative latitude
+Figure \ref{fig:nh3tmap} shows the \citet{Ott2014a} temperature map in the same
+color scheme that we have used in Figure \ref{fig:temmap}.  There are some
+trends that are common between the two maps: the Sgr A complex and Sgr B2
+complex are the warmest regions, the `diffuse' gas surrounding these is
+somewhat cooler, and the positive latitude component of the
+\citet{Molinari2011a} `ring' is warmer than the negative latitude
 component.
 
 The most significant difference occurs in the southwest portion of the Sgr B2
@@ -994,20 +999,15 @@ range when using only these two lines, so the map is cut off at $T=80$ K.
 
 \subsection{Comparison to other measurements with \para}
 \label{sec:h2cocompare}
-The largest survey of \para temperatures prior to this work was
-by \citet{Ao2013a}, who observed the inner 30 pc.  They performed a similar
-analyis to ours but over a limited area.  They reported temperatures
-systematically lower by 10-20 K (but still $T\gtrsim50$ K).  This difference is
-due to a different set of collision rates adopted (\citet{Wiesenfeld2013a}
-rather than \citet{Green1991a}) and different priors on the fitted parameter
-space.  In particular, we left density as a free parameter and instead broke
-degeneracies with a conservative but nonetheless useful constraint on the
-column density and abundance.
-
+The largest survey of \para temperatures prior to this work was by
+\citet{Ao2013a}, who observed the inner 30 pc.  They performed a similar
+analysis to ours but over a limited area.  They reported similar temperatures,
+with some small differences due to a different set of collision rates adopted
+(\citet{Wiesenfeld2013a} rather than \citet{Green1991a}).
 The \citet{Ao2013a} survey found uniformly high temperatures within the bright
-Sgr A cloud complex.  Our survey finds a greater variety in gas temperatures,
-with significant contrast between the back-side cool clouds and the warmer
-foreground infrared dark clouds.
+Sgr A cloud complex.  Our survey finds a greater variety in gas temperatures due
+to the larger area covered, with significant contrast between the back-side
+cool clouds and the warmer foreground infrared dark clouds.
 
 There have also been observations of \para temperatures with interferometers.
 \citet{Johnston2014a} noted a very high temperature peak, $T>320$ K, using these
@@ -1015,7 +1015,7 @@ lines of \para toward The Brick, G0.253+0.015.  We measure similar line
 ratios toward The Brick, but on larger scales.  The interpretation of these
 line ratios is subject to some question, though.  Above 300K, the collision
 rates provided by LAMDA \citep{Green1991a,Schoier2005a,Wiesenfeld2013a} must be
-extrapolated.  Additionally, some of the observed ratios in our cannot be
+extrapolated.  Additionally, very high $R_1$ values cannot be
 reproduced by high temperatures with the current suite of collision rates, but
 instead require that the lines be optically thick and thermalized and therefore
 at very high densities.   Given the low brightness temperatures observed, if
@@ -1025,7 +1025,7 @@ unless it is also extremely patchy.  That remains a possibility if we are
 observing massive, dense clouds with relatively uniform turbulent properties,
 though it is unlikely - we discuss this further in Section
 \ref{sec:thickorwarm}.  We conclude, therefore, that a lower limit on the
-gas temperature in The Brick, $T>120$ K, is consistent with our observations.
+gas temperature in The Brick, $T\gtrsim120$ K, is consistent with our observations.
 
 
 \subsection{Discussion of Heating Mechanisms}
@@ -1052,37 +1052,41 @@ $T_{gas} \sim T_{dust}$, only about 10\% of the gas needs to be heated to
 $T\sim50-100$ K to generate the line brightness observed \emph{if} the hottest
 gas is also the densest.  However, hot and dense gas cools more efficiently, so
 sustaining a population of shock-heated gas may be infeasible.  Additionally,
-the log-poisson distribution followed by a multiplicative cascade has a substantial
-low-temperature tail \citep{Pan2009a}, which implies that the mean temperature
-must be near the observed temperature.  \todo{It would be nice to have some help
-from a theorist to assess whether non-uniform heating could really drive the observed
-temperatures.}
+the log-poisson distribution followed by a multiplicative cascade has a
+substantial low-temperature tail \citep{Pan2009a}, which implies that the mean
+temperature must be near the observed temperature.  Such an explanation for the
+observed temperatures must be investigated more thoroughly, ideally with
+hydrodynamic simulations of turbulence using a reasonable treatment for the gas
+shock heating and line cooling.
+%\todo{It would be nice to have some help
+%from a theorist to assess whether non-uniform heating could really drive the observed
+%temperatures.}
 
 %Gas temperatures higher than dust temperatures occur in both high and low density
 %gas \todo{need to have somes sort of density tracer - probably just dust + spherical}
 
 
-\subsection{Radial Variations}
-There are many reasons to expect that gas temperature will increase as gas
-falls toward the Galactic center.  As it falls further in on an elliptical but
-unclosed orbit, the gas is subject to much greater shear near pericenter,
-driving stronger turbulence.  The stellar density increases, implying a
-stronger radiation field.  There may be a
-greater density of young stars, which in turn would imply more supernovae and a
-greater cosmic ray density.  The density of X-ray emitting sources (e.g.,
-stellar remnants) also increases, providing yet another source of heating.
-Finally, the central black hole, while inactive now, may have gone through
-previous bursts of activity, driving brief but powerful waves of X-ray heating.
-Independent of the mechanism, though, there is reason to expect some radial
-variation in temperature.
-
-Figure \ref{fig:temvsrad} shows the latitude-averaged temperature as a
-function of projected radius.  While there is no clear radial trend, there are
-important features: the majority of the gas at $R>0.9\arcdeg$ (130 pc) is below
-$T\lesssim 60$ K, while within $R<0.9\arcdeg$ the majority of the gas is
-between 70 and 120 K (with many lower limits in Sgr B2).  There are hints that
-the cooler gas that is observed in this range may actually be at larger
-galactocentric radii and simply be projected onto the $R=0$ region.
+%\subsection{Radial Variations}
+%There are many reasons to expect that gas temperature will increase as gas
+%falls toward the Galactic center.  As it falls further in on an elliptical but
+%unclosed orbit, the gas is subject to much greater shear near pericenter,
+%driving stronger turbulence.  The stellar density increases, implying a
+%stronger radiation field.  There may be a
+%greater density of young stars, which in turn would imply more supernovae and a
+%greater cosmic ray density.  The density of X-ray emitting sources (e.g.,
+%stellar remnants) also increases, providing yet another source of heating.
+%Finally, the central black hole, while inactive now, may have gone through
+%previous bursts of activity, driving brief but powerful waves of X-ray heating.
+%Independent of the mechanism, though, there is reason to expect some radial
+%variation in temperature.
+%
+%Figure \ref{fig:temvsrad} shows the latitude-averaged temperature as a
+%function of projected radius.  While there is no clear radial trend, there are
+%important features: the majority of the gas at $R>0.9\arcdeg$ (130 pc) is below
+%$T\lesssim 60$ K, while within $R<0.9\arcdeg$ the majority of the gas is
+%between 70 and 120 K (with many lower limits in Sgr B2).  There are hints that
+%the cooler gas that is observed in this range may actually be at larger
+%galactocentric radii and simply be projected onto the $R=0$ region.
 
 %% t_vs_r
 %\Figure
@@ -1095,26 +1099,25 @@ galactocentric radii and simply be projected onto the $R=0$ region.
 
 \subsection{A stream of fresh gas falling into the CMZ?}
 \label{sec:coolstream}
-The gas streamer extending from $\ell=0.2$ to $\ell=1.3$ (Figure
+The gas streamer extending from $\ell=0.2\arcdeg$ to $\ell=1.3\arcdeg$ (Figure
 \ref{fig:coolstream}) may represent a stream of infalling gas.  The lack of
 IRDC features corresponding to this stream within $R<R_{SgrB2}$ restricts it to
-be on the back side of the CMZ, while the disagreement with the
-\citet{Kruijssen2014d} orbit suggests that it
-is not following the same path as the Brick, the lettered clouds, and Sgr B2.
+be on the back side of the CMZ.  Since it does not align closely with the
+\citet{Kruijssen2014d} orbit, this stream is probably not
+following the same path as the Brick, the lettered clouds, and Sgr B2.
 The large observed linewidths imply that the stream is genuinely associated
 with the CMZ, though its distance from Sgr A may be much larger than its
 projected distance.  The path we have traced through Figure \ref{fig:coolstream}
 has been selected by eye and is not physically motivated (e.g., by a predicted orbit)
 but it can be observed as a coherent-appearing stream in the \thirteenco data cubes
 as well.
-
-This cool stream projected along the line of sight to the CMZ may mitigate the
-star formation deficit noted in \citet{Longmore2013b}.  The cool stream does
+The cool stream does
 not appear to be actively star forming at present, most likely because the gas
-is at a lower average density, yet it contributes to the total cold gas mass
-inferred in the inner galaxy.  However, the total mass within the inner
-projected 200 pc is still dominated by the `ring' clouds and Sgr B2, so at
-least some deficit remains.
+is at a lower average density.
+% yet it contributes to the total cold gas mass
+% inferred in the inner galaxy.  However, the total mass within the inner
+% projected 200 pc is still dominated by the `ring' clouds and Sgr B2, so at
+% least some deficit remains.
 
 
 % backstream_pv

@@ -5,12 +5,13 @@ import os
 import copy
 from astropy import log
 import paths
+from spectral_cube import SpectralCube, BooleanArrayMask
 import matplotlib
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 from temperature_cubes import (tcube_dend, tcube_dend_smooth, tcube_direct,
                                tcubesm_direct)
 from ratio_cubes import (ratiocube_303321, ratiocubesm_303321)
-from masked_cubes import (cube303m, cube303msm)
+from masked_cubes import (cube303m, cube303msm, cube303, cube303sm)
 from astropy import units as u
 from image_registration.fft_tools import downsample
 
@@ -21,7 +22,7 @@ if not os.path.isdir(paths.fpath('temvslon')):
     os.mkdir(paths.fpath('temvslon'))
 
 figsize=(20,10)
-vmin,vmax = -150.,150.
+vmin,vmax = -145.,135.
 cbvmin,cbvmax = -80, 120
 dv = 20.
 vranges = np.arange(vmin, vmax, dv)
@@ -41,27 +42,37 @@ for weight in ("weighted_",""):
 
         log.info("Starting {0} {1}".format(name, weight))
 
+        mask = (cube303sm > 0.2 if 'sm' in name else cube303 > 0.3) 
+
         if weight:
             wcube = (cube303msm if 'sm' in name else cube303m)
             if tcube.shape != wcube.shape:
                 log.info("Not weighting {0}".format(fn))
                 continue
-            weighted = copy.copy(tcube)
+
+            weighted = copy.copy(tcube).with_mask(mask)
             weighted._data = wcube._data * tcube._data
+            mask = (wcube.mask & tcube.mask & mask &
+                    BooleanArrayMask(weighted.filled_data[...] != 0, weighted.wcs) &
+                    BooleanArrayMask(wcube.filled_data[...] != 0, wcube.wcs)
+                   )
+            wcube = wcube.with_mask(mask)
             pv1 = weighted.sum(axis=1)
             pv2 = wcube.sum(axis=1)
             pv = pv1/pv2
             bmean = pv.value
         else:
-            bmean = tcube.mean(axis=1)
+            bmean = tcube.with_mask(mask).mean(axis=1)
 
-        tcube_ds = tcube[::5 if 'sm' in name else 10,:,:] # for the WCS
+        ds = 10 if 'sm' in name else 20
+
+        tcube_ds = tcube[::ds,:,:] # for the WCS
         tcube_ds.data = downsample.downsample_axis(tcube._data,
-                                                   5 if 'sm' in name else 10,
+                                                   ds,
                                                    axis=0)
 
         bmeands = downsample.downsample_axis(bmean,
-                                             5 if 'sm' in name else 10,
+                                             ds,
                                              axis=0)
 
         fig1 = pl.figure(1, figsize=figsize)
@@ -95,6 +106,7 @@ for weight in ("weighted_",""):
             sel = (specax > v) & (specax < v+dv)
             x1 = np.argmin(np.abs(specax-v))
             x2 = np.argmin(np.abs(specax-(v+dv)))
+            assert x1 != x2
 
             data = (tcube_ds.filled_data[x1:x2,:,:]
                     .T.reshape([xax.size,tcube_ds.filled_data[x1:x2,:,:].size/xax.size]))
