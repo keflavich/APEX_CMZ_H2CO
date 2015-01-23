@@ -119,7 +119,7 @@ def do_pyspeck_fits_1comp(pcube, cube303m=None, vguesses='moment',
                              min_nsig=4)
 
 def do_the_brick(vrange=[-20,125], minpeak=0.22):
-    pc,c3 = get_subregion_pcube(cube303, cube303, cube321, regdict['BrickInABox'])
+    pc,c3 = get_subregion_pcube(cube303, cube303, cube321, regdict['BrickBox'])
     c3slab = c3.spectral_slab(vrange[0]*u.km/u.s, vrange[1]*u.km/u.s)
     moments = c3slab.moment1(axis=0)
     peak = c3slab.max(axis=0)

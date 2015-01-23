@@ -45,7 +45,7 @@
  "G0.33-0.08":         {'ncomp':3, 'velo':[17,80,100]},
  "G0.47-0.07box":      {'ncomp':1, 'velo':[91]},
  "G0.24-0.05box":      {'ncomp':2, 'velo':[29,80]},
- "BrickInABox":        {'ncomp':2, 'velo':[36,15]},
+ "BrickBox":        {'ncomp':2, 'velo':[36,15]},
  "G0.29+0.04box":      {'ncomp':2, 'velo':[2, 10]},
  "G0.11-0.01box":      {'ncomp':2, 'velo':[55,48]},
  "G0.08-0.08box":      {'ncomp':1, 'velo':[52]},

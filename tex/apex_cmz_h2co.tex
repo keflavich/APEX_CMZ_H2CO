@@ -39,20 +39,23 @@
 \section{Introduction}
 \todo{The introduction needs to be expanded.}
 The central region of our Galaxy is the nearest location in which we can study
-star formation in an `extreme' environment.  While there have been great leaps
-in our understanding of low-mass star formation from local molecular clouds in
-the past decade \citep{Lada2012a,Heiderman2010a,Lada2010a}, there remain many
-unanswered questions about how star formation changes as gas becomes denser,
-more opaque, and more turbulent, as it most likely was in galaxies at the peak
-of cosmic star formation \citep{Kruijssen2013a}.
+star formation in an `extreme' environment with pressure, turbulent Mach number, 
+and gas temperature much higher than in local star forming regions.  While
+there have been great leaps in our understanding of low-mass star formation
+from local molecular clouds in the past decade
+\citep{Lada2012a,Heiderman2010a,Lada2010a}, there remain many unanswered
+questions about how star formation changes as gas becomes denser, more opaque,
+and more turbulent, as it most likely was in galaxies at the peak of cosmic
+star formation \citep{Kruijssen2013a}.
 
 
 The central $\sim100$ pc `ring' \citep{Sofue1995a,Molinari2011a} has attracted
 a great deal of attention recently, as it has the most gas in the CMZ and a
 large, but unrealized, star-forming potential
 \citep{Longmore2013a,Longmore2012b,Longmore2012a,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
-The star formation in this region is suppressed relative to expectations based
-on nearby star-forming regions and nearby (on a different scale) Galactic disks
+The star formation in this region appears to be suppressed relative to
+expectations based on nearby star-forming regions and nearby (on a different
+scale) Galactic disks
 \citep{Kennicutt1998a,Kennicutt2012a,Leroy2013a,Heiderman2010a}.
 \citet{Longmore2013a} recently propose that the clouds along the ring represent
 a time-ordered path from starless to star-forming clouds, from `The Brick'
@@ -60,10 +63,11 @@ a time-ordered path from starless to star-forming clouds, from `The Brick'
 b,c,d,e,f][]{Lis199a}, ending at Sgr B2.
 
 Variations in star formation rate at a fixed gas surface density are observed
-in galactic nuclear regions even without AGN.  For example in the nuclei of NGC
-2614 and NGC 34, both galaxies with nuclear starburst rings, the star formation
+in extragalactic nuclear regions even without AGN.  For example in the nuclei of NGC
+1614 and NGC 34, both galaxies with $r\sim200$ pc nuclear starburst rings, the
+star formation
 rate is well above the standard star formation laws \citep{Xu2014b}.  However,
-in our own Galaxy's circumnuclear ring (not to be confused with the
+in our own Galaxy's $r\sim100$ pc circumnuclear ring (not to be confused with the
 circumnuclear disk within $\sim1$ pc of Sgr A*), star formation is lower.
 
 Hypotheses for this reduced star formation rate include suppressed
@@ -92,19 +96,21 @@ There is a long-standing problem that the observed gas and dust temperatures do
 not agree throughout the CMZ
 \citep{Guesten1981a,Ao2013a,Ott2014a,Molinari2011a}.  This discrepancy
 represents a significant problem for understanding the interplay between gas
-temperature and star formation, since the gas temperature drives gas pressure
-and the important dynamical effects, while dust temperature is readily
-determined on large scales.
+temperature and star formation since the gas temperature is dynamically
+important.  The dust temperature is readily determined via continuum mapping
+and therefore is often used as a proxy for the gas temperature, but the dust
+temperature itself is hydrodynamically unimportant.
 
 These prior works primarily used the popular ammonia (\ammonia) metastable
 inversion transition thermometer, which is sensitive to moderate density gas
-($n(\hh) \sim A_{ul}/C_{ul} \sim 2\ee{3}$ \percc).  While this thermometer is
+\citep[$n(\hh) \sim 10^3-10^4$ \percc][]{Shirley2015a}.  While this thermometer is
 generally reliable in cold regions, the population of the higher energy states
 - those sensitive to temperatures $T\gtrsim60$ K - may be affected by
 `formation heating', a mechanism recently discovered to affect much of the CMZ
 gas \citep[][]{Lis2014a,Mills2013a}.  \citet{Ao2013a} used the \para 220 GHz
-thermometer \citep{Mangum1993a}, which is sensitive to denser gas, and still
-found a significant discrepancy between gas and dust temperature, but they only
+thermometer \citep{Mangum1993a}, which is sensitive to denser gas
+($n\sim10^4-10^5$ \percc), and still found a significant discrepancy between
+gas and dust temperature, but they only
 covered the inner 30 pc.
 
 We adopt a distance $d=8.5$ kpc for all measurements made in this paper.
@@ -820,7 +826,7 @@ resolved but it is known.}
 \section{Discussion}
 \label{sec:discussion}
 \subsection{Parameter Comparison}
-\todo{Questionable.  Remove this & Figure \ref{fig:temvsfwhm_regions}?} In a
+\todo{Questionable.  Remove this \& Figure \ref{fig:temvsfwhm_regions}?} In a
 turbulent medium, the 1D line width of the gas should be tightly correlated
 with the 3D Mach number \citep[e.g.][]{Federrath2011a}.  If turbulence is the
 dominant gas heating mechanism, there should also be a correlation between the
@@ -845,6 +851,9 @@ $5 < S/N < 25$, green $25 < S/N < 50$, and red $S/N > 50$.  Small, faint points
 indicate ancestors in the dendrogram, while bright, large points indicate leaves.
 Lower limits on linewidth and temperature are indicated with triangles on the
 edge of the plot.  
+Note that in both cases, any correlation is even weaker than that observed in
+\citet{Huettemeister1993a} Figure 6, who make the same plot for \ammonia 4-4
+and 5-5.
 }
 {fig:temvsfwhm_regions}
 {1}{3.5in}
@@ -853,11 +862,11 @@ edge of the plot.
 
 
 \subsection{Variation with Spatial Scale}
-For any given cloud, the ratio \Rone varies with the spatial averaging scale.
+For any given cloud, the ratio $R_1$ varies with the spatial averaging scale.
 The \para \threeohthree line is often stronger relative to \threetwoone on
 larger scales, while the linewidth is always larger on larger scales.  We have
 examined this effect by selecting a few local \para \threeohthree peaks and
-measuring the ratio \Rone as a function of aperture size.  For each spectrum,
+measuring the ratio $R_1$ as a function of aperture size.  For each spectrum,
 we have fitted the 6-parameter model described in Section
 \ref{sec:linemodeling} to derive the ratio.
 
@@ -984,7 +993,7 @@ The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
 {figures/orbits/dendro_temperature_vs_time_firstMyr.pdf}
 {The observed temperature vs time since the most recent pericenter passage of
 The Brick on the \citet{Kruijssen2014d} orbit for dendrogram-extracted clumps with
-20 \kms and 12 pc of the orbital path.  There is a hint of a linear
+20 \kms and 12 pc of the orbital path.  There is a hint of an 
 increase in temperature with time, from an initial temperature $T\lesssim50$ K
 to $T\gtrsim100$ K over a period $\tau\sim0.5-1$ Myr.  The symbol sizes are
 proportional to the \para \threeohthree brightness and are meant to give
@@ -1054,7 +1063,7 @@ range when using only these two lines, so the map is cut off at $T=80$ K.
 \label{sec:h2cocompare}
 The largest survey of \para temperatures prior to this work was by
 \citet{Ao2013a}, who observed the inner 75 pc.  They performed a similar
-analysis to ours but over a limited area.  They reported similar temperatures,
+analysis to ours but over a smaller area.  They reported similar temperatures,
 with some small differences due to a different set of collision rates adopted
 (\citet{Wiesenfeld2013a} rather than \citet{Green1991a}).
 The \citet{Ao2013a} survey found uniformly high temperatures within the bright
@@ -1185,13 +1194,13 @@ gas from Section \ref{sec:coolstream}.}
 \label{sec:thickorwarm}
 As noted in Section \ref{sec:h2cocompare}, there is degeneracy in the modeling
 that allows the observed ratios to be produced by very dense gas in addition to
-hot gas.  Indeed, ratios approaching $\Rone=1$ occur for relatively low
+hot gas.  Indeed, ratios approaching $R_1=1$ occur for relatively low
 temperatures ($T\sim30$ K) at very high densities ($n>10^{6}$ \percc)
 and very high column densities ($N(\para)>10^{16}$ \perkms \persc) because
 the lines become optically thick and have LTE temperatures.
 
 Since the mean densities at 30\arcsec resolution are always significantly lower
-than this value ($n\lesssim\mathrm{few}\ee{5}$ \percc), such high density,
+($n\lesssim\mathrm{few}\ee{5}$ \percc), such high density,
 optically thick gas would have to have a very low filling factor.  The peak
 \para \threeohthree brightness ranged from $0.2 \lesssim T_{mb} \lesssim 2$ K
 in the detected regions, implying upper limits on the filling factor 1-7\%.
@@ -1199,8 +1208,8 @@ In practice, the filling factor would have to be lower still, since any opticall
 thin \para would favor the \threeohthree line and contribute to a lower \Rone.
 
 The strongest argument against such a scenario is the extremely high column
-density required.  At typical \para abundances $X\sim10^9$, or even more
-extreme abundances $X\sim10^8$, the implied local column density is
+density required.  At typical \para abundances $X\sim10^{-9}$, or even more
+extreme abundances $X\sim10^{-8}$, the implied local column density is
 $N(\hh)\gtrsim10^{25(24)}$ in a single velocity bin.  Column densities up to
 $N(\hh)\sim10^{24}$ \percc are observed, but with much lower filling fractions
 $ff\sim10^{-4}$, in The Brick \citep[][their Figure 4]{Rathborne2014a}.  Even
