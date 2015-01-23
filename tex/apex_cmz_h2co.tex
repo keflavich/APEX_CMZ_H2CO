@@ -107,6 +107,8 @@ thermometer \citep{Mangum1993a}, which is sensitive to denser gas, and still
 found a significant discrepancy between gas and dust temperature, but they only
 covered the inner 30 pc.
 
+We adopt a distance $d=8.5$ kpc for all measurements made in this paper.
+
 We describe new observations using the \para thermometer in Section
 \ref{sec:observations}.  In Section \ref{sec:signal}, we describe the analysis
 process used to extract signal from the data cubes and derive temperatures.  We
@@ -120,8 +122,10 @@ provide additional tables, and provide the source code for this project.
 
 \subsection{Observations}
 \todo{Specify rest frequencies.}
-We observed the Central Molecular Zone from $-0.4 < \ell < 1.6$ with the SHFI-1
-instrument \citep{Vassilev2008a} on the APEX telescope using the XFFTS backend.
+We observed the Central Molecular Zone from $-0.4\arcdeg < \ell < 1.6\arcdeg$ with the SHFI-1
+instrument \citep{Vassilev2008a} on the Atacama Pathfinder Experiment (APEX)
+telescope using the eXtended bandwidth Fast Fourier Transform Spectrometer
+(XFFTS) backend.
 The observations were performed in service mode, and were spread out over two
 years.  The time was divided into 25 hours in June 2013, 75 hours in April-July
 2014, and 50 hours in October 2014.  The time was split between the ESO
@@ -145,7 +149,8 @@ narrower than a few \kms in the CMZ, particularly not with the relatively
 shallow observations we have acquired.
 
 Additionally, for the \para data, we incorporated the 41 hours of observations
-using the older FFTS backend from \citet{Ao2013a}.  These data covered only 2
+using the older fast fourier transform spectrometer (FFTS) backend from
+\citet{Ao2013a}.  These data covered only 2
 GHz of bandwidth, including all three of the \para lines, but they did not
 cover the CO lines.
 
@@ -153,8 +158,9 @@ The system temperature ranged from $120 < T_{sys} < 200$ K for the majority of
 the observations, with a mean $T_{sys}=165$ K.  A small fraction (10\%) of
 observations were in the range $200 < T_{sys} < 300$ K.  There were also a very
 small number ($<1\%$) with much higher system temperatures, $300 < T_{sys} <
-750$ K, but these are associated with observations of the bright Sgr B2
-continuum source.
+750$ K that were flagged out (see Section\ref{sec:flagging}).
+%, but these are associated with observations of the bright Sgr B2
+%continuum source . 
 
 \subsection{Reduction}
 \subsubsection{Calibration}
@@ -170,11 +176,13 @@ pointing errors $\sigma\lesssim2$\arcsec. % Carlos de Breuck, privat comm
 There was a significant calibration error discovered at the APEX telescope during
 a large segment of the 2014 observing campaign
 (\url{http://www.apex-telescope.org/heterodyne/shfi/calibration/calfactor/}).
-The calibration errors were of order $\sim15-25\%$.  They were corrected after
-the fact, but the remaining calibration uncertainty
-is higher in this data, $\sim15\%$ total rather than the usual $\sim10\%$.
+The calibration errors were of order $\sim15-25\%$.  We corrected the data using
+the correction factors suggested on the calibration page, but the remaining
+calibration uncertainty is higher in this data, $\sim15\%$ total rather than
+the usual $\sim10\%$.
 
 \subsubsection{Flagging bad spectra}
+\label{sec:flagging}
 Spectra were removed if they showed excessive noise compared to the
 theoretical expectation given the measured system temperature.  As in
 \citet{Ao2013a}, the threshold was set to $1.5\times$ the theoretical noise,
@@ -186,6 +194,10 @@ removed.
 At the position of Sgr B2, the noise was significantly higher due to signal
 from the continuum source.  We therefore disabled this flagging in a
 $2.5\arcmin$ box around Sgr B2.
+% This is surprising, as Christian pointed out: Sgr B2 should only be 3-4 K in the
+% continuum
+% In [35]: (120*u.Jy).to(u.K, u.brightness_temperature((30/2.35*u.arcsec)**2*np.pi*2, 220*u.GHz))
+% Out[35]: <Quantity 3.3529547153047083 K>
 
 
 % Removing these baselines by
@@ -228,11 +240,11 @@ $2.5\arcmin$ box around Sgr B2.
 
 \subsubsection{Mapmaking}
 The maps were made by computing an output grid in Galactic coordinates with
-7.2\arcsec pixels and adding each spectrum to the appropriate pixel\footnote{We
-use the term `pixel' to refer to a square data element projected on the sky
-with axes in Galactic coordinates.  The term `voxel' is used to indicate a cubic data
-element, with two axes in galactic coordinates and a third in frequency or
-velocity}.  In order
+7.2\arcsec pixels and adding each spectrum to the cube at the appropriate
+pixel\footnote{We use the term `pixel' to refer to a square data element
+projected on the sky with axes in Galactic coordinates.  The term `voxel' is
+used to indicate a cubic data element, with two axes in galactic coordinates
+and a third in frequency or velocity} location.  In order
 to avoid empty pixels and maximize the signal-to-noise, the spectra were added
 to the grid with a weight set from a gaussian with $FWHM=10\arcsec$, which
 effectively smooths the output images from $FWHM\approx28\arcsec$ to
@@ -245,7 +257,8 @@ weighting.
 %\ref{sec:baseline}, we show maps of the \formaldehyde \threeohthree line before
 %and after PCA subtraction.}
 
-The PPV cubes were created with units of brightness temperature ($T_A^*$).  The
+The PPV cubes were created with units of brightness temperature on the corrected
+antenna temperature scale ($T_A^*$).  The
 main beam efficiency is $\eta_{mb} = 0.75$ (gain $\sim39$
 Jy/K)\footnote{\url{http://www.apex-telescope.org/telescope/efficiency/}}.
 These values are noted in the FITS headers of the released data.
@@ -273,14 +286,20 @@ made in moderately smoothed maps.
 \label{sec:baseline}
 The data showed significant baseline structure, leading to large-scale
 correlated components in the resulting spectra.  The baselines were removed
-after cube generation by first identifying bright regions in the \para
-\threeohthree line using the technique described in Section \ref{sec:signal},
-masking those out for each other line, then fitting a 7th-order polynomial to
-the remaining spectra over the velocity range -150 to 250 \kms and subtracting
-it.  Lower order baseline removal left a significant and patterned residual.
-After performing this baselining, the signal was re-extracted using the same
-method.  A more detailed examination of the baseline removal process is
-described in Appendix \ref{sec:baselineappendix}.
+after generating cubes over a velocity range $-150 < v_{LSR} < 150$ \kms by the
+following procedure:
+\begin{enumerate}
+    \item identify bright regions in the \para \threeohthree line using the
+        technique described in Section \ref{sec:signal}
+    \item mask the regions identified as \threeohthree-bright for each other 
+        spectral line data cube
+    \item fit a polynomial to the un-masked data
+    \item subtract the fitted polynomial
+\end{enumerate}
+We used a 7th-order polynomial for this process because lower order baseline
+removal left a significant and patterned residual.  A more detailed examination
+of the baseline removal process is described in Appendix
+\ref{sec:baselineappendix}.
 
 \section{Signal Extraction \& Masking}
 \label{sec:signal}
@@ -304,14 +323,15 @@ the following procedure:
 The \para \threeohthree mask was then applied to the \threetwoone and
 \threetwotwo cubes created with the same PPV gridding.  There is some overlap
 between the \methanol \fourtwotwo line and the \para \threetwotwo line in PPV
-space, so we shifted the \para mask to the velocity of the \methanol line in
-the \para \threetwotwo cube and excluded all pixels with \para detections.
+space, so we shifted the \para \threeohthree mask to the velocity of the
+\methanol line in the \para \threetwotwo cube and excluded those pixels expected
+to contain \methanol emission.
 However, inspection of the \threetwotwo cube revealed that significant chunks
 of the \threetwotwo signal were excised by this masking, so all further
 analysis excludes the \threetwotwo line.
 
 We found that much of the cube included marginal detections at the original
-resolution, FWHM=$30\arcsec$ and $\Delta v=1$\kms.  We therefore created
+resolution, FWHM=$30\arcsec$ and $\Delta v=1$ \kms.  We therefore created
 smoothed cubes, smoothing in the spatial dimensions with a
 $\sigma_{FWHM}=33.84\arcsec$ gaussian to achieve a resolution 45\arcsec, and
 $\sigma_{v, FWMH} = 3$ \kms in the spectral direction.  The smoothed cubes were
@@ -324,10 +344,11 @@ using the mask created from the \threeohthree data.
 
 \RotFigureTwoAA
 {figures/integrated/APEX_H2CO_303_202_masked_moment0}
-{figures/integrated/APEX_H2CO_303_202_masked_smooth_moment0}
+{figures/integrated/APEX_H2CO_303_202_masked_smooth_moment0_labeled}
 {Integrated intensity (moment 0) maps of the \para \threeohthree line in the
 original (a) and smoothed (b) data.  The cubes were masked prior to integration
-using the method described in Section \ref{sec:signal}.}
+using the method described in Section \ref{sec:signal}.  Region names along the
+dust ridge are labeled in (b).}
 {fig:integ303}{1}{9.5in}
 
 \RotFigureTwoAA
@@ -432,19 +453,34 @@ In order to extract higher signal-to-noise measurements on selected regions, we
 broke the data down into subsets using both a by-eye region selection drawing
 regions using ds9 and a more systematic approach using a dendrogram-based clump
 finding algorithm \citep[][\url{http://dendrograms.org/}]{Rosolowsky2008c}.
+The dendrogram clump finding uses a watershed decomposition like other clump
+finding methods, but it also extracts clumps at different brightness scales
+(different heights in the watershed) and tracks how nested clumps are related
+to each other.  Within a hierarchy of nested clumps, the brightest and smallest
+is a `leaf' and all associated larger structures are `ancestors'.
 
 % dendro_temperature.py
 % TODO: decide whether we used the full resolution or the smoothed version.
 % Presently (Jan 5), we are using the smoothed version
-We ran the dendrogram/clumpfind extraction analysis on the smoothed
-\threeohthree cube data.  We enforced thresholds of a minimum number of pixels
-$N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting threshold
-$\Delta = 2\sigma$.  The exact values of these parameters is not particularly
+% smooth We ran the dendrogram/clumpfind extraction analysis on the smoothed
+% smooth \threeohthree cube data.  We assumed a uniform noise per pixel
+% smooth $\sigma_{T}=\bar{\sigma_T}=0.02$ K.  We enforced thresholds of a minimum number of
+% smooth voxels
+% smooth $N_{min}=200$, 
+
+We ran the dendrogram/clumpfind extraction analysis on the 
+\threeohthree cube data.  We assumed a uniform noise per pixel
+$\sigma_{T}=\bar{\sigma_T}=0.07$ K.  We enforced thresholds of a minimum number of
+voxels $N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting
+threshold $\Delta = 2\sigma$, which defines how large the brightness difference
+between
+the peak pixel and an adjacent pixel must be in order to divide the clump into two
+sources.  The exact values of these parameters is not particularly
 important, as we are interested in general trends with size-scale and
 galactocentric distance, but we caution against overinterpretation of the
 resulting catalog as the number of sources and their size and distribution can
 change dramatically with small changes in the selected parameters.  The number
-and location of pixels included in the catalog is, however, relatively robust
+and location of voxels included in the catalog is, however, relatively robust
 against small parameter changes.
 
 For each extracted blob, we measured the corresponding integrated and peak
@@ -463,7 +499,8 @@ focusing on peaks in the \threeohthree or \threetwoone emission.  We also
 included a series of large square $8\arcmin \times 8\arcmin$ `apertures'
 corresponding to each observed field.  For each region extracted in this
 fashion, we fit a 1-3 component model as described in Section
-\ref{sec:linemodeling}.  An example spectrum extracted from a small region
+\ref{sec:linemodeling}, where each component consists of a 6-parameter
+multi-gaussian model.  An example spectrum extracted from a small region
 around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
 
 \section{Line Modeling and Temperature Derivation}
@@ -474,13 +511,13 @@ around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
 We use RADEX \citet{van-Der-Tak2007a} and a related solver (Fujun Du's
 \texttt{myRadex}; \url{https://github.com/fjdu/myRadex}) to create a model grid
 for the p-\formaldehyde lines over a grid of 20 density ($n=10^{2.5}$-$10^{7}$
-\percc), a fixed assumed line gradient of 5 \kms / pc, 20 \formaldehyde column
+\percc), a fixed assumed line gradient of 5 \kms / pc, 30 \formaldehyde column
 densities $N(\formaldehyde) = 1\ee{11}-1\ee{15.1}$ \persc, and 50 temperatures
 from 10 to 350 K.  The grid was created using the \texttt{pyradex} wrapper of
 RADEX\footnote{\url{https://github.com/adamginsburg/pyradex}} and collision rates
 retrieved from LAMDA \citep{Wiesenfeld2003a}.  We then
 upsampled these grids by spline interpolating between grid points to acquire a
-high-resolution ($T\times n \times N = 250\times100\times100$) grid covering
+high-resolution ($T\times n \times N = 250\times100\times101$) grid covering
 $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N < 10^{15.1}$
 \persc\perkmspc.
 
@@ -488,16 +525,16 @@ We extracted spectra averaged over selected regions and fitted
 a 6-parameter model to the full 218-219 GHz spectral range using
 \texttt{pyspeckit} \citep{Ginsburg2011c}.  The fitted parameters are the amplitude of the
 \formaldehyde \threeohthree line, the centroid velocity, the line width
-($\sigma$, not FWHM), the ratio $R_1 = \Rone$, the ratio $R_2 = \Rtwo$, and the
+($\sigma$), the ratio $R_1 = \Rone$, the ratio $R_2 = \Rtwo$, and the
 amplitude of the \methanol \fourtwotwo line.  For these spectra, we performed
 a different baseline subtraction to that described in Section
 \ref{sec:baseline}.  We first fit the described 6-parameter model, then fit a
 spline curve to the residual smoothed to a 50-channel (50 \kms) scale.  We then
 re-fit the model to the data.  In all but the lowest signal-to-noise cases,
 this approach resulted in consistent ratio measurements between the two fits
-and with the other methods.  Figure \ref{fig:twospectra_hotcold} shows two example
-spectra with significantly different ratios measured and with the spline baseline
-fit indicated.
+and with the other methods.  Figure \ref{fig:twospectra_hotcold} shows two
+example spectra that exhibit significantly different ratios with the spline
+baseline fit indicated.
 
 \FigureTwo
 {figures/simple/Brick_SW_fit_4_lines_simple_splinebaselined.pdf}
@@ -512,27 +549,29 @@ used to remove baseline ripples.}
 {fig:twospectra_hotcold}{1}{3in}
 
 
-For each extracted region, we created $\chi^2$ grids using independent
-constraints from the line ratio, the \formaldehyde abundance, the total column
-density of \hh, and a lower limit on the \hh volume density.  We use the line
-\emph{ratio} rather than line
-brightnesses to avoid uncertainties due to the ``filling factor'' of the
-emitting gas: even for diffuse clouds, the filling factor of the emitting
+For each extracted region (see Section \ref{sec:region}), we created $\chi^2$
+grids over the modeled temperature-density-column density parameter space.  We
+measured $\chi^2$ with five independent constraints: the line ratio $R_1$, the
+\formaldehyde abundance, the total column density of \hh, a lower limit on the
+\hh volume density, and an upper limit on the beam filling factor.  We use the
+line \emph{ratio} rather than line brightnesses to avoid uncertainties due to
+the ``filling factor'' of the emitting gas: even for diffuse clouds, the
+filling factor of the emitting
 regions may be $ff<<1$ if the emission is isolated to compact shocked regions,
 as expected if highly supersonic $\mathcal{M}>10$ turbulence is energetically
 dominant in the clouds.  We use an abundance $N(\para)/N(\hh) = X(\para) =
-10^{9.08\pm1} = 1.2\ee{-9} \times/\div 10$, allowing for dramatic uncertainty in
+10^{-9.08\pm1} = 1.2\ee{-9} \times/\div 10$, allowing for dramatic uncertainty in
 the \formaldehyde abundance
 \citep{Ginsburg2013a,Carey1998a,Wootten1978a,Mundy1987a}.  To constrain the
 total column density, we use the Herschel dust maps to derive an \hh column
 density, which has a nominal $\sim2-3\times$ uncertainty.  We treat the error
-as $10\times$ to account for the abundance uncertainty.  This large assumed
-error also accounts for factor $\sim2-3$ uncertainty due to line-of-sight
-confusion, since the dust column density cannot be associated with any specific
-velocity component.  To constrain the dust density, we assume the selected area
-has a mass given by the Herschel dust-derived mass and a spherical volume,
-which sets a conservative (but nonetheless highly constraining) lower limit on
-the volume density.
+as $10\times$ (instead of $\sim2-3\times$) to account for the abundance
+uncertainty.  This large assumed error also accounts for an additional factor
+$\sim2-3$ uncertainty due to line-of-sight confusion, since the dust column
+density cannot be associated with any specific velocity component.  To
+constrain the dust density, we assume the selected area has a mass given by the
+Herschel dust-derived mass and a spherical volume, which sets a conservative
+(but nonetheless highly constraining) lower limit on the volume density.
 
 These constraints are shown projected onto the three planes of our fitted
 parameter space in the multi-paneled Figures
@@ -612,14 +651,15 @@ Figure \ref{fig:coltemconstraints} caption.}
 
 \subsection{Blob modeling}
 \label{sec:dendromod}
-Similar to the line modeling approach, we derived temperatures for each
+We derived temperatures for each
 dendrogram catalog blob using the measured line ratio, dust column density, 
 and a dust-derived lower limit on the volume density as constraints.
 The $\chi^2$ grid approach described in Section \ref{sec:linemodeling} was used
 to extract the temperature and associated error.
 
 We plot the derived temperature for all clumps against the measured line ratio
-in Figure \ref{fig:ratiovstem}.  The figure illustrates the effects of assuming
+in Figure \ref{fig:ratiovstem}.  This figure includes both `leaves' and `ancestors'
+from the dendrogram extraction.  The figure illustrates the effects of assuming
 higher or lower density on the temperature. The lower density models are
 excluded by the observed volume density lower limit from the dust.
 
@@ -627,7 +667,7 @@ excluded by the observed volume density lower limit from the dust.
 \Figure{figures/dendrotem/ratio_vs_temperature_modeloverlay.pdf}
 {The derived temperature vs the measured ratio \Rone for the dendrogram clumps.
 The big symbols represent leaves (compact clumps) and the small symbols
-represent larger parent structures.
+represent larger ancestor structures.
 The temperature includes constraints from the assumed fixed \formaldehyde
 abundance and the 
 varying column density.  The points are color coded by signal-to-noise in the
@@ -733,9 +773,9 @@ and $n(\hh)$.  The maps are masked by signal-to-noise as in Figure
 {figures/big_maps/big_lores_peaksn}
 {figures/big_maps/big_lores_smooth_peaksn}
 {Map of the peak signal-to-noise in the \para \threeohthree line with no
-smoothing (top) and with 2-pixel (14.4\arcsec) smoothing (bottom).  
+smoothing (top) and with 33.84\arcsec smoothing (bottom).  
 These maps give an indication of the reliability of the temperatures extracted
-in Figure \ref{fig:temmap}.  The colorbars are intentionally saturated at a
+in Figure \ref{fig:temmap}.  The colorbars are intentionally saturated at
 S/N$>10$ since above this threshold, the temperatures are reliable as long as
 they are in the $T<150$ K regime.
 }
@@ -780,18 +820,17 @@ resolved but it is known.}
 \section{Discussion}
 \label{sec:discussion}
 \subsection{Parameter Comparison}
-In a turbulent medium, the 1D line width of the gas should be tightly
-correlated with the 3D Mach number \citep[e.g.][]{Federrath2011a}.  If
-turbulence is the dominant gas heating mechanism, there should also be a
-correlation between the Mach number of the turbulence and the gas temperature.
-However, Figure \ref{fig:temvsfwhm_regions} shows no such correlation.  For
-dendrogram-extracted regions, which consist of multiple nested clumps, there
-are trends between the linewidth and temperature, but not with the naively
-expected sign.  These trends are likely due to variation in the `clump' size.
+\todo{Questionable.  Remove this & Figure \ref{fig:temvsfwhm_regions}?} In a
+turbulent medium, the 1D line width of the gas should be tightly correlated
+with the 3D Mach number \citep[e.g.][]{Federrath2011a}.  If turbulence is the
+dominant gas heating mechanism, there should also be a correlation between the
+Mach number of the turbulence and the gas temperature.  However, Figure
+\ref{fig:temvsfwhm_regions} shows no such correlation.  There may be a
+correlation in the dendrogram-extracted data, but it is weak.
 
 \FigureTwo
 {figures/chi2_temperature_vs_linewidth_fieldsandsources}
-{figures/dendrotem/temperature_vs_rmsvelocity_smooth} % dendrotem_plots
+{figures/dendrotem/temperature_vs_rmsvelocity_xzoom} % dendrotem_plots
 {(a) 
 The fitted temperature as described in Section \ref{sec:linemodeling} plotted
 against the fitted line width for the by-eye selected regions.  The blue
@@ -800,14 +839,13 @@ symbols are compact `clump' sources and the red symbols are large-area
 is obvious.  The very broad line regions, FWHM $\gtrsim$ 40 \kms, are affected
 by significant baseline issues, and it is possible that the temperature has been
 underestimated as a result.
-(b) The same as (a) but for the dendrogram-extracted sources.  The arc of points
-from $\sigma_v=12$ to $8$ \kms and $T=80$ to $140$ K is from the hierarchy of
-Sgr B2 clumps and thus represents a variation in temperature with size scale.
-Similarly, the other high-linewidth points represent large interconnected
-structures.  In the range $1 < \sigma_v < 5$ \kms, which is the only region
-including low temperatures, no trend is observed.  The points are color coded
-by signal-to-noise in the ratio $R_1$, with black $S/N < 5$, blue $5 < S/N <
-25$, green $25 < S/N < 50$, and red $S/N > 50$.  }
+(b) The same as (a) but for the dendrogram-extracted sources. The points are
+color coded by signal-to-noise in the ratio $R_1$, with black $S/N < 5$, blue
+$5 < S/N < 25$, green $25 < S/N < 50$, and red $S/N > 50$.  Small, faint points
+indicate ancestors in the dendrogram, while bright, large points indicate leaves.
+Lower limits on linewidth and temperature are indicated with triangles on the
+edge of the plot.  
+}
 {fig:temvsfwhm_regions}
 {1}{3.5in}
 %{0.5}{0}
@@ -824,7 +862,7 @@ we have fitted the 6-parameter model described in Section
 \ref{sec:linemodeling} to derive the ratio.
 
 Different variations with scale are observed.  For example, around `The Brick',
-the ratio decreases from $\sim0.55$ at the position $\ell=0.237$, $b=0.008$
+the ratio decreases from $\sim0.55$ at the position $\ell=0.237\arcdeg$, $b=0.008$
 within a single spectrum to $\sim0.33$ when averaged over a radius
 $\sim70\arcsec$ (Figure \ref{fig:brickradial}a).  By contrast, Figure
 \ref{fig:brickradial}b shows a highly turbulent example where the temperature
@@ -867,7 +905,7 @@ points with untrustworthy fits.
 
 \FigureTwo
 {figures/chi2_temperature_vs_higaltemperature_fieldsandsources.pdf} % parameter_comparisons
-{figures/dendrotem/temperature_vs_dusttem_smooth.pdf} % dendrotem_plots
+{figures/dendrotem/temperature_vs_dusttem.pdf} % dendrotem_plots
 {(a) The fitted temperature as described in Section \ref{sec:linemodeling} plotted
 against the HiGal fitted dust temperature.  As in Figure \ref{fig:temvsfwhm_regions},
 the blue symbols are compact `clump' sources and the red symbols are large-area
@@ -898,7 +936,7 @@ through The Brick into the Sgr A complex.
 
 By contrast, lower temperatures, $T\sim60$ K, are observed in the
 negative-latitude component of the `ring'.  At positive longitudes,
-$\ell\gtrsim0.9$, the gas is uniformly $T\sim60$ K.  Similarly, most of the gas
+$\ell\gtrsim0.9\arcdeg$, the gas is uniformly $T\sim60$ K.  Similarly, most of the gas
 in the Sgr C complex is around 60 K.
 
 Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2014d} and
@@ -931,8 +969,9 @@ the `ring' represents a single gas stream on its first passage by Sgr A*.
 temperature cube along the \citet{Kruijssen2014d} orbit.  White regions are
 outside the mapped area, while grey regions have no gas detected or inadequate
 signal to measure a temperature.
-(b) The path used to create the slice shown in (a).  Each element is a small
-rectangle over which the temperature has been averaged.  The green rectangle at
+(b) The path used to create the slice shown in (a).  The path consists of a series
+of transparent $7.2\arcsec\times300\arcsec$
+rectangles over which the temperature has been averaged.  The green rectangle at
 $\ell=359.3\arcdeg$ indicates the starting point (offset$=0$) of the position-velocity
 slice.  The orbit is outside of our observed field to the west of Sgr C.  
 The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
@@ -940,18 +979,22 @@ The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
 {fig:kdlorbit}{1}{8.5in}
 
 % dendro_vs_time
-\Figure
-{figures/orbits/dendro_smooth_temperature_vs_time_firstMyr.pdf}
+\FigureTwo
+{figures/orbits/dendro_temperature_vs_time.pdf}
+{figures/orbits/dendro_temperature_vs_time_firstMyr.pdf}
 {The observed temperature vs time since the most recent pericenter passage of
 The Brick on the \citet{Kruijssen2014d} orbit for dendrogram-extracted clumps with
 20 \kms and 12 pc of the orbital path.  There is a hint of a linear
 increase in temperature with time, from an initial temperature $T\lesssim50$ K
 to $T\gtrsim100$ K over a period $\tau\sim0.5-1$ Myr.  The symbol sizes are
-proportional to the integrated \thirteenco 2-1 brightness and are meant to give
-an inidication of how reliable the detections are; most of the detections below
-$\lesssim40$ K are questionable.  The grey vertical lines through the circles
-indicate the formal $1-\sigma$ errors on the temperature.}
-{fig:kdltemvstime}{0.4}{0}
+proportional to the \para \threeohthree brightness and are meant to give
+an indication of how reliable the detections are.  The grey vertical lines
+through the circles indicate the formal $1-\sigma$ errors on the temperature.
+(a) shows the entire orbit
+while (b) shows an expanded
+view of the first Myr.  The colored bar along the bottom of the figure shows the
+modeled orbit velocity at each position.}
+{fig:kdltemvstime}{0.4}{3.5in}
 
 \subsection{Comparison to \citet{Ott2014a} \ammonia temperature map}
 \label{sec:ammoniacompare}
@@ -960,11 +1003,21 @@ region we mapped, from $-0.2\arcdeg < \ell < 0.8\arcdeg$.  These two lines are
 a frequently
 used thermometer sensitive to gas temperatures $5 \lesssim T \lesssim 40$ K,
 with weak sensitivity up to $\sim80$ K \citep[][Figure 1]{Mangum2013a}.  The
-\ammonia lines also have lower critical densities by about 2 orders of
-magnitude.  The temperatures
-derived from this line ratio are necessarily lower than those we have measured.
-Nonetheless, we compare our temperature map to that of \citet{Ott2014a} to look
-for common trends and significant differences.
+\ammonia lines also have lower critical densities by about an order of
+magnitude, $n_{crit}(\ammonia 1-1)\sim10^3$ \percc while $n_{crit}(\para
+\threeohthree)\sim10^4$ \percc \citep[Figure \ref{fig:nh3vsh2co}][]{Shirley2015a}.  The temperatures
+derived from the \ammonia line ratio are lower by construction than those we have
+measured.  Nonetheless, we compare our temperature map to that of
+\citet{Ott2014a} to look for common trends and significant differences.
+
+% ammonia_vs_h2co
+\Figure
+{figures/radex/NH3andH2COexcitation}
+{Model of the \ammonia and \para line excitation temperature $T_{ex}$ as a function
+of density in the optically thin approximation.   \ammonia is more easily
+excited than \para, so the \ammonia temperatures likely represent the
+temperatures in lower-density gas.}
+{fig:nh3vsh2co}{0.25}{0}
 
 Figure \ref{fig:nh3tmap} shows the \citet{Ott2014a} temperature map in the same
 color scheme that we have used in Figure \ref{fig:temmap}.  There are some
@@ -1000,7 +1053,7 @@ range when using only these two lines, so the map is cut off at $T=80$ K.
 \subsection{Comparison to other measurements with \para}
 \label{sec:h2cocompare}
 The largest survey of \para temperatures prior to this work was by
-\citet{Ao2013a}, who observed the inner 30 pc.  They performed a similar
+\citet{Ao2013a}, who observed the inner 75 pc.  They performed a similar
 analysis to ours but over a limited area.  They reported similar temperatures,
 with some small differences due to a different set of collision rates adopted
 (\citet{Wiesenfeld2013a} rather than \citet{Green1991a}).
@@ -1123,7 +1176,7 @@ is at a lower average density.
 % backstream_pv
 \RotFigureTwoAA
 {figures/orbits/mydrawnpathpv_on_H2CO_TemperatureFromRatio_smooth_weighted.pdf}
-{figures/orbits/mydrawnpath_on_H2CO_TemperatureFromRatio_smooth_weighted.pdf}
+{figures/orbits/mydrawnpath_on_H2CO_TemperatureFromRatio_smooth_weighted_masked.pdf}
 {Position-velocity slice tracing the ``fresh stream'' of cooler molecular
 gas from Section \ref{sec:coolstream}.}
 {fig:coolstream}{1}{9.5in}
@@ -1160,7 +1213,8 @@ outside the densest clouds.
 For comparison to extragalactic observations, we have included a spectrum
 averaged over the whole $\sim300$ pc extent of our survey in Figure
 \ref{fig:wholecmzspec}.  The peak amplitude is 50-60 mK and the measured
-line ratio $\Rone = 0.25$, corresponding to a temperature $T=60$ K.  
+line ratio $\Rone = 0.25$, corresponding to a temperature $T=64$ K at $n=10^4$
+\percc or $T=48$ K at $n=10^5$ \percc.  
 Over the same area, the measured mean dust temperature from HiGal is 23 K,
 though on such large scales it would be more appropriate to use Planck or WMAP
 data to perform this measurement.
@@ -1252,24 +1306,23 @@ subtler individual components are evident.}
 %much lower than in cloud d and more comparable to The Brick.
 
 \section{Conclusion}
-We present the largest gas temperature map of the CMZ to date.
-There is warm ($T\gtrsim60$ K) pervading the CMZ out to a radius $\sim200$ pc.
-However, there is also significant contrast in gas temperature, with massive
-clouds such as The Brick, Sgr B2, and the Sgr A cloud complex exhibiting
-temperatures in excess of $T>100$ K.
+We present the largest gas temperature map of the CMZ to date.  There is warm
+($T\gtrsim60$ K) gas pervading the CMZ out to a radius $\sim200$ pc.  However,
+there is also significant contrast in gas temperature, with massive clouds such
+as The Brick, Sgr B2, and the Sgr A cloud complex exhibiting temperatures in
+excess of $T>100$ K.
 
 Our new observations are broadly consistent with the orbital model described by
 \citet{Kruijssen2014d}.  While there are some individual discrepancies, it at
 least appears that the front-side clouds (The Brick and the lettered clouds on
 the path to Sgr B2) have consistent thermal properties and fall along a stream
-of progressively increasing temperature as a function of age.  However, The
-Brick itself is an outlier in this progression.
+of progressively increasing temperature as a function of age.  
 
-The 80 \kms cloud stream extending from $\ell=1.2$ to $\ell=0.3$ is relatively
-cool compared to the rest of the CMZ despite its broad line width.  The lower
-temperature hints that it is more distant from pericenter than the `ring'
-clouds, and it may therefore represent a fresh stream of gas infalling into the
-center.
+The 80 \kms cloud stream extending from $\ell=1.2\arcdeg$ to $\ell=0.3\arcdeg$
+is relatively cool compared to the rest of the CMZ despite its broad line
+width.  The lower temperature hints that it is more distant from pericenter
+than the `ring' clouds, and it may therefore represent a fresh stream of gas
+infalling into the center.
 
 \textbf{Acknowledgements}:
 We thank the staff and observers at APEX for carrying out the service-mode

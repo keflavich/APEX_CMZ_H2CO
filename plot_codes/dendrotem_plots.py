@@ -12,7 +12,8 @@ from dendrograms import (catalog, catalog_sm, dend, dendsm)
 
 matplotlib.rc_file(pcpath('pubfiguresrc'))
 
-tm = TemperatureMapper(logdensities=[3,4,5])
+if 'tm' not in locals():
+    tm = TemperatureMapper(logdensities=[3,4,5])
 
 zipped = zip((catalog,catalog_sm,),#catalog321,catalog321_sm),
              (dend,dendsm,),#dend321,dend321sm),
@@ -250,17 +251,29 @@ for cat,dendro,smooth in zipped:
     fig12, ax12 = pl.subplots(num=12)
     hot = cat['temperature_chi2'] > 150
     ax12.errorbar(cat['v_rms'][hot]*np.sqrt(8*np.log(2)), [149]*hot.sum(),
-                  lolims=True, linestyle='none', capsize=0, alpha=alpha,
+                  lolims=True, linestyle='none', capsize=0, alpha=0.3,
                   marker='^', color='r')
     for mask,color,alpha in masks_colors:
         ax12.errorbar(cat['v_rms'][mask]*np.sqrt(8*np.log(2)), cat['temperature_chi2'][mask],
-                    #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
-                    linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
+                      #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
+                      markersize=10 if any(mask & is_leaf) else 5,
+                      linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax12.set_xlabel(r"Line FWHM (km s$^{-1}$)")
         ax12.set_ylabel("Temperature [K]")
-    ax12.set_ylim([0,200])
+    ax12.set_ylim([0,150])
     fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
-    ax12.set_xlim([0,15])
+    wide = cat['v_rms'] > 20/np.sqrt(8*np.log(2))
+    ax12.errorbar([19.5] * (wide & is_leaf).sum(),
+                  cat['temperature_chi2'][wide&is_leaf],
+                  lolims=True, linestyle='none', capsize=0, alpha=0.3,
+                  markersize=10,
+                  marker='>', color='r')
+    ax12.errorbar([19.5] * (wide & ~is_leaf).sum(),
+                  cat['temperature_chi2'][wide&(~is_leaf)],
+                  lolims=True, linestyle='none', capsize=0, alpha=0.1,
+                  markersize=5,
+                  marker='>', color='r')
+    ax12.set_xlim([0,20])
     fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity_xzoom{0}.pdf'.format(smooth)))
 
     fig22 = pl.figure(22)

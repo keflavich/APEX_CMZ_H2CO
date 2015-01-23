@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pvextractor
 import spectral_cube
@@ -6,7 +7,7 @@ import pylab as pl
 import matplotlib
 import pyregion
 import copy
-from paths import mpath,apath,fpath,molpath,hpath,rpath
+from paths import mpath,apath,fpath,molpath,hpath,rpath,h2copath
 from astropy import units as u
 from astropy import coordinates
 from astropy.io import ascii
@@ -130,6 +131,7 @@ for weight in ("_weighted",""):
         F.save(fpath('orbits/mydrawnpathpv_on_{0}{1}.pdf'.format(molecule,weight)))
 
 
+        smooth = '_smooth' if 'smooth' in fn else ''
         peaksn = os.path.join(h2copath,'APEX_H2CO_303_202{0}_bl_mask_integ.fits'.format(smooth))
 
         fig2 = pl.figure(2)

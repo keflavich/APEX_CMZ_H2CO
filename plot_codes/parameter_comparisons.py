@@ -50,7 +50,7 @@ ax5.errorbar(coordinates.Angle(pcfittable['GLON']*u.deg).wrap_at(180*u.deg).valu
                    (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[maps]],
              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
 ax5.set_ylim(0,150)
-ax5.set_ylabel("Kinetic Temperature (K)")
+ax5.set_ylabel("Temperature (K)")
 ax5.set_xlabel("Galactic Longitude ($^{\\circ}$)")
 fig5.savefig(paths.fpath('chi2_temperature_vs_glon_byfield.pdf'),
                          bbox_inches='tight')
@@ -72,7 +72,7 @@ ax6.errorbar(pcfittable['higaldusttem'][maps],
              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
 ax6.plot([15,30],[15,30],'k--')
 ax6.set_xlabel("HiGal Fitted Temperature")
-ax6.set_ylabel("Kinetic Temperature (K)")
+ax6.set_ylabel("Temperature (K)")
 ax6.set_ylim(0,200)
 ax6.set_xlim(15,30)
 fig6.savefig(paths.fpath('chi2_temperature_vs_higaltemperature_byfield.pdf'),
@@ -94,15 +94,20 @@ ax7.errorbar(pcfittable['width'][maps]*(8*np.log(2))**0.5,
              pcfittable['temperature_chi2'][maps],
              yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[maps],
                    (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[maps]],
+             capsize=0,
+             markeredgecolor='none',
              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
 ax7.set_xlabel("Line FWHM (km s$^{-1}$)")
-ax7.set_ylabel("Kinetic Temperature (K)")
+ax7.set_ylabel("Temperature (K)")
+ax7.set_ylim(0,200)
 fig7.savefig(paths.fpath('chi2_temperature_vs_linewidth_byfield.pdf'),
                          bbox_inches='tight')
 ax7.errorbar(pcfittable['width'][~maps]*(8*np.log(2))**0.5,
              pcfittable['temperature_chi2'][~maps],
              yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[~maps],
                    (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[~maps]],
+             capsize=0,
+             markeredgecolor='none',
              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='b')
 fig7.savefig(paths.fpath('chi2_temperature_vs_linewidth_fieldsandsources.pdf'),
                          bbox_inches='tight')
@@ -117,7 +122,7 @@ ax8.errorbar(pcfittable['ampH2CO'][maps],
                    (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[maps]],
              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
 ax8.set_xlabel("H2CO Peak Amplitude")
-ax8.set_ylabel("Kinetic Temperature (K)")
+ax8.set_ylabel("Temperature (K)")
 fig8.savefig(paths.fpath('chi2_temperature_vs_h2coamp_byfield.pdf'),
                          bbox_inches='tight')
 ax8.errorbar(pcfittable['ampH2CO'][~maps],
@@ -139,7 +144,7 @@ ax9.errorbar(pcfittable['higalcolumndens'][maps],
                    (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[maps]],
              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
 ax9.set_xlabel("Hi-Gal Fitted Column Density")
-ax9.set_ylabel("Kinetic Temperature (K)")
+ax9.set_ylabel("Temperature (K)")
 fig9.savefig(paths.fpath('chi2_temperature_vs_higalcolumn_byfield.pdf'),
                          bbox_inches='tight')
 ax9.errorbar(pcfittable['higalcolumndens'][~maps],
@@ -214,7 +219,7 @@ ax13.errorbar(pcfittable['area'][maps],
                     pcfittable['tmax1sig_chi2'][maps]-pcfittable['temperature_chi2'][maps]],
               linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
 ax13.set_xlabel("Area (square degrees)")
-ax13.set_ylabel("Kinetic Temperature (K)")
+ax13.set_ylabel("Temperature (K)")
 ax13.set_xscale('log')
 fig13.savefig(paths.fpath('temperature_vs_area_byfield.pdf'),
                          bbox_inches='tight')
@@ -237,7 +242,7 @@ ax14.errorbar(pcfittable['higalcolumndens'][maps],
              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
 #ax14.plot([15,30],[15,30],'k--')
 ax14.set_xlabel("HiGal Fitted Column Density")
-ax14.set_ylabel("Kinetic Temperature (K)")
+ax14.set_ylabel("Temperature (K)")
 fig14.savefig(paths.fpath('chi2_temperature_vs_higaldustcol_byfield.pdf'),
                          bbox_inches='tight')
 ax14.errorbar(pcfittable['higalcolumndens'][~maps],
