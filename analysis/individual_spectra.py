@@ -72,7 +72,8 @@ font_sizes = {1: 20,
               3: 11,
               4: 8}
 
-def fit_a_spectrum(sp, radexfit=False, write=True, vlimits=(-105,125)):
+def fit_a_spectrum(sp, radexfit=False, write=True, vlimits=(-105,125),
+                   pars=pars):
     sp.plotter.autorefresh=False
     sp.plotter(figure=1)
     ncomp = pars[sp.specname]['ncomp']
@@ -83,10 +84,14 @@ def fit_a_spectrum(sp, radexfit=False, write=True, vlimits=(-105,125)):
     velos = pars[sp.specname]['velo']
     spname = sp.specname.replace(" ","_")
 
-    if 'Map' in sp.specname or 'box' in sp.specname:
-        width_min,width_max = 1,40
+    width_min = 1
+
+    if 'width_max' in pars[sp.specname]:
+        width_max = pars[sp.specname]['width_max']
+    elif 'Map' in sp.specname or 'box' in sp.specname:
+        width_max = 40
     else:
-        width_min,width_max = 1,15
+        width_max = 15
 
 
     sp.specfit.Registry.add_fitter('h2co_simple', simple_fitter2, 6,
@@ -188,6 +193,7 @@ def fit_a_spectrum(sp, radexfit=False, write=True, vlimits=(-105,125)):
                                         "radex/{0}_fit_h2co_mm_radex.pdf".format(spname)))
 
         returns.append(copy.copy(sp.specfit.parinfo))
+
 
     return returns
 
