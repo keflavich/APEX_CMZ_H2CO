@@ -286,7 +286,8 @@ for cat,dendro,smooth in zipped:
     for mask,color,alpha in masks_colors:
         ax22.errorbar(cat['higaldusttem'][mask], cat['temperature_chi2'][mask],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
-                    linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
+                      markersize=10 if any(mask & is_leaf) else 5,
+                      linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax22.plot([14,38], [14,38], 'k--')
         ax22.set_xlim([13,38])
         ax22.set_ylim([13,150])
