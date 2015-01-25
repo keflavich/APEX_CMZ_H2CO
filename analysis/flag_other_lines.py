@@ -26,7 +26,7 @@ def flag_dendro(dend, catalog=None, smooth=False):
         obj.bad = False
 
     for x,y,z in pixels_with_bad:
-        z = z-50 # Jan 25: the cubes were shifted
+        z = z-64 # Jan 25: the cubes were shifted
         if z < 0: continue
         bad_obj = dend.structure_at([z/(2 if smooth else 1),y,x])
         if bad_obj:

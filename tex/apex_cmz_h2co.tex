@@ -736,7 +736,7 @@ gas temperature, our data would be sensitive enough to measure temperature down
 to $T\sim20$ K.  The higher temperatures become lower limits above $\sim150$ K
 because the \para line ratio is intrinsically insensitive to higher
 temperatures, as can be seen in Figure \ref{fig:parsonbrightness}, in which
-the modeled line brightnesses are both nearly constant above $T\grtsim150$ K.
+the modeled line brightnesses are both nearly constant above $T\gtrsim150$ K.
 
 
 % tmap_figure
@@ -971,22 +971,31 @@ through The Brick into the Sgr A complex.
 By contrast, lower temperatures, $T\sim60$ K, are observed in the
 negative-latitude component of the `ring'.  At positive longitudes,
 $\ell\gtrsim0.9\arcdeg$, there are many regions with $T\sim60$ K.  Similarly,
-most of the gas in the Sgr C complex is around 60 K.
+most of the gas in the Sgr C complex is around 60 K.  Figure \ref{fig:temvslonplot}
+shows the derived temperatures for the dendrogram objects as a function of longitude
+to more directly illustrate this structure.
+
+% dendrotem_plots
+\Figure
+{figures/dendrotem/temperature_vs_longitude_velocolor}
+{Derived temperature as a function of longitude colored by LSR velocity.
+The points have a size proportional to the \threeohthree line brightness.  The
+more transparent points reflect ancestors in the dendrogram tree, while the
+opaque points show leaves.}
+{fig:temvslonplot}{0.5}{0}
 
 Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2014d} and
 a position-velocity slice through the fitted temperature cube following that
 orbit.  The fit is imperfect, especially along the green segment, but still very useful
-for tracking the properties of clouds in common environments.
-Intriguingly, the `back-side' clouds (green segment), are cooler than
-many of those on the front side, such as The Brick (red segment).  Nontheless,
-many of the clouds besides The Brick within the molecular `ring' are among the
-coldest detected in our survey.
+for tracking the properties of clouds in common environments.  Intriguingly,
+the `far-side' clouds (green segment, 1 Myr < $t$ < 2 Myr), are cooler than
+many of those on the near side, such as The Brick (red segment).  
 
-Perhaps the most interesting feature of the orbital extraction is the qualitative
-difference between the `big clouds', Sgr B2, Sgr A, and The Brick, and the rest
-of the gas.  At least in terms of gas temperature, The Brick is in the same class
-as the massive star-forming Sgr B2 complex and the clouds closest to the central
-black hole.
+%Perhaps the most interesting feature of the orbital extraction is the qualitative
+%difference between the `big clouds', Sgr B2, Sgr A, and The Brick, and the rest
+%of the gas.  At least in terms of gas temperature, The Brick is in the same class
+%as the massive star-forming Sgr B2 complex and the clouds closest to the central
+%black hole.
 
 There is some evolution of temperature over time evident in Figure
 \ref{fig:kdltemvstime}, which shows the temperature within each
@@ -994,6 +1003,9 @@ dendrogram-extracted clump within 20 \kms and 6 pc of the
 \citet{Kruijssen2014d} orbit.  The linear increase in temperature over the
 first $\sim0.5$ Myr seems to support the \citet{Kruijssen2014d} hypothesis that
 the `ring' represents a single gas stream on its first passage by Sgr A*.
+The coolear gas on the far side does not obviously fit with this picture, 
+and we suggest in Section \ref{sec:coolstream} that it is not affiliated
+with the orbit.
 
 % orbit_pv
 \RotFigureTwoAA
@@ -1038,9 +1050,10 @@ a frequently
 used thermometer sensitive to gas temperatures $5 \lesssim T \lesssim 40$ K,
 with weak sensitivity up to $\sim80$ K \citep[][Figure 1]{Mangum2013a}.  The
 \ammonia lines also have lower critical densities by about an order of
-magnitude, $n_{crit}(\ammonia 1-1)\sim10^3$ \percc while $n_{crit}(\para
-\threeohthree)\sim10^4$ \percc \citep[Figure \ref{fig:nh3vsh2co}][]{Shirley2015a}.  The temperatures
-derived from the \ammonia line ratio are lower by construction than those we have
+magnitude, $n_{crit}(\ammonia 1-1)\sim10^3$ \percc while $n_{crit}(\para~
+\threeohthree)\sim10^4$ \percc \citep[Figure
+\ref{fig:nh3vsh2co}][]{Shirley2015a}.  The temperatures derived from the
+\ammonia line ratio are lower by construction than those we have
 measured.  Nonetheless, we compare our temperature map to that of
 \citet{Ott2014a} to look for common trends and significant differences.
 
@@ -1067,7 +1080,7 @@ cloud.  In this region, the \ammonia temperature transitions from the high
 $T\sim30-40$ K.  By contrast, the \formaldehyde temperatures stay high,
 indicating gas temperatures $T>150$ K extending $\sim2.5\arcmin$ (6 pc) to the
 southwest of Sgr B2 S.  This difference probably indicates that there is a
-massive, cool, diffuse component being detected in \ammonia, while
+cool, diffuse component being detected in \ammonia, while
 \formaldehyde is detecting a hotter, denser component.
 
 \RotFigureTwoAA
@@ -1093,7 +1106,7 @@ with some small differences due to a different set of collision rates adopted
 (\citet{Wiesenfeld2013a} rather than \citet{Green1991a}).
 The \citet{Ao2013a} survey found uniformly high temperatures within the bright
 Sgr A cloud complex.  Our survey finds a greater variety in gas temperatures due
-to the larger area covered, with significant contrast between the back-side
+to the larger area covered, with significant contrast between the far-side
 cool clouds and the warmer foreground infrared dark clouds.
 
 There have also been observations of \para temperatures with interferometers.
@@ -1364,7 +1377,7 @@ excess of $T>100$ K.
 
 Our new observations are broadly consistent with the orbital model described by
 \citet{Kruijssen2014d}.  While there are some individual discrepancies, it at
-least appears that the front-side clouds (The Brick and the lettered clouds on
+least appears that the near-side clouds (The Brick and the lettered clouds on
 the path to Sgr B2) have consistent thermal properties and fall along a stream
 of progressively increasing temperature as a function of age.  
 

@@ -266,7 +266,7 @@ for cat,dendro,smooth in zipped:
     ax5.set_xlabel("Galactic Longitude")
     ax5.set_ylabel("Temperature")
     ax5.set_ylim([0,150])
-    ax5.set_xlim([1.65,-0.6])
+    ax5.set_xlim([1.7,-0.6])
     sm = matplotlib.cm.ScalarMappable(norm=matplotlib.colors.Normalize(vmin=cbvmin, vmax=cbvmax),
                                       cmap=cmap_rainbowvelo)
     sm._A = []
