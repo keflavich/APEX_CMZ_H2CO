@@ -37,7 +37,7 @@
 \todo{To-do items are coded in red.}
 
 \section{Introduction}
-\todo{The introduction needs to be expanded.}
+\todo{The introduction needs to be cleaned up.}
 The central region of our Galaxy is the nearest location in which we can study
 star formation in an `extreme' environment with pressure, turbulent Mach number, 
 and gas temperature much higher than in local star forming regions.  While
@@ -415,7 +415,8 @@ divide-by-zero numerical errors.
 \Rone.  The data cubes were masked by
 signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
 indicating nondetections.  The Sgr B2 peaks exhibit \formaldehyde
-absorption and therefore are not reliable.  Higher ratios (red) correspond
+absorption and therefore do not contain reliable measurements.  Higher ratios
+(red) correspond
 to higher temperatures.
 \newline
 (b) The same as (a), but the average along velocity has been
@@ -439,7 +440,8 @@ weighted by the \threeohthree brightness
 \Rone.  The data cubes were masked by
 signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
 indicating nondetections.  The Sgr B2 peaks exhibit \formaldehyde
-absorption and therefore are not reliable.  Higher ratios (red) correspond
+absorption and therefore do not contain reliable measurements.  Higher ratios
+(red) correspond
 to higher temperatures.
 \newline
 (b) The same as (a), but the average along velocity has been
@@ -463,7 +465,10 @@ The dendrogram clump finding uses a watershed decomposition like other clump
 finding methods, but it also extracts clumps at different brightness scales
 (different heights in the watershed) and tracks how nested clumps are related
 to each other.  Within a hierarchy of nested clumps, the brightest and smallest
-is a `leaf' and all associated larger structures are `ancestors'.
+is a `leaf' and all associated larger structures are `ancestors' (roots or
+trunks and branches).
+\citet{Rosolowsky2008c} Figures 1 and 3 give visual representations of this
+hierarchy.
 
 % dendro_temperature.py
 % TODO: decide whether we used the full resolution or the smoothed version.
@@ -517,11 +522,15 @@ around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
 We use RADEX \citet{van-Der-Tak2007a} and a related solver (Fujun Du's
 \texttt{myRadex}; \url{https://github.com/fjdu/myRadex}) to create a model grid
 for the p-\formaldehyde lines over a grid of 20 density ($n=10^{2.5}$-$10^{7}$
-\percc), a fixed assumed line gradient of 5 \kms / pc, 30 \formaldehyde column
-densities $N(\formaldehyde) = 1\ee{11}-1\ee{15.1}$ \persc, and 50 temperatures
-from 10 to 350 K.  The grid was created using the \texttt{pyradex} wrapper of
-RADEX\footnote{\url{https://github.com/adamginsburg/pyradex}} and collision rates
-retrieved from LAMDA \citep{Wiesenfeld2003a}.  We then
+\percc), a fixed assumed\footnote{The line gradient is selected because observed line widths have
+FWHM larger than 5 \kms throughout the CMZ.  The temperature measurements are
+robust against this assumption, with a change of $dT/T < 5\%$ for a gradient
+$4\times$ larger; if the gradient is significantly smaller, the gas temperature
+must be higher than we report.} line gradient of 5 \kms / pc, 30 \formaldehyde
+column densities $N(\formaldehyde) = 1\ee{11}-1\ee{15.1}$ \persc, and 50
+temperatures from 10 to 350 K.  The grid was created using the \texttt{pyradex}
+wrapper of RADEX\footnote{\url{https://github.com/adamginsburg/pyradex}} and
+collision rates retrieved from LAMDA \citep{Wiesenfeld2003a}.  We then
 upsampled these grids by spline interpolating between grid points to acquire a
 high-resolution ($T\times n \times N = 250\times100\times101$) grid covering
 $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N < 10^{15.1}$
@@ -621,16 +630,17 @@ is weakly inconsistent with the joint constraints from the other parameters.
 \newline
 (top right) The same colorscheme as before, showing the constraints imposed by
 assuming the abundance of \para relative to \hh is as labeled.  
-The abundance does not constrain these parameters.
+The abundance does not constrain these parameters, but in Figure
+\ref{fig:coltemconstraints}, the abundance rules out a substantial region of parameter
+space.
 \newline
 (bottom right) The same colorscheme as before, showing the constraints imposed
-by using the measured mean volume density as a lower limit.
+by using the measured mean volume density as a lower limit.  In this figure,
+the volume density imposes no constraint, but in Figure \ref{fig:coltemconstraints}
+and \ref{fig:denstemconstraints} it is important.
 \newline
 (bottom left) The same colorscheme as before, showing the constraints imposed
-by the measured total column density of \hh, converted to a constraint on the
-\para column by assuming a velocity gradient (5 \kms \perpc) and abundance as
-shown in the top right panel.  The uncertainty is dominated by the abundance
-uncertainty.
+by the measured total column density of \hh.
 }
 {fig:coltemconstraints}{0.5}{0}
 
@@ -718,14 +728,15 @@ the inverse S/N from Figure \ref{fig:peaksn}b.
 The effective range of detected temperatures is $\approx40-150$ K. While lower
 and higher temperatures appear in the map, those measurements should not be
 trusted.  Below $T\lesssim40$ K, all temperature measurements are effectively
-upper limits, generally corresponding to $T\lesssim40$ K as shown.  This limit
+upper limits, generally corresponding to $T\lesssim40$ K.  This limit
 is due to a combination of sensitivity and excitation: below 40 K, the \para
 lines are observed to be faint, and therefore the \threetwoone line is not
 detected.  If the high column density gas in, e.g., G0.253+0.016 had a lower
 gas temperature, our data would be sensitive enough to measure temperature down
 to $T\sim20$ K.  The higher temperatures become lower limits above $\sim150$ K
 because the \para line ratio is intrinsically insensitive to higher
-temperatures as can be seen in Figure \ref{fig:parsonbrightness}.
+temperatures, as can be seen in Figure \ref{fig:parsonbrightness}, in which
+the modeled line brightnesses are both nearly constant above $T\grtsim150$ K.
 
 
 % tmap_figure
@@ -797,7 +808,7 @@ they are in the $T<150$ K regime.
 Galactic latitude and using the $n=10^4$ \percc curve from Figure
 \ref{fig:ratiovstem}.  (b) The peak signal-to-noise along Galactic latitude,
 which is used as a mask in (a).  The apparently cold blobs at -80 \kms in Sgr
-B2 and -90 \kms in Sgr A is a different line, HC$_3$N 24-23.
+B2 and -90 \kms in Sgr A are from a different line, HC$_3$N 24-23.
 \todo{The excessive whitespace in panel (a) is a bug that has not yet been
 resolved but it is known.}
 }
@@ -876,9 +887,12 @@ the ratio decreases from $\sim0.55$ at the position $\ell=0.237\arcdeg$, $b=0.00
 within a single spectrum to $\sim0.33$ when averaged over a radius
 $\sim70\arcsec$ (Figure \ref{fig:brickradial}a).  By contrast, Figure
 \ref{fig:brickradial}b shows a highly turbulent example where the temperature
-is lowest at the center and higher on larger scales.  These observations imply
-that two different heating mechanisms, one internally driven (The Brick) and
-one external (G1.23-0.08), are active within the CMZ.
+is lowest at the center and higher on larger scales.  Apparently some regions
+are able to cool moderately below the mean temperature, but on the largest
+scales a high mean temperature prevails.
+%These observations imply
+%that two different heating mechanisms, one internally driven (The Brick) and
+%one external (G1.23-0.08), are active within the CMZ.
 
 % analysis/multiscale_fit
 \FigureTwo
@@ -913,6 +927,15 @@ independent of the method used to extract the temperature.  The small handful
 of data points near the $T_{dust}=T_{gas}$ line are the low signal-to-noise
 points with untrustworthy fits.
 
+\citet{Clark2013a} modeled The Brick with a suite of hydrodynamic simulations
+and found that even for such a dense structure, the gas and dust temperature
+can be uncoupled if the interstellar radiation field (ISRF) and cosmic ray
+ionization rate (CRIR) are $\sim1000\times$ their local values.  In their
+model, the ISRF determines the dust temperature while the CRIR determines the
+gas temperature.  Assuming their model still holds further from Sgr A, our
+observations of high gas temperatures imply that the CRIR must remain elevated
+to $\sim10^{14}$ out to a projected radius $R_{GC} \sim 250$ pc.
+
 \FigureTwo
 {figures/chi2_temperature_vs_higaltemperature_fieldsandsources.pdf} % parameter_comparisons
 {figures/dendrotem/temperature_vs_dusttem.pdf} % dendrotem_plots
@@ -933,10 +956,11 @@ and red $S/N > 50$.  }
 \subsection{Regional variations in gas temperature}
 There are significant regional variations in the gas temperature.  The most
 obvious is in and around the Sgr B2 complex, where very high gas temperatures
-are measured.  High gas temperatures, $T>50$ K, were measured in a ridge to the
+are measured.  High gas temperatures, $T\sim100-120$ K, were measured in a ridge to the
 Galactic northeast of Sgr B2 N using \methylcyanide previously \citep[][Figure
-4b]{de-Vicente1997a}, which we now confirm.  \citet{Ott2014a} also showed high
-\ammonia temperatures in this hot ridge.
+4b]{de-Vicente1997a}, which we now confirm, though our data show $T\gtrsim150$ K.
+\citet{Ott2014a} also showed relatively high \ammonia temperatures in this hot
+ridge.
 
 The high temperatures in the Sgr B2 region, $T>80$ K, extend to a radius of
 $\sim10$ pc (5\arcmin), and nearly 30 pc (12.5\arcmin) in the
@@ -946,8 +970,8 @@ through The Brick into the Sgr A complex.
 
 By contrast, lower temperatures, $T\sim60$ K, are observed in the
 negative-latitude component of the `ring'.  At positive longitudes,
-$\ell\gtrsim0.9\arcdeg$, the gas is uniformly $T\sim60$ K.  Similarly, most of the gas
-in the Sgr C complex is around 60 K.
+$\ell\gtrsim0.9\arcdeg$, there are many regions with $T\sim60$ K.  Similarly,
+most of the gas in the Sgr C complex is around 60 K.
 
 Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2014d} and
 a position-velocity slice through the fitted temperature cube following that
@@ -1206,9 +1230,12 @@ Since the mean densities at 30\arcsec resolution are always significantly lower
 ($n\lesssim\mathrm{few}\ee{5}$ \percc), such high density,
 optically thick gas would have to have a very low filling factor.  The peak
 \para \threeohthree brightness ranged from $0.2 \lesssim T_{mb} \lesssim 2$ K
-in the detected regions, implying upper limits on the filling factor 1-7\%.
-In practice, the filling factor would have to be lower still, since any optically
-thin \para would favor the \threeohthree line and contribute to a lower \Rone.
+in the detected regions, implying upper limits on the filling factor 1-7\% if
+we assume the resolved brightness temperature equals the dust temperature,
+$T_B=T_{dust}$.
+In practice, the filling factor would have to be lower still, since any
+optically thin \para in surrounding lower-density gas would favor the
+\threeohthree line and contribute to a lower \Rone.
 
 The strongest argument against such a scenario is the extremely high column
 density required.  At typical \para abundances $X\sim10^{-9}$, or even more
@@ -1220,6 +1247,17 @@ in The Brick, the densest cloud besides Sgr B2, higher column densities are not
 observed.  So, while it remains possible that optically thick \para is
 responsible for the observed line ratios, it is very unlikely, especially
 outside the densest clouds.
+
+\todo{Too speculative for the final paper, but kept to generate discussion in
+Draft 1.}
+One remaining possibility is that the \para lines become optically thick
+because of dramatically reduced turbulent line spreading and therefore
+increased line trapping.  Such an effect would require a transition from
+turbulent to coherent gas motion \citep[e.g.][]{Pineda2010a} and could reduce
+the required column densities by $\sim100\times$.  Still, the fact that we
+observe \para emission spread over
+a wide range of velocities renders this scenario unlikely again.
+
 
 \subsection{The CMZ average}
 For comparison to extragalactic observations, we have included a spectrum
@@ -1444,7 +1482,10 @@ limits.
 {figures/regions/circles_on_h2co}
 {figures/regions/square_fields_on_h2co}
 {Figures showing the extracted regions.  The background is the integrated
-masked \para \threeohthree image.}
+masked \para \threeohthree image. (a) Box regions created for large-scale averaging
+and to track the morphology of individual clumps  (b) Circular regions selected
+to highlight points of interest (c) $8\arcmin \times 8\arcmin$ Box regions
+matching the observational setup in 2014.}
 {fig:regions}{1}{9.5in}
 
 \section{Source code and Data release}

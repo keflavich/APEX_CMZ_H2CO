@@ -48,6 +48,7 @@ ax5.errorbar(coordinates.Angle(pcfittable['GLON']*u.deg).wrap_at(180*u.deg).valu
              pcfittable['temperature_chi2'][maps],
              yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[maps],
                    (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[maps]],
+             capsize=0, markeredgecolor='none',
              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
 ax5.set_ylim(0,150)
 ax5.set_ylabel("Temperature (K)")
@@ -58,6 +59,7 @@ ax5.errorbar(coordinates.Angle(pcfittable['GLON']*u.deg).wrap_at(180*u.deg).valu
              pcfittable['temperature_chi2'][~maps],
              yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[~maps],
                    (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[~maps]],
+             capsize=0, markeredgecolor='none',
              linestyle='none', marker='s', linewidth=1, alpha=0.5)
 fig5.savefig(paths.fpath('chi2_temperature_vs_glon_fieldsandsources.pdf'),
                          bbox_inches='tight')

@@ -47,7 +47,9 @@ if not os.path.exists(paths.fpath('param_fits')):
 nlevs=5
 
 density_label = 'Density $n(\mathrm{H}_2)$ [log cm$^{-3}$]'
-column_label = 'p-H$_2$CO [log cm$^{-2}$/(km s$^{-1}$ pc)]'
+column_label = 'Column p-H$_2$CO [log cm$^{-2}$/(km s$^{-1}$ pc)]'
+density_label_short = "$n(\mathrm{H}_2) (\mathrm{cm}^{-3})$"
+column_label_short = "$N(\mathrm{p-H}_2\mathrm{CO}) (\mathrm{cm}^{-2})$"
 temperature_label = 'Temperature (K)'
 prevname = ''
 num = 0
@@ -142,7 +144,8 @@ for row in fittable:
     pl.contour(mf.carr, mf.darr, chi2b[zz,:,:], levels=chi2b.min()+np.arange(nlevs))
     # only label middle row
     #pl.ylabel(column_label)
-    pl.xlabel(column_label)
+    pl.xlabel(column_label_short)
+    ax1.set_xticks(np.arange(11,16))
 
     ax2 = pl.subplot(3,3,2)
     im2 = pl.imshow(mf.tline303[:,yy,:], cmap=pl.cm.bone_r, interpolation='spline36',
@@ -150,7 +153,8 @@ for row in fittable:
               aspect=np.diff(mf.crange)/np.diff(mf.trange),
               extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
     pl.contour(mf.carr, mf.tarr, chi2b[:,yy,:], levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(column_label)
+    pl.xlabel(column_label_short)
+    ax2.set_xticks(np.arange(11,16))
     pl.ylabel(temperature_label)
     #ax2.set_title("p-H$_2$CO $3_{0,3}-2_{0,2}$")
 
@@ -160,7 +164,7 @@ for row in fittable:
               aspect=np.diff(mf.drange)/np.diff(mf.trange),
               extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
     pl.contour(mf.darr, mf.tarr, chi2b[:,:,xx], levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(density_label)
+    pl.xlabel(density_label_short)
     ax3.xaxis.set_ticks(np.arange(mf.darr.min(), mf.darr.max()))
     pl.ylabel(temperature_label)
     cax = fig1.add_axes([0.91,0.68,0.02,0.22])
@@ -174,8 +178,9 @@ for row in fittable:
               norm=pl.matplotlib.colors.LogNorm(),
               extent=mf.crange+mf.drange, vmin=vmin, vmax=vmax)
     pl.contour(mf.carr, mf.darr, chi2b[zz,:,:], levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(column_label)
-    pl.ylabel(density_label)
+    pl.xlabel(column_label_short)
+    ax4.set_xticks(np.arange(11,16))
+    pl.ylabel(density_label_short)
 
     ax5 = pl.subplot(3,3,5)
     im5 = pl.imshow(mf.tline321[:,yy,:], cmap=pl.cm.bone_r, interpolation='spline36',
@@ -183,7 +188,8 @@ for row in fittable:
               aspect=np.diff(mf.crange)/np.diff(mf.trange),
               extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
     pl.contour(mf.carr, mf.tarr, chi2b[:,yy,:], levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(column_label)
+    pl.xlabel(column_label_short)
+    ax5.set_xticks(np.arange(11,16))
     pl.ylabel(temperature_label)
     #ax5.set_title("p-H$_2$CO $3_{2,1}-2_{2,0}$")
 
@@ -193,7 +199,7 @@ for row in fittable:
               aspect=np.diff(mf.drange)/np.diff(mf.trange),
               extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
     pl.contour(mf.darr, mf.tarr,  chi2b[:,:,xx], levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(density_label)
+    pl.xlabel(density_label_short)
     ax6.xaxis.set_ticks(np.arange(mf.darr.min(), mf.darr.max()))
     pl.ylabel(temperature_label)
     cax = fig1.add_axes([0.91,0.40,0.02,0.22])
@@ -209,8 +215,9 @@ for row in fittable:
                      extent=mf.crange+mf.drange, vmin=vminr, vmax=vmaxr)
     pl.contour(mf.carr, mf.darr, chi2b[zz,:,:], levels=chi2b.min()+np.arange(nlevs))
     # only label middle row
-    #pl.ylabel(column_label)
-    pl.xlabel(column_label)
+    #pl.ylabel(column_label_short)
+    pl.xlabel(column_label_short)
+    ax7.set_xticks(np.arange(11,16))
 
     ax8 = pl.subplot(3,3,8)
     im8 = ax8.imshow(mf.modelratio1[:,yy,:], cmap=pl.cm.bone_r,
@@ -219,7 +226,8 @@ for row in fittable:
                       aspect=np.diff(mf.crange)/np.diff(mf.trange),
                       extent=mf.crange+mf.trange, vmin=vminr, vmax=vmaxr)
     pl.contour(mf.carr, mf.tarr, chi2b[:,yy,:], levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(column_label)
+    pl.xlabel(column_label_short)
+    ax8.set_xticks(np.arange(11,16))
     pl.ylabel(temperature_label)
     #ax2.set_title("p-H$_2$CO $3_{0,3}-2_{0,2}$")
 
@@ -230,7 +238,7 @@ for row in fittable:
                      aspect=np.diff(mf.drange)/np.diff(mf.trange),
                      extent=mf.drange+mf.trange, vmin=vminr, vmax=vmaxr)
     pl.contour(mf.darr, mf.tarr, chi2b[:,:,xx], levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(density_label)
+    pl.xlabel(density_label_short)
     ax9.xaxis.set_ticks(np.arange(mf.darr.min(), mf.darr.max()))
     pl.ylabel(temperature_label)
     cax3 = fig1.add_axes([0.91,0.1,0.02,0.22])
@@ -239,7 +247,7 @@ for row in fittable:
 
 
     pl.suptitle(row['Source_Name'])
-    pl.subplots_adjust(wspace=0.33, hspace=0.22, left=0.1)
+    pl.subplots_adjust(wspace=0.33, hspace=0.25, left=0.1)
 
     pl.savefig(paths.fpath('param_fits/{name}_{num}_h2coratio.pdf'.format(name=row['Source_Name'],
                                                                           num=num)), bbox_inches='tight')
@@ -257,8 +265,9 @@ for row in fittable:
               norm=pl.matplotlib.colors.LogNorm(),
               extent=mf.crange+mf.drange, vmin=vmin, vmax=vmax)
     pl.contour(mf.carr, mf.darr, chi2b.min(axis=0), levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(column_label)
-    pl.ylabel(density_label)
+    pl.xlabel(column_label_short)
+    ax1.set_xticks(np.arange(11,16))
+    pl.ylabel(density_label_short)
 
     ax2 = pl.subplot(2,3,2)
     zi, xi = np.indices([mf.tline303.shape[0], mf.tline303.shape[2],])
@@ -269,7 +278,8 @@ for row in fittable:
               aspect=np.diff(mf.crange)/np.diff(mf.trange),
               extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
     pl.contour(mf.carr, mf.tarr, chi2b.min(axis=1), levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(column_label)
+    pl.xlabel(column_label_short)
+    ax2.set_xticks(np.arange(11,16))
     pl.ylabel(temperature_label)
 
     ax3 = pl.subplot(2,3,3)
@@ -281,7 +291,7 @@ for row in fittable:
               aspect=np.diff(mf.drange)/np.diff(mf.trange),
               extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
     pl.contour(mf.darr, mf.tarr, chi2b.min(axis=2), levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(density_label)
+    pl.xlabel(density_label_short)
     ax3.xaxis.set_ticks(np.arange(mf.darr.min(), mf.darr.max()))
     pl.ylabel(temperature_label)
     cax = fig2.add_axes([0.91,0.55,0.02,0.35])
@@ -296,8 +306,9 @@ for row in fittable:
               norm=pl.matplotlib.colors.LogNorm(),
               extent=mf.crange+mf.drange, vmin=vmin, vmax=vmax)
     pl.contour(mf.carr, mf.darr, chi2b.min(axis=0), levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(column_label)
-    pl.ylabel(density_label)
+    pl.xlabel(column_label_short)
+    ax4.set_xticks(np.arange(11,16))
+    pl.ylabel(density_label_short)
 
     ax5 = pl.subplot(2,3,5)
     zi, xi = np.indices([mf.tline303.shape[0], mf.tline303.shape[2],])
@@ -308,7 +319,8 @@ for row in fittable:
               aspect=np.diff(mf.crange)/np.diff(mf.trange),
               extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
     pl.contour(mf.carr, mf.tarr, chi2b.min(axis=1), levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(column_label)
+    pl.xlabel(column_label_short)
+    ax5.set_xticks(np.arange(11,16))
     pl.ylabel(temperature_label)
 
     ax6 = pl.subplot(2,3,6)
@@ -320,7 +332,7 @@ for row in fittable:
               aspect=np.diff(mf.drange)/np.diff(mf.trange),
               extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
     pl.contour(mf.darr, mf.tarr,  chi2b.min(axis=2), levels=chi2b.min()+np.arange(nlevs))
-    pl.xlabel(density_label)
+    pl.xlabel(density_label_short)
     ax6.xaxis.set_ticks(np.arange(mf.darr.min(), mf.darr.max()))
     pl.ylabel(temperature_label)
     cax = fig2.add_axes([0.91,0.1,0.02,0.35])
@@ -328,7 +340,7 @@ for row in fittable:
     cb.set_label("$T_B$ (p-H$_2$CO $3_{2,1}-2_{2,0}$)")
 
     pl.suptitle(row['Source_Name'])
-    pl.subplots_adjust(wspace=0.33, left=0.1, hspace=0.22)
+    pl.subplots_adjust(wspace=0.33, left=0.1, hspace=0.25)
 
     pl.savefig(paths.fpath('param_fits/{name}_{num}_h2coratio_minaxis.pdf'.format(name=row['Source_Name'],
                                                                                   num=num)), bbox_inches='tight')

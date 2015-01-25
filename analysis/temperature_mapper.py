@@ -5,7 +5,9 @@ from astropy.io import fits
 from astropy import log
 
 def ph2cogrid(ntemp=50, trange=[10,200], abundances=(1.2e-9,),
-              logdensities=(4,5), opr=3):
+              logdensities=(4,5), opr=3, 
+              deltav=5.0, # km/s
+             ):
     import pyradex
 
     temperatures=np.linspace(trange[0],trange[1],ntemp)
@@ -13,7 +15,6 @@ def ph2cogrid(ntemp=50, trange=[10,200], abundances=(1.2e-9,),
     # initial density; will be modified later
     density = 1e4
 
-    deltav = 5.0 # km/s
 
     fortho = opr/(1.+opr)
 

@@ -14,10 +14,26 @@ matplotlib.rc_file(pcpath('pubfiguresrc'))
 
 if 'tm' not in locals():
     tm = TemperatureMapper(logdensities=[3,4,5])
+    tm2 = TemperatureMapper(logdensities=[4], deltav=20.0)
+    tm3 = TemperatureMapper(logdensities=[4], deltav=1.0)
+
+segmentdata = {'alpha': [(0.0, 1.0, 1.0), (0.5, 1.0, 1.0), (1.0, 1.0, 1.0)],
+               'blue': [(0.0, 1.0, 1.0), (0.5, 0.0, 0.0), (1.0, 0.0, 0.0)],
+               'green': [(0.0, 0.0, 0.0), (0.5, 0.75, 0.75), (1.0, 0.0, 0.0)],
+               'red': [(0.0, 0.0, 0.0), (0.5, 0.0, 0.0), (1.0, 1.0, 1.0)],
+               'alpha':[(0.0,0.5,0.5), (0.5, 0.5, 0.5), (1.0, 0.5, 0.5)],
+              }
+cmap_rainbowvelo = matplotlib.colors.LinearSegmentedColormap(name='rgb',
+                                                             segmentdata=segmentdata)
+
+cbvmin,cbvmax = -50, 120
+cblabel = r"$v_{LSR}$ (km s$^{-1}$)"
+
 
 zipped = zip((catalog,catalog_sm,),#catalog321,catalog321_sm),
              (dend,dendsm,),#dend321,dend321sm),
              ('','_smooth',))#'_321ssel','_321sel_smooth'))
+
 
 for cat,dendro,smooth in zipped:
     for ii in range(1,14):
@@ -27,8 +43,12 @@ for cat,dendro,smooth in zipped:
     sn = (cat['ratio303321']/cat['eratio303321'])
     sngt50 = sn > 50
     sn25_50 = (sn > 25) & (sn < 50)
-    ok = np.isfinite(sn) & (cat['Stot321'] < cat['Stot303']) & ~(cat['bad'] == 'True')
+    ok = (np.isfinite(sn) & (cat['Stot321'] < cat['Stot303']) & ~(cat['bad'] ==
+                                                                  'True') &
+          (~cat['IsNotH2CO']))
     gt5 = (sn>5)
+
+    hot = cat['temperature_chi2'] > 150
 
     is_leaf = np.array(cat['is_leaf'] == 'True')
     
@@ -68,12 +88,26 @@ for cat,dendro,smooth in zipped:
 
     if not hasattr(tm, 'temperatures'):
         tm.init()
+    if not hasattr(tm2, 'temperatures'):
+        tm2.init()
+    if not hasattr(tm3, 'temperatures'):
+        tm3.init()
     L1, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e3], tm.temperatures, 'k-.', label=r'$n(H_2)=10^3$ cm$^{-3}$', zorder=-5)
-    L1, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e4], tm.temperatures, 'k--', label=r'$n(H_2)=10^4$ cm$^{-3}$', zorder=-5)
-    L2, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e5], tm.temperatures, 'k:',  label=r'$n(H_2)=10^5$ cm$^{-3}$', zorder=-5)
+    L2, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e4], tm.temperatures, 'k--', label=r'$n(H_2)=10^4$ cm$^{-3}$', zorder=-5)
+    L3, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e5], tm.temperatures, 'k:',  label=r'$n(H_2)=10^5$ cm$^{-3}$', zorder=-5)
     leg = pl.legend(loc='best')
     ax2.axis([0,0.55,10,200])
     fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay.pdf'.format(smooth)))
+
+    L4, = ax2.plot(tm2.Xarr[1.2e-9]['ratio1'][1e4],
+                   tm2.temperatures, 'b--', alpha=0.2,
+                   label=r'$n(H_2)=10^4$ cm$^{-3}$, $dv=20$ km s$^{-1}$', zorder=-10)
+    L5, = ax2.plot(tm3.Xarr[1.2e-9]['ratio1'][1e4],
+                   tm3.temperatures, 'r--', alpha=0.2,
+                   label=r'$n(H_2)=10^4$ cm$^{-3}$, $dv=1$ km s$^{-1}$', zorder=-10)
+    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_dv.pdf'.format(smooth)))
+    L4.set_visible(False)
+    L5.set_visible(False)
 
     ax2.set_yscale('log')
     fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_log.pdf'.format(smooth)))
@@ -81,6 +115,7 @@ for cat,dendro,smooth in zipped:
 
     L1.set_visible(False)
     L2.set_visible(False)
+    L3.set_visible(False)
 
         
     if cat is catalog:
@@ -187,15 +222,58 @@ for cat,dendro,smooth in zipped:
     fig4.savefig(fpath("dendrotem/temperature_vs_density{0}.pdf".format(smooth)))
 
     fig5, ax5 = pl.subplots(num=5)
+    lon = cat['x_cen']
+    lon[lon>180] -= 360
+    ax5.scatter(lon[hot], [149]*hot.sum(),
+                c='r', alpha=0.3,
+                s=1000*cat['Smean303'][hot],
+                edgecolor='none',
+                marker='^',)
     for mask,color,alpha in masks_colors:
         lon = cat['x_cen'][mask]
         lon[lon>180] -= 360
-        ax5.errorbar(lon, cat['temperature_chi2'][mask],
-                    #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
-                    linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
+        ax5.scatter(lon, cat['temperature_chi2'][mask],
+                    s=1000*cat['Smean303'][mask],
+                    c=color,
+                    edgecolor='none', alpha=alpha, marker='.')
         ax5.set_xlabel("Galactic Longitude")
         ax5.set_ylabel("Temperature")
+    ax5.set_ylim([0,150])
     fig5.savefig(fpath('dendrotem/temperature_vs_longitude{0}.pdf'.format(smooth)))
+
+    fig5 = pl.figure(5)
+    fig5.clf()
+    ax5 = fig5.gca()
+    lon = cat['x_cen']
+    lon[lon>180] -= 360
+    ax5.scatter(lon[hot], [149]*hot.sum(),
+                c='r', alpha=0.3,
+                s=1000*cat['Smean303'][hot],
+                edgecolor='none',
+                marker='^',)
+    lon = cat['x_cen']
+    lon[lon>180] -= 360
+    vcen = cat['v_cen']/1e3
+    color = cmap_rainbowvelo((vcen-cbvmin)/(cbvmax-cbvmin))
+    sc = ax5.scatter(lon[is_leaf&ok], cat['temperature_chi2'][is_leaf&ok],
+                     s=1000*cat['Smean303'][is_leaf&ok],
+                     c=color[is_leaf&ok],
+                     edgecolor='none', marker='.')
+    sc2 = ax5.scatter(lon[(~is_leaf)&ok], cat['temperature_chi2'][(~is_leaf)&ok],
+                      s=1000*cat['Smean303'][(~is_leaf)&ok],
+                      c=color[(~is_leaf)&ok],
+                      edgecolor='none', alpha=0.2, marker='.')
+    ax5.set_xlabel("Galactic Longitude")
+    ax5.set_ylabel("Temperature")
+    ax5.set_ylim([0,150])
+    ax5.set_xlim([1.65,-0.6])
+    sm = matplotlib.cm.ScalarMappable(norm=matplotlib.colors.Normalize(vmin=cbvmin, vmax=cbvmax),
+                                      cmap=cmap_rainbowvelo)
+    sm._A = []
+    cb = fig5.colorbar(sm)
+    cb.set_label(cblabel)
+    fig5.savefig(fpath('dendrotem/temperature_vs_longitude_velocolor{0}.pdf'.format(smooth)))
+
 
     fig6, ax6 = pl.subplots(num=6)
     for mask,color,alpha in masks_colors:
@@ -249,7 +327,6 @@ for cat,dendro,smooth in zipped:
         ax11.set_ylabel("$S(3_{0,3}-2_{0,2})$ (K)")
 
     fig12, ax12 = pl.subplots(num=12)
-    hot = cat['temperature_chi2'] > 150
     ax12.errorbar(cat['v_rms'][hot]*np.sqrt(8*np.log(2)), [149]*hot.sum(),
                   lolims=True, linestyle='none', capsize=0, alpha=0.3,
                   marker='^', color='r')
@@ -279,7 +356,6 @@ for cat,dendro,smooth in zipped:
     fig22 = pl.figure(22)
     fig22.clf()
     ax22 = fig22.gca()
-    hot = cat['temperature_chi2'] > 150
     ax22.errorbar(cat['higaldusttem'][hot], [149]*hot.sum(),
                   lolims=True, linestyle='none', capsize=0, alpha=alpha,
                   marker='^', color='r')
@@ -298,7 +374,6 @@ for cat,dendro,smooth in zipped:
     fig24 = pl.figure(24)
     fig24.clf()
     ax24 = fig24.gca()
-    hot = cat['temperature_chi2'] > 150
     ax24.errorbar(10**cat['logh2column'][hot], [149]*hot.sum(),
                   lolims=True, linestyle='none', capsize=0, alpha=alpha,
                   marker='^', color='r')
@@ -506,7 +581,6 @@ for cat,dendro,smooth in zipped:
     fig23.clf()
     ax23 = fig23.gca()
 
-    hot = cat['temperature_chi2'] > 150
     ax23.errorbar(cat['v_rms'][hot]*np.sqrt(8*np.log(2)), [149]*hot.sum(),
                   lolims=True, linestyle='none', capsize=0, alpha=alpha,
                   marker='^', color='r')

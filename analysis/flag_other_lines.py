@@ -1,4 +1,5 @@
 from astropy import table
+from astropy import log
 import numpy as np
 
 def flag_dendro(dend, catalog=None, smooth=False):
@@ -25,6 +26,8 @@ def flag_dendro(dend, catalog=None, smooth=False):
         obj.bad = False
 
     for x,y,z in pixels_with_bad:
+        z = z-50 # Jan 25: the cubes were shifted
+        if z < 0: continue
         bad_obj = dend.structure_at([z/(2 if smooth else 1),y,x])
         if bad_obj:
             bad_obj = bad_obj.ancestor
@@ -37,3 +40,5 @@ def flag_dendro(dend, catalog=None, smooth=False):
         else:
             # sometimes these don't get IDd?
             pass
+
+    log.info("Flagged {0} dendrogram objects as HC3N".format(catalog['IsNotH2CO'].sum()))
