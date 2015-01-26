@@ -161,7 +161,7 @@ for weight in ("_weight",""):
                                       axes_class=matplotlib.axes.Axes)
 
             cb = pl.colorbar(mappable=ims, cax=cax)
-            cax.set_ylabel("Temperature [K]")
+            cax.set_ylabel("Temperature (K)")
             cb.ax.yaxis.set_label_position('right')
 
             ax.set_xlabel("Galactic Longitude")

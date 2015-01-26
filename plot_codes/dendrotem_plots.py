@@ -71,7 +71,7 @@ for cat,dendro,smooth in zipped:
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax1.set_xscale('log')
         ax1.set_xlabel("Size Scale (pixels?)")
-        ax1.set_ylabel("Temperature [K]")
+        ax1.set_ylabel("Temperature (K)")
     fig1.savefig(fpath('dendrotem/area_vs_temperature{0}.pdf'.format(smooth)))
 
     fig2, ax2 = pl.subplots(num=2)
@@ -83,7 +83,7 @@ for cat,dendro,smooth in zipped:
                      markersize=10 if any(mask & is_leaf) else 5,
                      color=color, linewidth=0.3)
         ax2.set_xlabel("Ratio $S(3_{2,1}-2_{2,0})/S(3_{0,3}-2_{0,2})$")
-        ax2.set_ylabel("Temperature [K]")
+        ax2.set_ylabel("Temperature (K)")
     fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}.pdf'.format(smooth)))
 
     if not hasattr(tm, 'temperatures'):
@@ -237,7 +237,7 @@ for cat,dendro,smooth in zipped:
                     c=color,
                     edgecolor='none', alpha=alpha, marker='.')
         ax5.set_xlabel("Galactic Longitude")
-        ax5.set_ylabel("Temperature [K]")
+        ax5.set_ylabel("Temperature (K)")
     ax5.set_ylim([0,150])
     fig5.savefig(fpath('dendrotem/temperature_vs_longitude{0}.pdf'.format(smooth)))
 
@@ -264,7 +264,7 @@ for cat,dendro,smooth in zipped:
                       c=color[(~is_leaf)&ok],
                       edgecolor='none', alpha=0.2, marker='.')
     ax5.set_xlabel("Galactic Longitude")
-    ax5.set_ylabel("Temperature [K]")
+    ax5.set_ylabel("Temperature (K)")
     ax5.set_ylim([0,150])
     ax5.set_xlim([1.7,-0.6])
     sm = matplotlib.cm.ScalarMappable(norm=matplotlib.colors.Normalize(vmin=cbvmin, vmax=cbvmax),
@@ -281,7 +281,7 @@ for cat,dendro,smooth in zipped:
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax6.set_xlabel("Centroid Velocity")
-        ax6.set_ylabel("Temperature [K]")
+        ax6.set_ylabel("Temperature (K)")
 
     fig7, ax7 = pl.subplots(num=7)
     for mask,color,alpha in masks_colors:
@@ -290,7 +290,7 @@ for cat,dendro,smooth in zipped:
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax7.set_xscale('log')
         ax7.set_xlabel("Radius (pixels?)")
-        ax7.set_ylabel("Temperature [K]")
+        ax7.set_ylabel("Temperature (K)")
 
     fig8, ax8 = pl.subplots(num=8)
     for mask,color,alpha in masks_colors:
@@ -299,7 +299,7 @@ for cat,dendro,smooth in zipped:
                     #xerr=[cat['e303'][mask], cat['e303'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax8.set_xlabel("$S(3_{0,3}-2_{0,2})$ (K)")
-        ax8.set_ylabel("Temperature [K]")
+        ax8.set_ylabel("Temperature (K)")
 
     fig9, ax9 = pl.subplots(num=9)
     for mask,color,alpha in masks_colors:
@@ -308,7 +308,7 @@ for cat,dendro,smooth in zipped:
                     #xerr=[cat['e321'][mask], cat['e321'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax9.set_xlabel("$S(3_{2,1}-2_{2,0})$ (K)")
-        ax9.set_ylabel("Temperature [K]")
+        ax9.set_ylabel("Temperature (K)")
 
     fig10, ax10 = pl.subplots(num=10)
     for mask,color,alpha in masks_colors:
@@ -316,7 +316,7 @@ for cat,dendro,smooth in zipped:
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax10.set_xlabel("${S}(^{13}$CO) (K)")
-        ax10.set_ylabel("Temperature [K]")
+        ax10.set_ylabel("Temperature (K)")
 
     fig11, ax11 = pl.subplots(num=11)
     for mask,color,alpha in masks_colors:
@@ -336,7 +336,7 @@ for cat,dendro,smooth in zipped:
                       markersize=10 if any(mask & is_leaf) else 5,
                       linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax12.set_xlabel(r"Line FWHM (km s$^{-1}$)")
-        ax12.set_ylabel("Temperature [K]")
+        ax12.set_ylabel("Temperature (K)")
     ax12.set_ylim([0,150])
     fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
     wide = cat['v_rms'] > 20/np.sqrt(8*np.log(2))
@@ -367,8 +367,8 @@ for cat,dendro,smooth in zipped:
         ax22.plot([14,38], [14,38], 'k--')
         ax22.set_xlim([13,38])
         ax22.set_ylim([13,150])
-        ax22.set_xlabel("HiGal Dust Temperature [K]")
-        ax22.set_ylabel("Temperature [K]")
+        ax22.set_xlabel("HiGal Dust Temperature (K)")
+        ax22.set_ylabel("Temperature (K)")
     fig22.savefig(fpath('dendrotem/temperature_vs_dusttem{0}.pdf'.format(smooth)))
 
     fig24 = pl.figure(24)
@@ -384,7 +384,7 @@ for cat,dendro,smooth in zipped:
         ax24.plot([14,38], [14,38], 'k--')
         ax24.set_ylim([13,150])
         ax24.set_xlabel("HiGal Dust Column Density")
-        ax24.set_ylabel("Temperature [K]")
+        ax24.set_ylabel("Temperature (K)")
     fig24.savefig(fpath('dendrotem/temperature_vs_dustcol{0}.pdf'.format(smooth)))
 
     fig25 = pl.figure(25)
@@ -521,7 +521,7 @@ for cat,dendro,smooth in zipped:
     dendroplot(axis=ax17, axname2='temperature_chi2', leaves_list=[sgra_leaves,sgrb2_leaves])
     ax17.set_xscale('log')
     ax17.set_xlabel("Area (square arcseconds)")
-    ax17.set_ylabel(r"Temperature [K]")
+    ax17.set_ylabel(r"Temperature (K)")
     fig17.savefig(fpath('dendrotem/temperature_vs_area{0}.pdf'.format(smooth)))
 
     fig17.clf()
@@ -529,7 +529,7 @@ for cat,dendro,smooth in zipped:
     dendroplot(axis=ax17, axname1='Smean303', axname2='temperature_chi2', leaves_list=[sgra_leaves,sgrb2_leaves])
     ax17.set_xscale('log')
     ax17.set_xlabel(r"$\bar{S_\nu}(3_{03}-2_{02})$")
-    ax17.set_ylabel(r"Temperature [K]")
+    ax17.set_ylabel(r"Temperature (K)")
     fig17.savefig(fpath('dendrotem/temperature_vs_flux{0}.pdf'.format(smooth)))
 
     fig18 = pl.figure(18)
@@ -538,7 +538,7 @@ for cat,dendro,smooth in zipped:
     dendroplot(leaves_list=[sgra_leaves, brick_leaves], axname2='temperature_chi2', axis=ax18)
     ax18.set_xscale('log')
     ax18.set_xlabel("Area (square arcseconds)")
-    ax18.set_ylabel("Temperature [K]")
+    ax18.set_ylabel("Temperature (K)")
     fig18.savefig(fpath('dendrotem/all_temperature_vs_sizescale{0}.pdf'.format(smooth)))
 
     fig19 = pl.figure(19)
@@ -589,7 +589,7 @@ for cat,dendro,smooth in zipped:
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax23.set_xlabel(r"Line FWHM (km s$^{-1}$)")
-        ax23.set_ylabel("Temperature [K]")
+        ax23.set_ylabel("Temperature (K)")
     ax23.set_ylim([0,150])
 
     # r,b,g = sgra, brick, sgrb2
@@ -599,7 +599,7 @@ for cat,dendro,smooth in zipped:
                linestyle='none', marker='s', markerfacecolor='none',
                highlight_monotonic=False,)
     ax23.set_xlabel(r"Line FWHM (km s$^{-1}$)")
-    ax23.set_ylabel(r"Temperature [K]")
+    ax23.set_ylabel(r"Temperature (K)")
     fig23.savefig(fpath('dendrotem/dendro_temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
 
 

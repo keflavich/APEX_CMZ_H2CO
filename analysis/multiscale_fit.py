@@ -128,7 +128,7 @@ def multiscale_fit(pcube, centerx, centery, offset_scale=0.3, savedir=None,
         ax1.set_ylim(*ylim)
     ax1b.set_ylim(*pwtem(ylim))
     ax1b.xaxis.set_ticklabels([])
-    ax1b.set_ylabel('Temperature [K]')
+    ax1b.set_ylabel('Temperature (K)')
 
     ax2 = pl.subplot(2,1,2)
     pl.subplots_adjust(hspace=0)

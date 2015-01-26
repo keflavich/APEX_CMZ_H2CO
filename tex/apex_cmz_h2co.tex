@@ -2,7 +2,8 @@
 
 \begin{document}
 
-\title{APEX CMZ \para 218 GHz Survey: Temperature Map of the CMZ}
+%\title{APEX CMZ \para 218 GHz Survey: Temperature Map of the CMZ}
+\title{Temperature Map of the Galactic Central Molecular Zone with \formaldehyde}
 \titlerunning{APEX CMZ \formaldehyde}
 \authorrunning{Ginsburg et al}
 \input{authors}
@@ -25,7 +26,8 @@
 %consistent with proposed orbital models.}
 {This is an abstract.}
 {To fill it in.}
-{Please write your own version of this and send it to Adam.}
+{Please write your own version of this and send it to Adam.
+Also, title suggestions are most welcome!}
 {We have filled it in.}
 {The abstract is done.}
 
@@ -41,7 +43,7 @@
 The central region of our Galaxy is the nearest location in which we can study
 star formation in an `extreme' environment with pressure, turbulent Mach number, 
 and gas temperature much higher than in local star forming regions.  While
-there have been great leaps in our understanding of low-mass star formation
+there have been great leaps in our understanding of star formation
 from local molecular clouds in the past decade
 \citep{Lada2012a,Heiderman2010a,Lada2010a}, there remain many unanswered
 questions about how star formation changes as gas becomes denser, more opaque,
@@ -49,26 +51,27 @@ and more turbulent, as it most likely was in galaxies at the peak of cosmic
 star formation \citep{Kruijssen2013a}.
 
 
-The central $\sim100$ pc `ring' \citep{Sofue1995a,Molinari2011a} has attracted
-a great deal of attention recently, as it has the most gas in the CMZ and a
-large, but unrealized, star-forming potential
+The central $\sim100$ pc `ring' \citep{Sofue1995a,Molinari2011a} within our Galaxy's
+central molecular zone (CMZ) has attracted a great deal of attention recently,
+as it contains most of the gas in the CMZ and has a large, but unrealized,
+star-forming potential
 \citep{Longmore2013a,Longmore2012b,Longmore2012a,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
 The star formation in this region appears to be suppressed relative to
-expectations based on nearby star-forming regions and nearby (on a different
-scale) Galactic disks
+expectations based on nearby star-forming regions and nearby (on a larger
+scale) galactic disks
 \citep{Kennicutt1998a,Kennicutt2012a,Leroy2013a,Heiderman2010a}.
-\citet{Longmore2013a} recently propose that the clouds along the ring represent
-a time-ordered path from starless to star-forming clouds, from `The Brick'
-(G0.253+0.016, cloud a) through the lettered clouds \citep[cloud
+\citet{Longmore2013a} recently proposed that the clouds along the ring
+represent a time-ordered path from starless to star-forming clouds, from `The
+Brick' (G0.253+0.016, cloud a) through the lettered clouds \citep[cloud
 b,c,d,e,f][]{Lis199a}, ending at Sgr B2.
 
 Variations in star formation rate at a fixed gas surface density are observed
-in extragalactic nuclear regions even without AGN.  For example in the nuclei of NGC
-1614 and NGC 34, both galaxies with $r\sim200$ pc nuclear starburst rings, the
-star formation
-rate is well above the standard star formation laws \citep{Xu2014b}.  However,
-in our own Galaxy's $r\sim100$ pc circumnuclear ring (not to be confused with the
-circumnuclear disk within $\sim1$ pc of Sgr A*), star formation is lower.
+in extragalactic nuclear regions even without AGN.  For example in the nuclei
+of NGC 1614 and NGC 34, both galaxies with $r\sim200$ pc nuclear starburst
+rings, the star formation rate is well above the standard star formation laws
+\citep{Xu2014b}.  However, in our own Galaxy's $r\sim100$ pc circumnuclear ring
+(not to be confused with the circumnuclear disk within $\sim1$ pc of Sgr A*),
+star formation is lower.
 
 Hypotheses for this reduced star formation rate include suppressed
 fragmentation by cosmic ray and X-ray heating and a raised star formation
@@ -127,20 +130,22 @@ provide additional tables, and provide the source code for this project.
 \label{sec:observations}
 
 \subsection{Observations}
-\todo{Specify rest frequencies.}
-We observed the Central Molecular Zone from $-0.4\arcdeg < \ell < 1.6\arcdeg$ with the SHFI-1
-instrument \citep{Vassilev2008a} on the Atacama Pathfinder Experiment (APEX)
-telescope using the eXtended bandwidth Fast Fourier Transform Spectrometer
-(XFFTS) backend.
-The observations were performed in service mode, and were spread out over two
-years.  The time was divided into 25 hours in June 2013, 75 hours in April-July
-2014, and 50 hours in October 2014.  The time was split between the ESO
-(E-093.C-0144A; 50h), MPIfR (M-091.F-0019 and M-093.F-0009; 75h), and OSO
-(E-093.C-0144A; 25h) queues.
+We observed the Central Molecular Zone from $-0.4\arcdeg < \ell < 1.6\arcdeg$
+with the SHFI-1 instrument \citep{Vassilev2008a} on the Atacama Pathfinder
+Experiment (APEX) telescope using the eXtended bandwidth Fast Fourier Transform
+Spectrometer (XFFTS) backend.  The observations were performed in service mode,
+and were spread out over two years.  The time was divided into 25 hours in June
+2013, 75 hours in April-July 2014, and 50 hours in October 2014.  The time was
+split between the ESO (E-093.C-0144A; 50h), MPIfR (M-091.F-0019 and
+M-093.F-0009; 75h), and OSO (E-093.C-0144A; 25h) queues.
 
 The 2013 observations were taken in $4\arcmin \times 4\arcmin$ patches, and the
 frequency range covered was 217.5-220 GHz and 216-218.5 GHz in the two spectral
-windows.  Scans were performed along lines of constant RA and Dec.
+windows.  The detected lines were \para \threeohthree 218.22219 GHz, \para
+\threetwotwo 218.47563 GHz, \para \threetwoone 218.76007 GHz, SiO 5-4 217.10498
+GHz, \methanol \fourtwotwo 218.44005 GHz OCS 18-17 218.90336 GHz, HC$_3$N 24-23
+218.32471 GHz, \ceighteeno 2-1 219.56036 GHz, and \thirteenco 2-1 220.39868
+GHz.  Scans were performed along lines of constant RA and Dec.
 
 The 2014 observing strategy was modified to use larger $8\arcmin \times
 8\arcmin$ scans along lines of Galactic latitude and longitude.  The frequency
@@ -1197,6 +1202,22 @@ shock heating and line cooling.
 %\todo{It would be nice to have some help
 %from a theorist to assess whether non-uniform heating could really drive the observed
 %temperatures.}
+
+Direct radiative heating from stars is another possibility.  If stars are
+forming in the centers of the clouds, one would expect the warmest portion of
+the cloud to be its interior, as seen in Figure \ref{fig:brickradial}a.  The
+Brick has very little star formation at present \citep{Rathborne2014b}, so it
+cannot be readily explained by star formation, but other clouds, such as cloud
+d, that exhibit similar radial variations may be explained by interior star
+formation.
+
+For clouds with the inverse profile, such as G1.23-0.08 (Figure
+\ref{fig:brickradial}b), external heating from the dense stellar population may
+explain the temperature profile.  \todo{Can we use this model to infer the
+radiation field?  Does it pass sanity checks?}
+% In G1.23-0.08 example, there are no hints of
+% active star formation: there are no 24 \um or 70 \um sources and no compact
+% radio continuum emission.
 
 %Gas temperatures higher than dust temperatures occur in both high and low density
 %gas \todo{need to have somes sort of density tracer - probably just dust + spherical}

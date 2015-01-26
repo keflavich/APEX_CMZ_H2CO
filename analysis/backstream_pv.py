@@ -111,6 +111,7 @@ for weight in ("_weighted",""):
             F.show_colorscale(cmap=cmap, aspect=0.5/actual_aspect, vmin=vmin, vmax=vmax)
             # This is where it fails...
             F.add_colorbar()
+            F.colorbar.set_axis_label_text("Temperature (K)")
             #divider = make_axes_locatable(F._ax1)
             #cax = divider.append_axes("right", size="5%", pad=0.05)
             #pl.colorbar(F._ax1.images[0], cax=cax)
@@ -142,6 +143,7 @@ for weight in ("_weighted",""):
         if 'Temperature' in fn:
             F2.show_colorscale(cmap=cmap, vmin=vmin, vmax=vmax)
             F2.add_colorbar()
+            F2.colorbar.set_axis_label_text("Temperature (K)")
         else:
             F2.show_grayscale()
 

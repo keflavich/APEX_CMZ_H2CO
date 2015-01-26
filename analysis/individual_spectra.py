@@ -239,7 +239,7 @@ def load_spectra(regs, cube):
             # Error is already computed above; this is an old hack
             #sp.error[:] = sp.stats((218e9,218.1e9))['std']
             spectra[name] = sp
-            sp.unit = "$T_{MB}$ [K]"
+            sp.unit = "$T_{MB}$ (K)"
         else:
             sp = spectra[name]
 
