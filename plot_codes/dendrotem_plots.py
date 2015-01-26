@@ -71,7 +71,7 @@ for cat,dendro,smooth in zipped:
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax1.set_xscale('log')
         ax1.set_xlabel("Size Scale (pixels?)")
-        ax1.set_ylabel("Temperature")
+        ax1.set_ylabel("Temperature [K]")
     fig1.savefig(fpath('dendrotem/area_vs_temperature{0}.pdf'.format(smooth)))
 
     fig2, ax2 = pl.subplots(num=2)
@@ -237,7 +237,7 @@ for cat,dendro,smooth in zipped:
                     c=color,
                     edgecolor='none', alpha=alpha, marker='.')
         ax5.set_xlabel("Galactic Longitude")
-        ax5.set_ylabel("Temperature")
+        ax5.set_ylabel("Temperature [K]")
     ax5.set_ylim([0,150])
     fig5.savefig(fpath('dendrotem/temperature_vs_longitude{0}.pdf'.format(smooth)))
 
@@ -264,7 +264,7 @@ for cat,dendro,smooth in zipped:
                       c=color[(~is_leaf)&ok],
                       edgecolor='none', alpha=0.2, marker='.')
     ax5.set_xlabel("Galactic Longitude")
-    ax5.set_ylabel("Temperature")
+    ax5.set_ylabel("Temperature [K]")
     ax5.set_ylim([0,150])
     ax5.set_xlim([1.7,-0.6])
     sm = matplotlib.cm.ScalarMappable(norm=matplotlib.colors.Normalize(vmin=cbvmin, vmax=cbvmax),
@@ -281,7 +281,7 @@ for cat,dendro,smooth in zipped:
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax6.set_xlabel("Centroid Velocity")
-        ax6.set_ylabel("Temperature")
+        ax6.set_ylabel("Temperature [K]")
 
     fig7, ax7 = pl.subplots(num=7)
     for mask,color,alpha in masks_colors:
@@ -290,7 +290,7 @@ for cat,dendro,smooth in zipped:
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax7.set_xscale('log')
         ax7.set_xlabel("Radius (pixels?)")
-        ax7.set_ylabel("Temperature")
+        ax7.set_ylabel("Temperature [K]")
 
     fig8, ax8 = pl.subplots(num=8)
     for mask,color,alpha in masks_colors:
