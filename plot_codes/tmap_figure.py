@@ -58,7 +58,7 @@ toloop = zip((
 for ftemplate,outtype in toloop:
 
     for smooth in ("","_smooth",):#"_vsmooth"):
-        log.info(ftemplate.format(smooth)+outtype)
+        log.info(ftemplate.format(smooth)+"   "+outtype)
         fig = pl.figure(4, figsize=figsize)
         fig.clf()
         F = aplpy.FITSFigure(h2copath+ftemplate.format(smooth),
@@ -84,6 +84,7 @@ for ftemplate,outtype in toloop:
                        colors=[(0.5,0.5,0.5,1)]*2 + [color + (alpha,) for alpha in np.exp(-(np.logspace(0.20,2)-1.7)**2/(2.5**2*2.))], #smooth=3,
                        filled=True,
                        #linewidths=[1.0]*5,
+                       layer='mask',
                        zorder=10, convention='calabretta')
         F.add_colorbar()
         F.colorbar.set_axis_label_text('T (K)')
@@ -106,6 +107,13 @@ for ftemplate,outtype in toloop:
         F.recenter(**big_recen)
         F.save(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
         log.info(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_withcontours.pdf'.format(smooth, outtype)))
+
+        F.hide_layer('mask')
+        F.recenter(**small_recen)
+        F.save(os.path.join(figurepath, "big_maps", 'lores{0}{1}_tmap_nomask_withcontours.pdf'.format(smooth, outtype)))
+        F.recenter(**big_recen)
+        F.save(os.path.join(figurepath, "big_maps", 'big_lores{0}{1}_tmap_nomask_withcontours.pdf'.format(smooth, outtype)))
+
 
         fig7 = pl.figure(7, figsize=figsize)
         fig7.clf()

@@ -26,15 +26,17 @@ vmax = 200
 cmap = pl.cm.RdYlBu_r
 figsize = (20,10)
 
-toloop = zip(('TemperatureCube{0}_PiecewiseFromRatio.fits',
+toloop = zip((
+              'TemperatureCube{0}_PiecewiseFromRatio.fits',
               'TemperatureCube_DendrogramObjects{0}.fits',
+              'TemperatureCube_DendrogramObjects{0}_leaves.fits',
               'pv_H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e4.fits',
               'pv_H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e5.fits',
               'pv_H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens3e4.fits',
               'pv_H2CO_321220_to_303202{0}_bl_integ_masked_weighted_temperature_dens1e4.fits',
               'pv_H2CO_321220_to_303202{0}_bl_integ_masked_weighted_temperature_dens1e5.fits',
               'pv_H2CO_321220_to_303202{0}_bl_integ_masked_weighted_temperature_dens3e4.fits',),
-             ('','_dendro',
+             ('','_dendro','_dendro_leaves',
               '_directpv1e4','_directpv1e5','_directpv3e4',
               '_directpv1e4_masked','_directpv1e5_masked','_directpv3e4_masked',))
 
@@ -163,7 +165,7 @@ for weight in ("_weight",""):
             cb.ax.yaxis.set_label_position('right')
 
             ax.set_xlabel("Galactic Longitude")
-            ax.set_ylabel("Velocity")
+            ax.set_ylabel("Velocity (km s$^{-1}$")
             pl.savefig(fpath("big_maps/pv_wcsaxes_tmap{0}{2}{1}_masked.pdf".format(smooth,
                                                                        outtype,
                                                                        weight)),
