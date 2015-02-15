@@ -27,7 +27,7 @@
 {This is an abstract.}
 {To fill it in.}
 {Please write your own version of this and send it to Adam.
-Also, title suggestions are most welcome!}
+Also, title suggestions are welcome!}
 {We have filled it in.}
 {The abstract is done.}
 
@@ -63,7 +63,7 @@ scale) galactic disks
 \citet{Longmore2013a} recently proposed that the clouds along the ring
 represent a time-ordered path from starless to star-forming clouds, from `The
 Brick' (G0.253+0.016, cloud a) through the lettered clouds \citep[cloud
-b,c,d,e,f][]{Lis199a}, ending at Sgr B2.
+b,c,d,e,f][]{Lis1999a}, ending at Sgr B2.
 
 Variations in star formation rate at a fixed gas surface density are observed
 in extragalactic nuclear regions even without AGN.  For example in the nuclei
@@ -274,10 +274,9 @@ main beam efficiency is $\eta_{mb} = 0.75$ (gain $\sim39$
 Jy/K)\footnote{\url{http://www.apex-telescope.org/telescope/efficiency/}}.
 These values are noted in the FITS headers of the released data.
 
-The maps achieved a depth of $\sigma=50-80$ mK in 1 \kms channels (Figure
-\ref{fig:noisestats}).  The noise is moderately lower (about 15\%) than
-expected from the online APEX calculator because our noise measurements are
-made in moderately smoothed maps.
+The maps achieved a depth of $\sigma=50-80$ mK in 1 \kms channels.  The noise
+is moderately lower (about 15\%) than expected from the online APEX calculator
+because our noise measurements are made in moderately smoothed maps.
 %While Figure \ref{fig:noisestats} shows the
 %generally good performance of SHFI-1 during our observations, our data are
 %affected by significant baseline problems which tend to obscure signal.
@@ -381,8 +380,8 @@ four different varieties of ratio map in Figures \ref{fig:ratiomaps} and
 
 Figure \ref{fig:ratiomaps} shows maps created by creating ratio cubes, in which
 each voxel has the value $R_1=\Rone$, then averaging across velocity with
-constant weight for each voxel in Figure \ref{ratiomaps}a and with the weight
-set by the \threeohthree brightness value in Fiure \ref{ratiomaps}b; the latter is
+constant weight for each voxel in Figure \ref{fig:ratiomaps}a and with the weight
+set by the \threeohthree brightness value in Fiure \ref{fig:ratiomaps}b; the latter is
 equivalent to the ratio of the moment 0 maps shown in Figures
 \ref{fig:integ303} and \ref{fig:integ321}.  In both
 cases, the mask described in Section \ref{sec:signal} was applied to the cubes
@@ -554,7 +553,7 @@ must be higher than we report.} line gradient of 5 \kms / pc, 30 \formaldehyde
 column densities $N(\formaldehyde) = 1\ee{11}-1\ee{15.1}$ \persc, and 50
 temperatures from 10 to 350 K.  The grid was created using the \texttt{pyradex}
 wrapper of RADEX\footnote{\url{https://github.com/adamginsburg/pyradex}} and
-collision rates retrieved from LAMDA \citep{Wiesenfeld2003a}.  We then
+collision rates retrieved from LAMDA \citep{Wiesenfeld2013a}.  We then
 upsampled these grids by spline interpolating between grid points to acquire a
 high-resolution ($T\times n \times N = 250\times100\times101$) grid covering
 $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N < 10^{15.1}$
@@ -642,7 +641,8 @@ the \methanol \fourtwotwo line.  }
 \Figure{figures/param_fits/c:G0.38+0.04_col_tem_0_parameter_constraints.pdf}
 {The parameter constraints for ``cloud c'' (Figure \ref{fig:cloudcspec})
 projected (marginalized) onto the temperature/column density plane.\newline
-(top left) Constraints imposed by the measured ratio \Rone are shown in filled contours,
+(top left) Constraints imposed by the measured ratio \Rone are shown in the
+background filled colors,
 with blue corresponding to $\Delta\chi^2 < 1$, cyan $1 < \Delta\chi^2 < 2$,
 yellow $2 < \Delta\chi^2 < 3$, and red $3 < \Delta\chi^2 < 4$.  The colored line
 contours show the joint constraints imposed by including restrictions on the
@@ -878,13 +878,14 @@ resolved but it is known.}
 \section{Discussion}
 \label{sec:discussion}
 \subsection{Parameter Comparison}
-\todo{Questionable.  Remove this \& Figure \ref{fig:temvsfwhm_regions}?} In a
-turbulent medium, the 1D line width of the gas should be tightly correlated
-with the 3D Mach number \citep[e.g.][]{Federrath2011a}.  If turbulence is the
-dominant gas heating mechanism, there should also be a correlation between the
-Mach number of the turbulence and the gas temperature.  However, Figure
-\ref{fig:temvsfwhm_regions} shows no such correlation.  There may be a
-correlation in the dendrogram-extracted data, but it is weak.
+\todo{Questionable - not sure the temperature-Mach number correlation
+is correct.  Remove this \& Figure \ref{fig:temvsfwhm_regions}?} In a
+turbulent medium, the 1D line width of the gas at a fixed spatial scale should
+be correlated with the 3D Mach number \citep[e.g.][]{Federrath2011a}.  If
+turbulence is the dominant gas heating mechanism, there should also be a
+correlation between the Mach number of the turbulence and the gas temperature.
+However, Figure \ref{fig:temvsfwhm_regions} shows no such correlation.  There
+may be a correlation in the dendrogram-extracted data, but it is weak.
 
 \FigureTwo
 {figures/chi2_temperature_vs_linewidth_fieldsandsources}
@@ -1022,7 +1023,7 @@ objects as a function of longitude to more directly illustrate this structure.
 The points have a size proportional to the \threeohthree line brightness.  The
 more transparent points reflect ancestors in the dendrogram tree, while the
 opaque points show leaves.}
-{fig:temvslonplot}{0.5}{0}
+{fig:temvslonplot}{0.4}{0}
 
 Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2014d} and
 a position-velocity slice through the fitted temperature cube following that
