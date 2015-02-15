@@ -71,7 +71,7 @@ of NGC 1614 and NGC 34, both galaxies with $r\sim200$ pc nuclear starburst
 rings, the star formation rate is well above the standard star formation laws
 \citep{Xu2014b}.  However, in our own Galaxy's $r\sim100$ pc circumnuclear ring
 (not to be confused with the circumnuclear disk within $\sim1$ pc of Sgr A*),
-star formation is lower.
+the star formation rate is lower.
 
 Hypotheses for this reduced star formation rate include suppressed
 fragmentation by cosmic ray and X-ray heating and a raised star formation
@@ -490,7 +490,7 @@ voxels $N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting
 threshold $\Delta = 2\sigma$, which defines how large the brightness difference
 between
 the peak pixel and an adjacent pixel must be in order to divide the clump into two
-sources.  The exact values of these parameters is not particularly
+sources.  The exact values of these parameters are not particularly
 important, as we are interested in general trends with size-scale and
 galactocentric distance, but we caution against overinterpretation of the
 resulting catalog as the number of sources and their size and distribution can
@@ -542,7 +542,7 @@ around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
 % TODO: I switched from 15.1 to 17 in column on Jan 14.  This may break all
 % of the code when I re-run it because it is changing the underlying prior!
 %
-We use RADEX \citet{van-Der-Tak2007a} and a related solver (Fujun Du's
+We use RADEX \citep{van-Der-Tak2007a} and a related solver (Fujun Du's
 \texttt{myRadex}; \url{https://github.com/fjdu/myRadex}) to create a model grid
 for the p-\formaldehyde lines over a grid of 20 density ($n=10^{2.5}$-$10^{7}$
 \percc), a fixed assumed\footnote{The line gradient is selected because observed line widths have
@@ -649,18 +649,19 @@ contours show the joint constraints imposed by including restrictions on the
 total column density, volume density,  filling factor, and abundance, following
 the same color
 scheme.  The solid grayscale contours show the constraints imposed by
-$R_2=\Rtwo$, from black ($\Delta\chi^2 < 1$) to white.  In this case, $R_2$
-is weakly inconsistent with the joint constraints from the other parameters.
+$R_2=\Rtwo$, from black ($\Delta\chi^2 < 1$) to white ($3<\Delta\chi^2<4$).  In
+this case, $R_2$ is weakly inconsistent with the joint constraints from the
+other parameters.
 \newline
 (top right) The same colorscheme as before, showing the constraints imposed by
 assuming the abundance of \para relative to \hh is as labeled.  
 The abundance does not constrain these parameters, but in Figure
-\ref{fig:coltemconstraints}, the abundance rules out a substantial region of parameter
+\ref{fig:denscolconstraints}, the abundance rules out a substantial region of parameter
 space.
 \newline
 (bottom right) The same colorscheme as before, showing the constraints imposed
 by using the measured mean volume density as a lower limit.  In this figure,
-the volume density imposes no constraint, but in Figure \ref{fig:coltemconstraints}
+the volume density imposes no constraint, but in Figure \ref{fig:denscolconstraints}
 and \ref{fig:denstemconstraints} it is important.
 \newline
 (bottom left) The same colorscheme as before, showing the constraints imposed
@@ -1044,7 +1045,7 @@ dendrogram-extracted clump within 20 \kms and 6 pc of the
 \citet{Kruijssen2014d} orbit.  The linear increase in temperature over the
 first $\sim0.5$ Myr seems to support the \citet{Kruijssen2014d} hypothesis that
 the `ring' represents a single gas stream on its first passage by Sgr A*.
-The coolear gas on the far side does not obviously fit with this picture, 
+The cooler gas on the far side does not obviously fit with this picture, 
 and we suggest in Section \ref{sec:coolstream} that it is not affiliated
 with the orbit.
 
@@ -1267,10 +1268,10 @@ The large observed linewidths imply that the stream is genuinely associated
 with the CMZ, though its distance from Sgr A may be much larger than its
 projected distance.  The path we have traced through Figure \ref{fig:coolstream}
 has been selected by eye and is not physically motivated (e.g., by a predicted
-orbit) but it can be observed as a coherent-appearing stream in the \thirteenco
+orbit) but it can be observed as an apparently coherent stream in the \thirteenco
 data cubes as well.    Gas in this stream is moderately cooler than its
 surroundings and the positive-latitude molecular ring clouds.  The stream does
-not appear to be actively star forming at present, most likely because the gas
+not appear to be actively star-forming at present, most likely because the gas
 is at a lower average density.
 % yet it contributes to the total cold gas mass
 % inferred in the inner galaxy.  However, the total mass within the inner
@@ -1322,10 +1323,11 @@ Draft 1.}
 One remaining possibility is that the \para lines become optically thick
 because of dramatically reduced turbulent line spreading and therefore
 increased line trapping.  Such an effect would require a transition from
-turbulent to coherent gas motion \citep[e.g.][]{Pineda2010a} and could reduce
+supersonically turbulent to coherent (subsonically turbulent) gas motion
+\citep[e.g.][]{Pineda2010a} and could reduce
 the required column densities by $\sim100\times$.  Still, the fact that we
 observe \para emission spread over
-a wide range of velocities renders this scenario unlikely again.
+a wide range of velocities renders this scenario unlikely.
 
 
 \subsection{The CMZ average}
