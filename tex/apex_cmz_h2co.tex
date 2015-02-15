@@ -51,8 +51,9 @@ and more turbulent, as it most likely was in galaxies at the peak of cosmic
 star formation \citep{Kruijssen2013a}.
 
 
-The central $\sim100$ pc `ring' \citep{Sofue1995a,Molinari2011a} within our Galaxy's
-central molecular zone (CMZ) has attracted a great deal of attention recently,
+The central $\sim100$ pc `ring' or `dust ridge' \citep{Lis1994a,Sofue1995a,Molinari2011a}
+within our Galaxy's central molecular zone (CMZ) has attracted a great deal of
+attention recently,
 as it contains most of the gas in the CMZ and has a large, but unrealized,
 star-forming potential
 \citep{Longmore2013a,Longmore2012b,Longmore2012a,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
@@ -62,7 +63,7 @@ scale) galactic disks
 \citep{Kennicutt1998a,Kennicutt2012a,Leroy2013a,Heiderman2010a}.
 \citet{Longmore2013a} recently proposed that the clouds along the ring
 represent a time-ordered path from starless to star-forming clouds, from `The
-Brick' (G0.253+0.016, cloud a) through the lettered clouds \citep[cloud
+Brick' (G0.253+0.016, cloud a) through the lettered clouds \citep[clouds
 b,c,d,e,f][]{Lis1999a}, ending at Sgr B2.
 
 Variations in star formation rate at a fixed gas surface density are observed
@@ -71,7 +72,8 @@ of NGC 1614 and NGC 34, both galaxies with $r\sim200$ pc nuclear starburst
 rings, the star formation rate is well above the standard star formation laws
 \citep{Xu2014b}.  However, in our own Galaxy's $r\sim100$ pc circumnuclear ring
 (not to be confused with the circumnuclear disk within $\sim1$ pc of Sgr A*),
-the star formation rate is lower.
+the star formation rate is lower
+\citep{Longmore2013b,Immer2012a,Yusef-Zadeh2009a,Murray2010a}.
 
 Hypotheses for this reduced star formation rate include suppressed
 fragmentation by cosmic ray and X-ray heating and a raised star formation
@@ -90,7 +92,7 @@ along the line of sight to the Galactic Center that can be distinguished in
 part by their relative line widths, with Galactic Center clouds having typical
 linewidths $\sigma_{FWHM}\gtrsim5$ \kms and local clouds $\sigma_{FWHM}
 \lesssim 2$ \kms, but this only provides a qualitative distance, distinguishing
-nearby ($d\sim1-5$ kpc) from clouds within the central kiloparsec.  Additionally,
+nearby ($d\sim1-5$ kpc) clouds from clouds within the central kiloparsec.  Additionally,
 there is significant velocity confusion within the Galactic center: many clouds
 are seen to overlap in velocity while they are not necessarily at the same distance
 \citep{Jones2012a,Oka2012a}
@@ -104,17 +106,19 @@ important.  The dust temperature is readily determined via continuum mapping
 and therefore is often used as a proxy for the gas temperature, but the dust
 temperature itself is hydrodynamically unimportant.
 
-These prior works primarily used the popular ammonia (\ammonia) metastable
-inversion transition thermometer, which is sensitive to moderate density gas
-\citep[$n(\hh) \sim 10^3-10^4$ \percc][]{Shirley2015a}.  While this thermometer is
+These prior gas temperature measurements primarily used the popular ammonia
+(\ammonia) metastable inversion transition thermometer, which is sensitive to
+moderate density gas
+\citep[$n(\hh) \sim 10^3-10^4$ \percc;][]{Shirley2015a}.  While this thermometer is
 generally reliable in cold regions, the population of the higher energy states
 - those sensitive to temperatures $T\gtrsim60$ K - may be affected by
 `formation heating', a mechanism recently discovered to affect much of the CMZ
-gas \citep[][]{Lis2014a,Mills2013a}.  \citet{Ao2013a} used the \para 220 GHz
-thermometer \citep{Mangum1993a}, which is sensitive to denser gas
-($n\sim10^4-10^5$ \percc), and still found a significant discrepancy between
-gas and dust temperature, but they only
-covered the inner 30 pc.
+gas in which the excess energy from molecule formation leaves a significant fraction of the molecules
+in a rotationally excited state \citep[][]{Lis2014a,Mills2013a}.
+\citet{Ao2013a} used the \para 220 GHz thermometer \citep{Mangum1993a}, which
+is sensitive to denser gas ($n\sim10^4-10^5$ \percc), and still found a
+significant discrepancy between gas and dust temperature, but they only covered
+the inner 75 pc.
 
 We adopt a distance $d=8.5$ kpc for all measurements made in this paper.
 
@@ -132,9 +136,11 @@ provide additional tables, and provide the source code for this project.
 \subsection{Observations}
 We observed the Central Molecular Zone from $-0.4\arcdeg < \ell < 1.6\arcdeg$
 with the SHFI-1 instrument \citep{Vassilev2008a} on the Atacama Pathfinder
-Experiment (APEX) telescope using the eXtended bandwidth Fast Fourier Transform
-Spectrometer (XFFTS) backend.  The observations were performed in service mode,
-and were spread out over two years.  The time was divided into 25 hours in June
+Experiment (APEX) telescope \citep{Guesten2006b} using the eXtended bandwidth
+Fast Fourier Transform
+Spectrometer (XFFTS) backend \citep{Klein2012a}.  The observations were
+performed in service mode, and were spread out over two years.  The time was
+divided into 25 hours in June
 2013, 75 hours in April-July 2014, and 50 hours in October 2014.  The time was
 split between the ESO (E-093.C-0144A; 50h), MPIfR (M-091.F-0019 and
 M-093.F-0009; 75h), and OSO (E-093.C-0144A; 25h) queues.
@@ -153,11 +159,11 @@ range was also shifted to cover windows over 217-219.5 and 218.4-220.9 GHz, thus
 including the bright \thirteenco and \ceighteeno 2-1 lines.
 
 
-The raw data were acquired with 32768 spectral channels in each window, yielding
-0.1 \kms resolution.  We downsampled the data by a factor of 8 to 0.8 \kms
-resolution to make the data more manageable.  We also expect to see no lines
-narrower than a few \kms in the CMZ, particularly not with the relatively
-shallow observations we have acquired.
+The raw data were acquired with 32768 spectral channels in each window,
+yielding 0.1 \kms resolution.  We expect to see no lines narrower than a few
+\kms in the CMZ, particularly not with the relatively shallow observations we
+have acquired.  We therefore downsampled the data by a factor of 8 to 0.8 \kms
+resolution to make the data more manageable.  
 
 Additionally, for the \para data, we incorporated the 41 hours of observations
 using the older fast fourier transform spectrometer (FFTS) backend from
@@ -168,8 +174,8 @@ cover the CO lines.
 The system temperature ranged from $120 < T_{sys} < 200$ K for the majority of
 the observations, with a mean $T_{sys}=165$ K.  A small fraction (10\%) of
 observations were in the range $200 < T_{sys} < 300$ K.  There were also a very
-small number ($<1\%$) with much higher system temperatures, $300 < T_{sys} <
-750$ K that were flagged out (see Section\ref{sec:flagging}).
+small number ($<1\%$) with much higher system temperatures ($300 < T_{sys} <
+750$ K) that were flagged out (see Section \ref{sec:flagging}).
 %, but these are associated with observations of the bright Sgr B2
 %continuum source . 
 
@@ -268,9 +274,9 @@ weighting.
 %\ref{sec:baseline}, we show maps of the \formaldehyde \threeohthree line before
 %and after PCA subtraction.}
 
-The PPV cubes were created with units of brightness temperature on the corrected
-antenna temperature scale ($T_A^*$).  The
-main beam efficiency is $\eta_{mb} = 0.75$ (gain $\sim39$
+The position-position-velocity (PPV) cubes were created with units of
+brightness temperature on the corrected antenna temperature scale ($T_A^*$).
+The main beam efficiency is $\eta_{mb} = 0.75$ (gain $\sim39$
 Jy/K)\footnote{\url{http://www.apex-telescope.org/telescope/efficiency/}}.
 These values are noted in the FITS headers of the released data.
 
@@ -299,7 +305,7 @@ correlated components in the resulting spectra.  The baselines were removed
 after generating cubes over a velocity range $-150 < v_{LSR} < 150$ \kms by the
 following procedure:
 \begin{enumerate}
-    \item identify bright regions in the \para \threeohthree line using the
+    \item identify bright PPV regions in the \para \threeohthree line using the
         technique described in Section \ref{sec:signal}
     \item mask the regions identified as \threeohthree-bright for each other 
         spectral line data cube
@@ -324,8 +330,8 @@ the following procedure:
 \begin{enumerate}
     \item Smooth the data with a gaussian of width 2 pixels in each direction
         (spatial and spectral)
-    \item Identify all pixels with brightness $T_A > 2\sigma$ in the smoothed
-        map
+    \item Create an inclusive mask of all pixels with brightness $T_A >
+        2\sigma$ in the smoothed map
     \item Grow the mask from the previous step by 1 pixel in each direction
         (this is known in image processing as binary dilation)
 \end{enumerate}
@@ -342,7 +348,7 @@ analysis excludes the \threetwotwo line.
 
 We found that much of the cube included marginal detections at the original
 resolution, FWHM=$30\arcsec$ and $\Delta v=1$ \kms.  We therefore created
-smoothed cubes, smoothing in the spatial dimensions with a
+additional smoothed cubes, smoothing in the spatial dimensions with a
 $\sigma_{FWHM}=33.84\arcsec$ gaussian to achieve a resolution 45\arcsec, and
 $\sigma_{v, FWMH} = 3$ \kms in the spectral direction.  The smoothed cubes were
 also downsampled by a factor of 2 in the spectral direction.  We then performed
@@ -357,8 +363,8 @@ using the mask created from the \threeohthree data.
 {figures/integrated/APEX_H2CO_303_202_masked_smooth_moment0_labeled}
 {Integrated intensity (moment 0) maps of the \para \threeohthree line in the
 original (a) and smoothed (b) data.  The cubes were masked prior to integration
-using the method described in Section \ref{sec:signal}.  Region names along the
-dust ridge are labeled in (b).}
+using the method described in Section \ref{sec:signal}.  Selected region names
+are labeled in (b).}
 {fig:integ303}{1}{9.5in}
 
 \RotFigureTwoAA
@@ -378,10 +384,10 @@ the ratio maps are a good proxy for \emph{relative} temperature.  We display
 four different varieties of ratio map in Figures \ref{fig:ratiomaps} and
 \ref{fig:ratiomapssm}.
 
-Figure \ref{fig:ratiomaps} shows maps created by creating ratio cubes, in which
+Figure \ref{fig:ratiomaps} shows maps produced by creating ratio cubes, in which
 each voxel has the value $R_1=\Rone$, then averaging across velocity with
 constant weight for each voxel in Figure \ref{fig:ratiomaps}a and with the weight
-set by the \threeohthree brightness value in Fiure \ref{fig:ratiomaps}b; the latter is
+set by the \threeohthree brightness value in Figure \ref{fig:ratiomaps}b; the latter is
 equivalent to the ratio of the moment 0 maps shown in Figures
 \ref{fig:integ303} and \ref{fig:integ321}.  In both
 cases, the mask described in Section \ref{sec:signal} was applied to the cubes
@@ -416,10 +422,9 @@ divide-by-zero numerical errors.
 {figures/big_maps/big_H2CO_321220_to_303202_bl_integ_masked_weighted.pdf}
 %{figures/big_maps/big_lores_tmap_withcontours.pdf} % tmap_figure
 {(a) Map of the ratio of the integrated emission of
-\Rone.  The data cubes were masked by
-signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
-indicating nondetections.  The Sgr B2 peaks exhibit \formaldehyde
-absorption and therefore do not contain reliable measurements.  Higher ratios
+\Rone.  The grey areas indicate pixels that were completely masked out in the
+PPV cubes.  The Sgr B2 peaks exhibit \formaldehyde absorption and therefore do
+not contain reliable measurements.  Higher ratios
 (red) correspond
 to higher temperatures.
 \newline
@@ -440,19 +445,6 @@ weighted by the \threeohthree brightness
 {figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ_masked_weighted.pdf}
 %{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf} % tmap_figure
 {Same as figure \ref{fig:ratiomaps}, but smoothed with a 34\arcsec gaussian.
-(a) Map of the ratio of the integrated emission of
-\Rone.  The data cubes were masked by
-signal-to-noise ratio in the \threeohthree line, with blank (gray) regions
-indicating nondetections.  The Sgr B2 peaks exhibit \formaldehyde
-absorption and therefore do not contain reliable measurements.  Higher ratios
-(red) correspond
-to higher temperatures.
-\newline
-(b) The same as (a), but the average along velocity has been
-weighted by the \threeohthree brightness
-\newline
-%(c) The temperature map derived from (a).  The modeling used to derive
-%temperature is discussed in Section \ref{sec:linemodeling}.
 }
 %{fig:ratiomaps}{1}{7in}
 %{fig:ratiomaps}{0.6}{0}
