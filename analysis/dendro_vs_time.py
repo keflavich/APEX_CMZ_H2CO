@@ -159,6 +159,11 @@ for cat,smooth in ((catalog,"",),):
     pl.savefig(fpath("orbits/dendro{0}_temperature_vs_time_firstMyr.pdf".format(smooth)),
                bbox_inches='tight')
 
+    L, = ax3.plot([0,0.8], [30,100], 'k--', linewidth=3, alpha=0.3, zorder=-10)
+    pl.savefig(fpath("orbits/dendro{0}_temperature_vs_time_firstMyr_trendline.pdf".format(smooth)),
+               bbox_inches='tight')
+    L.set_visible(False)
+
     if smooth:
         ax3.set_xlim(-0.1,4.6)
     else:
@@ -171,6 +176,10 @@ for cat,smooth in ((catalog,"",),):
              horizontalalignment='center', rotation='vertical', color='m', weight='bold')
 
     pl.savefig(fpath("orbits/dendro{0}_temperature_vs_time.pdf".format(smooth)),
+               bbox_inches='tight')
+
+    L.set_visible(True)
+    pl.savefig(fpath("orbits/dendro{0}_temperature_vs_time_trendline.pdf".format(smooth)),
                bbox_inches='tight')
 
     fig4 = pl.figure(4, figsize=(14,8))
