@@ -61,7 +61,7 @@ for cat,dendro,smooth in zipped:
     # Make the not-leaves be half as bright
     masks_colors = zip(leaf_masks,
                        ('b','b','g','g','r','r','k','k'),
-                       (0.2*2,0.2/2, 0.3*2,0.3/2., 0.4*2,0.4/2., 0.1*2,0.1/2.),
+                       (0.4,0.2, 0.6,0.3, 0.7,0.35, 0.5,0.2),
                       )
 
     fig1, ax1 = pl.subplots(num=1)

@@ -444,7 +444,7 @@ weighted by the \threeohthree brightness
 {figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
 {figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ_masked_weighted.pdf}
 %{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf} % tmap_figure
-{Same as figure \ref{fig:ratiomaps}, but smoothed with a 34\arcsec gaussian.
+{Same as Figure \ref{fig:ratiomaps}, but smoothed with a 34\arcsec gaussian.
 }
 %{fig:ratiomaps}{1}{7in}
 %{fig:ratiomaps}{0.6}{0}
@@ -463,7 +463,7 @@ finding methods, but it also extracts clumps at different brightness scales
 to each other.  Within a hierarchy of nested clumps, the brightest and smallest
 is a `leaf' and all associated larger structures are `ancestors' (roots or
 trunks and branches).
-\citet{Rosolowsky2008c} Figures 1 and 3 give visual representations of this
+Figures 1 and 3 in \citet{Rosolowsky2008c} give visual representations of this
 hierarchy.
 
 % dendro_temperature.py
@@ -477,7 +477,8 @@ hierarchy.
 
 We ran the dendrogram/clumpfind extraction analysis on the 
 \threeohthree cube data.  We assumed a uniform noise per pixel
-$\sigma_{T}=\bar{\sigma_T}=0.07$ K.  We enforced thresholds of a minimum number of
+$\sigma_{T}=\bar{\sigma_T}=0.07$ K, which corresponds to the mean noise
+per field.  We enforced thresholds of a minimum number of
 voxels $N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting
 threshold $\Delta = 2\sigma$, which defines how large the brightness difference
 between
@@ -493,11 +494,12 @@ against small parameter changes.
 For each extracted blob, we measured the corresponding integrated and peak
 emission in the \threetwoone and \thirteenco cubes.  We also extracted the mean
 dust temperature and column density from SED fits to Herschel HiGal 170-500\um
-maps.  The SED fits were performed on background-subtracted data using an
-approach originally described in \citet{Battersby2011a}, which includes details
-of the fitting process and specification of assumed physical parameters.  We
-also extracted dust column density and temperature using a more naive
-pixel-by-pixel approach with no background subtraction
+maps \citep{Molinari2010a,Traficante2011a}.  The SED fits were performed on
+background-subtracted data using an approach originally described in
+\citet{Battersby2011a}, which includes details of the fitting process and
+specification of assumed physical parameters.  We also extracted dust column
+density and temperature using a more naive pixel-by-pixel approach with no
+background subtraction
 (\url{http://hi-gal-sed-fitter.readthedocs.org/en/latest/}) and found the two
 to be consistent.
 
@@ -513,7 +515,7 @@ is interesting for visualization purposes, but should be treated with some
 skepticism: structures that are connected in PPV space in the \threeohthree
 line do not generally have the same, constant temperature, but they are forced
 by construction to have the same temperature in this cube.  Despite this
-caveat, comparison of the dendrogram figures (Figure \ref{fig:dendrotemmap} to
+caveat, comparison of the dendrogram figures (Figure \ref{fig:dendrotemmap}) to
 the directly averaged figures (Figures \ref{fig:temmap} and
 \ref{fig:temmapnosmooth}) shows that the dendrogram objects are effectively
 averages over the included area in most cases.
@@ -571,7 +573,13 @@ baseline fit indicated.
 {figures/simple/ds:G0.42+0.03box_fit_4_lines_simple_splinebaselined.pdf}
 {
 Fits to the \para lines and the \methanol \fourtwotwo line for (a) The Brick
-and (b) a box centered on G0.42+0.03.  These spectra have significantly
+and (b) a box centered on G0.42+0.03.
+The fitted parameters shown in the legend are the amplitude of the
+\formaldehyde \threeohthree line, the centroid velocity, the line width
+($\sigma$, not FWHM), the ratio $R_1 = \Rone$,
+the ratio $R_2 = \Rtwo$, and the amplitude of
+the \methanol \fourtwotwo line.  
+These spectra have significantly
 different ratios and therefore derived temperatures: The Brick has
 $T\gtrsim100$ K while G0.42+0.03 has $T\approx40-50$ K.  The bottom black
 spectrum is the residual, and the orange wiggly spectrum shows the spline fit
@@ -622,11 +630,7 @@ with the \methanol \fourtwotwo line.
 % individual_spectra
 \Figure{figures/simple/c:G0.38+0.04_fit_4_lines_simple.pdf}
 {Fitted spectrum of ``cloud c".  The fitted parameters and their corresponding
-errors are shown in the legend.  The parameters are the amplitude of the
-\formaldehyde \threeohthree line, the centroid velocity, the line width
-($\sigma$, not FWHM), the ratio $R_1 = \Rone$,
-the ratio $R_2 = \Rtwo$, and the amplitude of
-the \methanol \fourtwotwo line.  }
+errors are shown in the legend as in Figure \ref{fig:twospectra_hotcold}.}
 {fig:cloudcspec}{0.5}{0}
 
 % param_plots
@@ -704,7 +708,7 @@ represent larger ancestor structures.
 The temperature includes constraints from the assumed fixed \formaldehyde
 abundance and the 
 varying column density.  The points are color coded by signal-to-noise in the
-ratio $R_1$, with black $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$,
+ratio $R_1$, with gray $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$,
 and red $S/N > 50$.  The black lines show the modeled temperature as a function of
 $R_1$ for three different assumed densities with a constant assumed abundance.
 }
@@ -765,7 +769,8 @@ the modeled line brightnesses are both nearly constant above $T\gtrsim150$ K.
 {figures/big_maps/big_lores_smoothdens1e5_weighted_masked_tmap_withcontours.pdf}
 {Temperature maps using the smoothed data assuming fixed $X_{\para}=1.2\ee{-9}$
 and $n(\hh)$.  The maps in (b) and (c) are masked by signal-to-noise as in Figure
-\ref{fig:ratiomaps}.
+\ref{fig:ratiomaps}.  The thin black contours are at a column $N(\hh)=5\ee{22}$
+\percc from the Herschel SED fit maps.
 (a) $n(\hh) = 10^4$ \percc, no mask
 (b) $n(\hh) = 10^4$ \percc
 (c) $n(\hh) = 10^5$ \percc
@@ -780,8 +785,10 @@ and $n(\hh)$.  The maps in (b) and (c) are masked by signal-to-noise as in Figur
 {figures/big_maps/big_loresdens1e4_weighted_masked_tmap_withcontours.pdf}
 {figures/big_maps/big_loresdens1e5_weighted_masked_tmap_withcontours.pdf}
 {Temperature maps using the unsmoothed data assuming fixed $X_{\para}=1.2\ee{-9}$
-and $n(\hh)$.  The maps in (b) and (c) are masked by signal-to-noise as in Figure
-\ref{fig:ratiomaps}.
+and $n(\hh)$.  The maps in (b) and (c) are masked by signal-to-noise as in
+Figure \ref{fig:ratiomaps}.  The thin black contours are at a column
+$N(\hh)=5\ee{22}$ \percc
+from the Herschel SED fit maps.
 (a) $n(\hh) = 10^4$ \percc, no mask
 (b) $n(\hh) = 10^4$ \percc
 (c) $n(\hh) = 10^5$ \percc
@@ -810,11 +817,12 @@ nodes.
 \newline
 (c) The same as (b), but weighted by the \threeohthree brightness.
 \newline
-In all three, regions of lower signal-to-noise, and therefore less reliable
+In all three panels, regions of lower signal-to-noise, and therefore less
+reliable
 temperature, are grayed out with a filter that gets more opaque toward lower
 signal-to-noise.  The thin contours are from the Herschel HiGal
-dust SED fit at a level $N(\hh)=5\ee{22}$ and are included to provide a visual
-reference for comparison between the temperature maps.
+dust SED fit at a level $N(\hh)=5\ee{22}$ \percc and are included to provide a
+visual reference for comparison between the temperature maps.
 }
 {fig:dendrotemmap}{1}{9.5in}
 
@@ -898,7 +906,7 @@ indicate ancestors in the dendrogram, while bright, large points indicate leaves
 Lower limits on linewidth and temperature are indicated with triangles on the
 edge of the plot.  
 Note that in both cases, any correlation is even weaker than that observed in
-\citet{Huettemeister1993a} Figure 6, who make the same plot for \ammonia 4-4
+Figure 6 of \citet{Huettemeister1993a}, who make the same plot for \ammonia 4-4
 and 5-5.
 }
 {fig:temvsfwhm_regions}
@@ -990,11 +998,11 @@ and red $S/N > 50$.  }
 \subsection{Regional variations in gas temperature}
 There are significant regional variations in the gas temperature.  The most
 obvious is in and around the Sgr B2 complex, where very high gas temperatures
-are measured.  High gas temperatures, $T\sim100-120$ K, were measured in a ridge to the
-Galactic northeast of Sgr B2 N using \methylcyanide previously \citep[][Figure
-4b]{de-Vicente1997a}, which we now confirm, though our data show $T\gtrsim150$ K.
-\citet{Ott2014a} also showed relatively high \ammonia temperatures in this hot
-ridge.
+are measured.  High gas temperatures, $T\sim100-120$ K, were previously
+measured in a ridge to the Galactic northeast of Sgr B2 N using \methylcyanide
+\citep[][Figure 4b]{de-Vicente1997a}, which we now confirm, though our data
+show $T\gtrsim150$ K.  \citet{Ott2014a} also showed relatively high \ammonia
+temperatures in this hot ridge.
 
 The high temperatures in the Sgr B2 region, $T>80$ K, extend to a radius of
 $\sim10$ pc (5\arcmin), and nearly 30 pc (12.5\arcmin) in the
@@ -1051,7 +1059,7 @@ outside the mapped area, while grey regions have no gas detected or inadequate
 signal to measure a temperature.
 (b) The path used to create the slice shown in (a).  The path consists of a series
 of transparent $7.2\arcsec\times300\arcsec$
-rectangles over which the temperature has been averaged.  The green rectangle at
+rectangles over which the temperature has been averaged.  The green bar at
 $\ell=359.3\arcdeg$ indicates the starting point (offset$=0$) of the position-velocity
 slice.  The orbit is outside of our observed field to the west of Sgr C.  
 The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
@@ -1084,9 +1092,9 @@ a frequently
 used thermometer sensitive to gas temperatures $5 \lesssim T \lesssim 40$ K,
 with weak sensitivity up to $\sim80$ K \citep[][Figure 1]{Mangum2013a}.  The
 \ammonia lines also have lower critical densities by about an order of
-magnitude, $n_{crit}(\ammonia 1-1)\sim10^3$ \percc while $n_{crit}(\para~
+magnitude, $n_{crit}(\textrm{\ammonia}~1-1)\sim10^3$ \percc while $n_{crit}(\para~
 \threeohthree)\sim10^4$ \percc \citep[Figure
-\ref{fig:nh3vsh2co}][]{Shirley2015a}.  The temperatures derived from the
+\ref{fig:nh3vsh2co};][]{Shirley2015a}.  The temperatures derived from the
 \ammonia line ratio are lower by construction than those we have
 measured.  Nonetheless, we compare our temperature map to that of
 \citet{Ott2014a} to look for common trends and significant differences.
@@ -1117,8 +1125,9 @@ southwest of Sgr B2 S.  This difference probably indicates that there is a
 cool, diffuse component being detected in \ammonia, while
 \formaldehyde is detecting a hotter, denser component.
 
+% tmap_figure
 \RotFigureTwoAA
-{figures/big_maps/ott2014_nh3_tmap_15to150_withcontours.pdf}
+{figures/big_maps/ott2014_nh3_tmap_15to200_withcontours.pdf}
 {figures/big_maps/lores_smoothdens1e4_weighted_masked_tmap_withcontours.pdf}
 {(a) A temperature map derived from the \ammonia 1-1/2-2 line ratio from
 \citet{Ott2014a}.  The \ammonia thermometer has a more limited temperature
@@ -1439,7 +1448,7 @@ infalling into the center.
 
 \textbf{Acknowledgements}:
 We thank the staff and observers at APEX for carrying out the service-mode
-observations.  We are grateful to Arnaud Belloche, Axel Wieß, and Carlos de
+observations.  We are grateful to Arnaud Belloche, Axel Weiß, and Carlos de
 Breuck for assistance in developing the observing strategy, and Per Bergman for
 his assistance in understanding the SHFI-1 baseline issues.
 \todo{Please provide any acknowledgements that are needed here.}
