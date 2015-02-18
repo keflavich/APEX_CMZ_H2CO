@@ -11,20 +11,24 @@ from astropy.io import fits
 import photutils
 from astropy import coordinates
 from astropy import units as u
+from astropy import constants
+ckms = constants.c.to(u.km/u.s).value
 from astropy import log
 from astropy.utils.console import ProgressBar
 import pylab as pl
 from astroquery.splatalogue import Splatalogue
 
-from shfi_otf_pipeline.make_apex_cubes import all_lines
+from shfi_otf_pipeline.lines import all_lines,lines_tex
 
 pl.ioff()
-pl.figure(1, figsize=(10,6))
+pl.figure(1, figsize=(10,6)).clf()
 
 def fpath(x, figurepath=os.path.join(figurepath, 'fullspectra')):
     return os.path.join(figurepath, x)
 
 regs = pyregion.open(regpath+'spectral_apertures.reg')
+with open(regpath+'spectral_ncomp.txt') as f:
+    pars = eval(f.read())
 
 ftemplate =  'APEX_H2CO_2014_merge_{0}.fits'
 
@@ -52,6 +56,7 @@ for lh in ('low','high'):
     spectra = {}
     for region_number,reg in enumerate(regs):
         name = reg.attr[1]['text']
+        print name
         if name not in spectra:
             #sp = cube.get_apspec(reg.coord_list,coordsys='galactic',wunit='degree')
             shape = pyregion.ShapeList([reg])
@@ -65,7 +70,7 @@ for lh in ('low','high'):
             sp.xarr.convert_to_unit('GHz')
             sp.header['ERROR'] = error
             #sp.error[:] = sp.stats((218.5e9,218.65e9))['std']
-            sp.specname = reg.attr[1]['text']
+            sp.specname = name
             # Error is already computed above; this is an old hack
             #sp.error[:] = sp.stats((218e9,218.1e9))['std']
             spectra[name] = sp
@@ -73,14 +78,22 @@ for lh in ('low','high'):
         else:
             sp = spectra[name]
 
+        velo = pars[name]['velo'][0]
+
         sp.plotter.figure = pl.figure(1)
         sp.plotter(errstyle='fill')
         #linesel = (lfreq > sp.xarr.as_unit('GHz').min()) & (lfreq < sp.xarr.as_unit('GHz').max())
+        frequencies_shifted = [f*(1-velo/ckms) for f in all_lines.values()]
+        names, freqs = zip(*[(lines_tex[name],freq)
+                             for name,freq in zip(all_lines.keys(),
+                                                  frequencies_shifted)
+                             if freq > sp.xarr.as_unit('GHz').min()
+                             and freq < sp.xarr.as_unit('GHz').max()])
         try:
-            #sp.plotter.line_ids(names[linesel], lfreq[linesel], xval_units='GHz')
-            sp.plotter.line_ids(all_lines.keys(), all_lines.values(), xval_units='GHz')
+            sp.plotter.line_ids(names, freqs, xval_units='GHz', linewidth=0.5)
         except RuntimeError as ex:
             print ex
 
         spname = sp.specname.replace(" ","_")
-        sp.plotter.savefig(fpath("{0}_{1}.png".format(spname, lh)))
+        sp.plotter.savefig(fpath("{0}_{1}.png".format(spname, lh)), bbox_inches='tight')
+        sp.plotter.savefig(fpath("{0}_{1}.pdf".format(spname, lh)), bbox_inches='tight')

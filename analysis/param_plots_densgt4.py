@@ -377,10 +377,10 @@ for row in fittable:
         if hasattr(chi2r, 'min'):
             pl.contourf(xax, yax, chi2r.min(axis=axis), levels=chi2r.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+np.arange(nlevs))
-        if hasattr(chi2r2, 'min'):
-            pl.contour(xax, yax, chi2r2.min(axis=axis),
-                       levels=chi2r2.min()+np.arange(nlevs),
-                       cmap=pl.cm.bone)
+        #if hasattr(chi2r2, 'min'):
+        #    pl.contour(xax, yax, chi2r2.min(axis=axis),
+        #               levels=chi2r2.min()+np.arange(nlevs),
+        #               cmap=pl.cm.bone)
         pl.title(r"Ratio $R_1={0:0.3f}\pm{1:0.3f}$"
                  .format(ratio,eratio))
         ax4 = pl.subplot(2,2,2)

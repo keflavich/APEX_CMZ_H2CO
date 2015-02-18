@@ -136,11 +136,11 @@ def fit_a_spectrum(sp, radexfit=False, write=True, vlimits=(-105,125),
 
     # This will mess things up for the radexfit (maybe in a good way) but *cannot*
     # be done after the radexfit
-    # Set the spectrum to be the fit residualsa.  The linear baseline has
+    # Set the spectrum to be the fit residuals.  The linear baseline has
     # already been subtracted from both the data and the residuals
     linear_baseline = sp.baseline.basespec
     sp.baseline.unsubtract()
-    sp.baseline.spectofit = sp.specfit.residuals
+    fitted_residuals = sp.baseline.spectofit = sp.specfit.residuals
     sp.baseline.includemask[:] = True # Select ALL residuals
     sp.baseline.fit(spline=True, order=3, spline_sampling=50)
     spline_baseline = sp.baseline.basespec
@@ -153,12 +153,14 @@ def fit_a_spectrum(sp, radexfit=False, write=True, vlimits=(-105,125),
                limits=[(0,1e5),vlimits,(width_min,width_max),(0,1),(0.3,1.1),(0,1e5)],
               )
     sp.plotter()
-    sp.plotter.axis.plot(sp.xarr, spline_baseline+linear_baseline-err*5, color='orange',
-                         alpha=0.5, zorder=-1, linewidth=2)
+    sp.plotter.axis.plot(sp.xarr, spline_baseline-err*5, color='orange',
+                         alpha=0.75, zorder=-1, linewidth=2)
     sp.specfit.plot_fit(show_components=True)
     sp.specfit.annotate(fontsize=font_sizes[ncomp])
-    sp.specfit.plotresiduals(axis=sp.plotter.axis, yoffset=-err*5, clear=False,
-                             color='#444444', label=False)
+    sp.plotter.axis.plot(sp.xarr, fitted_residuals-err*5, color="#444444",
+                         linewidth=0.5, drawstyle='steps-mid')
+    #sp.specfit.plotresiduals(axis=sp.plotter.axis, yoffset=-err*5, clear=False,
+    #                         color='#444444', label=False)
     sp.plotter.axis.set_ylim(sp.plotter.ymin-err*5, sp.plotter.ymax)
     sp.plotter.savefig(os.path.join(figurepath,
                                     "simple/{0}_fit_4_lines_simple_splinebaselined.pdf".format(spname)))

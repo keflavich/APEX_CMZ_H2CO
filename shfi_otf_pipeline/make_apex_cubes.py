@@ -35,6 +35,7 @@ import spectral_cube
 from spectral_cube import SpectralCube,BooleanArrayMask
 from agpy import mad
 import matplotlib
+from lines import all_lines
 import paths
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
@@ -126,24 +127,7 @@ aorawpath = '/Users/adam/work/h2co/apex/2010_reduced/2010_raw/'
 aopath = '/Users/adam/work/h2co/apex/2010_reduced/'
 diagplotdir = '/Users/adam/work/h2co/apex/diagnostic_plots/'
 
-all_lines = {'H2CO_303_202':218.22219,
-             'H2CO_322_221':218.47563,
-             'H2CO_321_220':218.76007,
-             'SiO_54':217.10498,
-             'CH3OH_422_312':218.44005,
-             'CH3OH_514_422':216.9456,
-             'CH3OH_633_716':216.85786,
-             'HCCCH_65': 217.82215,
-             'HCCCH_54': 217.94004,
-             'OCS_18_17':218.90336,
-             'HC3N_24-23':218.32471,
-             'C18O':219.56036,
-             '13CO':220.39868,
-             'CH3CN_12_11':220.63807,
-             'SO_65_54':219.94944,
-             'HNCO_10010_909':219.79828,
-             #'H2S 2(2,0)-2(1,1)': 216.71044, ??
-             }
+
 bright_lines = {k:all_lines[k] for k in
                 ['H2CO_303_202', 'H2CO_322_221', 'H2CO_321_220', 'SiO_54',
                  'CH3OH_422_312', 'CH3OH_514_422', 'CH3OH_633_716', 'C18O',

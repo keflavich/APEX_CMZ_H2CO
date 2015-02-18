@@ -90,8 +90,7 @@ positions of clouds and stars \citep{Longmore2012b,Yusef-Zadeh2012a}, we are
 still limited by seeing the CMZ edge-on.  There are known foreground clouds
 along the line of sight to the Galactic Center that can be distinguished in
 part by their relative line widths, with Galactic Center clouds having typical
-linewidths $\sigma_{FWHM}\gtrsim5$ \kms and local clouds $\sigma_{FWHM}
-\lesssim 2$ \kms, but this only provides a qualitative distance, distinguishing
+linewidths $FWHM\gtrsim5$ \kms and local clouds $FWHM \lesssim 2$ \kms, but this only provides a qualitative distance, distinguishing
 nearby ($d\sim1-5$ kpc) clouds from clouds within the central kiloparsec.
 Additionally, there is significant velocity confusion within the Galactic
 center: many clouds are seen to overlap in velocity while they are not
@@ -119,7 +118,7 @@ represents a significant problem for understanding the importance of gas
 temperature and pressure in the evolution of molecular clouds.  The dust
 temperature is readily determined via continuum mapping and therefore is often
 used as a proxy for the gas temperature, but the dust temperature itself is
-hydrodynamically unimportant.  \citet{Ao2013a} used the \para 220 GHz
+hydrodynamically unimportant.  \citet{Ao2013a} used the para-formaldehyde (\para) 220 GHz
 thermometer \citep{Mangum1993a}, which is sensitive to denser gas
 ($n\sim10^4-10^5$ \percc), and still found a significant discrepancy between
 gas and dust temperature, but they only covered the inner 75 pc.
@@ -141,7 +140,7 @@ provide additional tables, and provide the source code for this project.
 
 \subsection{Observations}
 We observed the Central Molecular Zone from $-0.4\arcdeg < \ell < 1.6\arcdeg$
-with the SHFI-1 instrument \citep{Vassilev2008a} on the Atacama Pathfinder
+with the APEX-1 (SHFI) instrument \citep{Vassilev2008a} on the Atacama Pathfinder
 Experiment (APEX) telescope \citep{Guesten2006b} using the eXtended bandwidth
 Fast Fourier Transform
 Spectrometer (XFFTS) backend \citep{Klein2012a}.  The observations were
@@ -169,7 +168,8 @@ The raw data were acquired with 32768 spectral channels in each window,
 yielding 0.1 \kms resolution.  We expect to see no lines narrower than a few
 \kms in the CMZ, particularly not with the relatively shallow observations we
 have acquired.  We therefore downsampled the data by a factor of 8 to 0.8 \kms
-resolution to make the data more manageable.  
+resolution prior to resampling onto a 1 \kms grid to make the data more
+manageable.  
 
 Additionally, for the \para data, we incorporated the 41 hours of observations
 using the older fast fourier transform spectrometer (FFTS) backend from
@@ -365,7 +365,8 @@ resolution, FWHM=$30\arcsec$ and $\Delta v=1$ \kms.  We therefore created
 additional smoothed cubes, smoothing in the spatial dimensions with a
 $\sigma_{FWHM}=33.84\arcsec$ gaussian to achieve a resolution 45\arcsec, and
 $\sigma_{v, FWHM} = 3$ \kms in the spectral direction.  The smoothed cubes were
-also downsampled by a factor of 2 in the spectral direction.  We then performed
+also downsampled by a factor of 2 in the spectral direction (the smoothing and
+downsampling are independent).  We then performed
 the same signal extraction analysis described above, but with a threshold $T_A
 > 3\sigma$.  Integrated intensity maps of both the original and the smoothed
 data are shown in Figure \ref{fig:integ303} for the \threeohthree map masked
@@ -506,7 +507,7 @@ and location of voxels included in the catalog is, however, relatively robust
 against small parameter changes.
 
 For each extracted blob, we measured the corresponding integrated and peak
-emission in the \threetwoone and \thirteenco cubes.  We also extracted the mean
+emission in the \threeohthree, \threetwoone, and \thirteenco cubes.  We also extracted the mean
 dust temperature and column density from SED fits to Herschel HiGal 170-500\um
 maps \citep{Molinari2010a,Traficante2011a}.  The SED fits were performed on
 background-subtracted data using an approach originally described in
@@ -583,22 +584,24 @@ and with the other methods.  Figure \ref{fig:twospectra_hotcold} shows two
 example spectra that exhibit significantly different ratios with the spline
 baseline fit indicated.
 
+% individual_spectra
 \FigureTwo
 {figures/simple/Brick_SW_fit_4_lines_simple_splinebaselined.pdf}
 {figures/simple/ds:G0.42+0.03box_fit_4_lines_simple_splinebaselined.pdf}
 {
-Fits to the \para lines and the \methanol \fourtwotwo line for (a) The Brick
-and (b) a box centered on G0.42+0.03.
-The fitted parameters shown in the legend are the amplitude of the
-\formaldehyde \threeohthree line, the centroid velocity, the line width
-($\sigma$, not FWHM), the ratio $R_1 = \Rone$,
-the ratio $R_2 = \Rtwo$, and the amplitude of
-the \methanol \fourtwotwo line.  
-These spectra have significantly
-different ratios and therefore derived temperatures: The Brick has
-$T\gtrsim100$ K while G0.42+0.03 has $T\approx40-50$ K.  The bottom black
-spectrum is the residual, and the orange wiggly spectrum shows the spline fit
-used to remove baseline ripples.}
+Simultaneous fits to four lines, from low to high frequency, \para
+\threeohthree, \methanol \fourtwotwo, \para \threetwotwo, and \para \threetwoone
+for (a) The Brick and (b) a box centered on G0.42+0.03.  The fitted parameters
+shown in the legend are the amplitude of the \formaldehyde \threeohthree line,
+the centroid velocity, the line width ($\sigma$, not FWHM), the ratio $R_1 =
+\Rone$, the ratio $R_2 = \Rtwo$, and the amplitude of the \methanol \fourtwotwo
+line.  These spectra have significantly different ratios and therefore derived
+temperatures: The Brick has $T\gtrsim100$ K while G0.42+0.03 has
+$T\approx40-50$ K.  The bottom black spectrum is the residual, and the orange
+wiggly spectrum shows the spline fit used to remove baseline ripples.
+The OCS 18-17 218.90336 GHz and HC$_3$N 24-23 218.32471 GHZ lines are also
+detected, but not fitted, in The Brick.
+}
 {fig:twospectra_hotcold}{1}{3in}
 
 
@@ -606,13 +609,17 @@ For each extracted region (see Section \ref{sec:region}), we created $\chi^2$
 grids over the modeled temperature-density-column density parameter space.  We
 measured $\chi^2$ with five independent constraints: the line ratio $R_1$, the
 \formaldehyde abundance, the total column density of \hh, a lower limit on the
-\hh volume density, and an upper limit on the beam filling factor.  We use the
-line \emph{ratio} rather than line brightnesses to avoid uncertainties due to
-the ``filling factor'' of the emitting gas: even for diffuse clouds, the
-filling factor of the emitting
-regions may be $ff<<1$ if the emission is isolated to compact shocked regions,
-as expected if highly supersonic $\mathcal{M}>10$ turbulence is energetically
-dominant in the clouds.  We use an abundance $N(\para)/N(\hh) = X(\para) =
+\hh volume density, and an upper limit on the beam filling
+factor\footnote{Where the model predicts a brightness temperature higher than
+observed, we can invoke a low filling factor to explain the discrepancy.  If
+the model predicts a brightness temperature too low,
+we can rule it out.}.  We use the
+line \emph{ratio} as the primary constraint rather than line brightnesses to
+avoid uncertainties due to the filling factor of the emitting gas: even for
+diffuse clouds, the filling factor of the emitting regions may be $ff<<1$ if
+the emission is isolated to compact shocked regions, as expected if highly
+supersonic $\mathcal{M}>10$ turbulence is energetically dominant in the clouds.
+We use an abundance $N(\para)/N(\hh) = X(\para) =
 10^{-9.08\pm1} = 1.2\ee{-9} \times/\div 10$, allowing for dramatic uncertainty in
 the \formaldehyde abundance
 \citep{Ginsburg2013a,Carey1998a,Wootten1978a,Mundy1987a}.  To constrain the
@@ -660,10 +667,11 @@ yellow $2 < \Delta\chi^2 < 3$, and red $3 < \Delta\chi^2 < 4$.  The colored line
 contours show the joint constraints imposed by including restrictions on the
 total column density, volume density,  filling factor, and abundance, following
 the same color
-scheme.  The solid grayscale contours show the constraints imposed by
-$R_2=\Rtwo$, from black ($\Delta\chi^2 < 1$) to white ($3<\Delta\chi^2<4$).  In
-this case, $R_2$ is weakly inconsistent with the joint constraints from the
-other parameters.
+scheme.
+%The solid grayscale contours show the constraints imposed by
+%$R_2=\Rtwo$, from black ($\Delta\chi^2 < 1$) to white ($3<\Delta\chi^2<4$).  In
+%this case, $R_2$ is weakly inconsistent with the joint constraints from the
+%other parameters.
 \newline
 (top right) The same colorscheme as before, showing the constraints imposed by
 assuming the abundance of \para relative to \hh is as labeled.  
@@ -704,11 +712,10 @@ Figure \ref{fig:coltemconstraints} caption.}
 
 \subsection{Blob modeling}
 \label{sec:dendromod}
-We derived temperatures for each
-dendrogram catalog blob using the measured line ratio, dust column density, 
-and a dust-derived lower limit on the volume density as constraints.
-The $\chi^2$ grid approach described in Section \ref{sec:linemodeling} was used
-to extract the temperature and associated error.
+We derived temperatures for each dendrogram catalog blob using the same
+measured quantities as in Section \ref{sec:linemodeling} as constraints.  The
+$\chi^2$ grid approach described in Section \ref{sec:linemodeling} was used to
+extract the temperature and associated error.
 
 We plot the derived temperature for all clumps against the measured line ratio
 in Figure \ref{fig:ratiovstem}.  This figure includes both `leaves' and `ancestors'
@@ -721,7 +728,7 @@ excluded by the observed volume density lower limit from the dust.
 {The derived temperature vs the measured ratio \Rone for the dendrogram clumps.
 The big symbols represent leaves (compact clumps) and the small symbols
 represent larger ancestor structures.
-The temperature includes constraints from the assumed fixed \formaldehyde
+The temperature includes constraints from the assumed constant \formaldehyde
 abundance and the 
 varying column density.  The points are color coded by signal-to-noise in the
 ratio $R_1$, with gray $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$,
@@ -773,8 +780,9 @@ e.g., G0.253+0.016 had a lower
 gas temperature, our data would be sensitive enough to measure temperature down
 to $T\sim20$ K.  The higher temperatures become lower limits above $\sim150$ K
 because the \para line ratio is intrinsically insensitive to higher
-temperatures, as can be seen in Figure \ref{fig:parsonbrightness}, in which
-the modeled line brightnesses are both nearly constant above $T\gtrsim150$ K.
+temperatures, as can be seen in Figure \ref{fig:parsonbrightness} (rightmost
+column), in which the modeled line brightnesses are both nearly constant above
+$T\gtrsim150$ K.
 
 
 % tmap_figure
@@ -1065,9 +1073,10 @@ dendrogram-extracted clump within 20 \kms and 6 pc of the
 \citet{Kruijssen2014d} orbit.  The linear increase in temperature over the
 first $\sim0.5$ Myr seems to support the \citet{Kruijssen2014d} hypothesis that
 the `ring' represents a single gas stream on its first passage by Sgr A*.
-The cooler gas on the far side does not obviously fit with this picture, 
-and we suggest in Section \ref{sec:coolstream} that it is not affiliated
-with the orbit.
+The cooler gas on the far side does not obviously fit into this picture, 
+and we suggest in Section \ref{sec:coolstream} that it is not affiliated with
+the orbit (but the existence of such a cool stream does \emph{not} challenge
+the model directly).
 
 % orbit_pv
 \RotFigureTwoAA
@@ -1333,7 +1342,7 @@ The strongest argument against such a scenario is the extremely high column
 density required.  At typical \para abundances $X\sim10^{-9}$, or even more
 extreme abundances $X\sim10^{-8}$, the implied local column density is
 $N(\hh)\gtrsim10^{25(24)}$ in a single velocity bin.  Column densities up to
-$N(\hh)\sim10^{24}$ \percc are observed, but with much lower filling fractions
+$N(\hh)\sim10^{24}$ \persc are observed, but with much lower filling fractions
 $ff\sim10^{-4}$, in The Brick \citep[][their Figure 4]{Rathborne2014a}.  Even
 in The Brick, the densest cloud besides Sgr B2, higher column densities are not
 observed.  So, while it remains possible that optically thick \para is
