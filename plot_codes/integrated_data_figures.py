@@ -30,6 +30,10 @@ method_label = {'mean': "Mean Brightness $T_A^*$ (K)",
                 'moment0': "Integrated Brightness\n"
                    r"$T_A^* dv $ (K km s$^{-1}$)"}
 
+dustcolumn = fits.open('/Users/adam/work/gc/gcmosaic_column_conv36.fits')
+dustcoldata = dustcolumn[0].data
+dustcolwcs = WCS(dustcolumn[0].header)
+
 # Direct from cubes
 for method in ('mean','moment0'):
     for cube,name,masked,smooth in zip((cube303, cube303m, cube303sm, cube303msm,
@@ -62,6 +66,7 @@ for method in ('mean','moment0'):
         vmax = np.percentile(im.data[np.isfinite(im.data)], 99.95)
         ims = ax.imshow(im.data, cmap=cm, vmin=vmin, vmax=vmax)
                         #norm=matplotlib.colors.LogNorm())
+        limits = ax.axis()
 
 
         # create an axes on the right side of ax. The width of cax will be 5%
@@ -81,6 +86,15 @@ for method in ('mean','moment0'):
 
         ax.set_xlabel("Galactic Longitude")
         ax.set_ylabel("Galactic Latitude")
+
+        tr = ax.get_transform(dustcolwcs)
+        con = ax.contour(dustcoldata, levels=[5], colors=[(0,0,0,0.5)],
+                         zorder=15, alpha=0.5, linewidths=[0.5], transform=tr)
+        ax.axis(limits)
+
+        pl.savefig(fpath('integrated/{0}'.format(outname.replace(".fits",".pdf"))),
+                   bbox_inches='tight')
+        for c in con.collections: c.set_visible(False)
         
         labels = pyregion.open(rpath('ridge_names.reg'))
         PC, TC = ds9(labels, im.header, text_offset=0)
@@ -89,6 +103,13 @@ for method in ('mean','moment0'):
         TC.add_to_axes(ax)
 
         pl.savefig(fpath('integrated/{0}'.format(outname.replace(".fits","_labeled.pdf"))),
+                   bbox_inches='tight')
+
+
+        for c in con.collections: c.set_visible(True)
+        ax.axis(limits)
+        pl.savefig(fpath('integrated/{0}'.format(outname.replace(".fits",
+                                                                 "_labeled_dustcontours.pdf"))),
                    bbox_inches='tight')
 
 
@@ -137,3 +158,10 @@ for smooth in ("","_bl", "_smooth", "_smooth_bl"):
     pl.savefig(fpath('integrated/{0}'.format(outname.replace("fits","pdf"))),
                bbox_inches='tight')
 
+    tr = ax.get_transform(dustcolwcs)
+    con = ax.contour(dustcoldata, levels=[5], colors=[(0,0,0,0.5)],
+                     zorder=15, alpha=0.5, linewidths=[0.5], transform=tr)
+
+    pl.savefig(fpath('integrated/{0}'.format(outname.replace(".fits",
+                                                             "_dustcontours.pdf"))),
+               bbox_inches='tight')

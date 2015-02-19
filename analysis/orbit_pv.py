@@ -29,6 +29,13 @@ dist = (dl**2+db**2)**0.5
 cdist = np.zeros(dist.size+1)
 cdist[1:] = dist.cumsum()
 
+reftime = -2
+bricktime = 0.3
+time = table['t']
+
+# how much time per pixel?
+dtdx = (table['t'].max() - table['t'].min()) / cdist.max()
+
 figsize=(20,10)
 
 vmin,vmax=10,200
@@ -53,29 +60,33 @@ molecules = molecules + ('H2CO_TemperatureFromRatio',
                          'H2CO_TemperatureFromRatio_smooth',
                          'H2CO_Ratio',
                          'H2CO_Ratio_smooth',
-                         'H2CO_DendrogramTemperature',
-                         'H2CO_DendrogramTemperature_smooth',
-                         'H2CO_DendrogramTemperature_Leaves',
-                         'H2CO_DendrogramTemperature_Leaves_smooth')
+                         #'H2CO_DendrogramTemperature',
+                         #'H2CO_DendrogramTemperature_smooth',
+                         #'H2CO_DendrogramTemperature_Leaves',
+                         #'H2CO_DendrogramTemperature_Leaves_smooth'
+                        )
 filenames.append(hpath('TemperatureCube_PiecewiseFromRatio.fits'))
 filenames.append(hpath('TemperatureCube_smooth_PiecewiseFromRatio.fits'))
 filenames.append(hpath('H2CO_321220_to_303202_cube_bl.fits'))
 filenames.append(hpath('H2CO_321220_to_303202_cube_smooth_bl.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects_leaves.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_leaves.fits'))
+#filenames.append(hpath('TemperatureCube_DendrogramObjects.fits'))
+#filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth.fits'))
+#filenames.append(hpath('TemperatureCube_DendrogramObjects_leaves.fits'))
+#filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_leaves.fits'))
 
 
 cmap = copy.copy(pl.cm.RdYlBu_r)
-cmap.set_bad((1.0,)*3)
 cmap.set_under((0.9,0.9,0.9,0.5))
-#cmap.set_bad((0.9,0.9,0.9,0.5))
 
 for weight in ("_weighted",""):
     for molecule,fn in zip(molecules,filenames):
         log.info(molecule)
         cube = spectral_cube.SpectralCube.read(fn)
+
+        if 'smooth' in fn:
+            cmap.set_bad((1.0,)*3)
+        else:
+            cmap.set_bad((0.9,0.9,0.9,0.5))
 
         if weight:
 
@@ -100,9 +111,9 @@ for weight in ("_weighted",""):
 
             #pv1a = pvextractor.extract_pv_slice(cube, P, respect_nan=True)
             pv1,apv1 = extract_poly_slice(weighted.filled_data[...].value,
-                                     P.sample_polygons(spacing=1.0,
-                                                       wcs=cube.wcs),
-                                     return_area=True)
+                                          P.sample_polygons(spacing=1.0,
+                                                            wcs=cube.wcs),
+                                          return_area=True)
             print()
             pv2,apv2 = extract_poly_slice(wcube.filled_data[...].value,
                                      P.sample_polygons(spacing=1.0, wcs=cube.wcs),
@@ -137,19 +148,51 @@ for weight in ("_weighted",""):
 
         fig1 = pl.figure(1, figsize=figsize)
         fig1.clf()
-        F = aplpy.FITSFigure(pv, figure=fig1)
+        ax = fig1.gca()
+        mywcs = WCS(pv.header)
+        xext, = mywcs.sub([1]).wcs_pix2world((0,pv.shape[1]), 0)
+        yext, = mywcs.sub([2]).wcs_pix2world((0,pv.shape[0]), 0)
+        yext /= 1e3
+        dy = yext[1]-yext[0]
+        dx = xext[1]-xext[0]
+        #F = aplpy.FITSFigure(pv, figure=fig1)
         actual_aspect = pv.shape[0]/float(pv.shape[1])
         if 'Temperature' in fn:
-            F.show_colorscale(cmap=cmap, aspect=0.5/actual_aspect, vmin=vmin, vmax=vmax)
-            # This is where it fails...
-            #F.add_colorbar()
-            #divider = make_axes_locatable(F._ax1)
-            #cax = divider.append_axes("right", size="5%", pad=0.05)
+            #F.show_colorscale(cmap=cmap, aspect=0.5/actual_aspect, vmin=vmin, vmax=vmax)
+            im = ax.imshow(pv.data, extent=[xext[0], xext[1], yext[0], yext[1]],
+                           aspect=0.5*dx/dy, vmin=vmin, vmax=vmax, cmap=cmap)
+            #divider = make_axes_locatable(ax)
+            #cax = divider.append_axes("right", size="2%", pad=0.05)
+            cb = fig1.colorbar(im)
+            cb.set_label("Temperature (K)")
+            ## This is where it fails...
+            ##F.add_colorbar()
+            #if 'smooth' in fn:
+            #    F.colorbar.set_pad(-0.94/actual_aspect)
+            #else:
+            #    F.colorbar.set_pad(-1.43/actual_aspect)
+            #F.colorbar.set_axis_label_text("Temperature (K)")
             #pl.colorbar(F._ax1.images[0], cax=cax)
         elif 'Ratio' in fn:
-            F.show_colorscale(cmap=cmap, aspect=0.5/actual_aspect, vmin=0, vmax=0.5)
+            im = ax.imshow(pv.data, extent=[xext[0], xext[1], yext[0], yext[1]],
+                           aspect=0.5*dx/dy, vmin=0, vmax=0.5, cmap=cmap)
+            cb = fig1.colorbar(im)
+            cb.set_label("Ratio $R_1$")
         else:
-            F.show_grayscale(aspect=0.5/actual_aspect)
+            #F.show_grayscale(aspect=0.5/actual_aspect)
+            im = ax.imshow(pv.data, extent=[xext[0], xext[1], yext[0], yext[1]],
+                           aspect=0.5*dx/dy, cmap=cmap)
+
+        ax2 = ax.twiny()
+        ax2.xaxis.set_label_position('top')
+        ax2.xaxis.set_ticklabels(["{0:0.2f}".format(x) for x in
+                                  np.interp(ax2.xaxis.get_ticklocs(),
+                                            np.linspace(0,1,time.size),
+                                            time-reftime)])
+        ax2.set_xlabel("Time since 1$^\\mathrm{st}$ pericenter passage [Myr]",
+                       size=24, labelpad=10)
+        ax.set_xlabel("Offset (degrees)")
+        ax.set_ylabel("$V_{LSR}$ $(\mathrm{km\ s}^{-1})$")
 
         for color, segment in zip(('red','green','blue','black','purple'),
                                   ('abcde')):
@@ -157,31 +200,46 @@ for weight in ("_weighted",""):
             # Connect the previous to the next segment - force continuity
             if np.argmax(selection) > 0:
                 selection[np.argmax(selection)-1] = True
-            F.show_lines(np.array([[cdist[selection],
-                                    table["v'los"][selection]*1e3]]), zorder=1000,
-                         color=color, linewidth=3, alpha=0.25)
+            ax.plot(np.array(cdist[selection]),
+                    table["v'los"][selection], zorder=1000,
+                    color=color, linewidth=3, alpha=0.25)
+            #F.show_lines(np.array([[cdist[selection],
+            #                        table["v'los"][selection]*1e3]]), zorder=1000,
+            #             color=color, linewidth=3, alpha=0.25)
             #F.show_markers(cdist[selection], table["v'los"][selection]*1e3, zorder=1000,
             #             color=color, marker='+')
-        F.recenter(x=4.5/2., y=20., width=4.5, height=240000)
+        #F.recenter(x=4.5/2., y=20., width=4.5, height=240000)
         #F.show_markers([offset_to_point(0.47,-0.01)], [30.404e3], color=['r'])
         #F.show_markers([offset_to_point(0.38,+0.04)], [39.195e3], color=['b'])
-        F.show_markers([offset_to_point(0.47, -0.01)],[30.404e3], edgecolor='r', marker='x')
-        F.show_markers([offset_to_point(0.38, 0.04)], [39.195e3], edgecolor='b', marker='x')
-        F.show_markers([offset_to_point(0.253, 0.016)], [36.5e3], edgecolor='purple', marker='x')
+        #F.show_markers([offset_to_point(0.47, -0.01)],[30.404e3], edgecolor='r', marker='x')
+        #F.show_markers([offset_to_point(0.38, 0.04)], [39.195e3], edgecolor='b', marker='x')
+        #F.show_markers([offset_to_point(0.253, 0.016)], [36.5e3], edgecolor='purple', marker='x')
+        ax.plot(offset_to_point(0.47, -0.01),30.404, color='r', marker='x')
+        ax.plot(offset_to_point(0.38, 0.04), 39.195, color='b', marker='x')
+        ax.plot(offset_to_point(0.253, 0.016), 36.5, color='purple', marker='x')
 
-        F.save(fpath('orbits/KDL2014_orbit_on_{0}{1}.pdf'.format(molecule, weight)))
+        #F.refresh()
+        #F._ax1.set_ylabel("$V_{LSR} (\mathrm{km\ s}^{-1})$")
+        #F._ax1.set_yticklabels([(str(int(x.get_text())/1000)) for x in F._ax1.get_yticklabels()])
+        #F.refresh()
+        ax.axis([xext[0], xext[1], yext[0], yext[1]])
 
-        if weight:
-            color = (0.5,)*3 # should be same as background #888
-            F.show_contour(pv2hdu,
-                           levels=[-1,0]+np.logspace(0.20,2).tolist(),
-                           colors=([(0.5,0.5,0.5,1)]*2 + 
-                                   [color + (alpha,) for alpha in
-                                    np.exp(-(np.logspace(0.20,2)-1.7)**2/(2.5**2*2.))]),
-                           filled=True,
-                           smooth=3,
-                           zorder=10, convention='calabretta')
-            F.save(fpath('orbits/KDL2014_orbit_on_{0}{1}_masked.pdf'.format(molecule, weight)))
+        #F.save(fpath('orbits/KDL2014_orbit_on_{0}{1}.pdf'.format(molecule, weight)))
+        fig1.savefig(fpath('orbits/KDL2014_orbit_on_{0}{1}.pdf'.format(molecule, weight)),
+                     bbox_inches='tight')
+
+        # TODO!
+        #if weight:
+        #    color = (0.5,)*3 # should be same as background #888
+        #    ax.show_contour(pv2hdu,
+        #                   levels=[-1,0]+np.logspace(0.20,2).tolist(),
+        #                   colors=([(0.5,0.5,0.5,1)]*2 + 
+        #                           [color + (alpha,) for alpha in
+        #                            np.exp(-(np.logspace(0.20,2)-1.7)**2/(2.5**2*2.))]),
+        #                   filled=True,
+        #                   smooth=3,
+        #                   zorder=10, convention='calabretta')
+        #    F.save(fpath('orbits/KDL2014_orbit_on_{0}{1}_masked.pdf'.format(molecule, weight)))
 
 
         fig2 = pl.figure(2)
@@ -200,6 +258,9 @@ for weight in ("_weighted",""):
         if 'Temperature' in fn:
             F2.show_colorscale(cmap=cmap, vmin=vmin, vmax=vmax)
             F2.add_colorbar()
+            F2.colorbar.set_ticks(np.arange(20,240,40))
+            F2.colorbar.set_axis_label_font(size=20)
+            F2.colorbar.set_axis_label_text('Temperature (K)')
         else:
             F2.show_grayscale()
 
@@ -281,8 +342,6 @@ for weight in ("_weighted",""):
         fig3.clf()
         ax3 = fig3.gca()
 
-        reftime = -2
-        bricktime = 0.3
         ax3.plot(time-reftime, pv.data.T, 'k.', alpha=0.5, markersize=3)
         ax3.set_xlabel("Time since 1$^\\mathrm{st}$ pericenter passage [Myr]", size=24, labelpad=10)
         if 'Temperature' in fn:
@@ -298,15 +357,15 @@ for weight in ("_weighted",""):
             ytext = ax3.get_ylim()[1]*(14./15.)
 
         ax3.text(bricktime, ytext, "Brick", verticalalignment='center',
-                 horizontalalignment='center', rotation='vertical', color='purple', weight='bold')
+                 horizontalalignment='center', rotation='vertical', color='k', weight='bold')
         ax3.text(bricktime+0.43, ytext, "Sgr B2", verticalalignment='center',
-                 horizontalalignment='center', rotation='vertical', color='b', weight='bold')
+                 horizontalalignment='center', rotation='vertical', color='k', weight='bold')
         ax3.text(bricktime+3.58, ytext*135./140., "20 km s$^{-1}$", verticalalignment='center',
-                 horizontalalignment='center', rotation='vertical', color='g', weight='bold')
+                 horizontalalignment='center', rotation='vertical', color='k', weight='bold')
         ax3.text(bricktime+3.66, ytext*135./140., "50 km s$^{-1}$", verticalalignment='center',
-                 horizontalalignment='center', rotation='vertical', color='g', weight='bold')
+                 horizontalalignment='center', rotation='vertical', color='k', weight='bold')
         ax3.text(bricktime+3.28, ytext, "Sgr C", verticalalignment='center',
-                 horizontalalignment='center', rotation='vertical', color='m', weight='bold')
+                 horizontalalignment='center', rotation='vertical', color='k', weight='bold')
         pl.setp(ax3.get_xticklabels(), fontsize=20)
         pl.setp(ax3.get_yticklabels(), fontsize=20)
         ax3.set_xlim(-0.1,4.6)

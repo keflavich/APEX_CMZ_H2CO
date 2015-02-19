@@ -41,7 +41,7 @@ toloop = zip((
               '_directpv1e4_masked','_directpv1e5_masked','_directpv3e4_masked',))
 
 for weight in ("_weight",""):
-    for smooth in ("_smooth",""):#"_vsmooth"):
+    for smooth in ("",):#("_smooth",""):#"_vsmooth"):
         sncubefile = hpath('APEX_H2CO_303_202{0}_signal_to_noise_cube.fits'.format(smooth))
         sncube = SpectralCube.read(sncubefile)
         snproj = sncube.max(axis=1)
@@ -56,7 +56,14 @@ for weight in ("_weight",""):
         Fsn.add_colorbar()
         Fsn.colorbar.set_axis_label_text('Peak S/N')
         Fsn.recenter(**recen)
+        Fsn.axis_labels.set_xtext(r'Galactic Longitude')
         Fsn.tick_labels.set_xformat('d.dd')
+
+        Fsn.refresh()
+        Fsn._ax1.set_ylabel("$V_{LSR} (\mathrm{km\ s}^{-1})$")
+        Fsn._ax1.set_yticklabels([(str(int(x.get_text())/1000)) for x in Fsn._ax1.get_yticklabels()])
+        Fsn.refresh()
+
         Fsn.save(fpath("big_maps/pv_peaksn{0}.pdf".format(smooth)))
 
         for ftemplate,outtype in toloop:
@@ -114,7 +121,18 @@ for weight in ("_weight",""):
             F.recenter(**recen)
             F.tick_labels.set_xformat('d.dd')
             F.add_colorbar()
-            F.colorbar.set_axis_label_text('T (K)')
+            if smooth:
+                F.colorbar.set_pad(-5)
+            F.colorbar.set_ticks(np.arange(20,240,40))
+            F.colorbar.set_axis_label_font(size=20)
+            F.colorbar.set_axis_label_text('Temperature (K)')
+
+            F.refresh()
+            F._ax1.set_ylabel("$V_{LSR} (\mathrm{km\ s}^{-1})$")
+            F._ax1.set_yticklabels([(str(int(x.get_text())/1000)) for x in F._ax1.get_yticklabels()])
+            F.refresh()
+            F.axis_labels.set_xtext(r'Galactic Longitude')
+
             F.save(fpath("big_maps/pv_tmap{0}{2}{1}.pdf".format(smooth, outtype, weight)))
 
 

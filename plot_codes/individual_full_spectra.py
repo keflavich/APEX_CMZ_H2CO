@@ -81,16 +81,18 @@ for lh in ('low','high'):
         velo = pars[name]['velo'][0]
 
         sp.plotter.figure = pl.figure(1)
-        sp.plotter(errstyle='fill')
+        # extend y limits to make space for annotations
+        sp.plotter(errstyle='fill', ypeakscale=1.5)
         #linesel = (lfreq > sp.xarr.as_unit('GHz').min()) & (lfreq < sp.xarr.as_unit('GHz').max())
         frequencies_shifted = [f*(1-velo/ckms) for f in all_lines.values()]
         names, freqs = zip(*[(lines_tex[name],freq)
                              for name,freq in zip(all_lines.keys(),
                                                   frequencies_shifted)
-                             if freq > sp.xarr.as_unit('GHz').min()
-                             and freq < sp.xarr.as_unit('GHz').max()])
+                             if freq > sp.xarr.as_unit('GHz').min()+0.05
+                             and freq < sp.xarr.as_unit('GHz').max()-0.05])
         try:
-            sp.plotter.line_ids(names, freqs, xval_units='GHz', linewidth=0.5)
+            sp.plotter.line_ids(names, freqs, xval_units='GHz', linewidth=0.5,
+                                auto_yloc_fraction=0.85)
         except RuntimeError as ex:
             print ex
 

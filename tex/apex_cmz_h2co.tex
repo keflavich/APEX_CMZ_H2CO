@@ -39,9 +39,9 @@ Also, title suggestions are welcome!}
 \todo{To-do items are coded in red.}
 
 \section{Introduction}
-\todo{The introduction needs to be cleaned up.}
-The central region of our Galaxy is the nearest location in which we can study
-star formation in an `extreme' environment with pressure, turbulent Mach number, 
+The central region of our Galaxy, the Central Molecular Zone (CMZ), is the
+nearest location in which we can study star formation in an `extreme'
+environment with pressure, turbulent Mach number, 
 and gas temperature much higher than in local star forming regions.  While
 there have been great leaps in our understanding of star formation
 from local molecular clouds in the past decade
@@ -51,11 +51,11 @@ and more turbulent, as it most likely was in galaxies at the peak of cosmic
 star formation \citep{Kruijssen2013a}.
 
 
-The central $\sim100$ pc `ring' or `dust ridge' \citep{Lis1994a,Sofue1995a,Molinari2011a}
-within our Galaxy's central molecular zone (CMZ) has attracted a great deal of
-attention recently,
-as it contains most of the gas in the CMZ and has a large, but unrealized,
-star-forming potential
+The central $\sim100$ pc\footnote{Assuming the IAU-recommended $d=8.5$ kpc
+\citep{Ghez2008a,Gillessen2009b,Reid2009a,Gillessen2013b}.} `ring' or `dust ridge'
+\citep{Lis1994a,Sofue1995a,Molinari2011a} within our Galaxy's CMZ has attracted
+a great deal of attention recently, as it contains most of the gas in the CMZ
+and has a large, but unrealized, star-forming potential
 \citep{Longmore2013a,Longmore2012b,Longmore2012a,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
 The star formation in this region appears to be suppressed relative to
 expectations based on nearby star-forming regions and nearby (on a larger
@@ -75,14 +75,16 @@ rings, the star formation rate is well above the standard star formation laws
 the star formation rate is lower
 \citep{Longmore2013b,Immer2012a,Yusef-Zadeh2009a,Murray2010a}.
 
-Hypotheses for this reduced star formation rate include suppressed
-fragmentation by cosmic ray and X-ray heating and a raised star formation
-threshold from enhanced turbulence.  \citet{Papadopoulos2010a} and
-\citet{Papadopoulos2011a} suggested that high temperatures driven by cosmic
-rays may suppress fragmentation.  \citet{Kruijssen2014c} concluded that the
+Hypotheses for the reduced CMZ star formation rate include a raised star
+formation threshold from enhanced turbulence and stochasticity resulting from a
+modified threshold.  \citet{Kruijssen2014c} concluded that the
 `threshold' for star formation must be higher in the CMZ to explain the
 suppressed star formation rate, and therefore turbulence is the essential
 mechanism.  
+
+%\citet{Papadopoulos2010a} and
+%\citet{Papadopoulos2011a} suggested that high temperatures driven by cosmic
+%rays may suppress fragmentation.  
 
 The geometry of CMZ gas is frequently a subject of debate.  While we can in
 some cases see absorption signatures indicating the relative line-of-sight
@@ -90,15 +92,15 @@ positions of clouds and stars \citep{Longmore2012b,Yusef-Zadeh2012a}, we are
 still limited by seeing the CMZ edge-on.  There are known foreground clouds
 along the line of sight to the Galactic Center that can be distinguished in
 part by their relative line widths, with Galactic Center clouds having typical
-linewidths $FWHM\gtrsim5$ \kms and local clouds $FWHM \lesssim 2$ \kms, but this only provides a qualitative distance, distinguishing
-nearby ($d\sim1-5$ kpc) clouds from clouds within the central kiloparsec.
+linewidths $FWHM\gtrsim5$ \kms and local clouds $FWHM \lesssim 2$ \kms, but
+this only provides a qualitative distance, distinguishing nearby ($d\sim1-5$
+kpc) clouds from clouds within the central kiloparsec.
 Additionally, there is significant velocity confusion within the Galactic
 center: many clouds are seen to overlap in velocity while they are not
 necessarily at the same distance
 \citep{Jones2012a,Oka2012a}.  Within the molecular ring, the `dust ridge' at
-positive latitudes is known to be in the foreground of the CMZ both because it
-is seen as an infrared-dark absorption feature \citep{Yusef-Zadeh2009a} and
-because Sgr B2 has a closer parallax distance than Sgr A* \citep{Reid2009a}.
+positive latitudes is known to be in the foreground of the CMZ because it
+is seen as an infrared-dark absorption feature \citep{Yusef-Zadeh2009a}.
 
 Prior gas temperature measurements primarily used the popular ammonia
 (\ammonia) metastable inversion transition thermometer
@@ -125,7 +127,6 @@ gas and dust temperature, but they only covered the inner 75 pc.
 
 
 
-We adopt a distance $d=8.5$ kpc for all measurements made in this paper.
 
 We describe new observations using the \para thermometer in Section
 \ref{sec:observations}.  In Section \ref{sec:signal}, we describe the analysis
@@ -183,6 +184,20 @@ small number ($<1\%$) with much higher system temperatures ($300 < T_{sys} <
 750$ K) that were flagged out (see Section \ref{sec:flagging}).
 %, but these are associated with observations of the bright Sgr B2
 %continuum source . 
+
+% individual_full_spectra
+\FigureTwoAA
+{figures/fullspectra/20_kms_low.pdf}
+{figures/fullspectra/20_kms_high.pdf}
+{Spectra of one sample bright cloud, the 20 \kms cloud, over the full APEX band.
+All detected lines are identified.  The grey background indicates the
+approximate $1-\sigma$ errorbars. The feature overlapping the \ceighteeno 2-1
+line at about 219.5 GHz is the \twelveco line from the upper sideband,
+suppressed by $\sim20$ dB.
+There are artifacts at the band edges, e.g. below 217.0 GHz, because these
+spectra average a few different tunings without accounting for missing data at
+the band edges.}
+{fig:fullspectra}{1}{6.5in}
 
 \subsection{Reduction}
 \subsubsection{Calibration}
@@ -360,36 +375,24 @@ However, inspection of the \threetwotwo cube revealed that significant chunks
 of the \threetwotwo signal were excised by this masking, so all further
 analysis excludes the \threetwotwo line.
 
-We found that much of the cube included marginal detections at the original
-resolution, FWHM=$30\arcsec$ and $\Delta v=1$ \kms.  We therefore created
-additional smoothed cubes, smoothing in the spatial dimensions with a
-$\sigma_{FWHM}=33.84\arcsec$ gaussian to achieve a resolution 45\arcsec, and
-$\sigma_{v, FWHM} = 3$ \kms in the spectral direction.  The smoothed cubes were
-also downsampled by a factor of 2 in the spectral direction (the smoothing and
-downsampling are independent).  We then performed
-the same signal extraction analysis described above, but with a threshold $T_A
-> 3\sigma$.  Integrated intensity maps of both the original and the smoothed
-data are shown in Figure \ref{fig:integ303} for the \threeohthree map masked
-with the above method in and Figure \ref{fig:integ321} for the \threetwoone map
+Integrated intensity maps are shown in Figure
+\ref{fig:integ303321}a for the \threeohthree map masked with the above method
+in and Figure \ref{fig:integ303321}b for the \threetwoone map
 using the mask created from the \threeohthree data.
 
-\RotFigureTwoAA
-{figures/integrated/APEX_H2CO_303_202_masked_moment0}
-{figures/integrated/APEX_H2CO_303_202_masked_smooth_moment0_labeled}
-{Integrated intensity (moment 0) maps of the \para \threeohthree line in the
-original (a) and smoothed (b) data.  The cubes were masked prior to integration
-using the method described in Section \ref{sec:signal}.  Selected region names
-are labeled in (b).}
-{fig:integ303}{1}{9.5in}
 
+% integrated_data_figures (?)
 \RotFigureTwoAA
-{figures/integrated/APEX_H2CO_321_220_masked_moment0}
-{figures/integrated/APEX_H2CO_321_220_masked_smooth_moment0}
-{Integrated intensity (moment 0) maps of the \para \threetwoone line in the
-original (a) and smoothed (b) data.  The cubes were masked prior to integration
-using the mask generated from the \threeohthree line as described in Section
-\ref{sec:signal}.}
-{fig:integ321}{1}{9.5in}
+{figures/integrated/APEX_H2CO_303_202_masked_moment0_labeled_dustcontours}
+{figures/integrated/APEX_H2CO_321_220_masked_moment0_labeled_dustcontours}
+{Integrated intensity (moment 0) maps of the (a) \para \threeohthree and (b)
+\threetwoone lines.  The cubes were masked prior to integration using the
+method described in Section \ref{sec:signal}.  Selected region names are
+labeled in (b).  
+ The thin black contours are at a column $N(\hh)=5\ee{22}$
+\percc from the Herschel SED fit maps.
+}
+{fig:integ303}{1}{9.5in}
 
 \subsection{Ratio maps}
 \label{sec:ratio}
@@ -408,8 +411,6 @@ equivalent to the ratio of the moment 0 maps shown in Figures
 cases, the mask described in Section \ref{sec:signal} was applied to the cubes
 before averaging over velocity.
 
-Figure \ref{fig:ratiomapssm} shows the same process performed on the smoothed
-data cubes described in Section \ref{sec:signal}.
 
 
 %We created two independent ratio maps, \threetwotwo/\threeohthree and
@@ -453,17 +454,6 @@ weighted by the \threeohthree brightness
 %{fig:ratiomaps}{0.6}{0}
 {fig:ratiomaps}{1}{9.5in}
 
-% figure_ratio_maps
-\RotFigureTwoAA
-%{figures/big_H2CO_322221_to_303202_smooth_bl_integ.pdf}
-{figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
-{figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ_masked_weighted.pdf}
-%{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf} % tmap_figure
-{Same as Figure \ref{fig:ratiomaps}, but smoothed with a 34\arcsec gaussian.
-}
-%{fig:ratiomaps}{1}{7in}
-%{fig:ratiomaps}{0.6}{0}
-{fig:ratiomapssm}{1}{9.5in}
 
 
 \subsection{Region extraction}
@@ -477,7 +467,8 @@ finding methods, but it also extracts clumps at different brightness scales
 (different heights in the watershed) and tracks how nested clumps are related
 to each other.  Within a hierarchy of nested clumps, the brightest and smallest
 is a `leaf' and all associated larger structures are `ancestors' (roots or
-trunks and branches).
+trunks and branches).  We refer to the clumps identified in this manner as
+`dendrogram-extracted' clumps from here on.
 Figures 1 and 3 in \citet{Rosolowsky2008c} give visual representations of this
 hierarchy.
 
@@ -490,8 +481,8 @@ hierarchy.
 % smooth voxels
 % smooth $N_{min}=200$, 
 
-We ran the dendrogram/clumpfind extraction analysis on the 
-\threeohthree cube data.  We assumed a uniform noise per pixel
+We ran the dendrogram extraction analysis on the 
+\threeohthree PPV cube data.  We assumed a uniform noise per pixel
 $\sigma_{T}=\bar{\sigma_T}=0.07$ K, which corresponds to the mean noise
 per field.  We enforced thresholds of a minimum number of
 voxels $N_{min}=100$, a peak threshold of $I = 3\sigma$, and a splitting
@@ -518,33 +509,18 @@ background subtraction
 (\url{http://hi-gal-sed-fitter.readthedocs.org/en/latest/}) and found the two
 to be consistent.
 
-The dendrogram-extracted catalog was used to build a temperature PPV data cube
-for visualization purposes.  Each voxel was assigned a value corresponding to
-the temperature in the smallest dendrogram structure it was included in.  For
-example, a voxel corresponding to a leaf has the temperature measured for that
-leaf, while a voxel that is not in a leaf but is part of a structure would be
-assigned the temperature of the \emph{smallest} structure.  The rest of the
-cube was assigned NAN values.  This cube is similar to a smoothed cube, but
-smoothed over connected structures rather than with a symmetric beam.  The cube
-is interesting for visualization purposes, but should be treated with some
-skepticism: structures that are connected in PPV space in the \threeohthree
-line do not generally have the same, constant temperature, but they are forced
-by construction to have the same temperature in this cube.  Despite this
-caveat, comparison of the dendrogram figures (Figure \ref{fig:dendrotemmap}) to
-the directly averaged figures (Figures \ref{fig:temmap} and
-\ref{fig:temmapnosmooth}) shows that the dendrogram objects are effectively
-averages over the included area in most cases.
-
 \subsubsection{Manual region extraction}
 \label{sec:byeye}
 The by-eye selected regions were extracted less systematically, instead
-focusing on peaks in the \threeohthree or \threetwoone emission.  We also
+focusing on peaks in the \threeohthree or \threetwoone emission.  These
+selections were made in two dimension rather than in the full PPV space.  We
 included a series of large square $8\arcmin \times 8\arcmin$ `apertures'
 corresponding to each observed field.  For each region extracted in this
 fashion, we fit a 1-3 component model as described in Section
 \ref{sec:linemodeling}, where each component consists of a 6-parameter
-multi-gaussian model.  An example spectrum extracted from a small region
-around ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.
+multi-gaussian model.  An example spectrum extracted from a small region around
+``cloud c'' is shown in Figure \ref{fig:cloudcspec}.  The extracted regions are
+shown in Figure \ref{fig:regions}.
 
 \section{Line modeling and temperature derivation}
 \label{sec:linemodeling}
@@ -574,8 +550,9 @@ a 6-parameter model to the full 218-219 GHz spectral range using
 \texttt{pyspeckit} \citep{Ginsburg2011c}.  The fitted parameters are the amplitude of the
 \formaldehyde \threeohthree line, the centroid velocity, the line width
 ($\sigma$), the ratio $R_1 = \Rone$, the ratio $R_2 = \Rtwo$, and the
-amplitude of the \methanol \fourtwotwo line.  For these spectra, we performed
-a different baseline subtraction to that described in Section
+amplitude of the \methanol \fourtwotwo line, where $S_\nu$ is the surface
+brightness.  For these spectra, we performed a different baseline subtraction
+to that described in Section
 \ref{sec:baseline}.  We first fit the described 6-parameter model, then fit a
 spline curve to the residual smoothed to a 50-channel (50 \kms) scale.  We then
 re-fit the model to the data.  In all but the lowest signal-to-noise cases,
@@ -620,7 +597,7 @@ diffuse clouds, the filling factor of the emitting regions may be $ff<<1$ if
 the emission is isolated to compact shocked regions, as expected if highly
 supersonic $\mathcal{M}>10$ turbulence is energetically dominant in the clouds.
 We use an abundance $N(\para)/N(\hh) = X(\para) =
-10^{-9.08\pm1} = 1.2\ee{-9} \times/\div 10$, allowing for dramatic uncertainty in
+10^{-9.08\pm1}$, allowing for dramatic uncertainty in
 the \formaldehyde abundance
 \citep{Ginsburg2013a,Carey1998a,Wootten1978a,Mundy1987a}.  To constrain the
 total column density, we use the Herschel dust maps (see Section
@@ -656,58 +633,6 @@ with the \methanol \fourtwotwo line.
 errors are shown in the legend as in Figure \ref{fig:twospectra_hotcold}.}
 {fig:cloudcspec}{0.5}{0}
 
-% param_plots
-\Figure{figures/param_fits/c:G0.38+0.04_col_tem_0_parameter_constraints.pdf}
-{The parameter constraints for ``cloud c'' (Figure \ref{fig:cloudcspec})
-projected (marginalized) onto the temperature/column density plane.\newline
-(top left) Constraints imposed by the measured ratio \Rone are shown in the
-background filled colors,
-with blue corresponding to $\Delta\chi^2 < 1$, cyan $1 < \Delta\chi^2 < 2$,
-yellow $2 < \Delta\chi^2 < 3$, and red $3 < \Delta\chi^2 < 4$.  The colored line
-contours show the joint constraints imposed by including restrictions on the
-total column density, volume density,  filling factor, and abundance, following
-the same color
-scheme.
-%The solid grayscale contours show the constraints imposed by
-%$R_2=\Rtwo$, from black ($\Delta\chi^2 < 1$) to white ($3<\Delta\chi^2<4$).  In
-%this case, $R_2$ is weakly inconsistent with the joint constraints from the
-%other parameters.
-\newline
-(top right) The same colorscheme as before, showing the constraints imposed by
-assuming the abundance of \para relative to \hh is as labeled.  
-The abundance does not constrain these parameters, but in Figure
-\ref{fig:denscolconstraints}, the abundance rules out a substantial region of parameter
-space.
-\newline
-(bottom left) The same colorscheme as before, showing the constraints imposed
-by using the measured mean volume density as a lower limit.  In this figure,
-the volume density imposes no constraint, but in Figure \ref{fig:denscolconstraints}
-and \ref{fig:denstemconstraints} it is important.
-\newline
-(bottom right) The same colorscheme as before, showing the constraints imposed
-by the measured total column density of \hh.
-}
-{fig:coltemconstraints}{0.5}{0}
-
-\Figure{figures/param_fits/c:G0.38+0.04_dens_col_0_parameter_constraints.pdf}
-{The constraints in density-column parameter space.
-See Figure \ref{fig:coltemconstraints} for details.
-}
-{fig:denscolconstraints}{0.5}{0}
-
-\Figure{figures/param_fits/c:G0.38+0.04_dens_tem_0_parameter_constraints.pdf}
-{The constraints in density-temperature parameter space.
-See Figure \ref{fig:coltemconstraints} for details.}
-{fig:denstemconstraints}{0.5}{0}
-
-\Figure{figures/param_fits/c:G0.38+0.04_0_h2coratio_minaxis.pdf}
-{The line brightness of \para \threeohthree (top row) and \para \threetwoone
-(bottom row) in the three different projections of parameter space.  The
-grayscale images correspond to a slice through the parameter spaces at the
-location of the best-fit parameter.  The colored contours show the allowed
-marginalized regions in each parameter space as described in the
-Figure \ref{fig:coltemconstraints} caption.}
-{fig:parsonbrightness}{0.5}{0}
 
 
 \subsection{Blob modeling}
@@ -739,11 +664,11 @@ $R_1$ for three different assumed densities with a constant assumed abundance.
 
 \subsection{Temperature maps}
 \label{sec:formaldehydetemmap}
-Using the relation described in Section \ref{sec:dendromod}, we
-converted the ratio map shown in Figure \ref{fig:ratiomaps} to a temperature
-map in Figure \ref{fig:temmap}a.  Because this map includes the full line-of-sight
-integrated emission, there are many regions where multiple independent components
-are being mixed.
+Using the relations shown in Figure \ref{fig:ratiovstem}, we converted the
+ratio map shown in Figure \ref{fig:ratiomaps} to a temperature map in Figure
+\ref{fig:temmap}a.  Because this map includes the full line-of-sight integrated
+emission, there are many regions where multiple independent components are
+being mixed.
 
 %Figure \ref{fig:temmap}b shows a temperature map created by measuring the
 %temperature in each clump from the dendrogram clump extraction based on the
@@ -765,42 +690,26 @@ more important.  In regions where the peak signal is low, the reliability of
 these maps is substantially reduced.  Figure \ref{fig:peaksn} shows the peak
 signal-to-noise in both the unsmoothed and the smoothed maps to indicate where
 the temperature measurements can be relied upon.  We have also applied a mask
-to both panels of Figure \ref{fig:temmap} to make the low-reliability regions
+to both panels of Figure \ref{fig:temmapnosmooth} to make the low-reliability regions
 blend into the background by adding a foreground gray layer with opacity set by
 the inverse S/N from Figure \ref{fig:peaksn}b.
 
 The effective range of detected temperatures is $\approx40-150$ K. While lower
 and higher temperatures appear in the map, those measurements should not be
-trusted.  Below $T\lesssim40$ K, all temperature measurements are effectively
-upper limits, generally corresponding to $T\lesssim40$ K.  This limit
-is due to a combination of sensitivity and excitation: below 40 K, the \para
-lines are observed to be faint, and therefore the \threetwoone line is not
-detected while the \threeohthree line is.  If the high column density gas in,
-e.g., G0.253+0.016 had a lower
-gas temperature, our data would be sensitive enough to measure temperature down
-to $T\sim20$ K.  The higher temperatures become lower limits above $\sim150$ K
-because the \para line ratio is intrinsically insensitive to higher
-temperatures, as can be seen in Figure \ref{fig:parsonbrightness} (rightmost
-column), in which the modeled line brightnesses are both nearly constant above
-$T\gtrsim150$ K.
+trusted.  Below $T\lesssim40$ K, all temperature measurements in the map are
+effectively upper limits, generally corresponding to $T\lesssim40$ K.  This
+limit is due to a combination of sensitivity and excitation: below 40 K, the
+\para lines are observed to be faint; the \threetwoone line is not detected.
+In regions of high column density, we detect both lines, and in all of these
+regions, we have measured high temperatures ($T>40$ K).  If the high column
+density gas in,
+e.g., G0.253+0.016 had a lower gas temperature, our data would be sensitive
+enough to measure temperature down to $T\sim20$ K.  The higher temperatures
+become lower limits above $\sim150$ K because the \para line ratio is
+intrinsically insensitive to higher temperatures, as can be seen in Figure
+\ref{fig:parsonbrightness} (rightmost column), in which the modeled line
+brightnesses are both nearly constant above $T\gtrsim150$ K.
 
-
-% tmap_figure
-%\RotFigureTwoAA
-\RotFigureThreeAA
-%{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
-{figures/big_maps/big_lores_smoothdens1e4_weighted_tmap_nomask_withcontours.pdf}
-{figures/big_maps/big_lores_smoothdens1e4_weighted_masked_tmap_withcontours.pdf}
-{figures/big_maps/big_lores_smoothdens1e5_weighted_masked_tmap_withcontours.pdf}
-{Temperature maps using the smoothed data assuming fixed $X_{\para}=1.2\ee{-9}$
-and $n(\hh)$.  The maps in (b) and (c) are masked by signal-to-noise as in Figure
-\ref{fig:ratiomaps}.  The thin black contours are at a column $N(\hh)=5\ee{22}$
-\percc from the Herschel SED fit maps.
-(a) $n(\hh) = 10^4$ \percc, no mask
-(b) $n(\hh) = 10^4$ \percc
-(c) $n(\hh) = 10^5$ \percc
-}
-{fig:temmap}{1}{9.5in}
 
 % tmap_figure
 %\RotFigureTwoAA
@@ -823,61 +732,21 @@ from the Herschel SED fit maps.
 
 
 
-% tmap_figure
-%\RotFigureTwoAA
-\RotFigureThreeAA
-%{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
-{figures/big_maps/big_loresdendro_leaf_tmap_withcontours.pdf}
-{figures/big_maps/big_loresdendro_tmap_withcontours.pdf}
-{figures/big_maps/big_loresdendro_weighted_tmap_withcontours.pdf}
-{Maps generated by building a data cube in which each voxel has been replaced
-with the average temperature from the smallest associated dendrogram-extracted
-clump.  These maps can be thought of as `adaptively-smoothed' maps, where the
-smoothing kernel is matched to the source size.
-(a) The mean ratio along each line of sight through the dendrogram-extracted
-cube, where only the leaf nodes have been included
-\newline
-(b) The same as (a), but including all ancestor nodes in addition to the leaf
-nodes. 
-\newline
-(c) The same as (b), but weighted by the \threeohthree brightness.
-\newline
-In all three panels, regions of lower signal-to-noise, and therefore less
-reliable
-temperature, are grayed out with a filter that gets more opaque toward lower
-signal-to-noise.  The thin contours are from the Herschel HiGal
-dust SED fit at a level $N(\hh)=5\ee{22}$ \percc and are included to provide a
-visual reference for comparison between the temperature maps.
-}
-{fig:dendrotemmap}{1}{9.5in}
-
-% tmap_figure
-\RotFigureTwoAA
-{figures/big_maps/big_lores_peaksn}
-{figures/big_maps/big_lores_smooth_peaksn}
-{Map of the peak signal-to-noise in the \para \threeohthree line with no
-smoothing (top) and with 33.84\arcsec smoothing (bottom).  
-These maps give an indication of the reliability of the temperatures extracted
-in Figure \ref{fig:temmap}.  The colorbars are intentionally saturated at
-S/N$>10$ since above this threshold, the temperatures are reliable as long as
-they are in the $T<150$ K regime.
-}
-{fig:peaksn}{1}{9.5in}
-
-
 
 % tmap_pv
 \RotFigureTwoAA
-{figures/big_maps/pv_tmap_smooth_weight_masked.pdf}
-{figures/big_maps/pv_peaksn_smooth.pdf}
-{(a) A Galactic longitude-velocity diagram made by averaging the smooth ratio
-cube along Galactic latitude and using the $n=10^4$ \percc curve from Figure
-\ref{fig:ratiovstem}.  (b) A Galactic longitude-velocity map of peak
+{figures/big_maps/pv_tmap_weight_masked.pdf}
+{figures/big_maps/pv_peaksn.pdf}
+{(a) A Galactic longitude-velocity diagram made by taking the weighted average
+of the ratio PPV cube along Galactic latitude and using the $n=10^4$ \percc curve
+from Figure \ref{fig:ratiovstem} to derive temperature.  (b) A Galactic
+longitude-velocity map of peak
 signal-to-noise along Galactic latitude, which is used as a mask in (a).  The
 apparently cold blobs at -80 \kms in Sgr
-B2 and -90 \kms in Sgr A are from a different line, HC$_3$N 24-23.
-\todo{The excessive whitespace in panel (a) is a bug that has not yet been
-resolved but it is known.}
+B2 and -90 \kms in Sgr A are from a different line, HC$_3$N 24-23: the
+temperatures from these positions are meaningless.
+The apparent high temperatures around the cloud edges are artifacts caused by
+lower signal-to-noise ratios at the edges and should be ignored.
 }
 {fig:pvtem}
 {1}{9.5in}
@@ -932,8 +801,8 @@ indicate ancestors in the dendrogram, while bright, large points indicate leaves
 Lower limits on linewidth and temperature are indicated with triangles on the
 edge of the plot.  
 Note that in both cases, any correlation is even weaker than that observed in
-Figure 6 of \citet{Huettemeister1993a}, who make the same plot for \ammonia 4-4
-and 5-5.
+Figure 6 of \citet{Huettemeister1993a}, who make the same plot for \ammonia (4,4)
+and (5,5).
 }
 {fig:temvsfwhm_regions}
 {1}{3.5in}
@@ -1002,7 +871,7 @@ ionization rate (CRIR) are $\sim1000\times$ their local values.  In their
 model, the ISRF determines the dust temperature while the CRIR determines the
 gas temperature.  Assuming their model still holds further from Sgr A, our
 observations of high gas temperatures imply that the CRIR must remain elevated
-to $\sim10^{14}$ out to a projected radius $R_{GC} \sim 250$ pc.
+to $\sim10^{14}$ s$^{-1}$ out to a projected radius $R_{GC} \sim 250$ pc.
 
 \FigureTwo
 {figures/chi2_temperature_vs_higaltemperature_fieldsandsources.pdf} % parameter_comparisons
@@ -1038,23 +907,23 @@ northwest/southeast directions.  A high temperature `ridge' follows along the
 positive-latitude component of the \citet{Molinari2011a} `ring', tracing
 through The Brick into the Sgr A complex.
 
-By contrast, lower temperatures, $T\sim60$ K, are observed in the
-negative-latitude component of the `ring'.  At positive longitudes,
-$\ell\gtrsim0.9\arcdeg$, there are many regions with $T\sim60$ K.  Similarly,
-most of the gas in the Sgr C complex is around 60 K.  Figure
-\ref{fig:temvslonplot} shows the derived temperatures for the dendrogram
-objects as a function of longitude to more directly illustrate this structure.
+% By contrast, lower temperatures, $T\sim60$ K, are observed in the
+% negative-latitude component of the `ring'.  At positive longitudes,
+% $\ell\gtrsim0.9\arcdeg$, there are many regions with $T\sim60$ K.  Similarly,
+% most of the gas in the Sgr C complex is around 60 K.  Figure
+% \ref{fig:temvslonplot} shows the derived temperatures for the dendrogram
+% objects as a function of longitude to more directly illustrate this structure.
 
 % dendrotem_plots
 \Figure
 {figures/dendrotem/temperature_vs_longitude_velocolor}
-{Derived temperature as a function of longitude colored by LSR velocity.
-The points have a size proportional to the \threeohthree line brightness.  The
-more transparent points reflect ancestors in the dendrogram tree, while the
-opaque points show leaves.}
+{Derived temperature as a function of longitude colored by LSR velocity for
+dendrogram-extracted data.  The points have a size proportional to the
+\threeohthree line brightness.  The more transparent points reflect ancestors
+in the dendrogram tree, while the opaque points show leaves.}
 {fig:temvslonplot}{0.4}{0}
 
-Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2014d} and
+Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2015a} and
 a position-velocity slice through the fitted temperature cube following that
 orbit.  The fit is imperfect, especially along the green segment, but still very useful
 for tracking the properties of clouds in common environments.  Intriguingly,
@@ -1070,8 +939,8 @@ many of those on the near side, such as The Brick (red segment).
 There is some evolution of temperature over time evident in Figure
 \ref{fig:kdltemvstime}, which shows the temperature within each
 dendrogram-extracted clump within 20 \kms and 6 pc of the
-\citet{Kruijssen2014d} orbit.  The linear increase in temperature over the
-first $\sim0.5$ Myr seems to support the \citet{Kruijssen2014d} hypothesis that
+\citet{Kruijssen2015a} orbit.  The linear increase in temperature over the
+first $\sim0.5$ Myr seems to support the \citet{Kruijssen2015a} hypothesis that
 the `ring' represents a single gas stream on its first passage by Sgr A*.
 The cooler gas on the far side does not obviously fit into this picture, 
 and we suggest in Section \ref{sec:coolstream} that it is not affiliated with
@@ -1080,12 +949,12 @@ the model directly).
 
 % orbit_pv
 \RotFigureTwoAA
-{figures/orbits/KDL2014_orbit_on_H2CO_TemperatureFromRatio_smooth_weighted.pdf}
-{figures/orbits/KDL2014_orbitpath_on_H2CO_TemperatureFromRatio_smooth_weighted.pdf}
-{(a) A position-velocity slice through the dendrogram clumpfind generated
-temperature cube along the \citet{Kruijssen2014d} orbit.  White regions are
-outside the mapped area, while grey regions have no gas detected or inadequate
-signal to measure a temperature.
+{figures/orbits/KDL2014_orbit_on_H2CO_TemperatureFromRatio_weighted.pdf}
+{figures/orbits/KDL2014_orbitpath_on_H2CO_TemperatureFromRatio_weighted.pdf}
+{(a) A position-velocity slice through the temperature cube along the
+\citet{Kruijssen2015a} orbit.  White regions are outside the mapped area, while
+grey regions have no gas detected or inadequate signal to measure a
+temperature.
 (b) The path used to create the slice shown in (a).  The path consists of a series
 of transparent $7.2\arcsec\times300\arcsec$
 rectangles over which the temperature has been averaged.  The green bar at
@@ -1100,10 +969,13 @@ The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
 {figures/orbits/dendro_temperature_vs_time.pdf}
 {figures/orbits/dendro_temperature_vs_time_firstMyr_trendline.pdf}
 {The observed temperature vs time since the most recent pericenter passage of
-The Brick on the \citet{Kruijssen2014d} orbit for dendrogram-extracted clumps with
-20 \kms and 12 pc of the orbital path.  There is a hint of an 
+The Brick on the \citet{Kruijssen2015a} orbit for dendrogram-extracted clumps within
+20 \kms and 12 pc of the orbital path.  There is a \emph{hint} of an 
 increase in temperature with time, from an initial temperature $T\lesssim50$ K
-to $T\gtrsim100$ K over a period $\tau\sim0.5-1$ Myr.  The symbol sizes are
+to $T\gtrsim100$ K over a period $\tau\sim0.5-1$ Myr, as illustrated by the
+dashed line in panel (b); note that the cool features from 0.7-0.9 Myr are
+at a significantly different velocity and therefore do not folow precisely the same
+stream.  The symbol sizes are
 proportional to the \para \threeohthree brightness and are meant to give
 an indication of how reliable the detections are.  The grey vertical lines
 through the circles indicate the formal $1-\sigma$ errors on the temperature.
@@ -1115,13 +987,13 @@ modeled orbit velocity at each position.}
 
 \subsection{Comparison to \citet{Ott2014a} \ammonia temperature map}
 \label{sec:ammoniacompare}
-\citet{Ott2014a} measured the \ammonia 1-1 and 2-2 lines over a subset of the
+\citet{Ott2014a} measured the \ammonia (1,1) and (2,2) lines over a subset of the
 region we mapped, from $-0.2\arcdeg < \ell < 0.8\arcdeg$.  These two lines are
 a frequently
 used thermometer sensitive to gas temperatures $5 \lesssim T \lesssim 40$ K,
 with weak sensitivity up to $\sim80$ K \citep[][Figure 1]{Mangum2013a}.  The
 \ammonia lines also have lower critical densities by about an order of
-magnitude, $n_{crit}(\textrm{\ammonia}~1-1)\sim10^3$ \percc while $n_{crit}(\para~
+magnitude, $n_{crit}(\textrm{\ammonia}~(1,1))\sim10^3$ \percc while $n_{crit}(\para~
 \threeohthree)\sim10^4$ \percc \citep[Figure
 \ref{fig:nh3vsh2co};][]{Shirley2015a}.  The temperatures derived from the
 \ammonia line ratio are lower by construction than those we have
@@ -1138,7 +1010,7 @@ temperatures in lower-density gas.}
 {fig:nh3vsh2co}{0.25}{0}
 
 Figure \ref{fig:nh3tmap} shows the \citet{Ott2014a} temperature map in the same
-color scheme that we have used in Figure \ref{fig:temmap}.  There are some
+color scheme that we have used in Figure \ref{fig:temmapnosmooth}.  There are some
 trends that are common between the two maps: the Sgr A complex and Sgr B2
 complex are the warmest regions, the `diffuse' gas surrounding these is
 somewhat cooler, and the positive latitude component of the
@@ -1157,13 +1029,14 @@ cool, diffuse component being detected in \ammonia, while
 % tmap_figure
 \RotFigureTwoAA
 {figures/big_maps/ott2014_nh3_tmap_15to200_withcontours.pdf}
-{figures/big_maps/lores_smoothdens1e4_weighted_masked_tmap_withcontours.pdf}
-{(a) A temperature map derived from the \ammonia 1-1/2-2 line ratio from
+{figures/big_maps/loresdens1e4_weighted_masked_tmap_withcontours.pdf}
+%{figures/big_maps/lores_smoothdens1e4_weighted_masked_tmap_withcontours.pdf}
+{(a) A temperature map derived from the \ammonia (1,1)/(2,2) line ratio from
 \citet{Ott2014a}.  The \ammonia thermometer has a more limited temperature
 range when using only these two lines, so the map is cut off at $T=80$ K.
 %This map can be compared to Figure \ref{fig:temmap}.
 (b) The \para-derived temperature map over the same region from Figure
-\ref{fig:temmap}a
+\ref{fig:temmapnosmooth}a
 }
 {fig:nh3tmap}
 {1}{9.5in}
@@ -1239,8 +1112,9 @@ shock heating and line cooling.
 Direct radiative heating from stars is another possibility.  If stars are
 forming in the centers of the clouds, one would expect the warmest portion of
 the cloud to be its interior, as seen in Figure \ref{fig:brickradial}a.  The
-Brick has very little star formation at present \citep{Rathborne2014b}, so it
-cannot be readily explained by star formation, but other clouds, such as cloud
+Brick has very little star formation at present \citep{Rathborne2014b}, so the
+temperature cannot be readily explained by star formation, but other clouds,
+such as cloud
 d, that exhibit similar radial variations may be explained by interior star
 formation.
 
@@ -1289,11 +1163,16 @@ radiation field?  Does it pass sanity checks?}
 
 \subsection{A stream of fresh gas falling into the CMZ?}
 \label{sec:coolstream}
+Accretion onto the CMZ from larger scales via the X1 and X2 orbits has
+previously been inferred from $^{12}$C/$^{13}$C ratios.  We have looked for
+features that may correspond to further accretion, transfering gas from
+$R\sim1$ kpc to $R\sim100$ pc.
+
 The gas streamer extending from $\ell=0.2\arcdeg$ to $\ell=1.3\arcdeg$ (Figure
-\ref{fig:coolstream}) may represent a stream of infalling gas.  The lack of
+\ref{fig:coolstream}) may represent such a stream of infalling gas.  The lack of
 IRDC features in the Spitzer 8 \um data corresponding to this stream within
 $R<R_{SgrB2}$ restricts it to be on the far side of the CMZ.  Since it does not
-align closely with the \citet{Kruijssen2014d} orbit, this stream is probably
+align closely with the \citet{Kruijssen2015a} orbit, this stream is probably
 not following the same path as the Brick, the lettered clouds, and Sgr B2.
 The large observed linewidths imply that the stream is genuinely associated
 with the CMZ, though its distance from Sgr A may be much larger than its
@@ -1312,8 +1191,8 @@ is at a lower average density.
 
 % backstream_pv
 \RotFigureTwoAA
-{figures/orbits/mydrawnpathpv_on_H2CO_TemperatureFromRatio_smooth_weighted.pdf}
-{figures/orbits/mydrawnpath_on_H2CO_TemperatureFromRatio_smooth_weighted_masked.pdf}
+{figures/orbits/mydrawnpathpv_on_H2CO_TemperatureFromRatio_weighted.pdf}
+{figures/orbits/mydrawnpath_on_H2CO_TemperatureFromRatio_weighted_masked.pdf}
 {Position-velocity slice tracing the ``fresh stream'' of cooler molecular
 gas from Section \ref{sec:coolstream}.}
 {fig:coolstream}{1}{9.5in}
@@ -1465,7 +1344,7 @@ as The Brick, Sgr B2, and the Sgr A cloud complex exhibiting temperatures in
 excess of $T>100$ K.
 
 Our new observations are broadly consistent with the orbital model described by
-\citet{Kruijssen2014d}.  While there are some individual discrepancies, it at
+\citet{Kruijssen2015a}.  While there are some individual discrepancies, it at
 least appears that the near-side clouds (The Brick and the lettered clouds on
 the path to Sgr B2) have consistent thermal properties and fall along a stream
 of progressively increasing temperature as a function of age.  
@@ -1611,6 +1490,180 @@ GB, with an actual size depending on whether the baseline-subtracted versions
 are kept separate from the original files.  The download process may take
 substantially longer than the data reduction.
 
+
+\section{A detailed example showing parameter constraints}
+In Section \ref{sec:linemodeling}, we discussed the fitting approach used
+to determine a best-fit temperature and uncertainties on that temperature.
+Here, we go through a detailed example showing projections of the full 3D
+temperature-density-column parameter space we explored and the constraints
+each measurement places in each phase space.
+
+% param_plots
+\Figure{figures/param_fits/c:G0.38+0.04_col_tem_0_parameter_constraints.pdf}
+{The parameter constraints for ``cloud c'' (Figure \ref{fig:cloudcspec})
+projected (marginalized) onto the temperature/column density plane.\newline
+(top left) Constraints imposed by the measured ratio \Rone are shown in the
+background filled colors,
+with blue corresponding to $\Delta\chi^2 < 1$, cyan $1 < \Delta\chi^2 < 2$,
+yellow $2 < \Delta\chi^2 < 3$, and red $3 < \Delta\chi^2 < 4$.  The colored line
+contours show the joint constraints imposed by including restrictions on the
+total column density, volume density,  filling factor, and abundance, following
+the same color
+scheme.
+%The solid grayscale contours show the constraints imposed by
+%$R_2=\Rtwo$, from black ($\Delta\chi^2 < 1$) to white ($3<\Delta\chi^2<4$).  In
+%this case, $R_2$ is weakly inconsistent with the joint constraints from the
+%other parameters.
+\newline
+(top right) The same colorscheme as before, showing the constraints imposed by
+assuming the abundance of \para relative to \hh is as labeled.  
+The abundance does not constrain these parameters, but in Figure
+\ref{fig:denscolconstraints}, the abundance rules out a substantial region of parameter
+space.
+\newline
+(bottom left) The same colorscheme as before, showing the constraints imposed
+by using the measured mean volume density as a lower limit.  In this figure,
+the volume density imposes no constraint, but in Figure \ref{fig:denscolconstraints}
+and \ref{fig:denstemconstraints} it is important.
+\newline
+(bottom right) The same colorscheme as before, showing the constraints imposed
+by the measured total column density of \hh.
+}
+{fig:coltemconstraints}{0.5}{0}
+
+\Figure{figures/param_fits/c:G0.38+0.04_dens_col_0_parameter_constraints.pdf}
+{The constraints in density-column parameter space.
+See Figure \ref{fig:coltemconstraints} for details.
+}
+{fig:denscolconstraints}{0.5}{0}
+
+\Figure{figures/param_fits/c:G0.38+0.04_dens_tem_0_parameter_constraints.pdf}
+{The constraints in density-temperature parameter space.
+See Figure \ref{fig:coltemconstraints} for details.}
+{fig:denstemconstraints}{0.5}{0}
+
+\Figure{figures/param_fits/c:G0.38+0.04_0_h2coratio_minaxis.pdf}
+{The line brightness of \para \threeohthree (top row) and \para \threetwoone
+(bottom row) in the three different projections of parameter space.  The
+grayscale images correspond to a slice through the parameter spaces at the
+location of the best-fit parameter.  The colored contours show the allowed
+marginalized regions in each parameter space as described in the
+Figure \ref{fig:coltemconstraints} caption.}
+{fig:parsonbrightness}{0.5}{0}
+
+\section{Smoothed maps}
+In many regions, signal was detected over large areas though the peak
+signal-to-noise ratio remained low.  In this Appendix, we display smoothed
+versions of many of the main figures in the paper to provide a record of
+features that were weakly detected.  The smoothed maps may also give a sense
+of how the temperature varies with spatial scale.
+
+We found that much of the cube included marginal detections at the original
+resolution, FWHM=$30\arcsec$ and $\Delta v=1$ \kms.  We therefore created
+additional smoothed cubes, smoothing in the spatial dimensions with a
+$\sigma_{FWHM}=33.84\arcsec$ gaussian to achieve a resolution 45\arcsec, and
+$\sigma_{v, FWHM} = 3$ \kms in the spectral direction.  The smoothed cubes were
+also downsampled by a factor of 2 in the spectral direction (the smoothing and
+downsampling are independent).  We then performed
+the same signal extraction analysis described above, but with a threshold $T_A
+> 3\sigma$.  
+
+Figure \ref{fig:ratiomapssm} shows the same process performed on the smoothed
+data cubes.
+
+% figure_ratio_maps
+\RotFigureTwoAA
+%{figures/big_H2CO_322221_to_303202_smooth_bl_integ.pdf}
+{figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ.pdf}
+{figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ_masked_weighted.pdf}
+%{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf} % tmap_figure
+{Same as Figure \ref{fig:ratiomaps}, but smoothed with a 34\arcsec gaussian.
+}
+%{fig:ratiomaps}{1}{7in}
+%{fig:ratiomaps}{0.6}{0}
+{fig:ratiomapssm}{1}{9.5in}
+
+
+% tmap_figure
+%\RotFigureTwoAA
+\RotFigureThreeAA
+%{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
+{figures/big_maps/big_lores_smoothdens1e4_weighted_tmap_nomask_withcontours.pdf}
+{figures/big_maps/big_lores_smoothdens1e4_weighted_masked_tmap_withcontours.pdf}
+{figures/big_maps/big_lores_smoothdens1e5_weighted_masked_tmap_withcontours.pdf}
+{Temperature maps using the smoothed data assuming fixed $X_{\para}=1.2\ee{-9}$
+and $n(\hh)$.  The maps in (b) and (c) are masked by signal-to-noise as in Figure
+\ref{fig:ratiomaps}.  The thin black contours are at a column $N(\hh)=5\ee{22}$
+\percc from the Herschel SED fit maps.
+(a) $n(\hh) = 10^4$ \percc, no mask
+(b) $n(\hh) = 10^4$ \percc
+(c) $n(\hh) = 10^5$ \percc
+}
+{fig:temmap}{1}{9.5in}
+
+
+% tmap_figure
+\RotFigureTwoAA
+{figures/big_maps/big_lores_peaksn}
+{figures/big_maps/big_lores_smooth_peaksn}
+{Map of the peak signal-to-noise in the \para \threeohthree line with no
+smoothing (top) and with 33.84\arcsec smoothing (bottom).  
+These maps give an indication of the reliability of the temperatures extracted
+in Figure \ref{fig:temmap}.  The colorbars are intentionally saturated at
+S/N$>10$ since above this threshold, the temperatures are reliable as long as
+they are in the $T<150$ K regime.
+}
+{fig:peaksn}{1}{9.5in}
+
+\subsection{Dendrogram cubes}
+
+The dendrogram-extracted catalog was used to build a temperature PPV data cube
+for visualization purposes.  Each voxel was assigned a value corresponding to
+the temperature in the smallest dendrogram structure it was included in.  For
+example, a voxel corresponding to a leaf has the temperature measured for that
+leaf, while a voxel that is not in a leaf but is part of a structure would be
+assigned the temperature of the \emph{smallest} structure.  The rest of the
+cube was assigned NAN values.  This cube is similar to a smoothed cube, but
+smoothed over connected structures rather than with a symmetric beam.  The cube
+is interesting for visualization purposes, but should be treated with some
+skepticism: structures that are connected in PPV space in the \threeohthree
+line do not generally have the same, constant temperature, but they are forced
+by construction to have the same temperature in this cube.  Despite this
+caveat, comparison of the dendrogram figures (Figure \ref{fig:dendrotemmap}) to
+the directly averaged figures (Figures \ref{fig:temmap} and
+\ref{fig:temmapnosmooth}) shows that the dendrogram objects are effectively
+averages over the included area in most cases.
+
+
+
+
+% tmap_figure
+%\RotFigureTwoAA
+\RotFigureThreeAA
+%{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
+{figures/big_maps/big_loresdendro_leaf_tmap_withcontours.pdf}
+{figures/big_maps/big_loresdendro_tmap_withcontours.pdf}
+{figures/big_maps/big_loresdendro_weighted_tmap_withcontours.pdf}
+{Maps generated by building a data cube in which each voxel has been replaced
+with the average temperature from the smallest associated dendrogram-extracted
+clump.  These maps can be thought of as `adaptively-smoothed' maps, where the
+smoothing kernel is matched to the source size.
+(a) The mean ratio along each line of sight through the dendrogram-extracted
+cube, where only the leaf nodes have been included
+\newline
+(b) The same as (a), but including all ancestor nodes in addition to the leaf
+nodes. 
+\newline
+(c) The same as (b), but weighted by the \threeohthree brightness.
+\newline
+In all three panels, regions of lower signal-to-noise, and therefore less
+reliable
+temperature, are grayed out with a filter that gets more opaque toward lower
+signal-to-noise.  The thin contours are from the Herschel HiGal
+dust SED fit at a level $N(\hh)=5\ee{22}$ \percc and are included to provide a
+visual reference for comparison between the temperature maps.
+}
+{fig:dendrotemmap}{1}{9.5in}
 
 
 \input{solobib}

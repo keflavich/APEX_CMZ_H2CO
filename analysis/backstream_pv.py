@@ -39,18 +39,19 @@ molecules = molecules + ('H2CO_TemperatureFromRatio',
                          'H2CO_TemperatureFromRatio_smooth',
                          'H2CO_Ratio',
                          'H2CO_Ratio_smooth',
-                         'H2CO_DendrogramTemperature',
-                         'H2CO_DendrogramTemperature_smooth',
-                         'H2CO_DendrogramTemperature_Leaves',
-                         'H2CO_DendrogramTemperature_Leaves_smooth')
+                         #'H2CO_DendrogramTemperature',
+                         #'H2CO_DendrogramTemperature_smooth',
+                         #'H2CO_DendrogramTemperature_Leaves',
+                         #'H2CO_DendrogramTemperature_Leaves_smooth',
+                        )
 filenames.append(hpath('TemperatureCube_PiecewiseFromRatio.fits'))
 filenames.append(hpath('TemperatureCube_smooth_PiecewiseFromRatio.fits'))
 filenames.append(hpath('H2CO_321220_to_303202_cube_bl.fits'))
 filenames.append(hpath('H2CO_321220_to_303202_cube_smooth_bl.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects_leaves.fits'))
-filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_leaves.fits'))
+#filenames.append(hpath('TemperatureCube_DendrogramObjects.fits'))
+#filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth.fits'))
+#filenames.append(hpath('TemperatureCube_DendrogramObjects_leaves.fits'))
+#filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth_leaves.fits'))
 
 def offset_to_point(ll, bb):
     """
@@ -64,14 +65,14 @@ def offset_to_point(ll, bb):
     return line.project(point)
 
 cmap = copy.copy(pl.cm.RdYlBu_r)
-cmap.set_bad((0.5,)*3)
-cmap.set_under((0.5,)*3)
+cmap.set_bad((0.25,)*3)
+cmap.set_under((0.25,)*3)
 
 vmin=10
 vmax=200
 
-for weight in ("_weighted",""):
-    for molecule,fn in zip(molecules[-8:],filenames[-8:]):
+for weight in ("_weighted",):# ,""
+    for molecule,fn in zip(molecules[-4:],filenames[-4:]):
         log.info(molecule)
         cube = spectral_cube.SpectralCube.read(fn)
 
@@ -115,6 +116,10 @@ for weight in ("_weighted",""):
             #divider = make_axes_locatable(F._ax1)
             #cax = divider.append_axes("right", size="5%", pad=0.05)
             #pl.colorbar(F._ax1.images[0], cax=cax)
+            if 'smooth' in fn:
+                F.colorbar.set_pad(-3.8)
+            else:
+                F.colorbar.set_pad(-0.5)
         elif 'Ratio' in fn:
             F.show_colorscale(cmap=cmap, aspect=0.5/actual_aspect, vmin=0, vmax=0.5)
         else:
@@ -123,19 +128,28 @@ for weight in ("_weighted",""):
         #F.show_lines(np.array([[cdist,
         #                        vlos]]), zorder=1000,
         #             color='k', linewidth=3, alpha=0.25)
-        F.recenter(x=1.25/2., y=50e3, width=1.25, height=200000)
+        if 'smooth' in fn:
+            F.recenter(x=1.25/2., y=45e3, width=1.25, height=195000)
+        else:
+            F.recenter(x=1.25/2., y=45e3, width=1.25, height=190000)
         #F.show_markers([offset_to_point(0.47,-0.01)], [30.404e3], color=['r'])
         #F.show_markers([offset_to_point(0.38,+0.04)], [39.195e3], color=['b'])
         #F.show_markers([offset_to_point(0.47, -0.01)],[30.404e3], edgecolor='r', marker='x')
         #F.show_markers([offset_to_point(0.38, 0.04)], [39.195e3], edgecolor='b', marker='x')
         #F.show_markers([offset_to_point(0.253, 0.016)], [36.5e3], edgecolor='purple', marker='x')
+
+        F.refresh()
+        F._ax1.set_ylabel("$V_{LSR} (\mathrm{km\ s}^{-1})$")
+        F._ax1.set_yticklabels([(str(int(x.get_text())/1000)) for x in F._ax1.get_yticklabels()])
+        F.refresh()
+
         F.save(fpath('orbits/mydrawnpathpv_on_{0}{1}.pdf'.format(molecule,weight)))
 
 
         smooth = '_smooth' if 'smooth' in fn else ''
         peaksn = os.path.join(h2copath,'APEX_H2CO_303_202{0}_bl_mask_integ.fits'.format(smooth))
 
-        fig2 = pl.figure(2)
+        fig2 = pl.figure(2, figsize=(14,8))
         pl.clf()
         img = cube.mean(axis=0).hdu
         img.data[np.isnan(img.data)] = 0
