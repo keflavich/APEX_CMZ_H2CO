@@ -25,6 +25,7 @@ from co_cubes import cube13co, cube18co, cube13cosm, cube18cosm
 from noise import noise, noise_cube, sm_noise_cube
 from higal_gridded import column_regridded, dusttem_regridded
 from common_constants import logabundance,elogabundance
+import heating
 
 warnings.simplefilter('once')
 
@@ -107,6 +108,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             'dustmass',
             'dustmindens',
             'bad',
+            'tkin_turb',
     ]
     columns = {k:[] for k in (keys+obs_keys)}
 
@@ -293,6 +295,16 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                     tcubeleafdata[dend_obj_mask.include()] = row_data['temperature_chi2']
 
             columns['bad'].append(is_bad)
+
+            width = row['v_rms']*u.km/u.s
+            lengthscale = reff
+
+            columns['tkin_turb'].append(heating.tkin_all(10**row_data['density_chi2']*u.cm**-3,
+                                                         width,
+                                                         lengthscale,
+                                                         width/lengthscale,
+                                                         columns['higaldusttem'][-1]*u.K,
+                                                         crir=0./u.s))
 
         if len(set(len(c) for k,c in columns.iteritems())) != 1:
             print("Columns are different lengths.  This is not allowed.")

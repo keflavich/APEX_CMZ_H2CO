@@ -1,6 +1,9 @@
 # Region file format: DS9 version 4.1
 global color=green dashlist=8 3 width=1 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1
 galactic
+box(0.8297763,0.015330175,601.25357",169.92428",358.172) # text={G0.83stream}
+box(1.2608165,-0.11940142,852.08522",156.50986",11.3862) # text={G1.25stream}
+box(1.0286263,-0.037775502,979.16666",149.30555",25.8595) # text={G1.00stream}
 box(1.227,-0.084,141.31738",149.39266",0) # text={G1.23-0.08box}
 circle(0.33761645,0.059522017,35.18586") # text={b:G0.34+0.06}
 circle(0.3767654,0.040528961,35.18586") # text={c:G0.38+0.04}

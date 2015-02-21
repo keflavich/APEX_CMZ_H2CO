@@ -773,15 +773,31 @@ lower signal-to-noise ratios at the edges and should be ignored.
 \clearpage
 \section{Discussion}
 \label{sec:discussion}
-\subsection{Parameter comparison}
-\todo{Questionable - not sure the temperature-Mach number correlation
-is correct.  Remove this \& Figure \ref{fig:temvsfwhm_regions}?} In a
-turbulent medium, the 1D line width of the gas at a fixed spatial scale should
-be correlated with the 3D Mach number \citep[e.g.][]{Federrath2011a}.  If
-turbulence is the dominant gas heating mechanism, there should also be a
-correlation between the Mach number of the turbulence and the gas temperature.
-However, Figure \ref{fig:temvsfwhm_regions} shows no such correlation.  There
-may be a correlation in the dendrogram-extracted data, but it is weak.
+\subsection{Turbulent Heating}
+Supersonic turbulence decays, resulting in direct gas heating
+\citep{Falgarone1995a, Pan2009a}.  The energy dissipation rate is proportional
+to the gas velocity dispersion cubed, which implies that the temperature
+of the gas should be strongly correlated with the observed line width.
+However, Figure \ref{fig:temvsfwhm_regions} shows no such correlation.  
+
+Following \citet{Ao2013a}, we determine the expected gas kinetic temperature
+by assuming that the heating and cooling processes are in equilibrium.
+We expand upon their analysis by solving for the temperature assuming that
+both cosmic ray ionization and turbulent heating are present and that the dust
+temperature is nonzero ($T_D=25$ K).  We have used the same cosmic ray heating rate
+and turbulence heating rate from \citet[][their equations 12 and 18]{Ao2013a}
+and the same parametrization of the gas and dust cooling rates (their equations
+7 and 8).  The gas cooling equation is a parametrization from
+\citet{Goldsmith2001a}, which is most appropriate for local dark clouds, but
+checking against the cooling curves of \citet{Clark2013a}, we find that the
+parametrization is consistent with their fiducial $1000 G_0$, 1000$\times$
+local cosmic ray ionization simulation (though the dominant coolant has changed).
+
+The resulting curves for $T_K(\sigma_v)$ are shown in Figure
+\ref{fig:temvsfwhm_regions}.  In the plotted curves, we have assumed a cloud
+scale $L=5$ pc, a gradient $dv/dr = 5$ \kms \perpc (the gradient and length
+scale are entirely degenerate), and a cosmic ray ionization rate (CRIR)
+$\zeta_{CR}=10^{-17}$ \pers, with exceptions noted in the legend.
 
 \FigureTwo
 {figures/chi2_temperature_vs_linewidth_fieldsandsources}
@@ -824,12 +840,12 @@ the ratio decreases from $\sim0.55$ at the position $\ell=0.237\arcdeg$, $b=0.00
 within a single spectrum to $\sim0.33$ when averaged over a radius
 $\sim70\arcsec$ (Figure \ref{fig:brickradial}a).  By contrast, Figure
 \ref{fig:brickradial}b shows a highly turbulent example where the temperature
-is lowest at the center and higher on larger scales.  Apparently some regions
-are able to cool moderately below the mean temperature, but on the largest
-scales a high mean temperature prevails.
-%These observations imply
-%that two different heating mechanisms, one internally driven (The Brick) and
-%one external (G1.23-0.08), are active within the CMZ.
+is lowest at the center and higher on larger scales.  
+These observations seem to imply that two different heating mechanisms, one
+internally driven (The Brick) and one external (G1.23-0.08), are active within
+the CMZ.  These two objects are not meant to be representative of the whole
+CMZ, though, and radial properties of clumps need to be studied in more detail
+to draw firm conclusions about the heating processes.
 
 % analysis/multiscale_fit
 \FigureTwo
@@ -900,12 +916,15 @@ measured in a ridge to the Galactic northeast of Sgr B2 N using \methylcyanide
 \citep[][Figure 4b]{de-Vicente1997a}, which we now confirm, though our data
 show $T\gtrsim150$ K.  \citet{Ott2014a} also showed relatively high \ammonia
 temperatures in this hot ridge.
-
 The high temperatures in the Sgr B2 region, $T>80$ K, extend to a radius of
 $\sim10$ pc (5\arcmin), and nearly 30 pc (12.5\arcmin) in the
-northwest/southeast directions.  A high temperature `ridge' follows along the
-positive-latitude component of the \citet{Molinari2011a} `ring', tracing
-through The Brick into the Sgr A complex.
+northwest/southeast directions. 
+The Brick, Sgr A, and the 50 \kms and 20 \kms clouds exhibit the
+highest temperatures outside of Sgr B2, with $T>100$ K.
+
+%A high temperature `ridge' follows along the
+%positive-latitude component of the \citet{Molinari2011a} `ring', tracing
+%through The Brick into the Sgr A complex.
 
 % By contrast, lower temperatures, $T\sim60$ K, are observed in the
 % negative-latitude component of the `ring'.  At positive longitudes,
@@ -920,7 +939,9 @@ through The Brick into the Sgr A complex.
 {Derived temperature as a function of longitude colored by LSR velocity for
 dendrogram-extracted data.  The points have a size proportional to the
 \threeohthree line brightness.  The more transparent points reflect ancestors
-in the dendrogram tree, while the opaque points show leaves.}
+in the dendrogram tree, while the opaque points show leaves.  Lower limits
+for some of the Sgr B2 regions are shown as red upward-pointing triangles near
+the top of the plot.}
 {fig:temvslonplot}{0.4}{0}
 
 Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2015a} and
@@ -939,13 +960,13 @@ many of those on the near side, such as The Brick (red segment).
 There is some evolution of temperature over time evident in Figure
 \ref{fig:kdltemvstime}, which shows the temperature within each
 dendrogram-extracted clump within 20 \kms and 6 pc of the
-\citet{Kruijssen2015a} orbit.  The linear increase in temperature over the
+\citet{Kruijssen2015a} orbit.  The possible linear increase in temperature over the
 first $\sim0.5$ Myr seems to support the \citet{Kruijssen2015a} hypothesis that
 the `ring' represents a single gas stream on its first passage by Sgr A*.
-The cooler gas on the far side does not obviously fit into this picture, 
-and we suggest in Section \ref{sec:coolstream} that it is not affiliated with
-the orbit (but the existence of such a cool stream does \emph{not} challenge
-the model directly).
+%The cooler gas on the far side does not obviously fit into this picture, 
+%and we suggest in Section \ref{sec:coolstream} that it is not affiliated with
+%the orbit (but the existence of such a cool stream does \emph{not} challenge
+%the model directly).
 
 % orbit_pv
 \RotFigureTwoAA
@@ -960,7 +981,8 @@ of transparent $7.2\arcsec\times300\arcsec$
 rectangles over which the temperature has been averaged.  The green bar at
 $\ell=359.3\arcdeg$ indicates the starting point (offset$=0$) of the position-velocity
 slice.  The orbit is outside of our observed field to the west of Sgr C.  
-The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
+The X's mark The Brick (purple), cloud d (blue), and cloud e (red) to provide
+landmarks for comparison between the two figures.
 }
 {fig:kdlorbit}{1}{8.5in}
 
@@ -970,13 +992,16 @@ The X's mark The Brick (purple), cloud d (blue), and cloud e (red).
 {figures/orbits/dendro_temperature_vs_time_firstMyr_trendline.pdf}
 {The observed temperature vs time since the most recent pericenter passage of
 The Brick on the \citet{Kruijssen2015a} orbit for dendrogram-extracted clumps within
-20 \kms and 12 pc of the orbital path.  There is a \emph{hint} of an 
+35 \kms and 12 pc of the orbital path.  The darker symbols represent `leaves'
+in the dendrogram structure, i.e. compact clumps, while the fainter symbols
+represent their parent structures. There is a \emph{hint} of an 
 increase in temperature with time, from an initial temperature $T\lesssim50$ K
-to $T\gtrsim100$ K over a period $\tau\sim0.5-1$ Myr, as illustrated by the
+to $T\gtrsim100$ K over a period $\tau\sim0.8$ Myr, as illustrated by the
 dashed line in panel (b); note that the cool features from 0.7-0.9 Myr are
 at a significantly different velocity and therefore do not folow precisely the same
-stream.  The symbol sizes are
-proportional to the \para \threeohthree brightness and are meant to give
+stream.  The Brick is an outlier (it is hotter) whether or not there is a
+trend.  The symbol sizes are proportional to the \para \threeohthree brightness
+and are meant to give
 an indication of how reliable the detections are.  The grey vertical lines
 through the circles indicate the formal $1-\sigma$ errors on the temperature.
 (a) shows the entire orbit
@@ -1161,41 +1186,44 @@ radiation field?  Does it pass sanity checks?}
 %{fig:temvsrad}{0.5}{0}
 
 
-\subsection{A stream of fresh gas falling into the CMZ?}
-\label{sec:coolstream}
-Accretion onto the CMZ from larger scales via the X1 and X2 orbits has
-previously been inferred from $^{12}$C/$^{13}$C ratios.  We have looked for
-features that may correspond to further accretion, transfering gas from
-$R\sim1$ kpc to $R\sim100$ pc.
-
-The gas streamer extending from $\ell=0.2\arcdeg$ to $\ell=1.3\arcdeg$ (Figure
-\ref{fig:coolstream}) may represent such a stream of infalling gas.  The lack of
-IRDC features in the Spitzer 8 \um data corresponding to this stream within
-$R<R_{SgrB2}$ restricts it to be on the far side of the CMZ.  Since it does not
-align closely with the \citet{Kruijssen2015a} orbit, this stream is probably
-not following the same path as the Brick, the lettered clouds, and Sgr B2.
-The large observed linewidths imply that the stream is genuinely associated
-with the CMZ, though its distance from Sgr A may be much larger than its
-projected distance.  The path we have traced through Figure \ref{fig:coolstream}
-has been selected by eye and is not physically motivated (e.g., by a predicted
-orbit) but it can be observed as an apparently coherent stream in the \thirteenco
-data cubes as well.    Gas in this stream is moderately cooler than its
-surroundings and the positive-latitude molecular ring clouds.  The stream does
-not appear to be actively star-forming at present, most likely because the gas
-is at a lower average density.
-% yet it contributes to the total cold gas mass
-% inferred in the inner galaxy.  However, the total mass within the inner
-% projected 200 pc is still dominated by the `ring' clouds and Sgr B2, so at
-% least some deficit remains.
-
-
-% backstream_pv
-\RotFigureTwoAA
-{figures/orbits/mydrawnpathpv_on_H2CO_TemperatureFromRatio_weighted.pdf}
-{figures/orbits/mydrawnpath_on_H2CO_TemperatureFromRatio_weighted_masked.pdf}
-{Position-velocity slice tracing the ``fresh stream'' of cooler molecular
-gas from Section \ref{sec:coolstream}.}
-{fig:coolstream}{1}{9.5in}
+%In the unsmoothed data, there is nothing to see.  I can't convince myself that
+%there was ever truly a cool component.  I think it came from the dendrogram
+%sources.
+% \subsection{A stream of fresh gas falling into the CMZ?}
+% \label{sec:coolstream}
+% Accretion onto the CMZ from larger scales via the X1 and X2 orbits has
+% previously been inferred from $^{12}$C/$^{13}$C ratios.  We have looked for
+% features that may correspond to further accretion, transfering gas from
+% $R\sim1$ kpc to $R\sim100$ pc.
+% 
+% The gas streamer extending from $\ell=0.2\arcdeg$ to $\ell=1.3\arcdeg$ (Figure
+% \ref{fig:coolstream}) may represent such a stream of infalling gas.  The lack of
+% IRDC features in the Spitzer 8 \um data corresponding to this stream within
+% $R<R_{SgrB2}$ restricts it to be on the far side of the CMZ.  Since it does not
+% align closely with the \citet{Kruijssen2015a} orbit, this stream is probably
+% not following the same path as the Brick, the lettered clouds, and Sgr B2.
+% The large observed linewidths imply that the stream is genuinely associated
+% with the CMZ, though its distance from Sgr A may be much larger than its
+% projected distance.  The path we have traced through Figure \ref{fig:coolstream}
+% has been selected by eye and is not physically motivated (e.g., by a predicted
+% orbit) but it can be observed as an apparently coherent stream in the \thirteenco
+% data cubes as well.    Gas in this stream is moderately cooler than its
+% surroundings and the positive-latitude molecular ring clouds.  The stream does
+% not appear to be actively star-forming at present, most likely because the gas
+% is at a lower average density.
+% % yet it contributes to the total cold gas mass
+% % inferred in the inner galaxy.  However, the total mass within the inner
+% % projected 200 pc is still dominated by the `ring' clouds and Sgr B2, so at
+% % least some deficit remains.
+% 
+% 
+% % backstream_pv
+% \RotFigureTwoAA
+% {figures/orbits/mydrawnpathpv_on_H2CO_TemperatureFromRatio_weighted.pdf}
+% {figures/orbits/mydrawnpath_on_H2CO_TemperatureFromRatio_weighted_masked.pdf}
+% {Position-velocity slice tracing the ``fresh stream'' of cooler molecular
+% gas from Section \ref{sec:coolstream}.}
+% {fig:coolstream}{1}{9.5in}
 
 \subsection{Is the gas warm or just optically thick?}
 \label{sec:thickorwarm}

@@ -91,9 +91,12 @@ for cat,smooth in ((catalog,"",),):
     cat.add_column(table.Column(distance, name='DistanceFromOrbit'))
 
     is_leaf = (cat['is_leaf'] == 'True')
-    selection = ((np.abs((modelvelo-vcen))<20) &
+    selection = ((np.abs((modelvelo-vcen))<35) &
                  (distance < 0.15) &
                  (vcen > -80))
+
+    # make sure the Brick is included
+    assert dend.structure_at((195,142,730)).idx in catalog['_idx'][selection]
 
     fig3 = pl.figure(3, figsize=(14,8))
     fig3.clf()
@@ -129,6 +132,7 @@ for cat,smooth in ((catalog,"",),):
                       s=100, alpha=0.5,
                      )
 
+    # plot the non-leaf objects too
     sc2 = ax3.scatter(time[selection&~is_leaf]-reftime,
                      temperature[selection&~is_leaf], marker='.',
                      c=color[selection&~is_leaf], alpha=0.2,
@@ -138,9 +142,9 @@ for cat,smooth in ((catalog,"",),):
 
     ytext=180
     ax3.text(bricktime, ytext, "Brick", verticalalignment='center',
-             horizontalalignment='center', rotation='vertical', color='purple', weight='bold')
+             horizontalalignment='center', rotation='vertical', color='k', weight='bold')
     ax3.text(bricktime+0.43, ytext, "Sgr B2", verticalalignment='center',
-             horizontalalignment='center', rotation='vertical', color='b', weight='bold')
+             horizontalalignment='center', rotation='vertical', color='k', weight='bold')
     pl.setp(ax3.get_xticklabels(), fontsize=20)
     pl.setp(ax3.get_yticklabels(), fontsize=20)
     ax3.set_ylim(0, 200)
@@ -169,11 +173,11 @@ for cat,smooth in ((catalog,"",),):
     else:
         ax3.set_xlim(-0.0,4.6)
     ax3.text(bricktime+3.58, ytext*135./140., "20 km s$^{-1}$", verticalalignment='center',
-             horizontalalignment='center', rotation='vertical', color='g', weight='bold')
+             horizontalalignment='center', rotation='vertical', color='k', weight='bold')
     ax3.text(bricktime+3.66, ytext*135./140., "50 km s$^{-1}$", verticalalignment='center',
-             horizontalalignment='center', rotation='vertical', color='g', weight='bold')
+             horizontalalignment='center', rotation='vertical', color='k', weight='bold')
     ax3.text(bricktime+3.28, ytext, "Sgr C", verticalalignment='center',
-             horizontalalignment='center', rotation='vertical', color='m', weight='bold')
+             horizontalalignment='center', rotation='vertical', color='k', weight='bold')
 
     pl.savefig(fpath("orbits/dendro{0}_temperature_vs_time.pdf".format(smooth)),
                bbox_inches='tight')

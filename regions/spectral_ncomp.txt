@@ -115,4 +115,7 @@
  "SgrD":               {'ncomp':1, 'velo':[-17]},
  "G0.71-0.10":         {'ncomp':1, 'width_max':35, 'velo':[5]},
  "G0.76-0.08":         {'ncomp':2, 'width_max':35, 'velo':[26,30]},
+ "G0.83stream":         {'ncomp':1, 'width_max':35, 'velo':[75]},
+ "G1.00stream":         {'ncomp':1, 'width_max':35, 'velo':[75]},
+ "G1.25stream":         {'ncomp':1, 'width_max':35, 'velo':[75]},
 }

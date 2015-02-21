@@ -2,7 +2,7 @@ from individual_spectra import *
 import full_cubes
 import paths
 
-spd = full_cubes.cube_merge_high.mean(axis=(1,2))
+spd = full_cubes.cube_merge_high.mean(axis=(1,2)).value
 sp = pyspeckit.Spectrum(xarr=full_cubes.cube_merge_high.spectral_axis, data=spd)
 sp.xarr.refX = full_cubes.pcube_merge_high.xarr.refX
 sp.xarr.refX_units = full_cubes.pcube_merge_high.xarr.refX_units

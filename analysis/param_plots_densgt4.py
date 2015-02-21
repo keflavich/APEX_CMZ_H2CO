@@ -23,6 +23,7 @@ from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
 from constrain_parameters import paraH2COmodel
 from h2co_modeling import grid_fitter
 from astropy import table
+import heating
 
 
 pl.rcParams['font.size'] = 16.0
@@ -39,6 +40,7 @@ fittable.add_columns([table.Column(name=name, dtype='float', length=len(fittable
                                    'density_chi2','dmin1sig_chi2','dmax1sig_chi2',
                                    'logh2column','elogh2column',
                                    'logabundance','elogabundance',
+                                   'tkin_turb',
                                   ]])
 
 if not os.path.exists(paths.fpath('param_fits')):
@@ -430,6 +432,15 @@ for row in fittable:
         pl.savefig(outf, bbox_inches='tight')
 
 
+    width = row['width']*u.km/u.s
+    lengthscale = (row['area']/np.pi * u.deg * 8.5*u.kpc).to(u.pc, u.dimensionless_angles())
+
+    row['tkin_turb'] = heating.tkin_all(10**row['density_chi2']*u.cm**-3,
+                                        width,
+                                        lengthscale,
+                                        width/lengthscale,
+                                        row['higaldusttem']*u.K,
+                                        crir=0./u.s)
 
     # IGNORE 321/322: it is generally not well constrained anyway
     mf.chi2 -= mf.chi2_r321322

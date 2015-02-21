@@ -130,8 +130,7 @@ diagplotdir = '/Users/adam/work/h2co/apex/diagnostic_plots/'
 
 bright_lines = {k:all_lines[k] for k in
                 ['H2CO_303_202', 'H2CO_322_221', 'H2CO_321_220', 'SiO_54',
-                 'CH3OH_422_312', 'CH3OH_514_422', 'CH3OH_633_716', 'C18O',
-                 '13CO']}
+                 'CH3OH_422_312', 'C18O', '13CO']}
 bandwidths = {'H2CO_303_202':25,
               'H2CO_322_221':25,
               'H2CO_321_220':25,

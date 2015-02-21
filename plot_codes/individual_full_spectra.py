@@ -98,4 +98,4 @@ for lh in ('low','high'):
 
         spname = sp.specname.replace(" ","_")
         sp.plotter.savefig(fpath("{0}_{1}.png".format(spname, lh)), bbox_inches='tight')
-        sp.plotter.savefig(fpath("{0}_{1}.pdf".format(spname, lh)), bbox_inches='tight')
+        sp.plotter.savefig(fpath("{0}_{1}.pdf".format(spname, lh)), bbox_inches='tight', rasterized=True)

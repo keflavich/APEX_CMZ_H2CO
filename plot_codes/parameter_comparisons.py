@@ -7,6 +7,7 @@ import numpy as np
 from astropy import coordinates
 from astropy import units as u
 import matplotlib
+import heating
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 pcfittable = table.Table.read(os.path.join(analysispath,
@@ -15,13 +16,14 @@ pcfittable = table.Table.read(os.path.join(analysispath,
 
 lolim = pcfittable['tmax1sig_chi2'] > 340
 maps = np.char.startswith(pcfittable['Source_Name'], 'Map')
-ok = ~np.isnan(pcfittable['tmin1sig_chi2']) & (pcfittable['width'] < 40)
+ok = ~np.isnan(pcfittable['tmin1sig_chi2']) & (pcfittable['width'] < 40) & (pcfittable['h2coratio321303']/pcfittable['eh2coratio321303'] > 5)
 flags = {'is_map': maps,
          'is_lolim': lolim,
          'is_ok': ok}
 # Don't plot these for now...
 pcfittable = pcfittable[(~lolim) & ok]
 maps = np.char.startswith(pcfittable['Source_Name'], 'Map')
+lolim_conservative = pcfittable['tmax1sig_chi2'] > 150
 
 fig4 = pl.figure(4)
 fig4.clf()
@@ -67,24 +69,49 @@ fig5.savefig(paths.fpath('chi2_temperature_vs_glon_fieldsandsources.pdf'),
 fig6 = pl.figure(6)
 fig6.clf()
 ax6 = fig6.gca()
-ax6.errorbar(pcfittable['higaldusttem'][maps],
-             pcfittable['temperature_chi2'][maps],
-             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[maps],
-                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[maps]],
+mask = maps&~lolim_conservative
+ax6.errorbar(pcfittable['higaldusttem'][mask],
+             pcfittable['temperature_chi2'][mask],
+             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[mask],
+                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[mask]],
              linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
 ax6.plot([15,30],[15,30],'k--')
+mask = maps&lolim_conservative
+ax6.plot(pcfittable['higaldusttem'][mask],
+         pcfittable['tmin1sig_chi2'][mask],
+         marker='^',
+         markersize=10,
+         markeredgecolor='none',
+         color='r',
+         alpha=0.5,
+         linestyle='none')
 ax6.set_xlabel("HiGal Fitted Temperature")
-ax6.set_ylabel("Temperature (K)")
+ax6.set_ylabel("H$_2$CO Temperature (K)")
 ax6.set_ylim(0,200)
 ax6.set_xlim(15,30)
 fig6.savefig(paths.fpath('chi2_temperature_vs_higaltemperature_byfield.pdf'),
                          bbox_inches='tight')
-ax6.errorbar(pcfittable['higaldusttem'][~maps],
-             pcfittable['temperature_chi2'][~maps],
-             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[~maps],
-                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[~maps]],
-             linestyle='none', marker='s', linewidth=1, alpha=0.5, color='b')
-ax6.set_ylim(0,200)
+mask = (~maps)&(~lolim_conservative)
+ax6.errorbar(pcfittable['higaldusttem'][mask],
+             pcfittable['temperature_chi2'][mask],
+             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[mask],
+                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[mask]],
+             capsize=0,
+             markeredgecolor='none',
+             markersize=10,
+             linestyle='none', marker='s', linewidth=0.5, alpha=0.5, color='b')
+
+mask = (~maps)&lolim_conservative
+ax6.plot(pcfittable['higaldusttem'][mask],
+         pcfittable['tmin1sig_chi2'][mask],
+         marker='^',
+         markersize=10,
+         markeredgecolor='none',
+         color='b',
+         alpha=0.5,
+         linestyle='none')
+
+ax6.set_ylim(10,150)
 ax6.set_xlim(15,30)
 fig6.savefig(paths.fpath('chi2_temperature_vs_higaltemperature_fieldsandsources.pdf'),
                          bbox_inches='tight')
@@ -92,25 +119,85 @@ fig6.savefig(paths.fpath('chi2_temperature_vs_higaltemperature_fieldsandsources.
 fig7 = pl.figure(7)
 fig7.clf()
 ax7 = fig7.gca()
-ax7.errorbar(pcfittable['width'][maps]*(8*np.log(2))**0.5,
-             pcfittable['temperature_chi2'][maps],
-             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[maps],
-                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[maps]],
+mask = maps&~lolim_conservative
+ax7.errorbar(pcfittable['width'][mask]*(8*np.log(2))**0.5,
+             pcfittable['temperature_chi2'][mask],
+             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[mask],
+                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[mask]],
              capsize=0,
+             markersize=10,
              markeredgecolor='none',
-             linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
+             linestyle='none', marker='s', linewidth=0.5, alpha=0.5, color='r')
+mask = maps&lolim_conservative
+ax7.plot(pcfittable['width'][mask]*(8*np.log(2))**0.5,
+         pcfittable['tmin1sig_chi2'][mask],
+         marker='^',
+         markersize=10,
+         markeredgecolor='none',
+         color='r',
+         alpha=0.5,
+         linestyle='none')
+
+linewidths = np.linspace(0,pcfittable['width'].max())*u.km/u.s
+ax7.plot(linewidths*2.35, [heating.tkin_all(10**4*u.cm**-3, sigma, 5*u.pc,
+                                            5*u.km/u.s/u.pc, 30*u.K)
+                           for sigma in linewidths],
+        linestyle='--', color='k', label='$n=10^4$ cm$^{-3}$', zorder=-5)
+ax7.plot(linewidths*2.35, [heating.tkin_all(10**4*u.cm**-3, sigma, 5*u.pc,
+                                            20*u.km/u.s/u.pc, 30*u.K)
+                           for sigma in linewidths],
+        linestyle='--', color='r', label='$n=10^4$ cm$^{-3}$, $dv/dr=20$', zorder=-5, linewidth=2, alpha=0.5)
+ax7.plot(linewidths*2.35, [heating.tkin_all(10**5*u.cm**-3, sigma, 5*u.pc,
+                                            5*u.km/u.s/u.pc, 30*u.K)
+                           for sigma in linewidths],
+         linestyle=':', color='k', label='$n=10^5$ cm$^{-3}$', zorder=-5)
+ax7.plot(linewidths*2.35, [heating.tkin_all(10**6*u.cm**-3, sigma, 5*u.pc,
+                                            5*u.km/u.s/u.pc, 30*u.K)
+                           for sigma in linewidths],
+        linestyle='-.', color='k', label='$n=10^6$ cm$^{-3}$', zorder=-5)
+ax7.plot(linewidths*2.35, [heating.tkin_all(10**5*u.cm**-3, sigma, 1*u.pc,
+                                            5*u.km/u.s/u.pc, 30*u.K)
+                           for sigma in linewidths],
+         linestyle=':', color='b', label='$n=10^5$ cm$^{-3}$, $L=1$ pc', zorder=-5, alpha=0.5, linewidth=2)
+ax7.plot(linewidths*2.35, [heating.tkin_all(10**5*u.cm**-3, sigma, 5*u.pc,
+                                            5*u.km/u.s/u.pc, 30*u.K, crir=1e-15*u.s**-1)
+                           for sigma in linewidths],
+         linestyle='-', color='g', label='$n=10^5$ cm$^{-3}$, $\zeta_{CR}=10^{-15}$ s$^{-1}$', zorder=-10, alpha=0.25, linewidth=4)
+ax7.plot(linewidths*2.35, [heating.tkin_all(10**5*u.cm**-3, sigma, 5*u.pc,
+                                            5*u.km/u.s/u.pc, 30*u.K, crir=1e-14*u.s**-1)
+                           for sigma in linewidths],
+         linestyle='--', color='purple', label='$n=10^5$ cm$^{-3}$, $\zeta_{CR}=10^{-14}$ s$^{-1}$', zorder=-10, alpha=0.25, linewidth=4)
+
+box = ax7.get_position()
+ax7.set_position([box.x0, box.y0, box.width * 0.7, box.height])
+ax7.legend(loc='center left', fontsize=16, bbox_to_anchor=(1.0, 0.75))
 ax7.set_xlabel("Line FWHM (km s$^{-1}$)")
 ax7.set_ylabel("Temperature (K)")
-ax7.set_ylim(0,200)
+ax7.set_ylim(10,150)
 fig7.savefig(paths.fpath('chi2_temperature_vs_linewidth_byfield.pdf'),
                          bbox_inches='tight')
-ax7.errorbar(pcfittable['width'][~maps]*(8*np.log(2))**0.5,
-             pcfittable['temperature_chi2'][~maps],
-             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[~maps],
-                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[~maps]],
+
+mask = (~maps)&(~lolim_conservative)
+ax7.errorbar(pcfittable['width'][mask]*(8*np.log(2))**0.5,
+             pcfittable['temperature_chi2'][mask],
+             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[mask],
+                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[mask]],
              capsize=0,
              markeredgecolor='none',
-             linestyle='none', marker='s', linewidth=1, alpha=0.5, color='b')
+             markersize=10,
+             linestyle='none', marker='s', linewidth=0.5, alpha=0.5, color='b')
+
+mask = (~maps)&lolim_conservative
+ax7.plot(pcfittable['width'][mask]*(8*np.log(2))**0.5,
+         pcfittable['tmin1sig_chi2'][mask],
+         marker='^',
+         markersize=10,
+         markeredgecolor='none',
+         color='b',
+         alpha=0.5,
+         linestyle='none')
+
+ax7.set_ylim(10,150)
 fig7.savefig(paths.fpath('chi2_temperature_vs_linewidth_fieldsandsources.pdf'),
                          bbox_inches='tight')
 

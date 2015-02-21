@@ -28,14 +28,15 @@ figsize=(20,10)
 
 method_label = {'mean': "Mean Brightness $T_A^*$ (K)",
                 'moment0': "Integrated Brightness\n"
-                   r"$T_A^* dv $ (K km s$^{-1}$)"}
+                   r"$T_A^* dv $ (K km s$^{-1}$)",
+                'max': 'Peak Brightness $T_A^*$ (K)'}
 
 dustcolumn = fits.open('/Users/adam/work/gc/gcmosaic_column_conv36.fits')
 dustcoldata = dustcolumn[0].data
 dustcolwcs = WCS(dustcolumn[0].header)
 
 # Direct from cubes
-for method in ('mean','moment0'):
+for method in ('max','mean','moment0'):
     for cube,name,masked,smooth in zip((cube303, cube303m, cube303sm, cube303msm,
                                         cube321, cube321m,  cube321sm, cube321msm),
                                        ['303_202']*4 + ['321_220']*4,
