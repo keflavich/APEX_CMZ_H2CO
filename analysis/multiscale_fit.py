@@ -49,6 +49,8 @@ def multiscale_fit(pcube, centerx, centery, offset_scale=0.3, savedir=None,
 
     r1b = []
     er1b = []
+    sigb = []
+    esigb = []
     r1 = [sp.specfit.parinfo[3].value]
     er1 = [sp.specfit.parinfo[3].error]
     sig = [sp.specfit.parinfo[2].value]
@@ -81,12 +83,26 @@ def multiscale_fit(pcube, centerx, centery, offset_scale=0.3, savedir=None,
         cen.append(sp.specfit.parinfo[1].value)
         ecen.append(sp.specfit.parinfo[1].error)
 
-        #spannulus = sp - splast
-        #spannulus.plotter.figure = sp.plotter.figure
-        #spannulus.plotter.axis = sp.plotter.axis
-        #fitspec(spannulus, exclude, guesses=sp.specfit.parinfo.values)
-        #r1b.append(spannulus.specfit.parinfo[3].value)
-        #er1b.append(spannulus.specfit.parinfo[3].error)
+        spannulus = sp - splast
+        spannulus.plotter.figure = sp.plotter.figure
+        spannulus.plotter.axis = sp.plotter.axis
+        fitspec(spannulus, exclude, guesses=sp.specfit.parinfo.values)
+
+        spannulus.specfit.plotresiduals(axis=pcube.plotter.axis,
+                                 yoffset=-spannulus.specfit.parinfo[0].value*offset_scale,
+                                 clear=False, color='#444444', label=False)
+        spannulus.plotter.axis.set_ylim(-5*spannulus.specfit.residuals.std()
+                                 -spannulus.specfit.parinfo[0].value*offset_scale,
+                                 spannulus.plotter.axis.get_ylim()[1])
+        spannulus.plotter.savefig(paths.fpath('{0}/{1}_r{2}_annulus.pdf'.format(savedir,
+                                                                    savepre,
+                                                                    radius)))
+
+        r1b.append(spannulus.specfit.parinfo[3].value)
+        er1b.append(spannulus.specfit.parinfo[3].error)
+        sigb.append(spannulus.specfit.parinfo[2].value)
+        esigb.append(spannulus.specfit.parinfo[2].error)
+
 
         splast = sp.copy()
 
@@ -108,8 +124,6 @@ def multiscale_fit(pcube, centerx, centery, offset_scale=0.3, savedir=None,
     ax1 = pl.subplot(2,1,1)
     ax1.errorbar(np.arange(1,10)*7.2, r1, yerr=er1, linestyle='none',
                  marker='s', color='k')
-    #ax1.errorbar(np.arange(2,10)*7.2, r1b, yerr=er1b, linestyle='none',
-    #             marker='s', color='b', zorder=-1, alpha=0.5)
     ax1.set_xlim(0.5*7.2,9.5*7.2)
     #ax1.set_xlabel("Aperture Radius (arcseconds)")
     ax1.set_ylabel("Ratio $3_{2,1}-2_{2,0} / 3_{0,3} - 2_{0,2}$")
@@ -136,9 +150,25 @@ def multiscale_fit(pcube, centerx, centery, offset_scale=0.3, savedir=None,
     ax2.set_xlim(0.5*7.2,9.5*7.2)
     ax2.set_xlabel("Aperture Radius (arcseconds)")
     ax2.set_ylabel("$\sigma$ (km s$^{-1}$)")
+
+    # Steve suggested adding a Mach number label, but this isn't possible:
+    # it would require a 3rd graph, since M ~ sigma/sqrt(T)
+    # ax2b = ax2.twinx()
+    # # set the y limits to the sigma limits
+    # ylim = ax2.get_ylim()
+    # ax2b.set_ylim()
+    # ax2b.xaxis.set_ticklabels([])
+    # ax2b.set_ylabel('Temperature (K)')
+
     pl.savefig(paths.fpath('{0}/{1}_ratio_vs_scale.pdf'.format(savedir, savepre)))
 
-    return r1,er1,sig,esig,cen,ecen
+    ax1.errorbar(np.arange(2,10)*7.2, r1b, yerr=er1b, linestyle='none',
+                 marker='s', color='b', zorder=-1, alpha=0.5)
+    ax2.errorbar(np.arange(2,10)*7.2, sigb, yerr=esigb, linestyle='none',
+                 marker='s', color='b', zorder=-1, alpha=0.5)
+    pl.savefig(paths.fpath('{0}/{1}_ratio_vs_scale_annuli.pdf'.format(savedir, savepre)))
+
+    return r1,er1,sig,esig,cen,ecen,r1b,er1b,sigb,esigb
 
 def multiscale_fit_g08south_hot(center=(434,63)):
     g08south_slice = np.s_[:,center[1]-16:center[1]+16,center[0]-16:center[0]+16]
@@ -219,5 +249,5 @@ def all_multiscales():
 
 if __name__ == "__main__":
     # Plots for paper
-    multiscale_fit_brick()
-    multiscale_fit_g1pt2_cool()
+    mfb    = multiscale_fit_brick()
+    mfg1p2 = multiscale_fit_g1pt2_cool()

@@ -37,7 +37,7 @@ zipped = zip((catalog,catalog_sm,),#catalog321,catalog321_sm),
              ('','_smooth',))#'_321ssel','_321sel_smooth'))
 
 
-for cat,dendro,smooth in zipped:
+for cat,dendro,smooth in zipped[:1]:
     for ii in range(1,14):
         pl.figure(ii)
         pl.clf()
@@ -47,7 +47,9 @@ for cat,dendro,smooth in zipped:
     sn25_50 = (sn > 25) & (sn < 50)
     ok = (np.isfinite(sn) & (cat['Stot321'] < cat['Stot303']) & ~(cat['bad'] ==
                                                                   'True') &
-          (~cat['IsNotH2CO']))
+          (cat['Smean321'] > 0) &
+          (cat['e321'] > 0) &
+          (~cat['IsNotH2CO']) & (~cat['IsAbsorption']))
     gt5 = (sn>5)
 
     hot = cat['temperature_chi2'] > 150
@@ -57,17 +59,21 @@ for cat,dendro,smooth in zipped:
 
     for ii in range(1,13): pl.figure(ii).clf()
 
-    masks = (gt5 & ~sngt50 & ~sn25_50, sn25_50 & gt5, sngt50 & gt5, ok & ~gt5)
+    masks = (gt5 & ~sngt50 & ~sn25_50 & ok,
+             sn25_50 & gt5 & ok,
+             sngt50 & gt5 & ok,
+             ok & ~gt5)
     leaf_masks = [mm for mask in masks for mm in (mask & is_leaf, mask & ~is_leaf)]
     # mask1 & leaf, mask1 & not leaf, mask2 & leaf, mask2 & not leaf....
     # Make the not-leaves be half as bright
     masks_colors = zip(leaf_masks,
                        ('b','b','g','g','r','r',    'k','k'),
                        (0.5,0.2, 0.6,0.3, 0.7,0.35, 0.3,0.15),
+                       (8,7,9,8,10,9,5,4),
                       )
 
     fig1, ax1 = pl.subplots(num=1)
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax1.errorbar(cat['area_exact'][mask], cat['temperature_chi2'][mask],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
@@ -77,7 +83,7 @@ for cat,dendro,smooth in zipped:
     fig1.savefig(fpath('dendrotem/area_vs_temperature{0}.pdf'.format(smooth)))
 
     fig2, ax2 = pl.subplots(num=2)
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax2.errorbar(cat['ratio303321'][mask], cat['temperature_chi2'][mask],
                      #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                      #xerr=[cat['eratio303321'][mask], cat['eratio303321'][mask]],
@@ -204,7 +210,7 @@ for cat,dendro,smooth in zipped:
 
     pl.figure(4).clf()
     fig4, (ax4a,ax4b) = pl.subplots(nrows=2,ncols=1,num=4)
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax4a.errorbar(cat['density_chi2'][mask], cat['temperature_chi2'][mask],
                      #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                      #xerr=[cat['elo_d'][mask], cat['ehi_d'][mask]],
@@ -231,7 +237,7 @@ for cat,dendro,smooth in zipped:
                 s=1000*cat['Smean303'][hot],
                 edgecolor='none',
                 marker='^',)
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         lon = cat['x_cen'][mask]
         lon[lon>180] -= 360
         ax5.scatter(lon, cat['temperature_chi2'][mask],
@@ -278,7 +284,7 @@ for cat,dendro,smooth in zipped:
 
 
     fig6, ax6 = pl.subplots(num=6)
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax6.errorbar(cat['v_cen'][mask], cat['temperature_chi2'][mask],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
@@ -286,7 +292,7 @@ for cat,dendro,smooth in zipped:
         ax6.set_ylabel("Temperature (K)")
 
     fig7, ax7 = pl.subplots(num=7)
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax7.errorbar(cat['radius'][mask], cat['temperature_chi2'][mask],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
@@ -295,7 +301,7 @@ for cat,dendro,smooth in zipped:
         ax7.set_ylabel("Temperature (K)")
 
     fig8, ax8 = pl.subplots(num=8)
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax8.errorbar(cat['Smean303'][mask], cat['temperature_chi2'][mask],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     #xerr=[cat['e303'][mask], cat['e303'][mask]],
@@ -304,7 +310,7 @@ for cat,dendro,smooth in zipped:
         ax8.set_ylabel("Temperature (K)")
 
     fig9, ax9 = pl.subplots(num=9)
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax9.errorbar(cat['Smean321'][mask], cat['temperature_chi2'][mask],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     #xerr=[cat['e321'][mask], cat['e321'][mask]],
@@ -313,7 +319,7 @@ for cat,dendro,smooth in zipped:
         ax9.set_ylabel("Temperature (K)")
 
     fig10, ax10 = pl.subplots(num=10)
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax10.errorbar(cat['13comean'][mask], cat['temperature_chi2'][mask],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
@@ -321,7 +327,7 @@ for cat,dendro,smooth in zipped:
         ax10.set_ylabel("Temperature (K)")
 
     fig11, ax11 = pl.subplots(num=11)
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax11.errorbar(cat['13comean'][mask], cat['Smean303'][mask],
                     #yerr=[cat['e303'][mask], cat['e303'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
@@ -332,10 +338,11 @@ for cat,dendro,smooth in zipped:
     ax12.errorbar(cat['v_rms'][hot]*np.sqrt(8*np.log(2)), [149]*hot.sum(),
                   lolims=True, linestyle='none', capsize=0, alpha=0.3,
                   marker='^', color='r')
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax12.errorbar(cat['v_rms'][mask]*np.sqrt(8*np.log(2)), cat['temperature_chi2'][mask],
                       #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                       markersize=10 if any(mask & is_leaf) else 5,
+                      markeredgecolor='none',
                       linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax12.set_xlabel(r"Line FWHM (km s$^{-1}$)")
         ax12.set_ylabel("Temperature (K)")
@@ -373,45 +380,54 @@ for cat,dendro,smooth in zipped:
     ax12.set_ylim([0,150])
     fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
     wide = cat['v_rms'] > 20/np.sqrt(8*np.log(2))
-    ax12.errorbar([19.5] * (wide & is_leaf).sum(),
+    ax12.errorbar([24.5] * (wide & is_leaf).sum(),
                   cat['temperature_chi2'][wide&is_leaf],
                   lolims=True, linestyle='none', capsize=0, alpha=0.3,
                   markersize=10,
                   marker='>', color='r')
-    ax12.errorbar([19.5] * (wide & ~is_leaf).sum(),
+    ax12.errorbar([24.5] * (wide & ~is_leaf).sum(),
                   cat['temperature_chi2'][wide&(~is_leaf)],
                   lolims=True, linestyle='none', capsize=0, alpha=0.1,
                   markersize=5,
                   marker='>', color='r')
-    ax12.set_xlim([0,20])
+    ax12.set_xlim([0,25])
     fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity_xzoom{0}.pdf'.format(smooth)))
 
     fig22 = pl.figure(22)
     fig22.clf()
     ax22 = fig22.gca()
-    ax22.errorbar(cat['higaldusttem'][hot], [149]*hot.sum(),
+    ax22.errorbar(cat['higaldusttem'][hot], cat['tmin1sig_chi2'][hot],
                   lolims=True, linestyle='none', capsize=0, alpha=alpha,
+                  markeredgecolor='none',
                   marker='^', color='r')
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax22.errorbar(cat['higaldusttem'][mask], cat['temperature_chi2'][mask],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
-                      markersize=10 if any(mask & is_leaf) else 5,
+                      markersize=markersize*(2 if any(mask & is_leaf) else 1),
                       linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
-        ax22.plot([14,38], [14,38], 'k--')
-        ax22.set_xlim([13,38])
-        ax22.set_ylim([13,150])
-        ax22.set_xlabel("HiGal Dust Temperature (K)")
-        ax22.set_ylabel("Temperature (K)")
+        mask = mask & (cat['tmin1sig_chi2'] < cat['higaldusttem'])
+        ax22.plot(cat['higaldusttem'][mask], cat['temperature_chi2'][mask],
+                  markersize=markersize*(2 if any(mask & is_leaf) else 1)*1.1,
+                  linestyle='none',
+                  alpha=alpha,
+                  marker='o',
+                  markerfacecolor='none',
+                  markeredgecolor=color)
+    ax22.plot([14,38], [14,38], 'k--', zorder=-5, alpha=0.5)
+    ax22.set_xlim([13,35])
+    ax22.set_ylim([13,150])
+    ax22.set_xlabel("HiGal Dust Temperature (K)")
+    ax22.set_ylabel("Temperature (K)")
     fig22.savefig(fpath('dendrotem/temperature_vs_dusttem{0}.pdf'.format(smooth)))
 
     fig24 = pl.figure(24)
     fig24.clf()
     ax24 = fig24.gca()
-    hot_lolim = cat['tmax1sig_chi2'] > 150
+    hot_lolim = cat['tmin1sig_chi2'] > 150
     ax24.errorbar(10**cat['logh2column'][hot|hot_lolim], [149]*(hot|hot_lolim).sum(),
                   lolims=True, linestyle='none', capsize=0, alpha=alpha,
                   marker='^', color='r')
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax24.errorbar(10**cat['logh2column'][mask&~hot_lolim],
                       cat['temperature_chi2'][mask&~hot_lolim],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
@@ -430,7 +446,7 @@ for cat,dendro,smooth in zipped:
                   cat['elo_t'][mask],
                   lolims=True, linestyle='none', capsize=0, alpha=0.3,
                   marker='^', color='r')
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         mask = (mask & (~hot_lolim) & is_leaf)
         if mask.sum() == 0: continue
         ax26.errorbar(cat['tkin_turb'][mask],
@@ -462,7 +478,7 @@ for cat,dendro,smooth in zipped:
 
     fig26.savefig(fpath('dendrotem/temperature_vs_turbtemperature{0}.pdf'.format(smooth)))
 
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         mask = (mask & (~hot_lolim) & ~is_leaf)
         if mask.sum() == 0: continue
         ax26.errorbar(cat['tkin_turb'][mask],
@@ -542,9 +558,9 @@ for cat,dendro,smooth in zipped:
 
 
 
-    brick_coords = [262/(2 if 'smooth' in smooth else 1),143,725]
-    sgra_coords = [239/(2 if 'smooth' in smooth else 1),97,907]
-    sgrb2_coords = [278/(2 if 'smooth' in smooth else 1),117,522]
+    brick_coords = [(262-64)/(2 if 'smooth' in smooth else 1),143,725]
+    sgra_coords  = [(239-64)/(2 if 'smooth' in smooth else 1),97,907]
+    sgrb2_coords = [(278-64)/(2 if 'smooth' in smooth else 1),117,522]
 
     try:
         brick = dendro.structure_at(brick_coords).ancestor
@@ -689,12 +705,12 @@ for cat,dendro,smooth in zipped:
     ax23.errorbar(cat['v_rms'][hot]*np.sqrt(8*np.log(2)), [149]*hot.sum(),
                   lolims=True, linestyle='none', capsize=0, alpha=alpha,
                   marker='^', color='r')
-    for mask,color,alpha in masks_colors:
+    for mask,color,alpha,markersize in masks_colors:
         ax23.errorbar(cat['v_rms'][mask]*np.sqrt(8*np.log(2)), cat['temperature_chi2'][mask],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax23.set_xlabel(r"Line FWHM (km s$^{-1}$)")
-        ax23.set_ylabel("Temperature (K)")
+        ax23.set_ylabel("H$_2$CO Temperature (K)")
     ax23.set_ylim([0,150])
 
     # r,b,g = sgra, brick, sgrb2
@@ -704,7 +720,7 @@ for cat,dendro,smooth in zipped:
                linestyle='none', marker='s', markerfacecolor='none',
                highlight_monotonic=False,)
     ax23.set_xlabel(r"Line FWHM (km s$^{-1}$)")
-    ax23.set_ylabel(r"Temperature (K)")
+    ax23.set_ylabel(r"H$_2$CO Temperature (K)")
     fig23.savefig(fpath('dendrotem/dendro_temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
 
 
@@ -718,6 +734,7 @@ for cat,dendro,smooth in zipped:
         pl.draw()
 
     pl.close(27)
+
 
     dview = dendro.viewer()
     structure = dendro.structure_at(brick_coords).ancestor
@@ -733,8 +750,9 @@ for cat,dendro,smooth in zipped:
     dview.slice_slider.set_val(sgra_coords[0])
     dview.fig.savefig(fpath('dendrotem/dendrogram_viewer_sgra{0}.pdf'.format(smooth)))
 
+
     # SgrA total, 20kms, 50kms
-    catalog_sm[np.array([126,247,346])]['_idx','ratio303321','dustmindens','temperature_chi2'].pprint()
+    #catalog_sm[np.array([126,247,346])]['_idx','ratio303321','dustmindens','temperature_chi2'].pprint()
 
     
 
@@ -742,4 +760,23 @@ for cat,dendro,smooth in zipped:
     pl.show()
 
 
-# catalog_sm[np.abs(catalog_sm['temperature_chi2']-catalog_sm['higaldusttem'])/catalog_sm['higaldusttem'] < 1.5].pprint()
+    # catalog_sm[np.abs(catalog_sm['temperature_chi2']-catalog_sm['higaldusttem'])/catalog_sm['higaldusttem'] < 1.5].pprint()
+
+    def zoom_to(idx, dendro=dendro, viewer=dview, button=1):
+        viewer.hub.select(button, dendro[idx])
+        w = dendro.wcs
+        sw = w.sub([3])
+        cw = w.sub([1,2])
+        row = cat[idx]
+        viewer.slice_slider.set_val(sw.wcs_world2pix((row['v_cen'],),0)[0])
+        edges = cw.wcs_world2pix([(row['x_cen'] - row['major_sigma']/3600.*3,
+                                   row['y_cen'] - row['major_sigma']/3600.*3),
+                                  (row['x_cen'] + row['major_sigma']/3600.*3,
+                                   row['y_cen'] + row['major_sigma']/3600.*3)],
+                                 0)
+        x0,x1 = edges[:,0] if edges[1,0] > edges[0,0] else edges[::-1,0]
+        y0,y1 = edges[:,1] if edges[1,1] > edges[0,1] else edges[::-1,1]
+        viewer.ax_image.axis((x0,x1,y0,y1))
+        viewer.ax_image.axis((x0,x1,y0,y1))
+        pl.draw()
+        pl.show()

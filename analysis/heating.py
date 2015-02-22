@@ -56,18 +56,20 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
     n = density.to(u.cm**-3)
     sigma = sigma.to(u.km/u.s)
 
+    # lambda = cooling
+    # gamma = heating
     lamgd  = lambda Tk: c1 * n**2 * Tk**(0.5) * (Tk-tdust)
     lamgas = lambda Tk: c2 * n**(1/2.) * Tk**3 * dvdr
     gamturb = n * 2.35 * m_h * (0.5*3**1.5 * sigma**3 / L)
-    lamcr = ccr * n * (crir/(1e-17*u.s**-1))
+    gamgr = ccr * n * (crir/(1e-17*u.s**-1))
     gammaxray = 1.2e-19 * (n/(1e5*u.cm**-3)) * (Fx/(u.erg*u.cm**-2*u.s**-1)) * (N/(1e22*u.cm**-2))**-0.9 * u.erg/u.s/u.cm**3
 
-    assert lamcr.unit.is_equivalent(energy_density)
+    assert gamgr.unit.is_equivalent(energy_density)
 
     def f(Tk):
         return (lamgd(Tk*u.K).to(u.erg/u.s/u.cm**3).value
                 + lamgas(Tk*u.K).to(u.erg/u.s/u.cm**3).value
-                - lamcr.value
+                - gamgr.value
                 - gamturb.to(u.erg/u.s/u.cm**3).value
                 - gammaxray.value)
 

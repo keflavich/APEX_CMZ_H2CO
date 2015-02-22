@@ -74,7 +74,7 @@ ax6.errorbar(pcfittable['higaldusttem'][mask],
              pcfittable['temperature_chi2'][mask],
              yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[mask],
                    (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[mask]],
-             linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r')
+             linestyle='none', marker='s', linewidth=1, alpha=0.5, color='r', capsize=0)
 ax6.plot([15,30],[15,30],'k--')
 mask = maps&lolim_conservative
 ax6.plot(pcfittable['higaldusttem'][mask],

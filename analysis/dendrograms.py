@@ -65,5 +65,8 @@ except IOError:
 # Mark all non-H2CO lines as 'bad'
 # This is done manually since there is overlap between HC3N and H2CO 303 in
 # velocity
-flag_other_lines.flag_dendro(dend, catalog=catalog, smooth=False)
-flag_other_lines.flag_dendro(dendsm, catalog=catalog_sm, smooth=True)
+# Also mark Sgr B2's absorption/emission as 'bad'
+flag_other_lines.flag_hc3n(dend, catalog=catalog, smooth=False)
+flag_other_lines.flag_hc3n(dendsm, catalog=catalog_sm, smooth=True)
+flag_other_lines.flag_absorption(dend, catalog=catalog, smooth=False)
+flag_other_lines.flag_absorption(dendsm, catalog=catalog_sm, smooth=True)

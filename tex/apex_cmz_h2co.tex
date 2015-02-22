@@ -775,13 +775,12 @@ lower signal-to-noise ratios at the edges and should be ignored.
 \label{sec:discussion}
 \subsection{Gas heating and thermal balance}
 \label{sec:heating}
-Supersonic turbulence decays, resulting in direct gas heating
-\citep{Falgarone1995a, Pan2009a}.  The energy dissipation rate is proportional
-to the gas velocity dispersion cubed, which implies that the temperature
-of the gas should be strongly correlated with the observed line width.
-However, Figure \ref{fig:temvsfwhm_regions} shows no such correlation.  
+Following \citet{Ao2013a}, we examine the energy balance in the CMZ gas to
+understand the temperatures we measure.  The two key processes they identified
+are cosmic ray and turbulent dissipation heating.  We ignore all UV-driven
+heating processes as we are interested in gas at high extinction.
 
-Following \citet{Ao2013a}, we determine the expected gas kinetic temperature
+We determine the expected gas kinetic temperature
 by assuming that the heating and cooling processes are in equilibrium.
 We expand upon their analysis by solving for the temperature assuming that
 both cosmic ray ionization and turbulent heating are present and that the dust
@@ -794,8 +793,8 @@ checking against the cooling curves of \citet{Clark2013a}, we find that the
 parametrization is consistent with their fiducial $1000 G_0$, 1000$\times$
 local cosmic ray ionization simulation (though the dominant coolant has changed).
 We solve these equations numerically to determine the resulting equilbrium
-kinetic temperature; the associated can be found in the file \texttt{heating.py}
-in the associated repository.
+kinetic temperature; the code can be found in the file
+\texttt{heating.py} in the associated repository.
 
 A first key point is that we measure gas temperatures $T\sim60$ K in many
 clouds everywhere throughout the CMZ.  Since cosmic rays have very high
@@ -894,15 +893,16 @@ systematic blob extraction of the dendrogram extraction.  This analysis is left
 for a future work.
 
 \FigureTwo
-{figures/chi2_temperature_vs_linewidth_fieldsandsources}
+{figures/chi2_temperature_vs_linewidth_fieldsandsources} % parameter_comparisons
 {figures/dendrotem/temperature_vs_rmsvelocity_xzoom} % dendrotem_plots
 {(a) 
 The fitted temperature as described in Section \ref{sec:linemodeling} plotted
 against the fitted line width for the by-eye selected regions.  The blue
 symbols are compact `clump' sources and the red symbols are large-area
 ($8\arcmin$) square regions.  No trend between the line width and temperature
-is obvious.  The very broad line regions, FWHM $\gtrsim$ 40 \kms, are affected
-by significant baseline issues, and it is possible that the temperature has been
+is obvious.  The very broad line regions, FWHM $\gtrsim$ 40 \kms, are sometimes
+affected by significant baseline issues, and it is possible that the
+temperature has been
 underestimated as a result.
 (b) The same as (a) but for the dendrogram-extracted sources. The points are
 color coded by signal-to-noise in the ratio $R_1$, with black $S/N < 5$, blue
@@ -923,7 +923,7 @@ and (5,5).
 {figures/dendrotem/temperature_vs_turbtemperature.pdf}
 {Plots of the \formaldehyde-measured temperature against the predicted
 turbulent-driven temperature as discussed in Section \ref{sec:heating}.
-(a) The hand-selected regions as described in Figure \ref{fig:}.  Triangles
+(a) The hand-selected regions as described in Figure \ref{fig:temvstem_regions}.  Triangles
 indicate regions with lower limits on the temperature, i.e. any region with
 a measured $1-\sigma$ upper limit on the temperature $T>150$ K.  The gray
 dashed line shows the $T_{turb} = T_{measured}$ relation.  Regions that are inconsistent
@@ -932,14 +932,24 @@ with the relation at the $1-\sigma$ level are outlined.
 }
 {fig:turbtem}{1}{3.5in}
 
-\subsection{Variation with spatial scale}
-For any given cloud, the ratio $R_1$ varies with the spatial averaging scale.
-The \para \threeohthree line is often stronger relative to \threetwoone on
-larger scales, while the linewidth is always larger on larger scales.  We have
-examined this effect by selecting a few local \para \threeohthree peaks and
-measuring the ratio $R_1$ as a function of aperture size.  For each spectrum,
-we have fitted the 6-parameter model described in Section
-\ref{sec:linemodeling} to derive the ratio.
+\subsection{Temperature variation with spatial scale or radius}
+Photon-driven heating mechanisms are subject to attenuation, so clouds with
+significant X-ray or UV heating may have heated shells and cool interiors.
+Turbulent and cosmic ray heating experience no such effects, but they exhibit a
+different dependence on gas density than the corresponding cooling mechanisms.
+If the interstellar UV radiation or X-ray heating are important, we would
+expect to find warmer cloud edges and cooler cloud interiors.  The same is true
+if the clouds are centrally condensed, since dust cooling can dominate heating
+processes at very high densities.  If clouds are internally heated by
+gravitational collapse and star formation, the cloud interior should be warmer
+than its exterior.  
+
+We have therefore examined the radial profiles of temperature and velocity
+dispersion for selected clouds.  We measured the ratio $R_1$ and the line width
+as a function of aperture size by extracting progressively larger circular
+apertures centered on the same point.  For each spectrum extracted, we have
+fitted the 6-parameter model described in Section \ref{sec:linemodeling} to
+derive the ratio and linewidth.
 
 Different variations with scale are observed.  For example, around `The Brick',
 the ratio decreases from $\sim0.55$ at the position $\ell=0.237\arcdeg$, $b=0.008$
@@ -951,13 +961,13 @@ These observations seem to imply that two different heating mechanisms, one
 internally driven (The Brick) and one external (G1.23-0.08), are active within
 the CMZ.  These two objects are not meant to be representative of the whole
 CMZ, though, and radial properties of clumps need to be studied in more detail
-to draw firm conclusions about the heating processes.
+to draw firm conclusions about the heating processes.  
 
 % analysis/multiscale_fit
 \FigureTwo
 {figures/brick_examples/brick_sw_specfit_ratio_vs_scale.pdf}
 {figures/g1.2/g1.2_coolspot_ratio_vs_scale.pdf}
-{\todo{Add Mach number labels.} (a) Radial plots centered on the southwest portion of `The Brick'.
+{ (a) Radial plots centered on the southwest portion of `The Brick'.
 The top panel shows the ratio \Rone as a function of aperture size, starting
 from a single pixel.
 The derived temperature using Figure \ref{fig:ratiovstem} is shown on the right
@@ -976,24 +986,27 @@ the ratio \Rone is lower at the center and increases toward larger radii.
 
 
 
-\subsection{Disagreement between gas and dust temperatures}
+\subsection{Difference between gas and dust temperatures}
 Similar to the results of \citet{Ao2013a} for the inner $\sim75$ pc, we find
-that the \para and dust temperatures do not agree anywhere within the inner
-$\sim200$ pc.  Figure \ref{fig:temvstem_regions} shows the fitted \para
+that the \para and dust temperatures are note the same anywhere within the
+inner $R\lesssim200$ pc.  Figure \ref{fig:temvstem_regions} shows the fitted \para
 temperature vs the fitted dust temperature from HiGal.  The majority of the
 \formaldehyde data points are well above the $T_{dust}=T_{gas}$ line
-independent of the method used to extract the temperature.  The small handful
-of data points near the $T_{dust}=T_{gas}$ line are the low signal-to-noise
-points with untrustworthy fits.
+independent of the method used to extract the temperature.  The few sources
+that are consistent with $T_{dust}=T_{gas}$ represent an interesting subset
+of potentially very cool clouds, though they all have low signal-to-noise
+ratios in the present data set.  Overall, though, our data clearly indicate
+that, on $\sim$pc scales in the CMZ, dust is a coolant and the gas and dust are
+not in equilibrium.
 
-\citet{Clark2013a} modeled The Brick with a suite of hydrodynamic simulations
-and found that even for such a dense structure, the gas and dust temperature
-can be uncoupled if the interstellar radiation field (ISRF) and cosmic ray
-ionization rate (CRIR) are $\sim1000\times$ their local values.  In their
-model, the ISRF determines the dust temperature while the CRIR determines the
-gas temperature.  Assuming their model still holds further from Sgr A, our
-observations of high gas temperatures imply that the CRIR must remain elevated
-to $\sim10^{14}$ s$^{-1}$ out to a projected radius $R_{GC} \sim 250$ pc.
+%\citet{Clark2013a} modeled The Brick with a suite of hydrodynamic simulations
+%and found that even for such a dense structure, the gas and dust temperature
+%can be uncoupled if the interstellar radiation field (ISRF) and cosmic ray
+%ionization rate (CRIR) are $\sim1000\times$ their local values.  In their
+%model, the ISRF determines the dust temperature while the CRIR determines the
+%gas temperature.  Assuming their model still holds further from Sgr A, our
+%observations of high gas temperatures imply that the CRIR must remain elevated
+%to $\sim10^{14}$ s$^{-1}$ out to a projected radius $R_{GC} \sim 250$ pc.
 
 \FigureTwo
 {figures/chi2_temperature_vs_higaltemperature_fieldsandsources.pdf} % parameter_comparisons
@@ -1022,11 +1035,15 @@ measured in a ridge to the Galactic northeast of Sgr B2 N using \methylcyanide
 \citep[][Figure 4b]{de-Vicente1997a}, which we now confirm, though our data
 show $T\gtrsim150$ K.  \citet{Ott2014a} also showed relatively high \ammonia
 temperatures in this hot ridge.
-The high temperatures in the Sgr B2 region, $T>80$ K, extend to a radius of
-$\sim10$ pc (5\arcmin), and nearly 30 pc (12.5\arcmin) in the
-northwest/southeast directions. 
+% The high temperatures in the Sgr B2 region, $T>80$ K, extend to a radius of
+% $\sim10$ pc (5\arcmin), and nearly 30 pc (12.5\arcmin) in the
+% northwest/southeast directions. 
 The Brick, Sgr A, and the 50 \kms and 20 \kms clouds exhibit the
-highest temperatures outside of Sgr B2, with $T>100$ K.
+highest temperatures outside of Sgr B2, with $T>100$ K.  The western portion of the
+CMZ, around G359.5, shows cooler temperatures $40 < T < 60$ K.  
+Along the `dust ridge', the high-latitude portion is slightly warmer than the
+low-latitude region; this difference is most evident when comparing The Brick
+to the region just south of it and at $\ell=0.5\arcdeg$.
 
 %A high temperature `ridge' follows along the
 %positive-latitude component of the \citet{Molinari2011a} `ring', tracing
@@ -1065,10 +1082,12 @@ many of those on the near side, such as The Brick (red segment).
 
 There is some evolution of temperature over time evident in Figure
 \ref{fig:kdltemvstime}, which shows the temperature within each
-dendrogram-extracted clump within 20 \kms and 6 pc of the
-\citet{Kruijssen2015a} orbit.  The possible linear increase in temperature over the
-first $\sim0.5$ Myr seems to support the \citet{Kruijssen2015a} hypothesis that
-the `ring' represents a single gas stream on its first passage by Sgr A*.
+dendrogram-extracted clump within 35 \kms and 6 pc of the
+\citet{Kruijssen2015a} orbit.  The possible linear increase in temperature over
+the first $\sim0.5$ Myr might support the \citet{Kruijssen2015a} hypothesis
+that the `ring' represents a single gas stream on its first passage by Sgr A*.
+However, the `trend' is equally consistent with a constant temperature over the
+same range.
 %The cooler gas on the far side does not obviously fit into this picture, 
 %and we suggest in Section \ref{sec:coolstream} that it is not affiliated with
 %the orbit (but the existence of such a cool stream does \emph{not} challenge
@@ -1090,7 +1109,7 @@ slice.  The orbit is outside of our observed field to the west of Sgr C.
 The X's mark The Brick (purple), cloud d (blue), and cloud e (red) to provide
 landmarks for comparison between the two figures.
 }
-{fig:kdlorbit}{1}{8.5in}
+{fig:kdlorbit}{0.8}{8.5in}
 
 % dendro_vs_time
 \FigureTwo
@@ -1106,10 +1125,11 @@ to $T\gtrsim100$ K over a period $\tau\sim0.8$ Myr, as illustrated by the
 dashed line in panel (b); note that the cool features from 0.7-0.9 Myr are
 at a significantly different velocity and therefore do not folow precisely the same
 stream.  The Brick is an outlier (it is hotter) whether or not there is a
-trend.  The symbol sizes are proportional to the \para \threeohthree brightness
+trend.  The symbol sizes are proportional to the \para \threetwoone brightness
 and are meant to give
-an indication of how reliable the detections are.  The grey vertical lines
-through the circles indicate the formal $1-\sigma$ errors on the temperature.
+an indication of how reliable the temperature measurements are.  The grey
+vertical lines through the circles indicate the formal $1-\sigma$ errors on the
+temperature.
 (a) shows the entire orbit
 while (b) shows an expanded
 view of the first Myr.  The colored bar along the bottom of the figure shows the
@@ -1145,17 +1165,18 @@ color scheme that we have used in Figure \ref{fig:temmapnosmooth}.  There are so
 trends that are common between the two maps: the Sgr A complex and Sgr B2
 complex are the warmest regions, the `diffuse' gas surrounding these is
 somewhat cooler, and the positive latitude component of the
-\citet{Molinari2011a} `ring' is warmer than the negative latitude
+\citet{Molinari2011a} `ring' is slightly warmer than the negative latitude
 component.
 
 The most significant difference occurs in the southwest portion of the Sgr B2
-cloud.  In this region, the \ammonia temperature ranges from the high
-($T>80K$) temperatures of the Sgr B2 N hot ridge into a cooler background
-$T\sim30-40$ K.  By contrast, the \formaldehyde temperatures stay high,
-indicating gas temperatures $T>150$ K extending $\sim2.5\arcmin$ (6 pc) to the
-southwest of Sgr B2 S.  This difference probably indicates that there is a
-cool, diffuse component being detected in \ammonia, while
-\formaldehyde is detecting a hotter, denser component.
+cloud.  In this region, the \ammonia temperature ranges from the high ($T>80K$)
+temperatures of the Sgr B2 N hot ridge into a cooler background $T\sim30-40$ K.
+By contrast, the \formaldehyde temperatures stay high, indicating gas
+temperatures $T>150$ K extending to the southwest of Sgr B2 S.  This difference
+probably indicates that there is a cool, diffuse component being detected in
+\ammonia, while \formaldehyde is detecting a hotter, denser component.  This
+region will provide a good comparison target for other thermometric
+observations.
 
 % tmap_figure
 \RotFigureTwoAA
@@ -1179,11 +1200,10 @@ The largest survey of \para temperatures prior to this work was by
 \citet{Ao2013a}, who observed the inner 75 pc.  They performed a similar
 analysis to ours but over a smaller area.  They reported similar temperatures,
 with some small differences due to a different set of collision rates adopted
-(\citet{Wiesenfeld2013a} rather than \citet{Green1991a}).
-The \citet{Ao2013a} survey found uniformly high temperatures within the bright
-Sgr A cloud complex.  Our survey finds a greater variety in gas temperatures due
-to the larger area covered, with significant contrast between the far-side
-cool clouds and the warmer foreground infrared dark clouds.
+(\citet{Wiesenfeld2013a} rather than \citet{Green1991a}).  The \citet{Ao2013a}
+survey found uniformly high temperatures within the bright Sgr A cloud complex.
+Our survey finds a greater variety in gas temperatures due to the larger area
+covered.
 
 There have also been observations of \para temperatures with interferometers.
 \citet{Johnston2014a} noted a very high temperature peak, $T>320$ K, using these
@@ -1203,62 +1223,6 @@ though it is unlikely - we discuss this further in Section
 \ref{sec:thickorwarm}.  We conclude, therefore, that a lower limit on the
 gas temperature in The Brick, $T\gtrsim120$ K, is consistent with our observations.
 
-
-\subsection{Discussion of heating mechanisms}
-\citet{Ao2013a} examined four heating mechanisms in the inner $\sim 40$ pc,
-concluding that the only viable heating mechanisms capable of explaining the
-high observed temperatures in the molecular gas are cosmic ray and turbulent
-heating.  
-
-The cosmic ray heating rate required by the \citet{Ao2013a} analysis is high,
-$\zeta\sim1-2\ee{-14}$ \pers, but plausible.  The turbulence in the CMZ is also
-sufficient to explain the observed gas temperatures. 
-The analysis performed in \citet{Ao2013a} determined the gas temperature
-assuming that the observed temperature corresponds to an equilibrium temperature
-for the bulk of the gas.  For
-cosmic ray-driven heating, this is a reasonable approximation: the CR-derived
-gas temperature
-has a weak density dependence ($T_{kin}\sim n^{1/6}$) and the energy deposited
-by cosmic rays should be relatively uniform across the cloud.  Turbulent heating,
-on the other hand, is nonuniform \citep{Pan2009a}.
-
-Non-uniform heating of the molecular gas could explain the temperature
-structure observed in the CMZ molecular clouds (see Figure
-\ref{fig:brickradial}).  If supersonic shocks within
-the gas are responsible for heating the gas above a mean background temperature
-$T_{gas} \sim T_{dust}$, only about 10\% of the gas needs to be heated to
-$T\sim50-100$ K to generate the line brightness observed \emph{if} the hottest
-gas is also the densest.  However, hot and dense gas cools more efficiently, so
-sustaining a population of shock-heated gas may be infeasible.  Additionally,
-the log-poisson distribution followed by a multiplicative cascade has a
-substantial low-temperature tail \citep{Pan2009a}, which implies that the mean
-temperature must be near the observed temperature.  Such an explanation for the
-observed temperatures must be investigated more thoroughly, ideally with
-hydrodynamic simulations of turbulence using a reasonable treatment for the gas
-shock heating and line cooling.
-%\todo{It would be nice to have some help
-%from a theorist to assess whether non-uniform heating could really drive the observed
-%temperatures.}
-
-Direct radiative heating from stars is another possibility.  If stars are
-forming in the centers of the clouds, one would expect the warmest portion of
-the cloud to be its interior, as seen in Figure \ref{fig:brickradial}a.  The
-Brick has very little star formation at present \citep{Rathborne2014b}, so the
-temperature cannot be readily explained by star formation, but other clouds,
-such as cloud
-d, that exhibit similar radial variations may be explained by interior star
-formation.
-
-For clouds with the inverse profile, such as G1.23-0.08 (Figure
-\ref{fig:brickradial}b), external heating from the dense stellar population may
-explain the temperature profile.  \todo{Can we use this model to infer the
-radiation field?  Does it pass sanity checks?}
-% In G1.23-0.08 example, there are no hints of
-% active star formation: there are no 24 \um or 70 \um sources and no compact
-% radio continuum emission.
-
-%Gas temperatures higher than dust temperatures occur in both high and low density
-%gas \todo{need to have somes sort of density tracer - probably just dust + spherical}
 
 
 %\subsection{Radial Variations}
@@ -1362,16 +1326,15 @@ observed.  So, while it remains possible that optically thick \para is
 responsible for the observed line ratios, it is very unlikely, especially
 outside the densest clouds.
 
-\todo{Too speculative for the final paper, but kept to generate discussion in
-Draft 1.}
 One remaining possibility is that the \para lines become optically thick
 because of dramatically reduced turbulent line spreading and therefore
 increased line trapping.  Such an effect would require a transition from
 supersonically turbulent to coherent (subsonically turbulent) gas motion
-\citep[e.g.][]{Pineda2010a} and could reduce
-the required column densities by $\sim100\times$.  Still, the fact that we
-observe \para emission spread over
-a wide range of velocities renders this scenario unlikely.
+\citep[e.g.][]{Pineda2010a} and could reduce the required column densities by
+$\sim100\times$.  Still, the fact that we observe \para emission spread over a
+wide range of velocities renders this scenario unlikely, since it would require
+many high-column-density, coherent clumps moving at high velocity with respect
+to one another.
 
 
 \subsection{The CMZ average}
@@ -1387,7 +1350,7 @@ The spectral fit is imperfect, showing a non-flat baseline between the
 \threetwoone and \threetwotwo lines, but nonetheless the extracted value is
 likely representative of the CMZ-wide average.  This temperature is very close
 to the \ammonia-measured temperature in M83 \citep[56 K;][]{Mangum2013a}, which
-also has a similarly low dust temperature $T_{dust,M83} = 31$ K over a 600 pc
+has a similarly low dust temperature $T_{dust,M83} = 31$ K over a 600 pc
 region.  Maffei 2, NGC 1365, and NGC 6946 also exhibit similar gas and dust
 temperatures to our Galactic center in the \citet{Mangum2013a} sample,
 suggesting that these galaxies all have analogous gas thermal structures in
@@ -1477,17 +1440,25 @@ there is also significant contrast in gas temperature, with massive clouds such
 as The Brick, Sgr B2, and the Sgr A cloud complex exhibiting temperatures in
 excess of $T>100$ K.
 
+The high gas temperatures throughout the CMZ suggest that turbulent heating is
+dominant in many locations.  Cosmic rays may dominate in less turbulent
+sub-regions within the CMZ, but we are able to place an upper limit $\zeta_{CR}
+< 10^{-14}$ \pers because a higher CRIR would result in a higher floor
+temperature for our observations.  In some areas, though, turbulent plus cosmic
+ray heating are inadequate to explain the observed temperatures, suggesting
+additional mechanisms are involved in some clouds.
+
 Our new observations are broadly consistent with the orbital model described by
 \citet{Kruijssen2015a}.  While there are some individual discrepancies, it at
 least appears that the near-side clouds (The Brick and the lettered clouds on
 the path to Sgr B2) have consistent thermal properties and fall along a stream
 of progressively increasing temperature as a function of age.  
 
-The 80 \kms cloud stream extending from $\ell=1.2\arcdeg$ to $\ell=0.3\arcdeg$
-is relatively cool compared to the rest of the CMZ despite its broad line
-width.  The lower temperature hints that it is more distant from pericenter
-than the `ring' clouds, and it may therefore represent a fresh stream of gas
-infalling into the center.
+% The 80 \kms cloud stream extending from $\ell=1.2\arcdeg$ to $\ell=0.3\arcdeg$
+% is relatively cool compared to the rest of the CMZ despite its broad line
+% width.  The lower temperature hints that it is more distant from pericenter
+% than the `ring' clouds, and it may therefore represent a fresh stream of gas
+% infalling into the center.
 
 \textbf{Acknowledgements}:
 We thank the staff and observers at APEX for carrying out the service-mode

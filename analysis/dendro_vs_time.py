@@ -91,9 +91,12 @@ for cat,smooth in ((catalog,"",),):
     cat.add_column(table.Column(distance, name='DistanceFromOrbit'))
 
     is_leaf = (cat['is_leaf'] == 'True')
+    ok = (~cat['IsAbsorption']) & (~cat['IsNotH2CO'])
+    sn = (cat['ratio303321']/cat['eratio303321'])
     selection = ((np.abs((modelvelo-vcen))<35) &
                  (distance < 0.15) &
-                 (vcen > -80))
+                 #(vcen > -80) &
+                 ok)
 
     # make sure the Brick is included
     assert dend.structure_at((195,142,730)).idx in catalog['_idx'][selection]
@@ -118,7 +121,7 @@ for cat,smooth in ((catalog,"",),):
     sc = ax3.scatter(time[selection&is_leaf]-reftime,
                      temperature[selection&is_leaf], marker='.',
                      c=color[selection&is_leaf], #alpha=0.5,
-                     s=5000*cat['Smean303'][selection&is_leaf], edgecolor='none')
+                     s=5000*cat['Smean321'][selection&is_leaf], edgecolor='none')
     ax3.errorbar(time[selection&is_leaf]-reftime,
                  temperature[selection&is_leaf],
                  yerr=[cat['temperature_chi2'][selection&is_leaf]-cat['tmin1sig_chi2'][selection&is_leaf],
@@ -136,7 +139,7 @@ for cat,smooth in ((catalog,"",),):
     sc2 = ax3.scatter(time[selection&~is_leaf]-reftime,
                      temperature[selection&~is_leaf], marker='.',
                      c=color[selection&~is_leaf], alpha=0.2,
-                     s=5000*cat['Smean303'][selection&~is_leaf],
+                     s=5000*cat['Smean321'][selection&~is_leaf],
                      edgecolor='none')
     ax3.set_xlabel("Time since 1$^\\mathrm{st}$ pericenter passage [Myr]", size=24, labelpad=10)
 
