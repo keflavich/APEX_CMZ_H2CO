@@ -1530,17 +1530,18 @@ lower-amplitude baseline spectra.}
 %replaced with a higher-quality figure}}
 %{fig:eigenspectra}{0.5}{0}
 
-\section{Ratio examination of individual regions}
-\todo{While figures have been made for this, they will not be included unless
-necessary.}
-To further examine the reliability of the ratio determination, we have examined
-individual regions in the unsmoothed images on a pixel-by-pixel basis, using
-\texttt{pyspeckit} to fit a 4-parameter model (amplitude, centroid, width, and
-$R_1$) to each spectrum with constrained velocity range and width.  These fits
-were performed on the locally baseline-subtracted data cubes.
+%I don't think this is necessary
+% \section{Ratio examination of individual regions}
+% \todo{While figures have been made for this, they will not be included unless
+% necessary.}
+% To further examine the reliability of the ratio determination, we have examined
+% individual regions in the unsmoothed images on a pixel-by-pixel basis, using
+% \texttt{pyspeckit} to fit a 4-parameter model (amplitude, centroid, width, and
+% $R_1$) to each spectrum with constrained velocity range and width.  These fits
+% were performed on the locally baseline-subtracted data cubes.
 
 \section{Spectral fits for regions and apertures}
-\todo{This section is intended to be electronic-only.}
+%\todo{This section is intended to be electronic-only.}
 We provide a catalog of line ratios measured from aperture-extracted spectra
 along with figures showing the best fit model for each spectrum.  We have
 extracted spectra in regions with significant \para emission and in commonly
@@ -1560,7 +1561,7 @@ Spatial parameters for the box (\texttt{GLON}, \texttt{GLAT},
 \texttt{GLAT}, and \texttt{radius}) regions are included.  The average dust
 column and dust temperature are reported (\texttt{higaldusttem} and
 \texttt{higalcolumndens}).  The best fit parameters for gas temperature, \para
-column, and \hh density are included along with their $\pm1-sigma$ marginalized
+column, and \hh density are included along with their $\pm1-\sigma$ marginalized
 limits.
 
 \RotFigureThreeAA
@@ -1663,18 +1664,14 @@ versions of many of the main figures in the paper to provide a record of
 features that were weakly detected.  The smoothed maps may also give a sense
 of how the temperature varies with spatial scale.
 
-We found that much of the cube included marginal detections at the original
-resolution, FWHM=$30\arcsec$ and $\Delta v=1$ \kms.  We therefore created
-additional smoothed cubes, smoothing in the spatial dimensions with a
-$\sigma_{FWHM}=33.84\arcsec$ gaussian to achieve a resolution 45\arcsec, and
+The cubes were smoothed in the spatial dimensions with a
+$\sigma_{FWHM}=33.84\arcsec$ gaussian to achieve a resolution 45\arcsec and
 $\sigma_{v, FWHM} = 3$ \kms in the spectral direction.  The smoothed cubes were
 also downsampled by a factor of 2 in the spectral direction (the smoothing and
-downsampling are independent).  We then performed
-the same signal extraction analysis described above, but with a threshold $T_A
-> 3\sigma$.  
+downsampling are independent).  
+The same signal extraction analysis described in Section \ref{sec:signal} was used with a
+threshold $T_A > 3\sigma$.  
 
-Figure \ref{fig:ratiomapssm} shows the same process performed on the smoothed
-data cubes.
 
 % figure_ratio_maps
 \RotFigureTwoAA
@@ -1727,7 +1724,8 @@ for visualization purposes.  Each voxel was assigned a value corresponding to
 the temperature in the smallest dendrogram structure it was included in.  For
 example, a voxel corresponding to a leaf has the temperature measured for that
 leaf, while a voxel that is not in a leaf but is part of a structure would be
-assigned the temperature of the \emph{smallest} structure.  The rest of the
+assigned the temperature of the \emph{smallest} structure in which it is
+included.  The rest of the
 cube was assigned NAN values.  This cube is similar to a smoothed cube, but
 smoothed over connected structures rather than with a symmetric beam.  The cube
 is interesting for visualization purposes, but should be treated with some
@@ -1737,7 +1735,8 @@ by construction to have the same temperature in this cube.  Despite this
 caveat, comparison of the dendrogram figures (Figure \ref{fig:dendrotemmap}) to
 the directly averaged figures (Figures \ref{fig:temmap} and
 \ref{fig:temmapnosmooth}) shows that the dendrogram objects are effectively
-averages over the included area in most cases.
+averages over the included area in most cases.  Since there is less noise in
+these figures, it is easier to identify interesting features in them by eye.
 
 
 
