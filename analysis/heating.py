@@ -55,8 +55,11 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
     energy_density = u.erg/u.cm**3/u.s
 
 
+    # c1 = leading constant for gas-dust cooling term
     c1 = 4e-33 * u.cm**3 * u.K**-1.5 *u.erg/u.s
+    # c2 = leading constant for gas line cooling term
     c2 = 6e-29 * u.erg/u.cm**3 /u.s *u.K**-3 *(u.km/u.s/u.pc)**-1 * (u.cm**-1.5)**-1
+    # ccr = leading term for cosmic ray heating term.  Also, a band.
     ccr = 3.2e-28 * u.erg * u.s**-1
 
     dvdr = gradient.to(u.km/u.s/u.pc)
