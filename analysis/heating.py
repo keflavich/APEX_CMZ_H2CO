@@ -9,14 +9,19 @@ from scipy.optimize import fsolve
 def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
              column=1e22*u.cm**-2, Fx=0*u.erg/u.s/u.cm**2):
     """
-    Solve: Lamda_(gas-dust) + Lamda_(gas) - Gamma_(turb) - Gamma_(crir) = 0
+    Solve:
+        Lamda_(gas-dust) + Lamda_(gas) - Gamma_(turb) - Gamma_(crir) - Gamma_(xray) = 0
+    (where any of the heating terms can be set to zero by setting the
+    appropriate constant to zero, but the cooling terms cannot be turned off)
 
     Lambda_(gas-dust) is given by Goldsmith & Langer 1978
     Lambda_(gas) is a parametrization of Goldsmith 2001 by Ao 2013
     Gamma_(turb) comes from Pan & Padoan 2009
     Gamma_(crir) is from Tielens 2005
+    Gamma_(xray) is direct from Ao 2013; I did not re-examine the derivation of
+                 this term
 
-    Uses `scipy.optimize.fsolve`
+    Uses `scipy.optimize.fsolve` to solve the equation numerically
 
     Parameters
     ----------
@@ -24,6 +29,7 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
         Volume density
     sigma : u.km/u.s equivalent
         Line width (sigma, not fwhm)
+        (set to zero to turn off turbulent heating)
     lengthscale : u.pc equivalent
         Length scale of turbulent driving
     gradient : u.km/u.s/u.pc equivalent
@@ -32,10 +38,12 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
         The dust temperature
     crir : u.s**-1 equivalent
         The cosmic ray ionization rate
+        (set to zero to turn off cosmic ray heating)
     column : u.cm**-2 equivalent
         The column density of the gas (for X-ray only)
     Fx : u.erg/u.s/u.cm**2 equivalent
         The X-ray flux density
+        (set to 0 to turn off X-ray heating)
     """
     assert density.unit.is_equivalent(u.cm**-3)
     assert sigma.unit.is_equivalent(u.km/u.s)
