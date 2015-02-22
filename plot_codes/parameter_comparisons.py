@@ -16,7 +16,7 @@ pcfittable = table.Table.read(os.path.join(analysispath,
 
 lolim = pcfittable['tmax1sig_chi2'] > 340
 maps = np.char.startswith(pcfittable['Source_Name'], 'Map')
-ok = ~np.isnan(pcfittable['tmin1sig_chi2']) & (pcfittable['width'] < 40) & (pcfittable['h2coratio321303']/pcfittable['eh2coratio321303'] > 5)
+ok = ~np.isnan(pcfittable['tmin1sig_chi2']) & (pcfittable['width'] < 40) & (pcfittable['h2coratio321303']/pcfittable['eh2coratio321303'] > 5) & pcfittable['is_good'].astype('bool')
 flags = {'is_map': maps,
          'is_lolim': lolim,
          'is_ok': ok}
@@ -127,7 +127,7 @@ ax7.errorbar(pcfittable['width'][mask]*(8*np.log(2))**0.5,
              capsize=0,
              markersize=10,
              markeredgecolor='none',
-             linestyle='none', marker='s', linewidth=0.5, alpha=0.5, color='r')
+             linestyle='none', marker='s', linewidth=0.5, alpha=0.6, color='r')
 mask = maps&lolim_conservative
 ax7.plot(pcfittable['width'][mask]*(8*np.log(2))**0.5,
          pcfittable['tmin1sig_chi2'][mask],
@@ -135,7 +135,7 @@ ax7.plot(pcfittable['width'][mask]*(8*np.log(2))**0.5,
          markersize=10,
          markeredgecolor='none',
          color='r',
-         alpha=0.5,
+         alpha=0.4,
          linestyle='none')
 
 linewidths = np.linspace(0,pcfittable['width'].max())*u.km/u.s
@@ -185,7 +185,7 @@ ax7.errorbar(pcfittable['width'][mask]*(8*np.log(2))**0.5,
              capsize=0,
              markeredgecolor='none',
              markersize=10,
-             linestyle='none', marker='s', linewidth=0.5, alpha=0.5, color='b')
+             linestyle='none', marker='s', linewidth=0.5, alpha=0.6, color='b')
 
 mask = (~maps)&lolim_conservative
 ax7.plot(pcfittable['width'][mask]*(8*np.log(2))**0.5,
@@ -194,7 +194,7 @@ ax7.plot(pcfittable['width'][mask]*(8*np.log(2))**0.5,
          markersize=10,
          markeredgecolor='none',
          color='b',
-         alpha=0.5,
+         alpha=0.4,
          linestyle='none')
 
 ax7.set_ylim(10,150)
@@ -343,3 +343,110 @@ fig14.savefig(paths.fpath('chi2_temperature_vs_higaldustcol_fieldsandsources.pdf
                          bbox_inches='tight')
 
 # pcfittable[np.abs(pcfittable['temperature_chi2']-pcfittable['higaldusttem'])/pcfittable['higaldusttem'] < 1.5].pprint()
+
+fig15 = pl.figure(15)
+fig15.clf()
+ax15 = fig15.gca()
+mask = maps&~lolim_conservative
+ax15.errorbar(pcfittable['tkin_turb'][mask],
+              pcfittable['temperature_chi2'][mask],
+             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[mask],
+                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[mask]],
+             capsize=0,
+             markersize=10,
+             markeredgecolor='none',
+             linestyle='none', marker='s', linewidth=0.5, alpha=0.6, color='r')
+mask = maps&lolim_conservative
+ax15.plot(pcfittable['tkin_turb'][mask],
+         pcfittable['tmin1sig_chi2'][mask],
+         marker='^',
+         markersize=10,
+         markeredgecolor='none',
+         color='r',
+         alpha=0.4,
+         linestyle='none')
+
+mask = (maps) & (~lolim_conservative) & ((pcfittable['tmin1sig_chi2'] > pcfittable['tkin_turb']) | (pcfittable['tmax1sig_chi2'] < pcfittable['tkin_turb']))
+ax15.plot(pcfittable['tkin_turb'][mask],
+         pcfittable['temperature_chi2'][mask],
+         marker='s',
+         markersize=15,
+         markeredgecolor='r',
+         markerfacecolor='none',
+         markeredgewidth=0.5,
+         alpha=0.4,
+         linestyle='none')
+mask = (maps) & (lolim_conservative) & ((pcfittable['tmin1sig_chi2'] > pcfittable['tkin_turb']))
+ax15.plot(pcfittable['tkin_turb'][mask],
+         pcfittable['tmin1sig_chi2'][mask],
+         marker='^',
+         markersize=15,
+         markeredgecolor='r',
+         markerfacecolor='none',
+         markeredgewidth=0.5,
+         alpha=0.4,
+         linestyle='none')
+
+# Sources with T_predicted >> T_measured
+#high_badpredictions = (pcfittable['tkin_turb'] > pcfittable['tmax1sig_chi2'])&(~lolim_conservative)
+#high_badpredictions = (pcfittable['tkin_turb'] > 120)&(~lolim_conservative)
+#for row,is_map in zip(pcfittable[high_badpredictions], maps[high_badpredictions]):
+#    xy = np.array((row['tkin_turb'], row['temperature_chi2']))
+#    ax15.annotate("{0}_{1}".format(row['Source_Name'], row['ComponentID']),
+#                  xy,
+#                  xytext=xy-(15, 7),
+#                  color='r' if is_map else 'b'
+#                 )
+
+ax15.plot([0,200], [0,200], 'k--', alpha=0.5, zorder=-5)
+ax15.set_xlabel("Turbulence-driven Temperature (K)")
+ax15.set_ylabel("H$_2$CO Temperature (K)")
+ax15.set_ylim(10,150)
+ax15.set_xlim(10,180)
+fig15.savefig(paths.fpath('chi2_temperature_vs_turbulenttemperature_byfield.pdf'),
+                         bbox_inches='tight')
+
+mask = (~maps)&(~lolim_conservative)
+ax15.errorbar(pcfittable['tkin_turb'][mask],
+             pcfittable['temperature_chi2'][mask],
+             yerr=[(pcfittable['temperature_chi2']-pcfittable['tmin1sig_chi2'])[mask],
+                   (pcfittable['tmax1sig_chi2']-pcfittable['temperature_chi2'])[mask]],
+             capsize=0,
+             markeredgecolor='none',
+             markersize=10,
+             linestyle='none', marker='s', linewidth=0.5, alpha=0.6, color='b')
+
+mask = (~maps)&lolim_conservative
+ax15.plot(pcfittable['tkin_turb'][mask],
+         pcfittable['tmin1sig_chi2'][mask],
+         marker='^',
+         markersize=10,
+         markeredgecolor='none',
+         color='b',
+         alpha=0.4,
+         linestyle='none')
+
+mask = (~maps) & (~lolim_conservative) & ((pcfittable['tmin1sig_chi2'] > pcfittable['tkin_turb']) | (pcfittable['tmax1sig_chi2'] < pcfittable['tkin_turb']))
+ax15.plot(pcfittable['tkin_turb'][mask],
+         pcfittable['temperature_chi2'][mask],
+         marker='s',
+         markersize=15,
+         markeredgecolor='b',
+         markerfacecolor='none',
+         markeredgewidth=0.5,
+         alpha=0.4,
+         linestyle='none')
+mask = (~maps) & (lolim_conservative) & ((pcfittable['tmin1sig_chi2'] > pcfittable['tkin_turb']))
+ax15.plot(pcfittable['tkin_turb'][mask],
+         pcfittable['tmin1sig_chi2'][mask],
+         marker='^',
+         markersize=15,
+         markeredgecolor='b',
+         markerfacecolor='none',
+         markeredgewidth=0.5,
+         alpha=0.4,
+         linestyle='none')
+
+ax15.set_ylim(10,150)
+fig15.savefig(paths.fpath('chi2_temperature_vs_turbulenttemperature_fieldsandsources.pdf'),
+                         bbox_inches='tight')

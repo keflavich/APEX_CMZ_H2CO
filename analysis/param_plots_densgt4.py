@@ -40,7 +40,7 @@ fittable.add_columns([table.Column(name=name, dtype='float', length=len(fittable
                                    'density_chi2','dmin1sig_chi2','dmax1sig_chi2',
                                    'logh2column','elogh2column',
                                    'logabundance','elogabundance',
-                                   'tkin_turb',
+                                   'tkin_turb', 'reff_pc',
                                   ]])
 
 if not os.path.exists(paths.fpath('param_fits')):
@@ -65,13 +65,13 @@ for row in fittable:
     log.info("Fitting {0}_{1}".format(row['Source_Name'],num))
     logh2column = np.log10(row['higalcolumndens'])
     elogh2column = 1.0
-    linewidth = row['width']
-    elinewidth = row['ewidth']
+    linewidth = row['spline_width']
+    elinewidth = row['espline_width']
 
-    par1 = row['ampH2CO']
-    epar1 = row['eampH2CO']
-    par2 = row['ampH2CO']*row['spline_h2coratio321303']
-    epar2 = row['ampH2CO']*row['espline_h2coratio321303']
+    par1 = row['spline_ampH2CO']
+    epar1 = row['espline_ampH2CO']
+    par2 = row['spline_ampH2CO']*row['spline_h2coratio321303']
+    epar2 = row['spline_ampH2CO']*row['espline_h2coratio321303']
     #match,indbest,chi2b = grid_fitter.grid_2p_getmatch(par1, epar1, tline303,
     #                                                   par2, epar2, tline321)
     ratio = row['spline_h2coratio321303']
@@ -431,23 +431,24 @@ for row in fittable:
                                                                                               num=num))
         pl.savefig(outf, bbox_inches='tight')
 
-
-    width = row['width']*u.km/u.s
-    lengthscale = (row['area']/np.pi * u.deg * 8.5*u.kpc).to(u.pc, u.dimensionless_angles())
-
-    row['tkin_turb'] = heating.tkin_all(10**row['density_chi2']*u.cm**-3,
-                                        width,
-                                        lengthscale,
-                                        width/lengthscale,
-                                        row['higaldusttem']*u.K,
-                                        crir=0./u.s)
-
     # IGNORE 321/322: it is generally not well constrained anyway
     mf.chi2 -= mf.chi2_r321322
 
     row_data = mf.get_parconstraints()
     for key,value in row_data.iteritems():
         row[key] = value
+
+
+    width = row['width']*u.km/u.s
+    row['reff_pc'] = reff.to(u.pc).value
+
+    row['tkin_turb'] = heating.tkin_all(density=10**row['density_chi2']*u.cm**-3,
+                                        sigma=width,
+                                        lengthscale=reff,
+                                        gradient=width/reff,
+                                        tdust=row['higaldusttem']*u.K,
+                                        crir=0./u.s)
+
 
     #if row_data['temperature_chi2'] == 10:
     #    import ipdb; ipdb.set_trace()

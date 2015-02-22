@@ -773,7 +773,8 @@ lower signal-to-noise ratios at the edges and should be ignored.
 \clearpage
 \section{Discussion}
 \label{sec:discussion}
-\subsection{Turbulent Heating}
+\subsection{Gas heating and thermal balance}
+\label{sec:heating}
 Supersonic turbulence decays, resulting in direct gas heating
 \citep{Falgarone1995a, Pan2009a}.  The energy dissipation rate is proportional
 to the gas velocity dispersion cubed, which implies that the temperature
@@ -792,12 +793,105 @@ and the same parametrization of the gas and dust cooling rates (their equations
 checking against the cooling curves of \citet{Clark2013a}, we find that the
 parametrization is consistent with their fiducial $1000 G_0$, 1000$\times$
 local cosmic ray ionization simulation (though the dominant coolant has changed).
+We solve these equations numerically to determine the resulting equilbrium
+kinetic temperature; the associated can be found in the file \texttt{heating.py}
+in the associated repository.
+
+A first key point is that we measure gas temperatures $T\sim60$ K in many
+clouds everywhere throughout the CMZ.  Since cosmic rays have very high
+penetration depths, we expect that cosmic ray heating is entirely uniform
+everywhere within the CMZ, independent of column density.  If this uniformity
+holds, then we can set an upper limit on the cosmic ray ionization rate,
+$\zeta_{CR} \lesssim 10^{-14}$ \pers, since a higher rate would result in a
+minimum gas temperature above what we have measured.  For a fiducial
+measurement, we use $n=10^{4.5}$ \percc, $dv/dr=5$ \kms \perpc, $T_{dust}=25$
+K, and $\zeta_{CR} = 10^{-14}$ \pers, which yields $T_{gas}=55$ K in the
+absence of any other heating mechanisms.  A lower density $n=10^4$ \percc and
+higher gradient $dv/dr=10$ \kms \perpc yield the same temperature if
+$\zeta_{CR} = 3\ee{-14}$ \pers, which gives a more conservative upper limit.
 
 The resulting curves for $T_K(\sigma_v)$ are shown in Figure
 \ref{fig:temvsfwhm_regions}.  In the plotted curves, we have assumed a cloud
 scale $L=5$ pc, a gradient $dv/dr = 5$ \kms \perpc (the gradient and length
 scale are entirely degenerate), and a cosmic ray ionization rate (CRIR)
 $\zeta_{CR}=10^{-17}$ \pers, with exceptions noted in the legend.
+
+We also have information on the linewidth, size scale, and density for each
+individual region, albeit with great uncertainties on each.  We use these
+measurements to predict the gas temperature if turbulence is the only source of
+heating.  We use the effective radius ($r_{eff} = (A/\pi)^{1/2}$, where $A$ is
+the source area) of the
+selected sources as the length scale, the measured linewidth $\sigma_v$, the
+measured dust temperature $T_{d}$, and we assume the velocity gradient $dv/dr =
+\sigma_v / r_{eff}$.  Of these measurements, the linewidth $\sigma_v$ is
+dominant in determining the predicted temperature and is the least uncertain;
+the velocity gradients we derive by this approach are not obviously reasonable
+but they only affect the temperature minimally, with a power of 1/3.  This
+analysis is performed both for the hand-selected apertures, which have
+arbitrary radii but well-measured linewidths, and the dendrogram leaf sources,
+which have reasonably well-defined radii but somewhat poorly defined line
+widths.
+
+The results of the turbulence-predicted temperature analysis are shown in 
+Figure \ref{fig:turbtem}, which plots our measured temperature against
+the predicted temperature.  For the hand-extracted regions, there is no
+strong trend in the data, but most data points can be explained by turbulent
+heating alone, perhaps with cosmic rays setting a high floor temperature.
+There are a few points with measured temperatures below the turbulence
+prediction.  Some of these regions
+%, e.g. the regions denoted ``CoolSpot'' and
+%``WarmSpot'' in the catalog,
+include at least one velocity component that seems
+to be genuinely cool and broad.  Perhaps the likeliest explanation for these
+regions is that their linewidths are an indication of bulk motion rather than
+turbulent motion, and therefore they may be good regions to examine as possible
+expanding bubble edges, either supernova or \hii-region driven.
+
+The dendrogram-extracted points cluster above the $T_{predicted} =
+T_{measured}$ line, but not by very much.  Since dendrogram-extracted
+sources are necessarily coherent in position-velocity space, they are less likely
+than the hand-selected features (which were selected in position-position space)
+to represent unassociated line-of-sight features, supporting the idea that the
+hand-selected features are widened by non-turbulent motions.
+
+Nearly all of the high signal-to-noise measurements in the dendrogram sources
+are above $T>60$ K, with many reaching $\sim100$ K.  The median temperature
+excess is $T_{measured}-T_{predicted} = 35$ K for sources that disagree.  This
+excess cannot readily be accounted for by cosmic rays, since it persists at
+high linewidths where the turbulent heating dominates the cosmic ray heating.
+The gas could be heated by a stronger local stellar radiation field, i.e. by
+local star formation, but if so, the dust should be similarly heated.
+Local X-ray heating could account for the higher temperatures if the local
+X-ray flux density is $\sim3$ orders of magnitude higher than the average,
+which provides a plausible explanation for some of these regions \citep{Ao2013a}.
+However, it seems unlikely that the majority of \formaldehyde-emitting regions
+mark local X-ray interaction features.  
+
+What else can explain the higher temperatures?  We have assumed that the
+\formaldehyde temperatures are driven by gas heating at the mean turbulent
+dissipation rate, $\Gamma_{turb} = n \mu m_H  \frac{1}{2}
+\left(\sqrt{3}\sigma_v\right)^3 / L$.  \citet{Pan2009a} observe that this is a
+robust assumption for their simulations, in which the density and the
+turbulence dissipation rate are uncorrelated (their Figure 3).  This
+decorrelation seems to rule out any possibility that local variations in the
+dissipation rate drive the high observed temperatures.
+% It is possible
+% that the turbulence in CMZ clouds is not well-developed, and the hot dense gas
+% is driven by large-scale shocks, e.g. \hii region and supernova bubble edges,
+% cloud `collisions' on self-intersecting orbits, and cloud accretion.  
+
+One other possibility is that the dendrogram source extraction approach has
+led to an underestimate of the line width.  Because we have selected only the
+leaf sources, we have artificially truncated the sources in both position and
+velocity.  The branch and trunk sources are systematically to the right of the
+leaf sources in Figure \ref{fig:turbtem} (though we do not show them to avoid
+excessive crowding), supporting this idea.  
+
+We may be able to further constrain the heating mechanisms using this same data
+set if precise velocity structure information is obtained for the clouds,
+combining the line fitting analysis of the hand-selected regions with the
+systematic blob extraction of the dendrogram extraction.  This analysis is left
+for a future work.
 
 \FigureTwo
 {figures/chi2_temperature_vs_linewidth_fieldsandsources}
@@ -824,7 +918,19 @@ and (5,5).
 {1}{3.5in}
 %{0.5}{0}
 
-
+\FigureTwo
+{figures/chi2_temperature_vs_turbulenttemperature_fieldsandsources.pdf}
+{figures/dendrotem/temperature_vs_turbtemperature.pdf}
+{Plots of the \formaldehyde-measured temperature against the predicted
+turbulent-driven temperature as discussed in Section \ref{sec:heating}.
+(a) The hand-selected regions as described in Figure \ref{fig:}.  Triangles
+indicate regions with lower limits on the temperature, i.e. any region with
+a measured $1-\sigma$ upper limit on the temperature $T>150$ K.  The gray
+dashed line shows the $T_{turb} = T_{measured}$ relation.  Regions that are inconsistent
+with the relation at the $1-\sigma$ level are outlined.
+(b) The same as (a) for the dendrogram-extracted regions.  
+}
+{fig:turbtem}{1}{3.5in}
 
 \subsection{Variation with spatial scale}
 For any given cloud, the ratio $R_1$ varies with the spatial averaging scale.

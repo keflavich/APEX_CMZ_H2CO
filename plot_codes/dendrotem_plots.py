@@ -62,8 +62,8 @@ for cat,dendro,smooth in zipped:
     # mask1 & leaf, mask1 & not leaf, mask2 & leaf, mask2 & not leaf....
     # Make the not-leaves be half as bright
     masks_colors = zip(leaf_masks,
-                       ('b','b','g','g','r','r','k','k'),
-                       (0.4,0.2, 0.6,0.3, 0.7,0.35, 0.5,0.2),
+                       ('b','b','g','g','r','r',    'k','k'),
+                       (0.5,0.2, 0.6,0.3, 0.7,0.35, 0.3,0.15),
                       )
 
     fig1, ax1 = pl.subplots(num=1)
@@ -407,11 +407,13 @@ for cat,dendro,smooth in zipped:
     fig24 = pl.figure(24)
     fig24.clf()
     ax24 = fig24.gca()
-    ax24.errorbar(10**cat['logh2column'][hot], [149]*hot.sum(),
+    hot_lolim = cat['tmax1sig_chi2'] > 150
+    ax24.errorbar(10**cat['logh2column'][hot|hot_lolim], [149]*(hot|hot_lolim).sum(),
                   lolims=True, linestyle='none', capsize=0, alpha=alpha,
                   marker='^', color='r')
     for mask,color,alpha in masks_colors:
-        ax24.errorbar(10**cat['logh2column'][mask], cat['temperature_chi2'][mask],
+        ax24.errorbar(10**cat['logh2column'][mask&~hot_lolim],
+                      cat['temperature_chi2'][mask&~hot_lolim],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax24.plot([14,38], [14,38], 'k--')
@@ -419,6 +421,75 @@ for cat,dendro,smooth in zipped:
         ax24.set_xlabel("HiGal Dust Column Density")
         ax24.set_ylabel("Temperature (K)")
     fig24.savefig(fpath('dendrotem/temperature_vs_dustcol{0}.pdf'.format(smooth)))
+
+    fig26 = pl.figure(26)
+    fig26.clf()
+    ax26 = fig26.gca()
+    mask = (hot|hot_lolim) & is_leaf
+    ax26.errorbar(cat['tkin_turb'][mask],
+                  cat['elo_t'][mask],
+                  lolims=True, linestyle='none', capsize=0, alpha=0.3,
+                  marker='^', color='r')
+    for mask,color,alpha in masks_colors:
+        mask = (mask & (~hot_lolim) & is_leaf)
+        if mask.sum() == 0: continue
+        ax26.errorbar(cat['tkin_turb'][mask],
+                      cat['temperature_chi2'][mask],
+                      yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
+                      linestyle='none', capsize=0, alpha=0.5*alpha, marker='',
+                      linewidth=0.5,
+                      color=color, markeredgecolor='none')
+        ax26.plot(cat['tkin_turb'][mask],
+                  cat['temperature_chi2'][mask],
+                  linestyle='none',  alpha=alpha, marker='o', color=color,
+                  markeredgecolor='none')
+
+        # Highlight those inconsistent with the curve
+        mask = mask & (cat['tmin1sig_chi2'] > cat['tkin_turb'])
+        ax26.plot(cat['tkin_turb'][mask],
+                  cat['temperature_chi2'][mask],
+                  linestyle='none',  alpha=alpha, marker='o',
+                  markersize=10,
+                  markerfacecolor='none',
+                  markeredgewidth=0.3,
+                  markeredgecolor=color)
+
+    ax26.plot([0,200], [0,200], 'k--', alpha=0.5, zorder=-5)
+    ax26.set_ylim([0,155])
+    ax26.set_xlim([cat['tkin_turb'][is_leaf].min()-2,cat['tkin_turb'][is_leaf].max()+2])
+    ax26.set_xlabel("Turbulence-driven Temperature (K)")
+    ax26.set_ylabel("H$_2$CO Temperature (K)")
+
+    fig26.savefig(fpath('dendrotem/temperature_vs_turbtemperature{0}.pdf'.format(smooth)))
+
+    for mask,color,alpha in masks_colors:
+        mask = (mask & (~hot_lolim) & ~is_leaf)
+        if mask.sum() == 0: continue
+        ax26.errorbar(cat['tkin_turb'][mask],
+                      cat['temperature_chi2'][mask],
+                      yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
+                      linestyle='none', capsize=0, alpha=0.5*alpha, marker='',
+                      linewidth=0.5,
+                      color=color, markeredgecolor='none')
+        ax26.plot(cat['tkin_turb'][mask],
+                  cat['temperature_chi2'][mask],
+                  linestyle='none',  alpha=alpha, marker='o', color=color,
+                  markeredgecolor='none')
+
+        # Highlight those inconsistent with the curve
+        mask = mask & (cat['tmin1sig_chi2'] > cat['tkin_turb'])
+        ax26.plot(cat['tkin_turb'][mask],
+                  cat['temperature_chi2'][mask],
+                  linestyle='none',  alpha=alpha, marker='o',
+                  markersize=10,
+                  markerfacecolor='none',
+                  markeredgewidth=0.3,
+                  markeredgecolor=color)
+
+    ax26.set_ylim([0,155])
+    ax26.set_xlim([cat['tkin_turb'][is_leaf].min()-2,cat['tkin_turb'][is_leaf].max()+2])
+
+    fig26.savefig(fpath('dendrotem/temperature_vs_turbtemperature_withtrunks{0}.pdf'.format(smooth)))
 
     fig25 = pl.figure(25)
     fig25.clf()
@@ -468,6 +539,7 @@ for cat,dendro,smooth in zipped:
     cb13.set_label(r'Temperature')
     ax13.set_xlim(1.7,-0.6)
     ax13.set_axis_bgcolor((0.6,0.6,0.6))
+
 
 
     brick_coords = [262/(2 if 'smooth' in smooth else 1),143,725]
@@ -637,6 +709,7 @@ for cat,dendro,smooth in zipped:
 
 
 
+
     for ii in range(1,13):
         pl.figure(ii)
         if ii not in (11,12,13,14,15):
@@ -644,7 +717,7 @@ for cat,dendro,smooth in zipped:
             ax.set_ylim(10, 125)
         pl.draw()
 
-    pl.close(26)
+    pl.close(27)
 
     dview = dendro.viewer()
     structure = dendro.structure_at(brick_coords).ancestor

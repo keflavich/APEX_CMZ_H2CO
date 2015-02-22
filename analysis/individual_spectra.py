@@ -284,6 +284,14 @@ if __name__ == "__main__":
                             length=name_column.size)
                 for name in ['boxwidth', 'boxheight', 'radius', 'area',
                              'posang'] ]
+
+    # is the fit good enough to use for plotting?
+    columns += [table.Column(data=[pars[reg.attr[1]['text']]['good']
+                                   for reg in regs
+                                   for ii in range(pars[reg.attr[1]['text']]['ncomp'])
+                                  ],
+                             name='is_good', dtype='int')]
+
     out_table = table.Table([name_column, comp_id_column, lon_column, lat_column] +
                             columns)
 
