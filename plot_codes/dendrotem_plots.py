@@ -348,34 +348,34 @@ for cat,dendro,smooth in zipped[:1]:
         ax12.set_ylabel("Temperature (K)")
 
     linewidths = np.linspace(0,cat['v_rms'].max())*u.km/u.s
-    ax12.plot(linewidths*2.35, [heating.tkin_all(10**4*u.cm**-3, sigma, 5*u.pc,
+    ax12.plot(linewidths*2.35, [heating.tkin_all(10**4*u.cm**-3, sigma, 10*u.pc,
                                                 5*u.km/u.s/u.pc, 30*u.K)
                                for sigma in linewidths],
             linestyle='--', color='k', label='$n=10^4$ cm$^{-3}$', zorder=-5)
-    ax12.plot(linewidths*2.35, [heating.tkin_all(10**4*u.cm**-3, sigma, 5*u.pc,
-                                                20*u.km/u.s/u.pc, 30*u.K)
+    ax12.plot(linewidths*2.35, [heating.tkin_all(10**4*u.cm**-3, sigma, 10*u.pc,
+                                                1*u.km/u.s/u.pc, 30*u.K)
                                for sigma in linewidths],
-            linestyle='--', color='r', label='$n=10^4$ cm$^{-3}$, $dv/dr=20$', zorder=-5, linewidth=2, alpha=0.5)
-    ax12.plot(linewidths*2.35, [heating.tkin_all(10**5*u.cm**-3, sigma, 5*u.pc,
+            linestyle='--', color='r', label='$n=10^4$ cm$^{-3}$, $dv/dr=1$', zorder=-5, linewidth=2, alpha=0.5)
+    ax12.plot(linewidths*2.35, [heating.tkin_all(10**4*u.cm**-3, sigma, 20*u.pc,
+                                                5*u.km/u.s/u.pc, 30*u.K)
+                               for sigma in linewidths],
+             linestyle='--', color='b', label='$n=10^4$ cm$^{-3}$, $L=20$ pc', zorder=-5, alpha=0.5, linewidth=2)
+    ax12.plot(linewidths*2.35, [heating.tkin_all(10**5*u.cm**-3, sigma, 10*u.pc,
                                                 5*u.km/u.s/u.pc, 30*u.K)
                                for sigma in linewidths],
              linestyle=':', color='k', label='$n=10^5$ cm$^{-3}$', zorder=-5)
-    ax12.plot(linewidths*2.35, [heating.tkin_all(10**6*u.cm**-3, sigma, 5*u.pc,
+    ax12.plot(linewidths*2.35, [heating.tkin_all(10**6*u.cm**-3, sigma, 10*u.pc,
                                                 5*u.km/u.s/u.pc, 30*u.K)
                                for sigma in linewidths],
             linestyle='-.', color='k', label='$n=10^6$ cm$^{-3}$', zorder=-5)
-    ax12.plot(linewidths*2.35, [heating.tkin_all(10**5*u.cm**-3, sigma, 1*u.pc,
-                                                5*u.km/u.s/u.pc, 30*u.K)
-                               for sigma in linewidths],
-             linestyle=':', color='b', label='$n=10^5$ cm$^{-3}$, $L=1$ pc', zorder=-5, alpha=0.5, linewidth=2)
-    ax12.plot(linewidths*2.35, [heating.tkin_all(10**5*u.cm**-3, sigma, 5*u.pc,
+    ax12.plot(linewidths*2.35, [heating.tkin_all(10**5*u.cm**-3, sigma, 10*u.pc,
                                                 5*u.km/u.s/u.pc, 30*u.K, crir=1e-15*u.s**-1)
                                for sigma in linewidths],
              linestyle='-', color='g', label='$n=10^5$ cm$^{-3}$, $\zeta_{CR}=10^{-15}$ s$^{-1}$', zorder=-10, alpha=0.25, linewidth=4)
-    ax12.plot(linewidths*2.35, [heating.tkin_all(10**5*u.cm**-3, sigma, 5*u.pc,
+    ax12.plot(linewidths*2.35, [heating.tkin_all(10**5*u.cm**-3, sigma, 10*u.pc,
                                                 5*u.km/u.s/u.pc, 30*u.K, crir=1e-14*u.s**-1)
                                for sigma in linewidths],
-             linestyle='--', color='purple', label='$n=10^5$ cm$^{-3}$, $\zeta_{CR}=10^{-14}$ s$^{-1}$', zorder=-10, alpha=0.25, linewidth=4)
+              linestyle=':', color='purple', label='$n=10^5$ cm$^{-3}$, $\zeta_{CR}=10^{-14}$ s$^{-1}$', zorder=-10, alpha=0.25, linewidth=4)
 
     ax12.set_ylim([0,150])
     fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
