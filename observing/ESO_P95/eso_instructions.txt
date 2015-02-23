@@ -1,0 +1,36 @@
+This is a continuation of Project 093.C-0144(A) and should be continued under
+that project code.  The observing scripts used for that program can be used,
+though the tuning center should be changed to 218.9 GHz and off positions
+should be scheduled more often (see below).
+
+Observations are 8x8' OTF maps with off-positions scheduled every 2 minutes (4
+scans).  The observing script describes 2 OTF maps observed with perpendicular
+scans to minimize cross-hatching.  
+
+The scans are oriented in Galactic coordinates.  There are three off positions
+selected to exclude CO emission.  13CO should be detected at all or nearly all
+positions, though at varying velocities.  The tuning center is 218.9 GHz
+to include the 13CO 2-1 line (220.399) and the SiO 5-4 line (217.105)
+simultaneously.  We avoid 219 GHz because that places the 12CO line in the USB
+at 134 km/s relative to the C18O line and creates overlap; the extra 100 MHz gives
+us an extra ~300 km/s of buffer.
+
+The targets for this run should include the following top-priority targets:
+
+Map_118
+Map_123
+Map_124
+Map_031
+Map_032
+Map_055
+Map_115
+Map_116
+
+and the following should be observed if the first 8 are completed:
+
+Map_122
+Map_019
+Map_021
+Map_056
+Map_010
+Map_013

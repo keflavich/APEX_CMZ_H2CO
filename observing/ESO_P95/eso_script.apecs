@@ -1,0 +1,115 @@
+# HET230 Setup File for project E-093.C-0144A-2014
+
+# Load special SHFI commands
+exec_apecs_script('shfi_commands')
+
+# Load APEX-1 observing functions:
+execfile('/homes/software/apecs/start_het230.apecs')
+
+# User line catalog for APEX-1
+linecats('e-093.c-0144a-2014.lin')
+
+# Setup for APEX-1 (frontend, backend, lines)
+# Uncomment the setup for the line to observe, or enter manually!
+
+
+# User source catalog
+sourcecats(['e-093.c-0144a-2014.cat'])
+
+# List of targets. Uncomment the one to observe, or enter manually!
+# The source is immediately followed by the associated off position
+#
+#source('Map_118', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs', system='EQ', epoch=2000.0)
+#source('Map_123', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_124', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_032', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_031', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_055', cats='all')
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+#source('Map_115',cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs', system='EQ', epoch=2000.0)
+#source('Map_116', cats='all')
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',system='EQ', epoch=2000.0)
+
+# Reference position (just for safety in this macro as well...)
+#use_ref('on')
+# Relative reference: use in worst-case-scenaro
+#reference(x=0, y=3600, time=0.0, on2off=1, unit='arcsec', mode='rel',
+#          system='ho', epoch=2000.0)
+## Reference 1: for l > 0.7
+#reference(x="17:52:06.854",x="-28:30:31.32", time=0.0, on2off=1, unit='hdms', mode='abs',
+#          system='eq', epoch=2000.0)
+## Reference 2: for 0.0 < l < 0.7
+#reference(x="17:43:53.890",x="-28:07:04.68", time=0.0, on2off=1, unit='hdms', mode='abs',
+#          system='eq', epoch=2000.0)
+## Reference 3: for l < 0.0
+#reference(x="17:48:11.934",x="-29:44:41.83", time=0.0, on2off=1, unit='hdms', mode='abs',
+#          system='eq', epoch=2000.0)
+
+
+# Improved metrology settings:
+use_linear_sensors('on')
+use_tiltmeters('on')
+
+#-------------------------------------------------------------
+#APEX-1 observe file: het230_observe.apecs
+
+# HET230 Observe File for project E-093.C-0144A-2014
+#
+setup_shfi(fename='het230',linename='shfi218_9ghz',sideband='',mode='spec')
+go()
+print ' '
+dummy = raw_input('\033[32;1mTune receiver if required - and press RETURN when ready!\033[0m ')
+print ' '
+
+use_ref('on')
+# reference position defined by an offset from the source:
+# [AG] Absolute references selected to avoid 12CO emission from Dame et al. 2001
+# [AG] Further refinement may be possible / necessary (only for 13CO)
+# [AG] TODO: Determine if this can be automatically selected based on source properties
+# [AG] Reference 1: for l > 0.7
+#reference(x="17:52:06.854",y="-28:30:31.32", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+## [AG] Reference 2: for 0.0 < l < 0.7
+#reference(x="17:43:53.890",y="-28:07:04.68", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+## [AG] Reference 3: for l < 0.0
+#reference(x="17:48:11.934",y="-29:44:41.83", time=0.0, on2off=3, unit='hdms', mode='abs',
+#          system='EQ', epoch=2000.0)
+
+
+#####################
+# OTF MAP
+# Section written by Adam Ginsburg [AG]
+# calibrate('cold') # REMOVED because of on2cal [AG]
+# tp() scans added to match ESO obs [AG]
+# Integration time dropped from 1.0 to 0.5 per Axel's recommendation [AG]
+# Each scan requires 480 / 9 * 0.5 = 26.6666 seconds
+# Calibrations should be performed every 10 minutes, so on2cal=15
+# (every 6.66 minutes, plus overheads) should be fine
+# Arnaud Belloche used 0.25s, step=9 (both directions) on May 7, 2014
+#
+# 2014-05-07 ABE: I change the step in scanning direction to 9'' and 
+# dumptime to 0.25s, to ensure proper Nyquist sampling
+# 2014-05-08 ABE: I change on2off from 1 to 3 in the above reference definition
+# 2015-02-23 AG: on2cal changed from 15 to 4 to suppress baseline problems
+#
+tp()
+repeat(1)
+otf(xlen=480, ylen=480, xstep=9, ystep=9, time=0.25, direction='x', zigzag=1,
+    angle=58.6, size_unit='arcsec', angle_unit='deg', system='eq', on2cal=4,
+    epoch=2000.0)
+otf(xlen=480, ylen=480, xstep=9, ystep=9, time=0.25, direction='y', zigzag=1,
+    angle=58.6, size_unit='arcsec', angle_unit='deg', system='eq', on2cal=4,
+    epoch=2000.0)
+tp()
