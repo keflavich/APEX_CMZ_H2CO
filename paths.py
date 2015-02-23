@@ -21,6 +21,7 @@ gridpath = os.path.join(root, 'h2co/radex/thermom/')
 analysispath = os.path.join(root, 'apex_cmz_h2co/analysis/')
 plotcodepath = os.path.join(root, 'apex_cmz_h2co/plot_codes/')
 observingpath = os.path.join(root, 'apex_cmz_h2co/observing/')
+tablepath = os.path.join(root, 'apex_cmz_h2co/tables/')
 
 def mpath(x, mergepath=mergepath):
     return os.path.join(mergepath,x)
@@ -50,3 +51,6 @@ def apath(x, analysispath=analysispath):
 
 def molpath(x, molcubepath=molcubepath):
     return os.path.join(molcubepath,x)
+
+def tpath(x, tablepath=tablepath):
+    return os.path.join(tablepath, x)

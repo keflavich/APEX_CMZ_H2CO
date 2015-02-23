@@ -3,7 +3,7 @@ import warnings
 from astropy import log
 from astrodendro import Dendrogram,ppv_catalog
 from astropy.table import Table
-from paths import hpath
+from paths import hpath,tpath
 from masked_cubes import cube303,cube303sm,cube321,cube321sm
 import flag_other_lines
 
@@ -40,9 +40,9 @@ if 'dendsm' not in locals():
 dend_sm = dendsm
 
 try:
-    catalog = Table.read(hpath('PPV_H2CO_Temperature.ipac'), format='ascii.ipac',
+    catalog = Table.read(tpath('PPV_H2CO_Temperature.ipac'), format='ascii.ipac',
                          guess=False)
-    catalog_sm = Table.read(hpath('PPV_H2CO_Temperature_smooth.ipac'), format='ascii.ipac',
+    catalog_sm = Table.read(tpath('PPV_H2CO_Temperature_smooth.ipac'), format='ascii.ipac',
                          guess=False)
     catalogsm = catalog_sm
 

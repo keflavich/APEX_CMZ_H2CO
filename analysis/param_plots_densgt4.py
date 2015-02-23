@@ -16,7 +16,7 @@ from astropy import log
 from astropy import units as u
 from astropy import constants
 from astropy import coordinates
-from paths import analysispath
+from paths import analysispath, tpath
 from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
                                texgrid322, taugrid322, hdr)
 
@@ -31,8 +31,7 @@ pl.rcParams['font.size'] = 16.0
 # mf means modelfitter
 mf = paraH2COmodel()
 
-fittable = table.Table.read(os.path.join(analysispath,
-                                          "fitted_line_parameters.ipac"),
+fittable = table.Table.read(tpath("fitted_line_parameters.ipac"),
                             format='ascii.ipac')
 fittable.add_columns([table.Column(name=name, dtype='float', length=len(fittable))
                       for name in ['temperature_chi2','tmin1sig_chi2','tmax1sig_chi2',
@@ -455,8 +454,7 @@ for row in fittable:
 
 log.info("Completed source loop.")
 
-fittable.write(os.path.join(analysispath,
-                            'fitted_line_parameters_Chi2Constraints.ipac'),
+fittable.write(tpath('fitted_line_parameters_Chi2Constraints.ipac'),
                format='ascii.ipac')
 
 log.info("Wrote table file.  Continuing to parameter plots.")

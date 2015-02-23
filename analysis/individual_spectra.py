@@ -3,7 +3,8 @@ import numpy as np
 import pyspeckit
 from astropy import table
 import spectral_cube
-from paths import h2copath, mergepath, figurepath, regpath, analysispath, mpath, hpath
+from paths import (h2copath, mergepath, figurepath, regpath, analysispath,
+                   mpath, hpath, tpath)
 import os
 from pyspeckit_fitting import simplemodel, simple_fitter, simple_fitter2
 try:
@@ -353,5 +354,5 @@ if __name__ == "__main__":
 
 
 
-    out_table.write(os.path.join(analysispath,"fitted_line_parameters.ipac"),
+    out_table.write(tpath("fitted_line_parameters.ipac"),
                     format='ascii.ipac')

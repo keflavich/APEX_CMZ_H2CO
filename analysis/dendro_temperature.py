@@ -15,7 +15,7 @@ from astropy import table
 from astropy.utils.console import ProgressBar
 from astrodendro import Dendrogram,ppv_catalog
 
-from paths import hpath,mpath,fpath
+from paths import hpath,mpath,fpath,tpath
 from constrain_parameters import paraH2COmodel
 from masked_cubes import (cube303m,cube321m,cube303msm,cube321msm,
                           cube303,cube321,cube303sm,cube321sm,
@@ -352,7 +352,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                                         data=catalog[hi]-catalog[mid]))
 
     if write:
-        catalog.write(hpath('PPV_H2CO_Temperature{0}.ipac'.format(suffix)), format='ascii.ipac')
+        catalog.write(tpath('PPV_H2CO_Temperature{0}.ipac'.format(suffix)), format='ascii.ipac')
 
     # Note that there are overlaps in the catalog, which means that ORDER MATTERS
     # in the above loop.  I haven't yet checked whether large scale overwrites
@@ -406,7 +406,7 @@ def do_321_dendro_temperatures_sharp():
                                                    sncube=sncube, suffix="",
                                                    line='321',
                                                    write=False)
-    catalog.write(hpath('PPV_H2CO_Temperature_321selected.ipac'), format='ascii.ipac')
+    catalog.write(tpath('PPV_H2CO_Temperature_321selected.ipac'), format='ascii.ipac')
     tcube.write(hpath('TemperatureCube_Dendrogram321Objects.fits'), overwrite=True)
 
     return catalog,tcube
@@ -425,7 +425,7 @@ def do_321_dendro_temperatures_smooth():
                                                    line='321',
                                                    write=False)
 
-    catalog.write(hpath('PPV_H2CO_Temperature_321selected_smooth.ipac'), format='ascii.ipac')
+    catalog.write(tpath('PPV_H2CO_Temperature_321selected_smooth.ipac'), format='ascii.ipac')
     tcube.write(hpath('TemperatureCube_Dendrogram321Objects_smooth.fits'), overwrite=True)
 
     return catalog, tcube
