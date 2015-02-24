@@ -71,7 +71,7 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
     # gamma = heating
     lamgd  = lambda Tk: c1 * n**2 * Tk**(0.5) * (Tk-tdust)
     lamgas = lambda Tk: c2 * n**(1/2.) * Tk**3 * dvdr
-    gamturb = n * 2.35 * m_h * (0.5*3**1.5 * sigma**3 / L)
+    gamturb = n * 2.8 * m_h * (0.5*3**1.5 * sigma**3 / L)
     gamgr = ccr * n * (crir/(1e-17*u.s**-1))
     gammaxray = 1.2e-19 * (n/(1e5*u.cm**-3)) * (Fx/(u.erg*u.cm**-2*u.s**-1)) * (N/(1e22*u.cm**-2))**-0.9 * u.erg/u.s/u.cm**3
 

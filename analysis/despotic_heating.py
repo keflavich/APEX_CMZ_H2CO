@@ -63,7 +63,7 @@ if __name__ == "__main__":
     pl.savefig(paths.fpath("despotic/TvsN.png"))
 
 
-    linewidths = np.arange(1,50,3)
+    linewidths = np.arange(0.5,30,2)
     tem2 = [tkin_all(1e4*u.cm**-3, sigma*u.km/u.s, lengthscale=10*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                     crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
@@ -93,14 +93,14 @@ if __name__ == "__main__":
     FWHM = np.sqrt(8*np.log(2))
     pl.figure(2)
     pl.clf()
-    pl.plot(linewidths*FWHM, tem2, 'k--', label='CRIR=1e-17, $n=10^4$')
-    pl.plot(linewidths*FWHM, tem7, 'k:', label='CRIR=1e-14, $n=10^4$')
-    pl.plot(linewidths*FWHM, tem9, 'k-', label='CRIR=1e-17, $n=10^4$ dvdr=20')
-    pl.plot(linewidths*FWHM, tem3, 'r--', label='CRIR=1e-17, $n=10^5$')
-    pl.plot(linewidths*FWHM, tem6, 'r-', label='CRIR=1e-17, $n=10^5$ L=1 pc')
-    pl.plot(linewidths*FWHM, tem4, 'r:', label='CRIR=1e-14, $n=10^5$')
-    pl.plot(linewidths*FWHM, tem5, 'b:', label='CRIR=1e-14, $n=10^6$')
-    pl.plot(linewidths*FWHM, tem8, 'r-.', label='CRIR=1e-17, $n=10^5$ ISRF=1000')
+    pl.plot(linewidths*FWHM, tem2, 'k--', alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^4$')
+    pl.plot(linewidths*FWHM, tem7, 'k:',  alpha=0.5, linewidth=2, label='CRIR=1e-14, $n=10^4$')
+    pl.plot(linewidths*FWHM, tem9, 'k-',  alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^4$ $dv/dr=20$')
+    pl.plot(linewidths*FWHM, tem3, 'r--', alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^5$')
+    pl.plot(linewidths*FWHM, tem6, 'r-',  alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^5$ L=1 pc')
+    pl.plot(linewidths*FWHM, tem4, 'r:',  alpha=0.5, linewidth=2, label='CRIR=1e-14, $n=10^5$')
+    pl.plot(linewidths*FWHM, tem5, 'b:',  alpha=0.5, linewidth=2, label='CRIR=1e-14, $n=10^6$')
+    pl.plot(linewidths*FWHM, tem8, 'r-.', alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^5$ ISRF=1000')
     pl.xlabel(r'FWHM $= 2.35 \sigma$ km s$^{-1}$')
     pl.ylabel('Temperature (K)')
     pl.ylim(0,150)

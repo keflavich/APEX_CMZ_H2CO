@@ -791,24 +791,13 @@ Assuming the turbulent dissipation scale is close to the sonic scale with a
 sound speed $c_s = 0.76 (T/100\mathrm{K})^{1/2}$, the gas temperature will be
 well mixed on milliparsec spatial scales on kiloyear timescales.
 
-\begin{eqnarray}
-    \Lambda_{g-d} = 4\ee{-33} n^2  T_{gas}^{1/2} (T_{gas}-T_{dust})
-    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
-    \Lambda_{line} = 6\ee{-29} n^(1/2)  T_{gas}^3 \frac{dv}{dr}
-    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
-    \Gamma_{turb} = n \mu  m_h  \frac{1}{2} 3^{3/2}  \frac{\sigma^3}{L}
-    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
-    \Gamma_{cr} = 3.2e-17 n \zeta_{cr}
-    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
-\end{eqnarray}
-
 We expand upon the \citet{Ao2013a} analysis by solving for the temperature
 assuming that both cosmic ray ionization and turbulent heating are present and
 that the dust temperature is nonzero ($T_{dust}=30$ K except where specified
 otherwise).  We have used the same cosmic ray heating rate
 and turbulence heating rate from \citet[][their equations 12 and 18]{Ao2013a}
 and the same parametrization of the gas and dust cooling rates (their equations
-7 and 8).  The gas cooling equation is a parametrization from
+7 and 8; see Appendix \ref{appendix:equations}).  The gas cooling equation is a parametrization from
 \citet{Goldsmith2001a}, which is most appropriate for local dark clouds, but
 checking against the cooling curves of \citet{Clark2013a}, we find that the
 parametrization is consistent with their fiducial $1000 G_0$, 1000$\times$
@@ -1801,6 +1790,27 @@ visual reference for comparison between the temperature maps.
 }
 {fig:dendrotemmap}{1}{9.5in}
 
+\section{Equations of heating and cooling}
+\label{appendix:equations}
+We state the equations used in Section \ref{sec:heating} here.
+
+\begin{eqnarray}
+    \Lambda_{g-d} = 4\ee{-33} n^2  T_{gas}^{1/2} (T_{gas}-T_{dust})
+    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
+    \Lambda_{line} = 6\ee{-29} n^{1/2}  T_{gas}^3 \frac{dv}{dr}
+    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
+    \Gamma_{turb} = n \mu  m_h  \frac{1}{2} 3^{3/2}  \frac{\sigma^3}{L}
+    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
+    \Gamma_{cr} = 3.2\ee{-17} n \zeta_{cr}
+    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3}
+\end{eqnarray}
+
+$n$ is the volume density of \hh.  $T_{gas}$ is the gas kinetic temperature in
+Kelvin.  $T_{dust}$ is the dust temperature in Kelvin.  $dv/dr$ is the velocity
+gradient in \kms \perpc.  $\mu$ is the mass per particle in AMU, taken to
+be 2.8.  $\zeta_{cr}$ is the cosmic ray ionization rate in ionizations per second.
+$m_h$ is the mass of a proton in grams.  $\sigma$ is the velocity dispersion.
+$L$ is the turbulent length scale.
 
 \input{solobib}
 \end{document}
