@@ -791,6 +791,16 @@ Assuming the turbulent dissipation scale is close to the sonic scale with a
 sound speed $c_s = 0.76 (T/100\mathrm{K})^{1/2}$, the gas temperature will be
 well mixed on milliparsec spatial scales on kiloyear timescales.
 
+\begin{eqnarray}
+    \Lambda_{g-d} = 4\ee{-33} n^2  T_{gas}^{1/2} (T_{gas}-T_{dust})
+    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
+    \Lambda_{line} = 6\ee{-29} n^(1/2)  T_{gas}^3 \frac{dv}{dr}
+    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
+    \Gamma_{turb} = n \mu  m_h  \frac{1}{2} 3^{3/2}  \frac{\sigma^3}{L}
+    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
+    \Gamma_{cr} = 3.2e-17 n \zeta_{cr}
+    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
+\end{eqnarray}
 
 We expand upon the \citet{Ao2013a} analysis by solving for the temperature
 assuming that both cosmic ray ionization and turbulent heating are present and
@@ -839,7 +849,9 @@ selected sources as the length scale, the measured linewidth $\sigma_v$, the
 measured dust temperature $T_{d}$, and we assume the velocity gradient $dv/dr =
 \sigma_v / r_{eff}$.  Of these measurements, the linewidth $\sigma_v$ is
 dominant in determining the predicted temperature and is the least uncertain;
-the velocity gradients we derive by this approach are not obviously reasonable
+the velocity gradients we derive by this approach are not obviously reasonable 
+(the velocity dispersion observed is not purely a gradient, and the size scale
+observed could easily be wrong by a factor of 2-3 because of projection)
 but they only affect the temperature minimally, with a power of 1/3.  This
 analysis is performed both for the hand-selected apertures, which have
 arbitrary radii but well-measured linewidths, and the dendrogram leaf sources,

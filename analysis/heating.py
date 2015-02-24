@@ -15,7 +15,7 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
     appropriate constant to zero, but the cooling terms cannot be turned off)
 
     Lambda_(gas-dust) is given by Goldsmith & Langer 1978
-    Lambda_(gas) is a parametrization of Goldsmith 2001 by Ao 2013
+    Lambda_(gas) is a parametrization of Goldsmith 2001 by Ao 2013 via Papadapolous 2010 eqn 9
     Gamma_(turb) comes from Pan & Padoan 2009
     Gamma_(crir) is from Tielens 2005
     Gamma_(xray) is direct from Ao 2013; I did not re-examine the derivation of
