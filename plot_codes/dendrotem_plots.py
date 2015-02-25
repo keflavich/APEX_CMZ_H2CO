@@ -664,9 +664,9 @@ for cat,dendro,smooth in zipped[:1]:
                 xax,yax = ([cat[leaf.idx][axname1]*axscale1],
                            [cat[leaf.idx][axname2]*axscale2])
                 if axname1 in ('v_rms','reff'):
-                    xax *= gcorfactor
+                    xax *= gcorfactor[leaf.idx]
                 if axname2 in ('v_rms','reff'):
-                    yax *= gcorfactor
+                    yax *= gcorfactor[leaf.idx]
                 axis.plot(xax, yax, marker, color=color, markeredgecolor='none', alpha=0.5)
                 obj = leaf.parent
                 while obj.parent:
