@@ -242,7 +242,7 @@ for weight in ("_weighted",""):
         #    F.save(fpath('orbits/KDL2014_orbit_on_{0}{1}_masked.pdf'.format(molecule, weight)))
 
 
-        fig2 = pl.figure(2)
+        fig2 = pl.figure(2, figsize=figsize)
         pl.clf()
         if weight:
             im1 = weighted.sum(axis=0)

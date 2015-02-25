@@ -19,7 +19,7 @@ import numpy as np
 gmc=cloud('cloud.desp')
 
 def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
-             ISRF=1):
+             ISRF=1, tdust_rad=None):
 
     assert density.unit.is_equivalent(u.cm**-3)
     assert sigma.unit.is_equivalent(u.km/u.s)
@@ -28,7 +28,8 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
     assert crir.unit.is_equivalent(1/u.s)
 
     gmc.sigmaNT = sigma.to(u.cm/u.s).value
-    gmc.Td = gmc.rad.TradDust = tdust.to(u.K).value
+    gmc.Td = tdust.to(u.K).value
+    gmc.rad.TradDust = gmc.Td if tdust_rad is None else tdust_rad.to(u.K).value
     gmc.dVdr = gradient.to(u.s**-1).value
     gmc.rad.chi = ISRF
 
@@ -66,27 +67,35 @@ if __name__ == "__main__":
     linewidths = np.arange(0.5,30,2)
     tem2 = [tkin_all(1e4*u.cm**-3, sigma*u.km/u.s, lengthscale=10*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                     tdust_rad=10*u.K,
                     crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
     tem3 = [tkin_all(1e5*u.cm**-3, sigma*u.km/u.s, lengthscale=10*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                     tdust_rad=10*u.K,
                     crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
     tem4 = [tkin_all(1e5*u.cm**-3, sigma*u.km/u.s, lengthscale=10*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                     tdust_rad=10*u.K,
                     crir=1e-14*u.s**-1) for sigma in ProgressBar(linewidths)]
     tem5 = [tkin_all(1e6*u.cm**-3, sigma*u.km/u.s, lengthscale=10*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                     tdust_rad=10*u.K,
                     crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
     tem6 = [tkin_all(1e5*u.cm**-3, sigma*u.km/u.s, lengthscale=1*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                     tdust_rad=10*u.K,
                     crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
     tem7 = [tkin_all(1e4*u.cm**-3, sigma*u.km/u.s, lengthscale=10*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                     tdust_rad=10*u.K,
                     crir=1e-14*u.s**-1) for sigma in ProgressBar(linewidths)]
     tem8 = [tkin_all(1e5*u.cm**-3, sigma*u.km/u.s, lengthscale=10*u.pc,
                      gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                     tdust_rad=10*u.K,
                      ISRF=1000,
                      crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
     tem9 = [tkin_all(1e4*u.cm**-3, sigma*u.km/u.s, lengthscale=10*u.pc,
+                     tdust_rad=10*u.K,
                     gradient=20*u.km/u.s/u.pc, tdust=25*u.K,
                     crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
 
