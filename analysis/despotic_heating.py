@@ -10,13 +10,15 @@ from astropy.utils.console import ProgressBar
 
 # Import the despotic library and the NL99 network; also import numpy
 from despotic import cloud
-#from despotic.chemistry import NL99
 import despotic
 import os
 import numpy as np
 
 # Use the Milky Way GMC file as a base
 gmc=cloud('cloud.desp')
+
+# from despotic.chemistry import NL99
+# gmc.setChemEq(network=NL99)
 
 def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
              ISRF=1, tdust_rad=None):
@@ -65,6 +67,7 @@ if __name__ == "__main__":
 
 
     linewidths = np.arange(0.5,30,2)
+    linewidths = np.logspace(np.log10(0.5), np.log10(30), 15)
     tem2 = [tkin_all(1e4*u.cm**-3, sigma*u.km/u.s, lengthscale=10*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                      tdust_rad=10*u.K,
@@ -81,6 +84,10 @@ if __name__ == "__main__":
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                      tdust_rad=10*u.K,
                     crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
+    tem10 = [tkin_all(1e6*u.cm**-3, sigma*u.km/u.s, lengthscale=10*u.pc,
+                    gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                     tdust_rad=10*u.K,
+                    crir=1e-14*u.s**-1) for sigma in ProgressBar(linewidths)]
     tem6 = [tkin_all(1e5*u.cm**-3, sigma*u.km/u.s, lengthscale=1*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                      tdust_rad=10*u.K,
@@ -96,24 +103,29 @@ if __name__ == "__main__":
                      crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
     tem9 = [tkin_all(1e4*u.cm**-3, sigma*u.km/u.s, lengthscale=10*u.pc,
                      tdust_rad=10*u.K,
-                    gradient=20*u.km/u.s/u.pc, tdust=25*u.K,
-                    crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
+                     gradient=20*u.km/u.s/u.pc, tdust=25*u.K,
+                     crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
 
     FWHM = np.sqrt(8*np.log(2))
     pl.figure(2)
     pl.clf()
-    pl.plot(linewidths*FWHM, tem2, 'k--', alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^4$')
-    pl.plot(linewidths*FWHM, tem7, 'k:',  alpha=0.5, linewidth=2, label='CRIR=1e-14, $n=10^4$')
-    pl.plot(linewidths*FWHM, tem9, 'k-',  alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^4$ $dv/dr=20$')
-    pl.plot(linewidths*FWHM, tem3, 'r--', alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^5$')
-    pl.plot(linewidths*FWHM, tem6, 'r-',  alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^5$ L=1 pc')
-    pl.plot(linewidths*FWHM, tem4, 'r:',  alpha=0.5, linewidth=2, label='CRIR=1e-14, $n=10^5$')
-    pl.plot(linewidths*FWHM, tem5, 'b:',  alpha=0.5, linewidth=2, label='CRIR=1e-14, $n=10^6$')
-    pl.plot(linewidths*FWHM, tem8, 'r-.', alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^5$ ISRF=1000')
-    pl.xlabel(r'FWHM $= 2.35 \sigma$ km s$^{-1}$')
-    pl.ylabel('Temperature (K)')
-    pl.ylim(0,150)
-    pl.legend(loc='best')
+    ax = pl.gca()
+    ax.plot(linewidths*FWHM, tem2,  'k--', alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^4$')
+    ax.plot(linewidths*FWHM, tem7,  'k:',  alpha=0.5, linewidth=2, label='CRIR=1e-14, $n=10^4$')
+    ax.plot(linewidths*FWHM, tem9,  'k-',  alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^4$ $dv/dr=20$')
+    ax.plot(linewidths*FWHM, tem3,  'r--', alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^5$')
+    ax.plot(linewidths*FWHM, tem6,  'r-',  alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^5$ L=1 pc')
+    ax.plot(linewidths*FWHM, tem4,  'r:',  alpha=0.5, linewidth=2, label='CRIR=1e-14, $n=10^5$')
+    ax.plot(linewidths*FWHM, tem10, 'b:',  alpha=0.5, linewidth=2, label='CRIR=1e-14, $n=10^6$')
+    ax.plot(linewidths*FWHM, tem5,  'b--', alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^6$')
+    ax.plot(linewidths*FWHM, tem8,  'r-.', alpha=0.5, linewidth=2, label='CRIR=1e-17, $n=10^5$ ISRF=1000')
+    ax.set_xlabel(r'FWHM $= 2.35 \sigma$ km s$^{-1}$')
+    ax.set_ylabel('Temperature (K)')
+    ax.set_ylim(0,150)
+
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.7, box.height])
+    ax.legend(loc='center left', fontsize=16, bbox_to_anchor=(1.0, 0.75))
     pl.savefig(paths.fpath("despotic/TvsSigma.png"))
 
     pl.draw(); pl.show()

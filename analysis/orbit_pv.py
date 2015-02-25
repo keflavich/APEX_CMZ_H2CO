@@ -1,8 +1,9 @@
+import os
 import numpy as np
 import pvextractor
 from pvextractor.geometry.poly_slices import extract_poly_slice
 import spectral_cube
-from spectral_cube import SpectralCube, BooleanArrayMask
+from spectral_cube import SpectralCube, BooleanArrayMask, Projection
 import aplpy
 import pylab as pl
 import matplotlib
@@ -79,7 +80,7 @@ cmap = copy.copy(pl.cm.RdYlBu_r)
 cmap.set_under((0.9,0.9,0.9,0.5))
 
 for weight in ("_weighted",""):
-    for molecule,fn in zip(molecules,filenames):
+    for molecule,fn in zip(molecules[-4:],filenames[-4:]):
         log.info(molecule)
         cube = spectral_cube.SpectralCube.read(fn)
 
@@ -88,60 +89,65 @@ for weight in ("_weighted",""):
         else:
             cmap.set_bad((0.9,0.9,0.9,0.5))
 
-        if weight:
-
-            wcube = (spectral_cube.SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_bl.fits'))
-                     if 'smooth' in fn
-                     else spectral_cube.SpectralCube.read(hpath('APEX_H2CO_303_202_bl.fits')))
-            mcube = (SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_bl_mask.fits'))
-                     if 'smooth' in fn
-                     else SpectralCube.read(hpath('APEX_H2CO_303_202_bl_mask.fits')))
-            if cube.shape != wcube.shape:
-                log.info("Not weighting {0}".format(fn))
-                continue
-            weighted = copy.copy(cube)
-            weighted._data = wcube._data * cube._data
-            mask = (wcube.mask & cube.mask &
-                    BooleanArrayMask(weighted.filled_data[...] != 0, weighted.wcs) &
-                    BooleanArrayMask(wcube.filled_data[...] != 0, wcube.wcs) &
-                    BooleanArrayMask(mcube._data==1, mcube.wcs)
-                   )
-            weighted = weighted.with_mask(mask)
-            wcube = wcube.with_mask(mask)
-
-            #pv1a = pvextractor.extract_pv_slice(cube, P, respect_nan=True)
-            pv1,apv1 = extract_poly_slice(weighted.filled_data[...].value,
-                                          P.sample_polygons(spacing=1.0,
-                                                            wcs=cube.wcs),
-                                          return_area=True)
-            print()
-            pv2,apv2 = extract_poly_slice(wcube.filled_data[...].value,
-                                     P.sample_polygons(spacing=1.0, wcs=cube.wcs),
-                                     return_area=True)
-
-            assert np.count_nonzero(pv1) == np.count_nonzero(pv2)
-            assert np.all((pv1 != 0) == (pv2 != 0))
-            assert np.all(apv1==apv2)
-
-            # Some of this header manipulation seems unnecessary but isn't.
-            header = copy.copy(cube.header)
-            for kw in ('CRPIX','CRVAL','CDELT','CUNIT','CTYPE',):
-                header[kw+"2"] = header[kw+"3"]
-                del header[kw+"3"]
-            header['CTYPE1'] = 'OFFSET'
-            header = pvextractor.utils.wcs_slicing.slice_wcs(WCS(header),
-                                                             spatial_scale=7.2*u.arcsec).to_header()
-            pv = fits.PrimaryHDU(data=pv1/pv2,
-                                 header=header)
-            pv2hdu = fits.PrimaryHDU(data=pv2, header=header)
+        pvfilename = paths.dpath('orbitpv/KDL2014_orbit_on_{0}{1}.fits'.format(molecule, weight))
+        if os.path.exists(pvfilename):
+            pv = fits.open(pvfilename)[0]
         else:
-            # respect_nan = False so that the background is zeros where there is data
-            # and nan where there is not data
-            # But not respecting nan results in data getting averaged with nan, so we
-            # need to respect it and then manually flag (in a rather unreliable
-            # fashion!)
-            #pv = pvextractor.extract_pv_slice(cube, P, respect_nan=False)
-            pv = pvextractor.extract_pv_slice(cube, P, respect_nan=True)
+            if weight:
+
+                wcube = (spectral_cube.SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_bl.fits'))
+                         if 'smooth' in fn
+                         else spectral_cube.SpectralCube.read(hpath('APEX_H2CO_303_202_bl.fits')))
+                mcube = (SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_bl_mask.fits'))
+                         if 'smooth' in fn
+                         else SpectralCube.read(hpath('APEX_H2CO_303_202_bl_mask.fits')))
+                if cube.shape != wcube.shape:
+                    log.info("Not weighting {0}".format(fn))
+                    continue
+                weighted = copy.copy(cube)
+                weighted._data = wcube._data * cube._data
+                mask = (wcube.mask & cube.mask &
+                        BooleanArrayMask(weighted.filled_data[...] != 0, weighted.wcs) &
+                        BooleanArrayMask(wcube.filled_data[...] != 0, wcube.wcs) &
+                        BooleanArrayMask(mcube._data==1, mcube.wcs)
+                       )
+                weighted = weighted.with_mask(mask)
+                wcube = wcube.with_mask(mask)
+
+                #pv1a = pvextractor.extract_pv_slice(cube, P, respect_nan=True)
+                pv1,apv1 = extract_poly_slice(weighted.filled_data[...].value,
+                                              P.sample_polygons(spacing=1.0,
+                                                                wcs=cube.wcs),
+                                              return_area=True)
+                print()
+                pv2,apv2 = extract_poly_slice(wcube.filled_data[...].value,
+                                         P.sample_polygons(spacing=1.0, wcs=cube.wcs),
+                                         return_area=True)
+
+                assert np.count_nonzero(pv1) == np.count_nonzero(pv2)
+                assert np.all((pv1 != 0) == (pv2 != 0))
+                assert np.all(apv1==apv2)
+
+                # Some of this header manipulation seems unnecessary but isn't.
+                header = copy.copy(cube.header)
+                for kw in ('CRPIX','CRVAL','CDELT','CUNIT','CTYPE',):
+                    header[kw+"2"] = header[kw+"3"]
+                    del header[kw+"3"]
+                header['CTYPE1'] = 'OFFSET'
+                header = pvextractor.utils.wcs_slicing.slice_wcs(WCS(header),
+                                                                 spatial_scale=7.2*u.arcsec).to_header()
+                pv = fits.PrimaryHDU(data=pv1/pv2,
+                                     header=header)
+                pv2hdu = fits.PrimaryHDU(data=pv2, header=header)
+            else:
+                # respect_nan = False so that the background is zeros where there is data
+                # and nan where there is not data
+                # But not respecting nan results in data getting averaged with nan, so we
+                # need to respect it and then manually flag (in a rather unreliable
+                # fashion!)
+                #pv = pvextractor.extract_pv_slice(cube, P, respect_nan=False)
+                pv = pvextractor.extract_pv_slice(cube, P, respect_nan=True)
+            pv.writeto(pvfilename)
         bad_cols = np.isnan(np.nanmax(pv.data, axis=0))
         nandata = np.isnan(pv.data)
         pv.data[nandata & ~bad_cols] = 0
