@@ -11,22 +11,24 @@
 \date{Date: \today ~~ Time: \currenttime}
 
 \abstract
-%{The Galactic center is the best region to study star formation under `extreme'
-%conditions.  It has a star formation rate below that of normal molecular clouds
-%and disk galaxies.}
-%{To assess what is suppressing star formation in the Galactic center.}
-%{We have mapped the inner 200 pc of the Central Molecular Zone (CMZ) in \para
-%in order to measure temperatures in the dense gas.}
-%{Gas temperatures in the Galactic Center range from $\sim60$ K to $>100$ K in
-%selected regions.  The gas at $R_{gal}>90$ pc is somewhat cooler than that within
-%$R_{gal}<90$ pc.}
-%{T}
-{This is an abstract.}
-{To fill it in.}
-{Please write your own version of this and send it to Adam.
-Also, title suggestions are welcome!}
-{We have filled it in.}
-{The abstract is done.}
+{The Galactic center is the best region to study star formation under `extreme'
+conditions.  It has an apparent star formation rate per unit `dense' gas below
+that of normal molecular clouds and disk galaxies.}
+{To measure the temperature of gas in the CMZ.}
+{We have mapped the inner 300 pc of the Central Molecular Zone (CMZ) in \para
+and measured temperatures in the dense ($n\sim10^4-10^5$ \percc) gas.}
+{Gas temperatures in the Galactic Center range from $\sim60$ K to $>100$ K in
+selected regions.  Gas temperatures are consistent with purely turbulent heating.
+We measure an upper limit on the cosmic ray ionization ray
+$\zeta_{CR}<10^{-14}$ \pers.}
+{The Galactic Center resembles that of other nearby galaxies in its bulk molecular
+temperature ($T\sim60$ K).  Turbulent heating can explain the observed temperatures.}
+%{This is an abstract.}
+%{To fill it in.}
+%{Please write your own version of this and send it to Adam.
+%Also, title suggestions are welcome!}
+%{We have filled it in.}
+%{The abstract is done.}
 
 
 %\footnote{Compiled on \today\ at \currenttime}
@@ -774,15 +776,16 @@ lower signal-to-noise ratios at the edges and should be ignored.
 Following \citet{Ao2013a}, we examine the energy balance in the CMZ gas to
 understand the temperatures we measure.  The two key processes they identified
 are cosmic ray and turbulent dissipation heating.  We ignore all UV-driven
-heating processes as we are interested in gas at high extinction.
+heating processes in this section as we are interested in gas at high extinction.
 
 We determine the expected gas kinetic temperature by assuming that the heating
 and cooling processes are in equilibrium.  This is generally a good assumption,
 as typical gas cooling rates via line or dust cooling around $T\sim100$ K and
 $n\sim10^5\percc$ are $dT/dt \sim 10^{-20} \mathrm{erg~s}^{-1}\percc \sim 23
-(n/10^5 \percc) K/kyr$ \citep[][and see below]{Goldsmith2001}.  The cooling timescale
-is shorter than the timescales for any energy injection mechanisms that may
-plausibly heat the gas.  The supernova rate is $<1$/kyr over the whole CMZ, and
+(n/10^5 \percc) K \mathrm{kyr}^{-1}$ \citep[][and see below]{Goldsmith2001a}.
+The cooling timescale is shorter than the timescales for any energy injection
+mechanisms that may
+plausibly heat the gas.  The supernova rate is $<1$ kyr$^{-1}$ over the whole CMZ, and
 supernova remnants have lifetimes that are not much longer, so the supernovae
 are expected to contribute to a diffuse cosmic ray population rather than local
 stochastic heating incidents.  Turbulence in these clouds is dynamically driven
@@ -793,18 +796,28 @@ well mixed on milliparsec spatial scales on kiloyear timescales.
 
 We expand upon the \citet{Ao2013a} analysis by solving for the temperature
 assuming that both cosmic ray ionization and turbulent heating are present and
-that the dust temperature is nonzero ($T_{dust}=30$ K except where specified
-otherwise).  We have used the same cosmic ray heating rate
-and turbulence heating rate from \citet[][their equations 12 and 18]{Ao2013a}
-and the same parametrization of the gas and dust cooling rates (their equations
-7 and 8; see Appendix \ref{appendix:equations}).  The gas cooling equation is a parametrization from
-\citet{Goldsmith2001a}, which is most appropriate for local dark clouds, but
-checking against the cooling curves of \citet{Clark2013a}, we find that the
-parametrization is consistent with their fiducial $1000 G_0$, 1000$\times$
-local cosmic ray ionization simulation (though the dominant coolant has changed).
-We solve these equations numerically to determine the resulting equilbrium
-kinetic temperature; the code can be found in the file
-\texttt{heating.py} in the associated repository.
+that the dust temperature is nonzero.  We have used the \texttt{DESPOTIC} code
+\citep{Krumholz2013a} to determine the equilibrium temperature.  We have
+included CO, O, and C as line coolants.  We used the large velocity gradient
+(LVG) approximation for optical depth calculation.  The resulting curves for
+$T_K(\sigma_v)$ are shown in Figure \ref{fig:temvsfwhm_regions}.  We have
+assumed a size scale $L=5$ pc, a gradient $dv/dr = 5$ \kms \perpc, and a cosmic
+ray ionization rate (CRIR) $\zeta_{CR}=10^{-17}$ \pers, with exceptions noted
+in the legend.  We assume a dust temperature $T_D=25$ K, but we assume lower
+dust radiation temperatures because the dust is optically thin at long
+wavelengths in most regions.
+
+% We have used the same cosmic ray heating rate
+% and turbulence heating rate from \citet[][their equations 12 and 18]{Ao2013a}
+% and the same parametrization of the gas and dust cooling rates (their equations
+% 7 and 8; see Appendix \ref{appendix:equations}).  The gas cooling equation is a parametrization from
+% \citet{Goldsmith2001a}, which is most appropriate for local dark clouds, but
+% checking against the cooling curves of \citet{Clark2013a}, we find that the
+% parametrization is consistent with their fiducial $1000 G_0$, 1000$\times$
+% local cosmic ray ionization simulation (though the dominant coolant has changed).
+% We solve these equations numerically to determine the resulting equilbrium
+% kinetic temperature; the code can be found in the file
+% \texttt{heating.py} in the associated repository.
 
 A first key point is that we measure gas temperatures $T\sim60$ K in many
 clouds everywhere throughout the CMZ.  Since cosmic rays have very high
@@ -812,18 +825,11 @@ penetration depths, we expect that cosmic ray heating is entirely uniform
 everywhere within the CMZ, independent of column density.  If this uniformity
 holds, then we can set an upper limit on the cosmic ray ionization rate,
 $\zeta_{CR} \lesssim 10^{-14}$ \pers, since a higher rate would result in a
-minimum gas temperature above what we have measured.  For a fiducial
-measurement, we use $n=10^{4.5}$ \percc, $dv/dr=5$ \kms \perpc, $T_{dust}=25$
-K, and $\zeta_{CR} = 10^{-14}$ \pers, which yields $T_{gas}=55$ K in the
-absence of any other heating mechanisms.  A lower density $n=10^4$ \percc and
-higher gradient $dv/dr=10$ \kms \perpc yield the same temperature if
-$\zeta_{CR} = 3\ee{-14}$ \pers, which gives a more conservative upper limit.
+minimum gas temperature above what we have measured.  
+For a fiducial upper limit measurement, we use $n=10^{4.5}$ \percc, $dv/dr=5$
+\kms \perpc, $T_{rad,dust}=10$ K, and $\zeta_{CR} = 10^{-14}$ \pers, which
+yields $T_{gas}=75$ K in the absence of any other heating mechanisms. 
 
-The resulting curves for $T_K(\sigma_v)$ are shown in Figure
-\ref{fig:temvsfwhm_regions}.  In the plotted curves, we have assumed a
-turbulent driving scale $L=10$ pc, a gradient $dv/dr = 5$ \kms \perpc, and a
-cosmic ray ionization rate (CRIR) $\zeta_{CR}=10^{-17}$ \pers, with exceptions
-noted in the legend.
 
 %If one instead imposes a Larson relationship, with $\sigma_V \propto \ell$, and
 %adds the constraint that the clouds must be in pressure equilibrium
@@ -831,22 +837,20 @@ noted in the legend.
 
 We also have information on the linewidth, size scale, and density for each
 individual region, albeit with great uncertainties on each.  We use these
-measurements to predict the gas temperature if turbulence is the only source of
-heating.  We use the effective radius ($r_{eff} = (A/\pi)^{1/2}$, where $A$ is
-the source area) of the
-selected sources as the length scale, the measured linewidth $\sigma_v$, the
-measured dust temperature $T_{d}$, and we assume the velocity gradient $dv/dr =
-\sigma_v / r_{eff}$.  Of these measurements, the linewidth $\sigma_v$ is
-dominant in determining the predicted temperature and is the least uncertain;
-the velocity gradients we derive by this approach are not obviously reasonable 
-(the velocity dispersion observed is not purely a gradient, and the size scale
-observed could easily be wrong by a factor of 2-3 because of projection)
-but they only affect the temperature minimally, with a power of 1/3.  This
-analysis is performed both for the hand-selected apertures, which have
-arbitrary radii but well-measured linewidths, and the dendrogram leaf sources,
-which have reasonably well-defined radii but somewhat poorly defined line
-widths.
+measurements to predict the gas temperature.  We use the effective radius
+($r_{eff} = (A/\pi)^{1/2}$, where $A$ is the source area) of the
+selected sources as the length scale, the measured linewidth\footnote{We correct
+the linewidth of dendrogram-extracted clumps for clipping assuming the
+underlying source is gaussian following \citet{Rosolowsky2006a} Appendix B.}
+$\sigma_v$, the
+measured dust temperature $T_{d}$ scaled down by an optical depth correction
+$1-\exp\left[-N(\hh)/10^{24} \percc\right]$, and we assume the velocity gradient
+$dv/dr = 5 \kms \perpc$.  Of these measurements, the linewidth $\sigma_v$ is
+dominant in determining the predicted temperature and is the least uncertain.
+This analysis is performed both for the hand-selected apertures, which have
+arbitrary radii but well-measured linewidths, and the dendrogram leaf sources.
 
+\todo{TODO: replace with despotic version.}
 The results of the turbulence-predicted temperature analysis are shown in 
 Figure \ref{fig:turbtem}, which plots our measured temperature against
 the predicted temperature.  For the hand-extracted regions, there is no
@@ -909,7 +913,7 @@ systematic blob extraction of the dendrogram extraction.  This analysis is left
 for a future work.
 
 \FigureTwo
-{figures/chi2_temperature_vs_linewidth_fieldsandsources} % parameter_comparisons
+{figures/despotic/chi2_temperature_vs_linewidth_fieldsandsources} % despotic_heating
 {figures/dendrotem/temperature_vs_rmsvelocity_xzoom} % dendrotem_plots
 {(a) 
 The fitted temperature as described in Section \ref{sec:linemodeling} plotted
@@ -1790,27 +1794,36 @@ visual reference for comparison between the temperature maps.
 }
 {fig:dendrotemmap}{1}{9.5in}
 
-\section{Equations of heating and cooling}
-\label{appendix:equations}
-We state the equations used in Section \ref{sec:heating} here.
+% \section{Equations of heating and cooling}
+% \label{appendix:equations}
+% We state the equations used in Section \ref{sec:heating} here.
+% 
+% \begin{eqnarray}
+%     \Lambda_{g-d} = 4\ee{-33} n^2  T_{gas}^{1/2} (T_{gas}-T_{dust})
+%     \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
+%     \Lambda_{line} = 6\ee{-29} n^{1/2}  T_{gas}^3 \frac{dv}{dr}
+%     \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
+%     \Gamma_{turb} = n \mu  m_h  \frac{1}{2} 3^{3/2}  \frac{\sigma^3}{L}
+%     \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
+%     \Gamma_{cr} = 3.2\ee{-17} n \zeta_{cr}
+%     \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3}
+% \end{eqnarray}
+% 
+% $n$ is the volume density of \hh.  $T_{gas}$ is the gas kinetic temperature in
+% Kelvin.  $T_{dust}$ is the dust temperature in Kelvin.  $dv/dr$ is the velocity
+% gradient in \kms \perpc.  $\mu$ is the mass per particle in AMU, taken to
+% be 2.8.  $\zeta_{cr}$ is the cosmic ray ionization rate in ionizations per second.
+% $m_h$ is the mass of a proton in grams.  $\sigma$ is the velocity dispersion.
+% $L$ is the turbulent length scale.
 
-\begin{eqnarray}
-    \Lambda_{g-d} = 4\ee{-33} n^2  T_{gas}^{1/2} (T_{gas}-T_{dust})
-    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
-    \Lambda_{line} = 6\ee{-29} n^{1/2}  T_{gas}^3 \frac{dv}{dr}
-    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
-    \Gamma_{turb} = n \mu  m_h  \frac{1}{2} 3^{3/2}  \frac{\sigma^3}{L}
-    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3} \\
-    \Gamma_{cr} = 3.2\ee{-17} n \zeta_{cr}
-    \mathrm{~erg~s}^{-1}\mathrm{cm}^{-3}
-\end{eqnarray}
+\section{Temperature balance plots without data}
+Figure \ref{fig:temvsfwhm_regions} shows theoretical curves with all data points
+superposed.  For clarity, we reproduce that figure with no data plotted here.
 
-$n$ is the volume density of \hh.  $T_{gas}$ is the gas kinetic temperature in
-Kelvin.  $T_{dust}$ is the dust temperature in Kelvin.  $dv/dr$ is the velocity
-gradient in \kms \perpc.  $\mu$ is the mass per particle in AMU, taken to
-be 2.8.  $\zeta_{cr}$ is the cosmic ray ionization rate in ionizations per second.
-$m_h$ is the mass of a proton in grams.  $\sigma$ is the velocity dispersion.
-$L$ is the turbulent length scale.
+\Figure{figures/despotic/TvsSigma}
+{Plots of the DESPOTIC-derived equilibrium temperature as a function of line width
+with no data overlaid.  The curves are identical to Figure \ref{fig:temvsfwhm_regions}.}
+{fig:tvssigma_despotic}{0.5}{0}
 
 \input{solobib}
 \end{document}

@@ -11,6 +11,7 @@ from paths import hpath, apath, fpath, pcpath
 from temperature_mapper import ph2cogrid, TemperatureMapper
 from dendrograms import (catalog, catalog_sm, dend, dendsm)
 import heating
+import gaussian_correction
 
 matplotlib.rc_file(pcpath('pubfiguresrc'))
 
@@ -53,6 +54,7 @@ for cat,dendro,smooth in zipped[:1]:
     gt5 = (sn>5)
 
     hot = cat['temperature_chi2'] > 150
+    gcorfactor = gaussian_correction.gaussian_correction(catalog['Smin303']/catalog['Smax303'])
 
     is_leaf = np.array(cat['is_leaf'] == 'True')
     
@@ -335,11 +337,11 @@ for cat,dendro,smooth in zipped[:1]:
         ax11.set_ylabel("$S(3_{0,3}-2_{0,2})$ (K)")
 
     fig12, ax12 = pl.subplots(num=12)
-    ax12.errorbar(cat['v_rms'][hot]*np.sqrt(8*np.log(2)), [149]*hot.sum(),
+    ax12.errorbar(cat['v_rms'][hot]*np.sqrt(8*np.log(2))*gcorfactor[hot], [149]*hot.sum(),
                   lolims=True, linestyle='none', capsize=0, alpha=0.3,
                   marker='^', color='r')
     for mask,color,alpha,markersize in masks_colors:
-        ax12.errorbar(cat['v_rms'][mask]*np.sqrt(8*np.log(2)), cat['temperature_chi2'][mask],
+        ax12.errorbar(cat['v_rms'][mask]*np.sqrt(8*np.log(2))*gcorfactor[mask], cat['temperature_chi2'][mask],
                       #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                       markersize=10 if any(mask & is_leaf) else 5,
                       markeredgecolor='none',
@@ -379,7 +381,7 @@ for cat,dendro,smooth in zipped[:1]:
 
     ax12.set_ylim([0,150])
     fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
-    wide = cat['v_rms'] > 20/np.sqrt(8*np.log(2))
+    wide = cat['v_rms']*gcorfactor > 20/np.sqrt(8*np.log(2))
     ax12.errorbar([24.5] * (wide & is_leaf).sum(),
                   cat['temperature_chi2'][wide&is_leaf],
                   lolims=True, linestyle='none', capsize=0, alpha=0.3,
@@ -507,6 +509,77 @@ for cat,dendro,smooth in zipped[:1]:
 
     fig26.savefig(fpath('dendrotem/temperature_vs_turbtemperature_withtrunks{0}.pdf'.format(smooth)))
 
+    fig27 = pl.figure(27)
+    fig27.clf()
+    ax27 = fig27.gca()
+    mask = (hot|hot_lolim) & is_leaf
+    ax27.errorbar(cat['DespoticTem'][mask],
+                  cat['elo_t'][mask],
+                  lolims=True, linestyle='none', capsize=0, alpha=0.3,
+                  marker='^', color='r')
+    for mask,color,alpha,markersize in masks_colors:
+        mask = (mask & (~hot_lolim) & is_leaf)
+        if mask.sum() == 0: continue
+        ax27.errorbar(cat['DespoticTem'][mask],
+                      cat['temperature_chi2'][mask],
+                      yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
+                      linestyle='none', capsize=0, alpha=0.5*alpha, marker='',
+                      linewidth=0.5,
+                      color=color, markeredgecolor='none')
+        ax27.plot(cat['DespoticTem'][mask],
+                  cat['temperature_chi2'][mask],
+                  linestyle='none',  alpha=alpha, marker='o', color=color,
+                  markeredgecolor='none')
+
+        # Highlight those inconsistent with the curve
+        mask = mask & (cat['tmin1sig_chi2'] > cat['DespoticTem'])
+        ax27.plot(cat['DespoticTem'][mask],
+                  cat['temperature_chi2'][mask],
+                  linestyle='none',  alpha=alpha, marker='o',
+                  markersize=10,
+                  markerfacecolor='none',
+                  markeredgewidth=0.3,
+                  markeredgecolor=color)
+
+    ax27.plot([0,200], [0,200], 'k--', alpha=0.5, zorder=-5)
+    ax27.set_ylim([0,155])
+    ax27.set_xlim([cat['DespoticTem'][is_leaf].min()-2,cat['DespoticTem'][is_leaf].max()+2])
+    ax27.set_xlabel("Turbulence-driven Temperature (K)")
+    ax27.set_ylabel("H$_2$CO Temperature (K)")
+
+    fig27.savefig(fpath('dendrotem/temperature_vs_Despoticturbtemperature{0}.pdf'.format(smooth)))
+
+    for mask,color,alpha,markersize in masks_colors:
+        mask = (mask & (~hot_lolim) & ~is_leaf)
+        if mask.sum() == 0: continue
+        ax27.errorbar(cat['DespoticTem'][mask],
+                      cat['temperature_chi2'][mask],
+                      yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
+                      linestyle='none', capsize=0, alpha=0.5*alpha, marker='',
+                      linewidth=0.5,
+                      color=color, markeredgecolor='none')
+        ax27.plot(cat['DespoticTem'][mask],
+                  cat['temperature_chi2'][mask],
+                  linestyle='none',  alpha=alpha, marker='o', color=color,
+                  markeredgecolor='none')
+
+        # Highlight those inconsistent with the curve
+        mask = mask & (cat['tmin1sig_chi2'] > cat['DespoticTem'])
+        ax27.plot(cat['DespoticTem'][mask],
+                  cat['temperature_chi2'][mask],
+                  linestyle='none',  alpha=alpha, marker='o',
+                  markersize=10,
+                  markerfacecolor='none',
+                  markeredgewidth=0.3,
+                  markeredgecolor=color)
+
+    ax27.set_ylim([0,155])
+    ax27.set_xlim([cat['DespoticTem'][is_leaf].min()-2,cat['DespoticTem'][is_leaf].max()+2])
+
+    fig27.savefig(fpath('dendrotem/temperature_vs_Despoticturbtemperature_withtrunks{0}.pdf'.format(smooth)))
+
+
+
     fig25 = pl.figure(25)
     fig25.clf()
     ax25 = fig25.gca()
@@ -590,6 +663,10 @@ for cat,dendro,smooth in zipped[:1]:
             for leaf in leaves:
                 xax,yax = ([cat[leaf.idx][axname1]*axscale1],
                            [cat[leaf.idx][axname2]*axscale2])
+                if axname1 in ('v_rms','reff'):
+                    xax *= gcorfactor
+                if axname2 in ('v_rms','reff'):
+                    yax *= gcorfactor
                 axis.plot(xax, yax, marker, color=color, markeredgecolor='none', alpha=0.5)
                 obj = leaf.parent
                 while obj.parent:
@@ -702,11 +779,11 @@ for cat,dendro,smooth in zipped[:1]:
     fig23.clf()
     ax23 = fig23.gca()
 
-    ax23.errorbar(cat['v_rms'][hot]*np.sqrt(8*np.log(2)), [149]*hot.sum(),
+    ax23.errorbar(cat['v_rms'][hot]*np.sqrt(8*np.log(2))*gcorfactor[hot], [149]*hot.sum(),
                   lolims=True, linestyle='none', capsize=0, alpha=alpha,
                   marker='^', color='r')
     for mask,color,alpha,markersize in masks_colors:
-        ax23.errorbar(cat['v_rms'][mask]*np.sqrt(8*np.log(2)), cat['temperature_chi2'][mask],
+        ax23.errorbar(cat['v_rms'][mask]*np.sqrt(8*np.log(2))*gcorfactor[mask], cat['temperature_chi2'][mask],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax23.set_xlabel(r"Line FWHM (km s$^{-1}$)")

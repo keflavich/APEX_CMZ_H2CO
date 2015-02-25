@@ -26,6 +26,7 @@ from noise import noise, noise_cube, sm_noise_cube
 from higal_gridded import column_regridded, dusttem_regridded
 from common_constants import logabundance,elogabundance
 import heating
+from gaussian_correction import gaussian_correction
 
 warnings.simplefilter('once')
 
@@ -83,6 +84,8 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
            ]
     obs_keys = [
             'Stot303',
+            'Smin303',
+            'Smax303',
             'Stot321',
             'Smean303',
             'Smean321',
@@ -168,6 +171,8 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             raise ValueError("NaN in cube.  This can't happen: the data from "
                              "which the dendrogram was derived can't have "
                              "NaN pixels.")
+        Smax303 = c303.max().value
+        Smin303 = c303.min().value
 
         Stot321 = c321.sum().value
         if npix == 0:
@@ -210,6 +215,8 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         columns['index'].append(row['_idx'])
         columns['s_ntotal'].append(sntot)
         columns['Stot303'].append(Stot303)
+        columns['Smax303'].append(Smax303)
+        columns['Smin303'].append(Smin303)
         columns['Stot321'].append(Stot321)
         columns['Smean303'].append(Smean303)
         columns['Smean321'].append(Smean321)

@@ -89,30 +89,32 @@ for weight in ("_weighted",""):
         else:
             cmap.set_bad((0.9,0.9,0.9,0.5))
 
-        pvfilename = paths.dpath('orbitpv/KDL2014_orbit_on_{0}{1}.fits'.format(molecule, weight))
+
+        if weight:
+            wcube = (spectral_cube.SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_bl.fits'))
+                     if 'smooth' in fn
+                     else spectral_cube.SpectralCube.read(hpath('APEX_H2CO_303_202_bl.fits')))
+            mcube = (SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_bl_mask.fits'))
+                     if 'smooth' in fn
+                     else SpectralCube.read(hpath('APEX_H2CO_303_202_bl_mask.fits')))
+            if cube.shape != wcube.shape:
+                log.info("Not weighting {0}".format(fn))
+                continue
+            weighted = copy.copy(cube)
+            weighted._data = wcube._data * cube._data
+            mask = (wcube.mask & cube.mask &
+                    BooleanArrayMask(weighted.filled_data[...] != 0, weighted.wcs) &
+                    BooleanArrayMask(wcube.filled_data[...] != 0, wcube.wcs) &
+                    BooleanArrayMask(mcube._data==1, mcube.wcs)
+                   )
+            weighted = weighted.with_mask(mask)
+            wcube = wcube.with_mask(mask)
+
+        pvfilename = paths.dpath('orbits/KDL2014_orbit_on_{0}{1}.fits'.format(molecule, weight))
         if os.path.exists(pvfilename):
             pv = fits.open(pvfilename)[0]
         else:
             if weight:
-
-                wcube = (spectral_cube.SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_bl.fits'))
-                         if 'smooth' in fn
-                         else spectral_cube.SpectralCube.read(hpath('APEX_H2CO_303_202_bl.fits')))
-                mcube = (SpectralCube.read(hpath('APEX_H2CO_303_202_smooth_bl_mask.fits'))
-                         if 'smooth' in fn
-                         else SpectralCube.read(hpath('APEX_H2CO_303_202_bl_mask.fits')))
-                if cube.shape != wcube.shape:
-                    log.info("Not weighting {0}".format(fn))
-                    continue
-                weighted = copy.copy(cube)
-                weighted._data = wcube._data * cube._data
-                mask = (wcube.mask & cube.mask &
-                        BooleanArrayMask(weighted.filled_data[...] != 0, weighted.wcs) &
-                        BooleanArrayMask(wcube.filled_data[...] != 0, wcube.wcs) &
-                        BooleanArrayMask(mcube._data==1, mcube.wcs)
-                       )
-                weighted = weighted.with_mask(mask)
-                wcube = wcube.with_mask(mask)
 
                 #pv1a = pvextractor.extract_pv_slice(cube, P, respect_nan=True)
                 pv1,apv1 = extract_poly_slice(weighted.filled_data[...].value,
@@ -147,6 +149,8 @@ for weight in ("_weighted",""):
                 # fashion!)
                 #pv = pvextractor.extract_pv_slice(cube, P, respect_nan=False)
                 pv = pvextractor.extract_pv_slice(cube, P, respect_nan=True)
+            if not os.path.isdir(os.path.dirname(pvfilename)):
+                os.mkdir(os.path.dirname(pvfilename))
             pv.writeto(pvfilename)
         bad_cols = np.isnan(np.nanmax(pv.data, axis=0))
         nandata = np.isnan(pv.data)

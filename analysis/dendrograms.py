@@ -1,11 +1,13 @@
+import numpy as np
 import time
 import warnings
 from astropy import log
 from astrodendro import Dendrogram,ppv_catalog
-from astropy.table import Table
+from astropy.table import Table, Column
 from paths import hpath,tpath
 from masked_cubes import cube303,cube303sm,cube321,cube321sm
 import flag_other_lines
+from astropy.utils.console import ProgressBar
 
 if 'dend' not in locals():
     t0 = time.time()
@@ -70,3 +72,24 @@ flag_other_lines.flag_hc3n(dend, catalog=catalog, smooth=False)
 flag_other_lines.flag_hc3n(dendsm, catalog=catalog_sm, smooth=True)
 flag_other_lines.flag_absorption(dend, catalog=catalog, smooth=False)
 flag_other_lines.flag_absorption(dendsm, catalog=catalog_sm, smooth=True)
+
+if 'DespoticTem' not in catalog.colnames:
+    from despotic_heating import tkin_all
+    print("Adding DESPOTIC-derived temperatures to dendrograms.")
+    from astropy import units as u
+    import gaussian_correction
+    gcorfactor = gaussian_correction.gaussian_correction(catalog['Smin303']/catalog['Smax303'])
+    dtems = [tkin_all(density=row['density_chi2']*u.cm**-3,
+                      sigma=row['v_rms']*u.km/u.s*gf,
+                      lengthscale=row['reff']*u.pc*gf,
+                      gradient=5*u.km/u.s/u.pc, #min(5,row['v_rms']/row['reff'])*u.km/u.s/u.pc,
+                      tdust=row['higaldusttem']*u.K,
+                      crir=1e-17*u.s**-1,
+                      ISRF=1,
+                      tdust_rad=(row['higaldusttem']*u.K *
+                                 (1-np.exp(-(10**row['logh2column']/1e24)))))
+             for row,gf in ProgressBar(zip(catalog, gcorfactor))]
+    catalog.add_column(Column(name='DespoticTem', data=dtems))
+
+    catalog.write(tpath('PPV_H2CO_Temperature.ipac'), format='ascii.ipac')
+

@@ -11,7 +11,7 @@ def flag_dendro(dend, catalog=None, smooth=False, pixels_with_bad=[],
     in dendro_temperature
     """
 
-    if catalog is not None:
+    if catalog is not None and colname not in catalog.colnames:
         catalog.add_column(table.Column(name=colname, dtype=bool,
                                         data=np.zeros(len(catalog),
                                                       dtype='bool')))
@@ -54,6 +54,14 @@ def flag_hc3n(dend, catalog, smooth):
     flag_dendro(dend, catalog, smooth, pixels_with_bad=pixels_with_bad,
                 colname='IsNotH2CO')
 
+    if issubclass(catalog['IsNotH2CO'].dtype.type, str):
+        col = catalog['IsNotH2CO']
+        catalog.remove_column('IsNotH2CO')
+        catalog.add_column(table.Column(name='IsNotH2CO',
+                                        dtype='bool',
+                                        data=col=='True'))
+
+
     log.info("Flagged {0} dendrogram objects as HC3N".format(catalog['IsNotH2CO'].sum()))
 
 def flag_absorption(dend, catalog=None, smooth=False):
@@ -70,5 +78,12 @@ def flag_absorption(dend, catalog=None, smooth=False):
                       ]
     flag_dendro(dend, catalog, smooth, pixels_with_bad=pixels_with_bad,
                 colname='IsAbsorption', flag_descendants=False)
+
+    if issubclass(catalog['IsAbsorption'].dtype.type, str):
+        col = catalog['IsAbsorption']
+        catalog.remove_column('IsAbsorption')
+        catalog.add_column(table.Column(name='IsAbsorption',
+                                        dtype='bool',
+                                        data=col=='True'))
 
     log.info("Flagged {0} dendrogram objects as Absorption".format(catalog['IsAbsorption'].sum()))
