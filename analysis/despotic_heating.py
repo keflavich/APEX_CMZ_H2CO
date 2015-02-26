@@ -6,6 +6,7 @@ import pylab as pl
 from astropy import units as u
 from astropy import constants
 import paths
+from paths import fpath
 from astropy.utils.console import ProgressBar
 
 # Import the despotic library and the NL99 network; also import numpy
@@ -135,8 +136,8 @@ if __name__ == "__main__":
     ax.plot(linewidths*FWHM, tem10, 'b:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^6$')
     ax.plot(linewidths*FWHM, tem5,  'b--', alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^6$')
     ax.plot(linewidths*FWHM, tem8,  'r-.', alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^5$ $T_D(rad)=25$ K')
-    ax.plot(linewidths*FWHM, tem11, 'r-', alpha=0.5, linewidth=4, label='$\zeta_{CR}=1e-13$, $n=10^5$')
-    ax.plot(linewidths*FWHM, tem12, 'r-', alpha=0.5, linewidth=3, label='$\zeta_{CR}=1e-15$, $n=10^5$')
+    ax.plot(linewidths*FWHM, tem11, 'r-', alpha=0.2, linewidth=6, label='$\zeta_{CR}=1e-13$, $n=10^5$')
+    ax.plot(linewidths*FWHM, tem12, 'r-', alpha=0.4, linewidth=4, label='$\zeta_{CR}=1e-15$, $n=10^5$')
     ax.set_xlabel("Line FWHM (km s$^{-1}$)")
     ax.set_ylabel("Temperature (K)")
     ax.set_ylim(0,150)
@@ -211,6 +212,84 @@ if __name__ == "__main__":
     ax.set_ylim(0,150)
     fig.savefig(paths.fpath('despotic/chi2_temperature_vs_linewidth_fieldsandsources.pdf'),
                              bbox_inches='tight')
+
+
+
+
+    from dendrograms import (catalog, catalog_sm, dend, dendsm)
+    smooth=''
+    cat = catalog
+    sn = (cat['ratio303321']/cat['eratio303321'])
+    sngt50 = sn > 50
+    sn25_50 = (sn > 25) & (sn < 50)
+    ok = (np.isfinite(sn) & (cat['Stot321'] < cat['Stot303']) & ~(cat['bad'] ==
+                                                                  'True') &
+          (cat['Smean321'] > 0) &
+          (cat['e321'] > 0) &
+          (~cat['IsNotH2CO']) & (~cat['IsAbsorption']))
+    gt5 = (sn>5)
+
+    hot = cat['temperature_chi2'] > 150
+    #gcorfactor = gaussian_correction.gaussian_correction(catalog['Smin303']/catalog['Smax303'])
+    gcorfactor = cat['gausscorrfactor']
+    masks = (gt5 & ~sngt50 & ~sn25_50 & ok,
+             sn25_50 & gt5 & ok,
+             sngt50 & gt5 & ok,
+             ok & ~gt5)
+    is_leaf = np.array(cat['is_leaf'])# == 'True')
+    leaf_masks = [np.array(mm, dtype='bool') for mask in masks for mm in (mask & is_leaf, mask & ~is_leaf)]
+    # mask1 & leaf, mask1 & not leaf, mask2 & leaf, mask2 & not leaf....
+    # Make the not-leaves be half as bright
+    masks_colors = zip(leaf_masks,
+                       ('b','b','g','g','r','r',    'k','k'),
+                       (0.5,0.2, 0.6,0.3, 0.7,0.35, 0.3,0.15),
+                       (8,7,9,8,10,9,5,4),
+                      )
+    pl.figure(12).clf()
+    fig12, ax12 = pl.subplots(num=12)
+    ax12.errorbar(cat['v_rms'][hot]*np.sqrt(8*np.log(2))*gcorfactor[hot], [149]*hot.sum(),
+                  lolims=True, linestyle='none', capsize=0, alpha=0.3,
+                  marker='^', color='r')
+    for mask,color,alpha,markersize in masks_colors:
+        ax12.errorbar(cat['v_rms'][mask]*np.sqrt(8*np.log(2))*gcorfactor[mask], cat['temperature_chi2'][mask],
+                      #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
+                      markersize=10 if any(mask & is_leaf) else 5,
+                      markeredgecolor='none',
+                      linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
+        ax12.set_xlabel(r"Line FWHM (km s$^{-1}$)")
+        ax12.set_ylabel("Temperature (K)")
+
+    ax12.plot(linewidths*FWHM, tem2,  'k--', alpha=0.5, linewidth=2,
+              label='$\zeta_{CR}=1e-17$ s$^{-1}$\n $n=10^4$ cm$^{-3}$\n'
+                    '$L=5$ pc\n $dv/dr=5$ km/s/pc\n'
+                    '$T_D=25$K\n $T_D(rad)=10$K')
+    ax12.plot(linewidths*FWHM, tem7,  'k:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^4$')
+    ax12.plot(linewidths*FWHM, tem9,  'k-',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^4$ $dv/dr=20$')
+    ax12.plot(linewidths*FWHM, tem3,  'r--', alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^5$')
+    ax12.plot(linewidths*FWHM, tem6,  'r-',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^5$ L=1 pc')
+    ax12.plot(linewidths*FWHM, tem4,  'r:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^5$')
+    ax12.plot(linewidths*FWHM, tem10, 'b:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^6$')
+    ax12.plot(linewidths*FWHM, tem5,  'b--', alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^6$')
+    ax12.plot(linewidths*FWHM, tem8,  'r-.', alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^5$ $T_D(rad)=25$ K')
+    ax12.plot(linewidths*FWHM, tem11, 'r-', alpha=0.2, linewidth=6, label='$\zeta_{CR}=1e-13$, $n=10^5$')
+    ax12.plot(linewidths*FWHM, tem12, 'r-', alpha=0.4, linewidth=4, label='$\zeta_{CR}=1e-15$, $n=10^5$')
+
+    ax12.set_xlim([2,70])
+    ax12.set_ylim([0,150])
+    fig12.savefig(fpath('despotic/temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
+    wide = cat['v_rms']*gcorfactor > 48/np.sqrt(8*np.log(2))
+    ax12.errorbar([50.5] * (wide & is_leaf).sum(),
+                  cat['temperature_chi2'][wide&is_leaf],
+                  lolims=True, linestyle='none', capsize=0, alpha=0.3,
+                  markersize=10,
+                  marker='>', color='r')
+    ax12.errorbar([50.5] * (wide & ~is_leaf).sum(),
+                  cat['temperature_chi2'][wide&(~is_leaf)],
+                  lolims=True, linestyle='none', capsize=0, alpha=0.1,
+                  markersize=5,
+                  marker='>', color='r')
+    ax12.set_xlim([2,25])
+    fig12.savefig(fpath('despotic/temperature_vs_rmsvelocity_xzoom{0}.pdf'.format(smooth)))
 
 
     pl.draw(); pl.show()

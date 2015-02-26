@@ -54,6 +54,9 @@ def flag_hc3n(dend, catalog, smooth):
     flag_dendro(dend, catalog, smooth, pixels_with_bad=pixels_with_bad,
                 colname='IsNotH2CO')
 
+    # This should not happen, but can if the table was read manually:
+    # the table reads true/false as strings:
+    # https://github.com/astropy/astropy/issues/2974
     if issubclass(catalog['IsNotH2CO'].dtype.type, str):
         col = catalog['IsNotH2CO']
         catalog.remove_column('IsNotH2CO')

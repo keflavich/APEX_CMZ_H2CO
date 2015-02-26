@@ -837,11 +837,12 @@ yields $T_{gas}=75$ K in the absence of any other heating mechanisms.
 
 We also have information on the linewidth, size scale, and density for each
 individual region, albeit with great uncertainties on each.  We use these
-measurements to predict the gas temperature.  We use the effective radius
-($r_{eff} = (A/\pi)^{1/2}$, where $A$ is the source area) of the
+measurements to predict the gas temperature.  We use the effective radius,
+which is the average between the moment-derived major and minor axes, of the
 selected sources as the length scale, the measured linewidth\footnote{We correct
-the linewidth of dendrogram-extracted clumps for clipping assuming the
-underlying source is gaussian following \citet{Rosolowsky2006a} Appendix B.}
+the linewidth and the radius of dendrogram-extracted clumps for clipping
+assuming the underlying source is gaussian following \citet{Rosolowsky2006a}
+Appendix B.}
 $\sigma_v$, the
 measured dust temperature $T_{d}$ scaled down by an optical depth correction
 $1-\exp\left[-N(\hh)/10^{24} \percc\right]$, and we assume the velocity gradient
@@ -850,71 +851,9 @@ dominant in determining the predicted temperature and is the least uncertain.
 This analysis is performed both for the hand-selected apertures, which have
 arbitrary radii but well-measured linewidths, and the dendrogram leaf sources.
 
-\todo{TODO: replace with despotic version.}
-The results of the turbulence-predicted temperature analysis are shown in 
-Figure \ref{fig:turbtem}, which plots our measured temperature against
-the predicted temperature.  For the hand-extracted regions, there is no
-strong trend in the data, but most data points can be explained by turbulent
-heating alone, perhaps with cosmic rays setting a high floor temperature.
-There are a few points with measured temperatures below the turbulence
-prediction.  Some of these regions
-%, e.g. the regions denoted ``CoolSpot'' and
-%``WarmSpot'' in the catalog,
-include at least one velocity component that seems
-to be genuinely cool and broad.  A possible explanation for these
-regions is that their linewidths are an indication of bulk motion rather than
-turbulent motion, and therefore they may be good regions to examine as possible
-expanding bubble edges, either supernova or \hii-region driven.
-
-The dendrogram-extracted points cluster above the $T_{predicted} =
-T_{measured}$ line, but not by very much.  Since dendrogram-extracted
-sources are necessarily coherent in position-velocity space, they are less likely
-than the hand-selected features (which were selected in position-position space)
-to represent unassociated line-of-sight features, supporting the idea that the
-hand-selected features are widened by non-turbulent motions.
-
-Nearly all of the high signal-to-noise measurements in the dendrogram sources
-are above $T>60$ K, with many reaching $\sim100$ K.  The median temperature
-excess is $T_{measured}-T_{predicted} = 35$ K for sources that disagree.  This
-excess cannot readily be accounted for by cosmic rays, since it persists at
-high linewidths where the turbulent heating dominates the cosmic ray heating.
-The gas could be heated by a stronger local stellar radiation field, i.e. by
-local star formation, but if so, the dust should be similarly heated.
-Local X-ray heating could account for the higher temperatures if the local
-X-ray flux density is $\sim3$ orders of magnitude higher than the average,
-which provides a plausible explanation for some of these regions \citep{Ao2013a}.
-However, it seems unlikely that the majority of \formaldehyde-emitting regions
-mark local X-ray interaction features.  
-
-What else can explain the higher temperatures?  We have assumed that the
-\formaldehyde temperatures are driven by gas heating at the mean turbulent
-dissipation rate, $\Gamma_{turb} = n \mu m_H  \frac{1}{2}
-\left(\sqrt{3}\sigma_v\right)^3 / L$.  \citet{Pan2009a} observe that this is a
-robust assumption for their simulations, in which the density and the
-turbulence dissipation rate are uncorrelated (their Figure 3).  This
-decorrelation seems to rule out any possibility that local variations in the
-dissipation rate drive the high observed temperatures.
-% It is possible
-% that the turbulence in CMZ clouds is not well-developed, and the hot dense gas
-% is driven by large-scale shocks, e.g. \hii region and supernova bubble edges,
-% cloud `collisions' on self-intersecting orbits, and cloud accretion.  
-
-One other possibility is that the dendrogram source extraction approach has
-led to an underestimate of the line width.  Because we have selected only the
-leaf sources, we have artificially truncated the sources in both position and
-velocity.  The branch and trunk sources are systematically to the right of the
-leaf sources in Figure \ref{fig:turbtem} (though we do not show them to avoid
-excessive crowding), supporting this idea.  
-
-We may be able to further constrain the heating mechanisms using this same data
-set if precise velocity structure information is obtained for the clouds,
-combining the line fitting analysis of the hand-selected regions with the
-systematic blob extraction of the dendrogram extraction.  This analysis is left
-for a future work.
-
 \FigureTwo
 {figures/despotic/chi2_temperature_vs_linewidth_fieldsandsources} % despotic_heating
-{figures/dendrotem/temperature_vs_rmsvelocity_xzoom} % dendrotem_plots
+{figures/despotic/temperature_vs_rmsvelocity} % despotic_heating
 {(a) 
 The fitted temperature as described in Section \ref{sec:linemodeling} plotted
 against the fitted line width for the by-eye selected regions.  The blue
@@ -939,6 +878,69 @@ range of velocity dispersions.
 {1}{3.5in}
 %{0.5}{0}
 
+\todo{TODO: replace with despotic version.}
+The results of the turbulence-predicted temperature analysis are shown in 
+Figure \ref{fig:turbtem}, which plots our measured temperature against
+the predicted temperature.  For the hand-extracted regions, there is no
+strong trend in the data, but most data points can be explained by turbulent
+heating alone, perhaps with cosmic rays setting a high floor temperature.
+There are a few points with measured temperatures below the turbulence
+prediction.  Some of these regions
+%, e.g. the regions denoted ``CoolSpot'' and
+%``WarmSpot'' in the catalog,
+include at least one velocity component that seems
+to be genuinely cool and broad.  A possible explanation for these
+regions is that their linewidths are an indication of bulk motion rather than
+turbulent motion, and therefore they may be good regions to examine as possible
+expanding bubble edges, either supernova or \hii-region driven.
+
+The dendrogram-extracted points \todo{cluster above the $T_{predicted} =
+T_{measured}$ line, but not by very much.}  Since dendrogram-extracted
+sources are necessarily coherent in position-velocity space, they are less likely
+than the hand-selected features (which were selected in position-position space)
+to represent unassociated line-of-sight features, supporting the idea that the
+hand-selected features are widened by non-turbulent motions.
+
+\todo{Nearly all of the high signal-to-noise measurements in the dendrogram sources
+are above $T>60$ K, with many reaching $\sim100$ K.  The median temperature
+excess is $T_{measured}-T_{predicted} = 35$ K for sources that disagree.  This
+excess cannot readily be accounted for by cosmic rays, since it persists at
+high linewidths where the turbulent heating dominates the cosmic ray heating.
+The gas could be heated by a stronger local stellar radiation field, i.e. by
+local star formation, but if so, the dust should be similarly heated.
+Local X-ray heating could account for the higher temperatures if the local
+X-ray flux density is $\sim3$ orders of magnitude higher than the average,
+which provides a plausible explanation for some of these regions \citep{Ao2013a}.
+However, it seems unlikely that the majority of \formaldehyde-emitting regions
+mark local X-ray interaction features.  }
+
+What else can explain the higher temperatures?  We have assumed that the
+\formaldehyde temperatures are driven by gas heating at the mean turbulent
+dissipation rate, $\Gamma_{turb} = n \mu m_H  \frac{1}{2}
+\left(\sqrt{3}\sigma_v\right)^3 / L$.  \citet{Pan2009a} observe that this is a
+robust assumption for their simulations, in which the density and the
+turbulence dissipation rate are uncorrelated (their Figure 3).  This
+decorrelation seems to rule out any possibility that local variations in the
+dissipation rate drive the high observed temperatures.
+% It is possible
+% that the turbulence in CMZ clouds is not well-developed, and the hot dense gas
+% is driven by large-scale shocks, e.g. \hii region and supernova bubble edges,
+% cloud `collisions' on self-intersecting orbits, and cloud accretion.  
+
+\todo{One other possibility is that the dendrogram source extraction approach has
+led to an underestimate of the line width.  Because we have selected only the
+leaf sources, we have artificially truncated the sources in both position and
+velocity.  The branch and trunk sources are systematically to the right of the
+leaf sources in Figure \ref{fig:turbtem} (though we do not show them to avoid
+excessive crowding), supporting this idea.  }
+
+\todo{We may be able to further constrain the heating mechanisms using this same data
+set if precise velocity structure information is obtained for the clouds,
+combining the line fitting analysis of the hand-selected regions with the
+systematic blob extraction of the dendrogram extraction.  This analysis is left
+for a future work.}
+
+
 \FigureTwo
 {figures/chi2_temperature_vs_turbulenttemperature_fieldsandsources.pdf}
 {figures/dendrotem/temperature_vs_turbtemperature.pdf}
@@ -958,11 +960,11 @@ Photon-driven heating mechanisms are subject to attenuation, so clouds with
 significant X-ray or UV heating may have heated shells and cool interiors.
 Turbulent and cosmic ray heating experience no such effects, but they exhibit a
 different dependence on gas density than the corresponding cooling mechanisms.
-If the interstellar UV radiation or X-ray heating are important, we would
+If interstellar UV or X-ray heating are important, we would
 expect to find warmer cloud edges and cooler cloud interiors.  The same is true
 if the clouds are centrally condensed, since dust cooling can dominate heating
 processes at very high densities.  If clouds are internally heated by
-gravitational collapse and star formation, the cloud interior should be warmer
+gravitational collapse and star formation, the cloud interior could be warmer
 than its exterior.  
 
 We have therefore examined the radial profiles of temperature and velocity
@@ -982,7 +984,7 @@ These observations seem to imply that two different heating mechanisms, one
 internally driven (The Brick) and one external (G1.23-0.08), are active within
 the CMZ.  These two objects are not meant to be representative of the whole
 CMZ, though, and radial properties of clumps need to be studied in more detail
-to draw firm conclusions about the heating processes.  
+to draw firm conclusions about photon-driven heating processes.  
 
 % analysis/multiscale_fit
 \FigureTwo
@@ -1048,7 +1050,7 @@ and red $S/N > 50$.  }
 {1}{3.5in}
 %{0.5}{0}
 
-\subsection{Spatial variations in gas temperature}
+\subsection{Spatial variations in gas temperature and orbit comparison}
 There are significant spatial variations in the gas temperature.  The most
 obvious is in and around the Sgr B2 complex, where very high gas temperatures
 are measured.  High gas temperatures, $T\sim100-120$ K, were previously
@@ -1088,6 +1090,7 @@ for some of the Sgr B2 regions are shown as red upward-pointing triangles near
 the top of the plot.}
 {fig:temvslonplot}{0.4}{0}
 
+\todo{Add some orbital motivation.  Search for a pattern?}
 Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2015a} and
 a position-velocity slice through the fitted temperature cube following that
 orbit.  The fit is imperfect, especially along the green segment, but still very useful
@@ -1103,11 +1106,12 @@ many of those on the near side, such as The Brick (red segment).
 
 We assign a time to each dendrogram-extracted clump within 35 \kms and 6 pc of
 the \citet{Kruijssen2015a} orbit and plot their temperatures against that time
-in Figure \ref{fig:kdltemvstime}.  The possible linear increase in temperature
+in Figure \ref{fig:kdltemvstime}.  \todo{We see a possible linear increase...} The possible linear increase in temperature
 over the first $\sim0.5$ Myr might support the \citet{Kruijssen2015a}
 hypothesis that the `ring' represents a single gas stream on its first passage
 by Sgr A*.  However, the `trend' is equally consistent with a constant
-temperature over the same range.
+temperature over the same range. \todo{If the trend is real, it indicates
+a stochastic driver for turbulence...}
 %The cooler gas on the far side does not obviously fit into this picture, 
 %and we suggest in Section \ref{sec:coolstream} that it is not affiliated with
 %the orbit (but the existence of such a cool stream does \emph{not} challenge

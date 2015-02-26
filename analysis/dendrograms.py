@@ -38,14 +38,25 @@ if 'dendsm' not in locals():
 #     log.info("Loaded dendrogram from file in {0:0.1f} seconds.".format(time.time()-t0))
 #     dend321sm.wcs = cube321sm.wcs
 
+# Workaround / bugfix for https://github.com/astropy/astropy/issues/2974
+def fix_logical(t):
+    newcols = []
+    for col in t.columns.values():
+        if col.dtype.str.endswith('S5'):
+            falses = col == 'False'
+            trues = col == 'True'
+            if np.all(falses | trues):
+                col = t.ColumnClass(trues, name=col.name)
+        newcols.append(col)
+    return Table(newcols)
 
 dend_sm = dendsm
 
 try:
-    catalog = Table.read(tpath('PPV_H2CO_Temperature.ipac'), format='ascii.ipac',
-                         guess=False)
-    catalog_sm = Table.read(tpath('PPV_H2CO_Temperature_smooth.ipac'), format='ascii.ipac',
-                         guess=False)
+    catalog = fix_logical(Table.read(tpath('PPV_H2CO_Temperature.ipac'),
+                                     format='ascii.ipac', guess=False))
+    catalog_sm = fix_logical(Table.read(tpath('PPV_H2CO_Temperature_smooth.ipac'),
+                             format='ascii.ipac', guess=False))
     catalogsm = catalog_sm
 
 except IOError:
@@ -79,7 +90,7 @@ if 'DespoticTem' not in catalog.colnames:
     from astropy import units as u
     import gaussian_correction
     gcorfactor = gaussian_correction.gaussian_correction(catalog['Smin303']/catalog['Smax303'])
-    dtems = [tkin_all(density=row['density_chi2']*u.cm**-3,
+    dtems = [tkin_all(density=10**row['density_chi2']*u.cm**-3,
                       sigma=row['v_rms']*u.km/u.s*gf,
                       lengthscale=row['reff']*u.pc*gf,
                       gradient=5*u.km/u.s/u.pc, #min(5,row['v_rms']/row['reff'])*u.km/u.s/u.pc,
@@ -90,6 +101,7 @@ if 'DespoticTem' not in catalog.colnames:
                                  (1-np.exp(-(10**row['logh2column']/1e24)))))
              for row,gf in ProgressBar(zip(catalog, gcorfactor))]
     catalog.add_column(Column(name='DespoticTem', data=dtems))
+    catalog.add_column(Column(name='gausscorrfactor', data=gcorfactor))
 
     catalog.write(tpath('PPV_H2CO_Temperature.ipac'), format='ascii.ipac')
 

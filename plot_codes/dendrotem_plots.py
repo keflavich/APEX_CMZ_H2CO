@@ -54,9 +54,11 @@ for cat,dendro,smooth in zipped[:1]:
     gt5 = (sn>5)
 
     hot = cat['temperature_chi2'] > 150
-    gcorfactor = gaussian_correction.gaussian_correction(catalog['Smin303']/catalog['Smax303'])
+    #gcorfactor = gaussian_correction.gaussian_correction(catalog['Smin303']/catalog['Smax303'])
+    gcorfactor = cat['gausscorrfactor']
 
-    is_leaf = np.array(cat['is_leaf'] == 'True')
+    # This was corrected with fix_bool...
+    is_leaf = np.array(cat['is_leaf'])# == 'True')
     
 
     for ii in range(1,13): pl.figure(ii).clf()
@@ -349,7 +351,7 @@ for cat,dendro,smooth in zipped[:1]:
         ax12.set_xlabel(r"Line FWHM (km s$^{-1}$)")
         ax12.set_ylabel("Temperature (K)")
 
-    linewidths = np.linspace(0,cat['v_rms'].max())*u.km/u.s
+    linewidths = np.linspace(0,2.35*cat['v_rms'].max())*u.km/u.s
     ax12.plot(linewidths*2.35, [heating.tkin_all(10**4*u.cm**-3, sigma, 10*u.pc,
                                                 5*u.km/u.s/u.pc, 30*u.K)
                                for sigma in linewidths],
@@ -381,13 +383,13 @@ for cat,dendro,smooth in zipped[:1]:
 
     ax12.set_ylim([0,150])
     fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
-    wide = cat['v_rms']*gcorfactor > 20/np.sqrt(8*np.log(2))
-    ax12.errorbar([24.5] * (wide & is_leaf).sum(),
+    wide = cat['v_rms']*gcorfactor > 48/np.sqrt(8*np.log(2))
+    ax12.errorbar([50.5] * (wide & is_leaf).sum(),
                   cat['temperature_chi2'][wide&is_leaf],
                   lolims=True, linestyle='none', capsize=0, alpha=0.3,
                   markersize=10,
                   marker='>', color='r')
-    ax12.errorbar([24.5] * (wide & ~is_leaf).sum(),
+    ax12.errorbar([50.5] * (wide & ~is_leaf).sum(),
                   cat['temperature_chi2'][wide&(~is_leaf)],
                   lolims=True, linestyle='none', capsize=0, alpha=0.1,
                   markersize=5,
@@ -512,13 +514,13 @@ for cat,dendro,smooth in zipped[:1]:
     fig27 = pl.figure(27)
     fig27.clf()
     ax27 = fig27.gca()
-    mask = (hot|hot_lolim) & is_leaf
+    mask = (hot|hot_lolim) & is_leaf & (gcorfactor < 3)
     ax27.errorbar(cat['DespoticTem'][mask],
                   cat['elo_t'][mask],
                   lolims=True, linestyle='none', capsize=0, alpha=0.3,
                   marker='^', color='r')
     for mask,color,alpha,markersize in masks_colors:
-        mask = (mask & (~hot_lolim) & is_leaf)
+        mask = (mask & (~hot_lolim) & is_leaf) & (gcorfactor < 3)
         if mask.sum() == 0: continue
         ax27.errorbar(cat['DespoticTem'][mask],
                       cat['temperature_chi2'][mask],
@@ -532,7 +534,10 @@ for cat,dendro,smooth in zipped[:1]:
                   markeredgecolor='none')
 
         # Highlight those inconsistent with the curve
-        mask = mask & (cat['tmin1sig_chi2'] > cat['DespoticTem'])
+        mask = (mask & 
+                ((cat['tmin1sig_chi2'] > cat['DespoticTem']) |
+                 (cat['tmax1sig_chi2'] < cat['DespoticTem'])) &
+                (gcorfactor < 3))
         ax27.plot(cat['DespoticTem'][mask],
                   cat['temperature_chi2'][mask],
                   linestyle='none',  alpha=alpha, marker='o',
@@ -550,7 +555,7 @@ for cat,dendro,smooth in zipped[:1]:
     fig27.savefig(fpath('dendrotem/temperature_vs_Despoticturbtemperature{0}.pdf'.format(smooth)))
 
     for mask,color,alpha,markersize in masks_colors:
-        mask = (mask & (~hot_lolim) & ~is_leaf)
+        mask = (mask & (~hot_lolim) & ~is_leaf) & (gcorfactor < 3)
         if mask.sum() == 0: continue
         ax27.errorbar(cat['DespoticTem'][mask],
                       cat['temperature_chi2'][mask],
@@ -564,7 +569,10 @@ for cat,dendro,smooth in zipped[:1]:
                   markeredgecolor='none')
 
         # Highlight those inconsistent with the curve
-        mask = mask & (cat['tmin1sig_chi2'] > cat['DespoticTem'])
+        mask = (mask & 
+                ((cat['tmin1sig_chi2'] > cat['DespoticTem']) |
+                 (cat['tmax1sig_chi2'] < cat['DespoticTem'])) &
+                (gcorfactor < 3))
         ax27.plot(cat['DespoticTem'][mask],
                   cat['temperature_chi2'][mask],
                   linestyle='none',  alpha=alpha, marker='o',
@@ -663,10 +671,10 @@ for cat,dendro,smooth in zipped[:1]:
             for leaf in leaves:
                 xax,yax = ([cat[leaf.idx][axname1]*axscale1],
                            [cat[leaf.idx][axname2]*axscale2])
-                if axname1 in ('v_rms','reff'):
-                    xax *= gcorfactor[leaf.idx]
-                if axname2 in ('v_rms','reff'):
-                    yax *= gcorfactor[leaf.idx]
+                #if axname1 in ('v_rms','reff'):
+                #    xax *= gcorfactor[leaf.idx]
+                #if axname2 in ('v_rms','reff'):
+                #    yax *= gcorfactor[leaf.idx]
                 axis.plot(xax, yax, marker, color=color, markeredgecolor='none', alpha=0.5)
                 obj = leaf.parent
                 while obj.parent:
