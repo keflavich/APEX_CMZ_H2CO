@@ -1,15 +1,5 @@
 """
-Jan 15: This isn't tracked - why?  Is it really not needed?  I'm tracking it
-now, but I think it is entirely redundant with make_ratio_cubes_ims and that
-file should supercede this now.  BUT, make_ratio_cubes_ims doesn't include
-ph2cogrid!  I guess BOTH are necessary.  make_ratio_cubes_ims is used for 321
-cubes (which were a failed experiment from early December) and this is the
-"real" one...
-
-
 Make ratio maps and temperature maps of cubes and images (not cube sims)
-
-try make_ratio_integ instead?
 """
 from __future__ import print_function
 import os

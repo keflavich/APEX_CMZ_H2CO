@@ -23,7 +23,6 @@ tcube_direct.write(hpath('TemperatureCube_PiecewiseFromRatio.fits'), overwrite=T
 
 tcubesm_direct.write(hpath('TemperatureCube_smooth_PiecewiseFromRatio.fits'), overwrite=True)
 
-
 # Do the integrated version
 for smooth in ('', '_smooth'):
     top = hpath('APEX_H2CO_321_220{0}_bl_mask_integ.fits'.format(smooth))

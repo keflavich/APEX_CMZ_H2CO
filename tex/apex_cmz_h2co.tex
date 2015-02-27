@@ -22,7 +22,11 @@ selected regions.  Gas temperatures are consistent with purely turbulent heating
 We measure an upper limit on the cosmic ray ionization ray
 $\zeta_{CR}<10^{-14}$ \pers.}
 {The Galactic Center resembles that of other nearby galaxies in its bulk molecular
-temperature ($T\sim60$ K).  Turbulent heating can explain the observed temperatures.}
+temperature ($T\sim60$ K).  Turbulent heating can readily explain the observed
+temperatures given the observed line widths.  The predicted temperature assuming
+standard cold cloud chemistry is often higher than the observed temperature, so
+we propose that the hotter CMZ clouds are able to cool via line emission more
+efficiently than local clouds.}
 %{This is an abstract.}
 %{To fill it in.}
 %{Please write your own version of this and send it to Adam.
@@ -51,7 +55,7 @@ star formation \citep{Kruijssen2013a}.
 
 The central $\sim100$ pc\footnote{Assuming the IAU-recommended $d=8.5$ kpc
 \citep{Ghez2008a,Gillessen2009b,Reid2009a,Gillessen2013b}.} `ring' or `dust ridge'
-\citep{Lis1994a,Sofue1995a,Molinari2011a} within our Galaxy's CMZ has attracted
+\citep{Lis1991a,Sofue1995a,Molinari2011a} within our Galaxy's CMZ has attracted
 a great deal of attention recently, as it has a much higher ratio of gas mass
 to star formation tracers than the rest of the galaxy
 \citep{Longmore2013a,Longmore2012b,Longmore2012a,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
@@ -122,7 +126,7 @@ for this project.
 \subsection{Observations}
 We observed the Central Molecular Zone from $-0.4\arcdeg < \ell < 1.6\arcdeg$
 with the APEX-1 (SHFI) instrument \citep{Vassilev2008a} on the Atacama Pathfinder
-Experiment (APEX) telescope \citep{Guesten2006b} using the eXtended bandwidth
+Experiment (APEX) telescope \citep{Gusten2006b} using the eXtended bandwidth
 Fast Fourier Transform
 Spectrometer (XFFTS) backend \citep{Klein2012a}.  The observations were
 performed in service mode, and were spread out over two years.  The time was
@@ -690,7 +694,10 @@ inverse S/N from Figure \ref{fig:peaksn}b.
 The effective range of detected temperatures is $\approx40-150$ K. While lower
 and higher temperatures appear in the map, those measurements should not be
 trusted.  Below $T\lesssim40$ K, all temperature measurements in the map are
-effectively upper limits, generally corresponding to $T\lesssim40$ K.  This
+effectively $1\sigma$ upper limits\footnote{When averaged into regions in later
+sections, we measure some temperatures below this limit, albeit still at low
+significance.}, generally
+corresponding to $T\lesssim40$ K.  This
 limit is due to a combination of sensitivity and excitation: below 40 K, the
 \para lines are observed to be faint; the \threetwoone line is not detected.
 In regions of high column density, we detect both lines, and in all of these
@@ -782,7 +789,7 @@ We determine the expected gas kinetic temperature by assuming that the heating
 and cooling processes are in equilibrium.  This is generally a good assumption,
 as typical gas cooling rates via line or dust cooling around $T\sim100$ K and
 $n\sim10^5\percc$ are $dT/dt \sim 10^{-20} \mathrm{erg~s}^{-1}\percc \sim 23
-(n/10^5 \percc) K \mathrm{kyr}^{-1}$ \citep[][and see below]{Goldsmith2001a}.
+(n/10^5 \percc) \mathrm{K~kyr}^{-1}$ \citep[][and see below]{Goldsmith2001a}.
 The cooling timescale is shorter than the timescales for any energy injection
 mechanisms that may
 plausibly heat the gas.  The supernova rate is $<1$ kyr$^{-1}$ over the whole CMZ, and
@@ -797,7 +804,7 @@ well mixed on milliparsec spatial scales on kiloyear timescales.
 We expand upon the \citet{Ao2013a} analysis by solving for the temperature
 assuming that both cosmic ray ionization and turbulent heating are present and
 that the dust temperature is nonzero.  We have used the \texttt{DESPOTIC} code
-\citep{Krumholz2013a} to determine the equilibrium temperature.  We have
+\citep{Krumholz2014c} to determine the equilibrium temperature.  We have
 included CO, O, and C as line coolants.  We used the large velocity gradient
 (LVG) approximation for optical depth calculation.  The resulting curves for
 $T_K(\sigma_v)$ are shown in Figure \ref{fig:temvsfwhm_regions}.  We have
@@ -828,25 +835,30 @@ $\zeta_{CR} \lesssim 10^{-14}$ \pers, since a higher rate would result in a
 minimum gas temperature above what we have measured.  
 For a fiducial upper limit measurement, we use $n=10^{4.5}$ \percc, $dv/dr=5$
 \kms \perpc, $T_{rad,dust}=10$ K, and $\zeta_{CR} = 10^{-14}$ \pers, which
-yields $T_{gas}=75$ K in the absence of any other heating mechanisms. 
+yields $T_{gas}=75$ K in the absence of any other heating mechanisms.  This
+upper limit could be violated if the gas is about an order of magnitude denser
+than the dust-derived average density, which is not likely.
 
 
 %If one instead imposes a Larson relationship, with $\sigma_V \propto \ell$, and
 %adds the constraint that the clouds must be in pressure equilibrium
 %TODO: as per diederik's request
 
-We also have information on the linewidth, size scale, and density for each
+We have information on the linewidth, size scale, and density for each
 individual region, albeit with great uncertainties on each.  We use these
 measurements to predict the gas temperature.  We use the effective radius,
-which is the average between the moment-derived major and minor axes, of the
-selected sources as the length scale, the measured linewidth\footnote{We correct
-the linewidth and the radius of dendrogram-extracted clumps for clipping
-assuming the underlying source is gaussian following \citet{Rosolowsky2006a}
-Appendix B.}
+which is the average between the moment-derived major and minor
+axes\footnote{The effective radius is often computed as the square root of the
+total area (in pixels), but \citet{Rosolowsky2006a} show that this is usually a
+very bad approximation, so we use the gaussian-corrected (see next footnote)
+moment-derived radius.}, of the selected sources as the length scale, the
+measured linewidth\footnote{We correct the linewidth and the radius of
+dendrogram-extracted clumps for clipping assuming the underlying source is
+gaussian following \citet{Rosolowsky2005b} Appendix B.}
 $\sigma_v$, the
 measured dust temperature $T_{d}$ scaled down by an optical depth correction
-$1-\exp\left[-N(\hh)/10^{24} \percc\right]$, and we assume the velocity gradient
-$dv/dr = 5 \kms \perpc$.  Of these measurements, the linewidth $\sigma_v$ is
+$1-\exp\left[-N(\hh)/10^{24}~\percc\right]$, and we assume the velocity gradient
+$dv/dr = 5$ \kms \perpc.  Of these measurements, the linewidth $\sigma_v$ is
 dominant in determining the predicted temperature and is the least uncertain.
 This analysis is performed both for the hand-selected apertures, which have
 arbitrary radii but well-measured linewidths, and the dendrogram leaf sources.
@@ -854,14 +866,24 @@ arbitrary radii but well-measured linewidths, and the dendrogram leaf sources.
 \FigureTwo
 {figures/despotic/chi2_temperature_vs_linewidth_fieldsandsources} % despotic_heating
 {figures/despotic/temperature_vs_rmsvelocity} % despotic_heating
-{(a) 
+{
+Plots of temperature vs linewidth.  The curves in both plots show theoretical
+curves given different assumptions as computed by \texttt{DESPOTIC}.  The legend
+shows the various assumptions, with the fiducial assumptions indicated at the
+top, associated with the dashed gray line; these fiducial values are kept fixed
+except where indicated.  The colors each correspond to a different density, while
+different line styles indicate changes in other physical constants.
+The green solid curve shows a pressure equilibrium case ($n\propto\sigma^{-2}$)
+with a Larson relation ($L\propto\sigma^{0.7}$) based on \citet{Shetty2012a}.
+A version of this plot with no data is shown in Figure
+\ref{fig:tvssigma_despotic}.
+(a) 
 The fitted temperature as described in Section \ref{sec:linemodeling} plotted
 against the fitted line width for the by-eye selected regions.  The blue
 symbols are compact `clump' sources and the red symbols are large-area
-($8\arcmin$) square regions.  No trend between the line width and temperature
-is obvious.  The very broad line regions, FWHM $\gtrsim$ 40 \kms, are sometimes
-affected by significant baseline issues, and it is possible that the
-temperature has been
+($8\arcmin$) square regions.  The very broad line regions, FWHM $\gtrsim$ 40
+\kms, are sometimes affected by significant baseline issues, and it is possible
+that the temperature has been
 underestimated as a result.
 (b) The same as (a) but for the dendrogram-extracted sources. The points are
 color coded by signal-to-noise in the ratio $R_1$, with black $S/N < 5$, blue
@@ -878,14 +900,14 @@ range of velocity dispersions.
 {1}{3.5in}
 %{0.5}{0}
 
-\todo{TODO: replace with despotic version.}
 The results of the turbulence-predicted temperature analysis are shown in 
 Figure \ref{fig:turbtem}, which plots our measured temperature against
-the predicted temperature.  For the hand-extracted regions, there is no
-strong trend in the data, but most data points can be explained by turbulent
-heating alone, perhaps with cosmic rays setting a high floor temperature.
-There are a few points with measured temperatures below the turbulence
-prediction.  Some of these regions
+the predicted temperature assuming turbulent heating is active and the
+cosmic ray heating is negligible ($\zeta_{CR}=1\ee{-17}$ \pers).  For the
+hand-extracted regions, there is no strong trend in the data, but most data
+points can be explained by turbulent heating alone, perhaps with cosmic rays
+setting a high floor temperature.  There are a few points with measured
+temperatures below the turbulence prediction.  Some of these regions
 %, e.g. the regions denoted ``CoolSpot'' and
 %``WarmSpot'' in the catalog,
 include at least one velocity component that seems
@@ -894,66 +916,64 @@ regions is that their linewidths are an indication of bulk motion rather than
 turbulent motion, and therefore they may be good regions to examine as possible
 expanding bubble edges, either supernova or \hii-region driven.
 
-The dendrogram-extracted points \todo{cluster above the $T_{predicted} =
-T_{measured}$ line, but not by very much.}  Since dendrogram-extracted
-sources are necessarily coherent in position-velocity space, they are less likely
-than the hand-selected features (which were selected in position-position space)
-to represent unassociated line-of-sight features, supporting the idea that the
-hand-selected features are widened by non-turbulent motions.
+The dendrogram-extracted points plotted include only those with a gaussian
+correction factor $<3$, as larger corrections are regarded as unreliable
+extrapolations.  Since dendrogram-extracted sources are necessarily coherent in
+position-velocity space, they are less likely than the hand-selected features
+(which were selected in position-position space) to represent unassociated
+line-of-sight features, supporting the idea that the hand-selected features are
+widened by non-turbulent motions.
 
-\todo{Nearly all of the high signal-to-noise measurements in the dendrogram sources
-are above $T>60$ K, with many reaching $\sim100$ K.  The median temperature
-excess is $T_{measured}-T_{predicted} = 35$ K for sources that disagree.  This
-excess cannot readily be accounted for by cosmic rays, since it persists at
-high linewidths where the turbulent heating dominates the cosmic ray heating.
-The gas could be heated by a stronger local stellar radiation field, i.e. by
-local star formation, but if so, the dust should be similarly heated.
-Local X-ray heating could account for the higher temperatures if the local
-X-ray flux density is $\sim3$ orders of magnitude higher than the average,
-which provides a plausible explanation for some of these regions \citep{Ao2013a}.
-However, it seems unlikely that the majority of \formaldehyde-emitting regions
-mark local X-ray interaction features.  }
-
-What else can explain the higher temperatures?  We have assumed that the
-\formaldehyde temperatures are driven by gas heating at the mean turbulent
-dissipation rate, $\Gamma_{turb} = n \mu m_H  \frac{1}{2}
-\left(\sqrt{3}\sigma_v\right)^3 / L$.  \citet{Pan2009a} observe that this is a
-robust assumption for their simulations, in which the density and the
-turbulence dissipation rate are uncorrelated (their Figure 3).  This
-decorrelation seems to rule out any possibility that local variations in the
-dissipation rate drive the high observed temperatures.
-% It is possible
-% that the turbulence in CMZ clouds is not well-developed, and the hot dense gas
-% is driven by large-scale shocks, e.g. \hii region and supernova bubble edges,
-% cloud `collisions' on self-intersecting orbits, and cloud accretion.  
-
-\todo{One other possibility is that the dendrogram source extraction approach has
-led to an underestimate of the line width.  Because we have selected only the
-leaf sources, we have artificially truncated the sources in both position and
-velocity.  The branch and trunk sources are systematically to the right of the
-leaf sources in Figure \ref{fig:turbtem} (though we do not show them to avoid
-excessive crowding), supporting this idea.  }
-
-\todo{We may be able to further constrain the heating mechanisms using this same data
-set if precise velocity structure information is obtained for the clouds,
-combining the line fitting analysis of the hand-selected regions with the
-systematic blob extraction of the dendrogram extraction.  This analysis is left
-for a future work.}
-
+The predicted temperatures for dendrogram clumps frequently exceed the measured
+temperatures by a large margin, often a factor of 2 or more.  There are two
+classes of explanation: First, that the cooling rate has been underestimated.
+This is entirely plausible, as we have assumed local chemistry (specifically, a
+CO abundance $X_{CO}=10^{-4}$ \hh, and negligible abundances for other
+coolants), which does not obviously hold under CMZ conditions.  The other
+possibility is that we have overestimated the line width or underestimated the
+size scale of the clump via our extraction method.  While we have tried to
+account for this source of error by correcting for clipping, we are nonetheless
+extrapolating our measurements to some degree.
 
 \FigureTwo
 {figures/chi2_temperature_vs_turbulenttemperature_fieldsandsources.pdf}
-{figures/dendrotem/temperature_vs_turbtemperature.pdf}
+%{figures/dendrotem/temperature_vs_turbtemperature.pdf} # dendrotem_plot
+{figures/dendrotem/temperature_vs_Despoticturbtemperature.pdf} % despotic_heating
 {Plots of the \formaldehyde-measured temperature against the predicted
 turbulent-driven temperature as discussed in Section \ref{sec:heating}.
-(a) The hand-selected regions as described in Figure \ref{fig:temvstem_regions}.  Triangles
-indicate regions with lower limits on the temperature, i.e. any region with
+(a) The hand-selected regions as described in Figure
+\ref{fig:temvstem_regions}.  Triangles indicate regions with lower limits on
+the temperature, i.e. any region with
 a measured $1-\sigma$ upper limit on the temperature $T>150$ K.  The gray
 dashed line shows the $T_{turb} = T_{measured}$ relation.  Regions that are inconsistent
 with the relation at the $1-\sigma$ level are outlined.
-(b) The same as (a) for the dendrogram-extracted regions.  
+(b) The same as (a) for the dendrogram-extracted regions.  Regions with a large
+gaussian correction factor $f_g>3$ are excluded.  Regions with $T_{turb}>180$ K
+are indicated with triangles.
 }
 {fig:turbtem}{1}{3.5in}
+
+To examine the possibility that our cooling rates are underestimated, we examine
+a particular clump from the catalog, with $n=10^{4.2}$ \percc, $\sigma=8.6
+f_g = 14.3$\kms, $L = 2r = 2(0.588)f_g = 1.65$ pc (deconvolved), $T_D=21$ K,
+and $T_{D,rad} = 1.2$ K.  This blob has a predicted temperature $T=156$ K,
+but a measured temperature $T=91$ K.  With local chemistry, the dominant
+coolant is CO by 2 orders of magnitude.  In \texttt{DESPOTIC}, we set chemical
+equilibrium using the \citet{Nelson1999a} chemical network code and find that
+the predicted O abundance is increased by
+an order of magnitude, which in turn makes oxygen a significant coolant with
+$\Lambda_{O} \approx 0.5 \Lambda_{CO}$.   The predicted equilibrium temperature
+is then $T=114$ K.  While this temperature is still a bit high, this example
+shows that the modified chemistry at these high temperatures should be
+accounted for when predicting gas temperature.
+
+We may be able to further constrain the heating mechanisms using this same data
+set if more precise velocity structure information is obtained for the clouds,
+combining the line fitting analysis of the hand-selected regions with the
+systematic blob extraction of the dendrogram extraction in order to avoid using
+the extrapolated correction factors.  This analysis is left for a future work.
+
+
 
 \subsection{Temperature variation with spatial scale or radius}
 Photon-driven heating mechanisms are subject to attenuation, so clouds with
@@ -1090,13 +1110,16 @@ for some of the Sgr B2 regions are shown as red upward-pointing triangles near
 the top of the plot.}
 {fig:temvslonplot}{0.4}{0}
 
-\todo{Add some orbital motivation.  Search for a pattern?}
-Figure \ref{fig:kdlorbit} shows the orbital fit from \citet{Kruijssen2015a} and
-a position-velocity slice through the fitted temperature cube following that
-orbit.  The fit is imperfect, especially along the green segment, but still very useful
-for tracking the properties of clouds in common environments.  Intriguingly,
-the `far-side' clouds (green segment, 1 Myr < $t$ < 2 Myr), are cooler than
-many of those on the near side, such as The Brick (red segment).  
+In order to search for explanations for the temperature variations we observe,
+we compare our data to predicted cloud orbits.  Figure \ref{fig:kdlorbit} shows
+the orbital fit from \citet{Kruijssen2015a} and a position-velocity slice
+through the fitted temperature cube following that orbit.  The fit is
+imperfect, especially along the green segment, but still very useful for
+tracking the properties of clouds in common environments.  Assuming we can use
+the orbit PPV predictions to locate the clouds in 3D, we can begin to
+understand the geometry of the CMZ.  Intriguingly, it appears that the
+`far-side' clouds (green segment, 1 Myr < $t$ < 2 Myr), are cooler than many of
+those on the near side, such as The Brick (red segment).  
 
 %Perhaps the most interesting feature of the orbital extraction is the qualitative
 %difference between the `big clouds', Sgr B2, Sgr A, and The Brick, and the rest
@@ -1106,12 +1129,15 @@ many of those on the near side, such as The Brick (red segment).
 
 We assign a time to each dendrogram-extracted clump within 35 \kms and 6 pc of
 the \citet{Kruijssen2015a} orbit and plot their temperatures against that time
-in Figure \ref{fig:kdltemvstime}.  \todo{We see a possible linear increase...} The possible linear increase in temperature
+in Figure \ref{fig:kdltemvstime}.  We see a suggestion of a linear increase in temperature
+with time at the first crossing, which is most directly explained by the
+\citet{Kruijssen2015a} model.  The possible linear increase in temperature
 over the first $\sim0.5$ Myr might support the \citet{Kruijssen2015a}
 hypothesis that the `ring' represents a single gas stream on its first passage
-by Sgr A*.  However, the `trend' is equally consistent with a constant
-temperature over the same range. \todo{If the trend is real, it indicates
-a stochastic driver for turbulence...}
+by Sgr A*.  The `trend' is also consistent with a constant temperature over the
+same range, so we caution against overinterpretation. Nonetheless, if the trend
+is real, it may indicate that additional turbulence is driven on closest
+passage, decaying over a timescale of $\sim1$ Myr to heat the gas.
 %The cooler gas on the far side does not obviously fit into this picture, 
 %and we suggest in Section \ref{sec:coolstream} that it is not affiliated with
 %the orbit (but the existence of such a cool stream does \emph{not} challenge
@@ -1133,7 +1159,7 @@ slice.  The orbit is outside of our observed field to the west of Sgr C.
 The X's mark The Brick (purple), cloud d (blue), and cloud e (red) to provide
 landmarks for comparison between the two figures.
 }
-{fig:kdlorbit}{0.8}{8.5in}
+{fig:kdlorbit}{0.7}{8.0in}
 
 % dendro_vs_time
 \FigureTwo
@@ -1175,14 +1201,14 @@ magnitude, $n_{crit}(\textrm{\ammonia}~(1,1))\sim10^3$ \percc while $n_{crit}(\p
 measured.  Nonetheless, we compare our temperature map to that of
 \citet{Ott2014a} to look for common trends and significant differences.
 
-% ammonia_vs_h2co
-\Figure
-{figures/radex/NH3andH2COexcitation}
-{Model of the \ammonia and \para line excitation temperature $T_{ex}$ as a function
-of density in the optically thin approximation.   \ammonia is more easily
-excited than \para, so the \ammonia temperatures likely represent the
-temperatures in lower-density gas.}
-{fig:nh3vsh2co}{0.25}{0}
+% % ammonia_vs_h2co
+% \Figure
+% {figures/radex/NH3andH2COexcitation}
+% {Model of the \ammonia and \para line excitation temperature $T_{ex}$ as a function
+% of density in the optically thin approximation.   \ammonia is more easily
+% excited than \para, so the \ammonia temperatures likely represent the
+% temperatures in lower-density gas.}
+% {fig:nh3vsh2co}{0.25}{0}
 
 Figure \ref{fig:nh3tmap} shows the \citet{Ott2014a} temperature map in the same
 color scheme that we have used in Figure \ref{fig:temmapnosmooth}.  There are some
@@ -1468,9 +1494,15 @@ The high gas temperatures throughout the CMZ suggest that turbulent heating is
 dominant in many locations.  Cosmic rays may dominate in less turbulent
 sub-regions within the CMZ, but we are able to place an upper limit $\zeta_{CR}
 < 10^{-14}$ \pers because a higher CRIR would result in a higher floor
-temperature for our observations.  In some areas, though, turbulent plus cosmic
-ray heating are inadequate to explain the observed temperatures, suggesting
-additional mechanisms are involved in some clouds.
+temperature for our observations.  
+
+There are many regions with predicted temperatures substantially higher than
+observed.  These regions may have chemistry significantly different from that
+in local clouds, with more line coolants (e.g., atomic oxygen) available due to
+the high gas temperature.  While we did not investigate the chemistry of CMZ
+clouds in detail, we suggest that exploring the gas phase chemistry in
+$\sim60-100$ K, $n\sim10^4$ \percc material will be essential for understanding
+observations of molecular lines in the CMZ.
 
 Our new observations are broadly consistent with the orbital model described by
 \citet{Kruijssen2015a}.  While there are some individual discrepancies, it at
@@ -1492,18 +1524,20 @@ Breuck for assistance in developing the observing strategy, and Per Bergman for
 his assistance in understanding the SHFI-1 baseline issues.
 \todo{Please provide any acknowledgements that are needed here.}
 
-\textbf{Code Packages Used}:
+\textbf{Code Bibliography}:
 
 \begin{itemize}
     \item sdpy \url{https://github.com/adamginsburg/sdpy}
+    \item \texttt{FITS\_tools} \url{https://github.com/keflavich/FITS_tools}
     \item aplpy \url{http://aplpy.github.io}
     \item pyradex \url{https://github.com/adamginsburg/pyradex}
     \item myRadex \url{https://github.com/fjdu/myRadex}
-    \item pyspeckit \url{http://pyspeckit.bitbucket.org}
-    \item aplpy \url{https://aplpy.github.io/}
+    \item pyspeckit \url{http://pyspeckit.bitbucket.org} \citep{Ginsburg2011c}
+    \item astropy \url{http://www.astropy.org} \citep{Astropy-Collaboration2013a}
     \item wcsaxes \url{http://wcsaxes.readthedocs.org}
     \item spectral cube \url{http://spectral-cube.readthedocs.org}
     \item pvextractor \url{http://pvextractor.readthedocs.org/}
+    \item ipython \url{http://ipython.org/} \citep{Perez2007a}
 \end{itemize}
 
 \appendix

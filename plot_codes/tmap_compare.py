@@ -1,30 +1,42 @@
 """
-Compare temperature maps made with order-of-magnitude different column,
-density
-
-(obsolete- not using these any more, I guess?)
-(also, figures were never saved)
+Compare the various temperature maps to ensure that they are identical
 """
+import numpy as np
+from spectral_cube import SpectralCube, BooleanArrayMask
+from temperature_cubes import tcubesm_direct, tcube_direct
+from astropy.io import fits
+import paths
+from paths import hpath
+import copy
 
-#from astropy.io import fits
-#from paths import hpath
-#import pylab as pl
-#import numpy as np
-#
-#im1 = fits.getdata(hpath('H2CO_321220_to_303202_bl_integ_temperature_dens1e5_col5e22.fits'))
-#im2 = fits.getdata(hpath('H2CO_321220_to_303202_bl_integ_temperature_dens1e4_col5e22.fits'))
-#im3 = fits.getdata(hpath('H2CO_321220_to_303202_bl_integ_temperature_dens1e5_col3e23.fits'))
-#
-#ok = np.isfinite(im1) & np.isfinite(im2) & np.isfinite(im3)
-#
-#fig1 = pl.figure(1)
-#fig1.clf()
-#pl.plot([0,300],[0,300], 'k--')
-#pl.plot(im1[ok], im2[ok], ',')
-#pl.plot(im1[ok], im3[ok], ',')
-#
-#fig2 = pl.figure(2)
-#fig2.clf()
-#pl.plot(im1[ok], (im1[ok]-im2[ok])/im1[ok], ',', label='Lower density')
-#pl.plot(im1[ok], (im1[ok]-im3[ok])/im1[ok], ',', label='Higher column')
-#pl.legend(loc='best')
+im1 = fits.getdata(hpath('H2CO_321220_to_303202_bl_integ_temperature_dens1e4_masked.fits'))
+im2 = fits.getdata(hpath('H2CO_321220_to_303202_bl_integ_temperature_dens1e4.fits'))
+im3 = fits.getdata(hpath('H2CO_321220_to_303202_bl_integ_weighted_temperature_dens1e4_masked.fits'))
+
+tcube = tcube_direct
+tcube_mean = tcube.mean(axis=0)
+
+wcube = SpectralCube.read(hpath('APEX_H2CO_303_202_bl.fits'))
+mcube = SpectralCube.read(hpath('APEX_H2CO_303_202_bl_mask.fits'))
+
+if tcube.shape != wcube.shape:
+    raise
+
+weighted = copy.copy(tcube)
+weighted._data = wcube._data * tcube._data
+mask = (wcube.mask & tcube.mask &
+        BooleanArrayMask(weighted.filled_data[...] != 0, weighted.wcs) &
+        BooleanArrayMask(wcube.filled_data[...] != 0, wcube.wcs) &
+        BooleanArrayMask(mcube._data==1, mcube.wcs)
+       )
+weighted = weighted.with_mask(mask)
+wcube = wcube.with_mask(mask)
+
+tcube_wmean = tcube.mean(axis=0)
+
+pl.figure(14, figsize=(12,20)).clf()
+pl.subplot(5,1,1).imshow(im1)
+pl.subplot(5,1,2).imshow(im2)
+pl.subplot(5,1,3).imshow(im3)
+pl.subplot(5,1,4).imshow(tcube_mean.value)
+pl.subplot(5,1,5).imshow(tcube_wmean.value)

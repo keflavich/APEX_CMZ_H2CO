@@ -90,6 +90,8 @@ for row in fittable:
     r_deg = (row['area']/np.pi)**0.5 * u.deg
     reff = (r_deg*(8.5*u.kpc)).to(u.pc, u.dimensionless_angles())
     mass = ((10**logh2column*u.cm**-2)*np.pi*reff**2*2.8*constants.m_p).to(u.M_sun)
+    # reff = mean of major and minor axes of elliptical.  This is not a bad
+    # assumption... we COULD use the HWHM instead here, though.
     density = (mass/(4/3.*np.pi*reff**3)/constants.m_p/2.8).to(u.cm**-3)
     mindens = np.log10(density.value)
     if mindens < 3:

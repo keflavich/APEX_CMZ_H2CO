@@ -18,11 +18,27 @@ import numpy as np
 # Use the Milky Way GMC file as a base
 gmc=cloud('cloud.desp')
 
-# from despotic.chemistry import NL99
+from despotic.chemistry import NL99
 # gmc.setChemEq(network=NL99)
 
+def turb_heating_generator(lengthscale=1*u.pc, turbulence=True):
+    def turb_heating(cloud, lengthscale=lengthscale):
+        """ Turbulent heating rate depends on cloud linewidth
+        (sigma_nonthermal) and driving scale of the turbulence
+        DESPOTIC wants units of erg/s/H (per hydrogen), so the turbulent
+        heating rate n sigma^3 / L is divided by n to get just sigma^3/L
+        """
+        if turbulence:
+            gamturb = (1.4 * constants.m_p *
+                       (0.5*3**1.5 * (cloud.sigmaNT*u.cm/u.s)**3 / (lengthscale)))
+            return [(gamturb).to(u.erg/u.s).value, 0]
+        else:
+            return [0,0]
+    return turb_heating
+
+
 def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
-             ISRF=1, tdust_rad=None, turbulence=True):
+             ISRF=1, tdust_rad=None, turbulence=True, gmc=gmc):
 
     assert density.unit.is_equivalent(u.cm**-3)
     assert sigma.unit.is_equivalent(u.km/u.s)
@@ -41,19 +57,91 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
     gmc.rad.ionRate = crir.to(u.s**-1).value * 2
     gmc.nH = density.to(u.cm**-3).value * 2
 
-    def turb_heating(cloud, driving_scale=lengthscale):
-        """ Turbulent heating rate depends on cloud linewidth
-        (sigma_nonthermal) and driving scale of the turbulence """
-        if turbulence:
-            gamturb = 1.4 * constants.m_p * cloud.nH*u.cm**-3 * (0.5*3**1.5 * (cloud.sigmaNT*u.cm/u.s)**3 / (driving_scale))
-            return [(gamturb/(cloud.nH*u.cm**-3)).to(u.erg/u.s).value, 0]
-        else:
-            return [0,0]
+    turb_heating = turb_heating_generator(lengthscale, turbulence=turbulence)
 
     gmc.setTempEq(escapeProbGeom='LVG', PsiUser=turb_heating)
     #energy_balance = gmc.dEdt()
 
     return gmc.Tg
+
+def case_study(row, gmc=gmc):
+    beam_pc = (30/(np.sqrt(8*np.log(2)))*u.arcsec*8.5*u.kpc).to(u.pc, u.dimensionless_angles())
+    print "Case study for object ID ",row['_idx']
+    gf=row['gausscorrfactor']
+    print "Gaussian correction factor: ",gf
+    print "Density: ",10**row['density_chi2']*u.cm**-3
+    print "Line width: ",row['v_rms']*u.km/u.s*gf
+    print "Lengthscale: ",2*((row['reff']*u.pc*gf)**2-(beam_pc)**2)**0.5
+    print "Tdust: ",row['higaldusttem']*u.K
+    print "Tdust,rad: ",(row['higaldusttem']*u.K *
+                         (1-np.exp(-(10**row['logh2column']/1e24))))
+
+    lengthscale = 2*((row['reff']*u.pc*gf)**2-(beam_pc)**2)**0.5
+
+    T0 = tkin_all(density=10**row['density_chi2']*u.cm**-3,
+                      sigma=row['v_rms']*u.km/u.s*gf,
+                      lengthscale=lengthscale,
+                      gradient=5*u.km/u.s/u.pc, #min(5,row['v_rms']/row['reff'])*u.km/u.s/u.pc,
+                      tdust=row['higaldusttem']*u.K,
+                      crir=1e-17*u.s**-1,
+                      ISRF=1,
+                      tdust_rad=(row['higaldusttem']*u.K *
+                                 (1-np.exp(-(10**row['logh2column']/1e24)))),
+                  gmc=gmc)
+    print "Initial temperature: ",T0
+    cool0 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
+    print "CO cooling: ",cool0['LambdaLine']['co']
+    print "O cooling: ",cool0['LambdaLine']['o']
+    gmc.setChemEq(network=NL99)
+
+    T1 = tkin_all(density=10**row['density_chi2']*u.cm**-3,
+                      sigma=row['v_rms']*u.km/u.s*gf,
+                      lengthscale=2*((row['reff']*u.pc*gf)**2-(beam_pc)**2)**0.5,
+                      gradient=5*u.km/u.s/u.pc, #min(5,row['v_rms']/row['reff'])*u.km/u.s/u.pc,
+                      tdust=row['higaldusttem']*u.K,
+                      crir=1e-17*u.s**-1,
+                      ISRF=1,
+                      tdust_rad=(row['higaldusttem']*u.K *
+                                 (1-np.exp(-(10**row['logh2column']/1e24)))),
+                  gmc=gmc)
+    print "Chemical equilbrium temperature: ",T1
+    cool1 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
+    print "CO cooling: ",cool1['LambdaLine']['co']
+    print "O cooling: ",cool1['LambdaLine']['o']
+
+    print 
+    print "The same, but with an enhanced IRSF = 1000x local"
+    T0 = tkin_all(density=10**row['density_chi2']*u.cm**-3,
+                      sigma=row['v_rms']*u.km/u.s*gf,
+                      lengthscale=2*((row['reff']*u.pc*gf)**2-(beam_pc)**2)**0.5,
+                      gradient=5*u.km/u.s/u.pc, #min(5,row['v_rms']/row['reff'])*u.km/u.s/u.pc,
+                      tdust=row['higaldusttem']*u.K,
+                      crir=1e-17*u.s**-1,
+                      ISRF=1000,
+                      tdust_rad=(row['higaldusttem']*u.K *
+                                 (1-np.exp(-(10**row['logh2column']/1e24)))),
+                  gmc=gmc)
+    print "Initial temperature: ",T0
+    cool0 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
+    print "CO cooling: ",cool0['LambdaLine']['co']
+    print "O cooling: ",cool0['LambdaLine']['o']
+    gmc.setChemEq(network=NL99)
+
+    T1 = tkin_all(density=10**row['density_chi2']*u.cm**-3,
+                      sigma=row['v_rms']*u.km/u.s*gf,
+                      lengthscale=2*((row['reff']*u.pc*gf)**2-(beam_pc)**2)**0.5,
+                      gradient=5*u.km/u.s/u.pc, #min(5,row['v_rms']/row['reff'])*u.km/u.s/u.pc,
+                      tdust=row['higaldusttem']*u.K,
+                      crir=1e-17*u.s**-1,
+                      ISRF=1000,
+                      tdust_rad=(row['higaldusttem']*u.K *
+                                 (1-np.exp(-(10**row['logh2column']/1e24)))),
+                  gmc=gmc)
+    print "Chemical equilbrium temperature: ",T1
+    cool1 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
+    print "CO cooling: ",cool1['LambdaLine']['co']
+    print "O cooling: ",cool1['LambdaLine']['o']
+
 
 if __name__ == "__main__":
     import matplotlib
@@ -111,15 +199,43 @@ if __name__ == "__main__":
                      tdust_rad=10*u.K,
                      gradient=20*u.km/u.s/u.pc, tdust=25*u.K,
                      crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
-    tem11 = [tkin_all(1e5*u.cm**-3, sigma*u.km/u.s, lengthscale=5*u.pc,
+    tem11 = [tkin_all(1e4*u.cm**-3, sigma*u.km/u.s, lengthscale=5*u.pc,
                      tdust_rad=10*u.K,
                      gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                      crir=2e-14*u.s**-1) for sigma in ProgressBar(linewidths)]
-    tem12 = [tkin_all(1e5*u.cm**-3, sigma*u.km/u.s, lengthscale=5*u.pc,
+    tem12 = [tkin_all(1e4*u.cm**-3, sigma*u.km/u.s, lengthscale=5*u.pc,
                      tdust_rad=10*u.K,
                      gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                      crir=1e-15*u.s**-1) for sigma in ProgressBar(linewidths)]
+    tem14 = [tkin_all(1e4*u.cm**-3, sigma*u.km/u.s, lengthscale=5*u.pc,
+                     tdust_rad=10*u.K,
+                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                     crir=1e-14*u.s**-1,
+                     turbulence=False) for sigma in ProgressBar(linewidths)]
 
+
+    linewidths2 = np.linspace(1,linewidths.max(),50.)
+    def rho(sig, rho_5kms=10**4.25*u.cm**-3):
+        return rho_5kms *(sig/(5*u.km/u.s))**-2
+    def L(sig, L_5kms=5*u.pc):
+        return L_5kms *(sig/(5*u.km/u.s))**0.7
+    tem13 = []
+    lambdaline = []
+    lambdadust = []
+    gammaturb = []
+    for sigma in ProgressBar(linewidths2):
+        tem13.append(tkin_all(density=rho(sigma*u.km/u.s),
+                      sigma=sigma*u.km/u.s,
+                      lengthscale=L(sigma*u.km/u.s),
+                      tdust_rad=10*u.K,
+                      gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                      crir=1e-17*u.s**-1))
+        dedt = gmc.dEdt(PsiUser=turb_heating_generator(L(sigma*u.km/u.s)))
+        lambdaline.append(np.sum(dedt['LambdaLine'].values()))
+        gammaturb.append(dedt['PsiUserGas'])
+        lambdadust.append(dedt['LambdaDust'])
+
+    # Plotting starts here
     FWHM = np.sqrt(8*np.log(2))
     fig = pl.figure(2)
     pl.clf()
@@ -128,20 +244,22 @@ if __name__ == "__main__":
             label='$\zeta_{CR}=1e-17$ s$^{-1}$\n $n=10^4$ cm$^{-3}$\n'
                   '$L=5$ pc\n $dv/dr=5$ km/s/pc\n'
                   '$T_D=25$K\n $T_D(rad)=10$K')
-    ax.plot(linewidths*FWHM, tem7,  'k:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^4$')
-    ax.plot(linewidths*FWHM, tem9,  'k-',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^4$ $dv/dr=20$')
-    ax.plot(linewidths*FWHM, tem3,  'r--', alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^5$')
-    ax.plot(linewidths*FWHM, tem6,  'r-',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^5$ L=1 pc')
-    ax.plot(linewidths*FWHM, tem4,  'r:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^5$')
-    ax.plot(linewidths*FWHM, tem10, 'b:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^6$')
-    ax.plot(linewidths*FWHM, tem5,  'b--', alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^6$')
-    ax.plot(linewidths*FWHM, tem8,  'r-.', alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^5$ $T_D(rad)=25$ K')
-    ax.plot(linewidths*FWHM, tem11, 'r-', alpha=0.2, linewidth=6, label='$\zeta_{CR}=1e-13$, $n=10^5$')
-    ax.plot(linewidths*FWHM, tem12, 'r-', alpha=0.4, linewidth=4, label='$\zeta_{CR}=1e-15$, $n=10^5$')
+    ax.plot(linewidths*FWHM, tem7,  'k:',  zorder=-5, alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$')
+    ax.plot(linewidths*FWHM, tem4,  'r:',  zorder=-5, alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^5$')
+    ax.plot(linewidths*FWHM, tem10, 'b:',  zorder=-5, alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^6$')
+    ax.plot(linewidths*FWHM, tem11, 'k-',  zorder=-5, alpha=0.2, linewidth=6, label='$\zeta_{CR}=2e-14$')
+    ax.plot(linewidths*FWHM, tem12, 'k-',  zorder=-5, alpha=0.3, linewidth=4, label='$\zeta_{CR}=1e-15$')
+    ax.plot(linewidths*FWHM, tem9,  'k-',  zorder=-5, alpha=0.5, linewidth=2, label='$dv/dr=20$')
+    ax.plot(linewidths*FWHM, tem3,  'r--', zorder=-5, alpha=0.5, linewidth=2, label='$n=10^5$')
+    ax.plot(linewidths*FWHM, tem5,  'b--', zorder=-5, alpha=0.5, linewidth=2, label='$n=10^6$')
+    ax.plot(linewidths*FWHM, tem6,  'r-',  zorder=-5, alpha=0.5, linewidth=2, label='$n=10^5$ $L=1$')
+    ax.plot(linewidths*FWHM, tem8,  'r-.', zorder=-5, alpha=0.5, linewidth=2, label='$n=10^5$ $T_D(rad)=25$')
+    ax.plot(linewidths2*FWHM, tem13, 'g-', zorder=-5, alpha=0.5, linewidth=2, label=r'$n=10^{4.25}\sigma_5^{-2}$, $L=5\sigma_5^{0.7}$')
+    ax.plot(linewidths*FWHM, tem14, 'g:',  zorder=-5, alpha=0.5, linewidth=2, label=r'$\zeta_{CR}=1e-14$, no turbulence')
     ax.set_xlabel("Line FWHM (km s$^{-1}$)")
     ax.set_ylabel("Temperature (K)")
     ax.set_ylim(0,150)
-    ax.set_xlim(0,linewidths.max()*FWHM)
+    ax.set_xlim(2,linewidths.max()*FWHM)
 
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.7, box.height])
@@ -222,11 +340,11 @@ if __name__ == "__main__":
     sn = (cat['ratio303321']/cat['eratio303321'])
     sngt50 = sn > 50
     sn25_50 = (sn > 25) & (sn < 50)
-    ok = (np.isfinite(sn) & (cat['Stot321'] < cat['Stot303']) & ~(cat['bad'] ==
-                                                                  'True') &
+    ok = (np.isfinite(sn) & (cat['Stot321'] < cat['Stot303']) & ~(cat['bad']) &
           (cat['Smean321'] > 0) &
           (cat['e321'] > 0) &
           (~cat['IsNotH2CO']) & (~cat['IsAbsorption']))
+    ok = np.array(ok, dtype='bool')
     gt5 = (sn>5)
 
     hot = cat['temperature_chi2'] > 150
@@ -236,7 +354,7 @@ if __name__ == "__main__":
              sn25_50 & gt5 & ok,
              sngt50 & gt5 & ok,
              ok & ~gt5)
-    is_leaf = np.array(cat['is_leaf'])# == 'True')
+    is_leaf = np.array(cat['is_leaf'])
     leaf_masks = [np.array(mm, dtype='bool') for mask in masks for mm in (mask & is_leaf, mask & ~is_leaf)]
     # mask1 & leaf, mask1 & not leaf, mask2 & leaf, mask2 & not leaf....
     # Make the not-leaves be half as bright
@@ -263,16 +381,18 @@ if __name__ == "__main__":
               label='$\zeta_{CR}=1e-17$ s$^{-1}$\n $n=10^4$ cm$^{-3}$\n'
                     '$L=5$ pc\n $dv/dr=5$ km/s/pc\n'
                     '$T_D=25$K\n $T_D(rad)=10$K')
-    ax12.plot(linewidths*FWHM, tem7,  'k:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^4$')
-    ax12.plot(linewidths*FWHM, tem9,  'k-',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^4$ $dv/dr=20$')
-    ax12.plot(linewidths*FWHM, tem3,  'r--', alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^5$')
-    ax12.plot(linewidths*FWHM, tem6,  'r-',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^5$ L=1 pc')
-    ax12.plot(linewidths*FWHM, tem4,  'r:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^5$')
-    ax12.plot(linewidths*FWHM, tem10, 'b:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^6$')
-    ax12.plot(linewidths*FWHM, tem5,  'b--', alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^6$')
-    ax12.plot(linewidths*FWHM, tem8,  'r-.', alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-17$, $n=10^5$ $T_D(rad)=25$ K')
-    ax12.plot(linewidths*FWHM, tem11, 'r-', alpha=0.2, linewidth=6, label='$\zeta_{CR}=1e-13$, $n=10^5$')
-    ax12.plot(linewidths*FWHM, tem12, 'r-', alpha=0.4, linewidth=4, label='$\zeta_{CR}=1e-15$, $n=10^5$')
+    ax12.plot(linewidths*FWHM, tem7,  'k:',  zorder=-5, alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$')
+    ax12.plot(linewidths*FWHM, tem9,  'k-',  zorder=-5, alpha=0.5, linewidth=2, label='$dv/dr=20$')
+    ax12.plot(linewidths*FWHM, tem11, 'k-',  zorder=-5, alpha=0.2, linewidth=6, label='$\zeta_{CR}=2e-14$')
+    ax12.plot(linewidths*FWHM, tem12, 'k-',  zorder=-5, alpha=0.3, linewidth=4, label='$\zeta_{CR}=1e-15$')
+    ax12.plot(linewidths*FWHM, tem3,  'r--', zorder=-5, alpha=0.5, linewidth=2, label='$n=10^5$')
+    ax12.plot(linewidths*FWHM, tem6,  'r-',  zorder=-5, alpha=0.5, linewidth=2, label='$n=10^5$ $L=1$')
+    ax12.plot(linewidths*FWHM, tem4,  'r:',  zorder=-5, alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^5$')
+    ax12.plot(linewidths*FWHM, tem10, 'b:',  zorder=-5, alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^6$')
+    ax12.plot(linewidths*FWHM, tem5,  'b--', zorder=-5, alpha=0.5, linewidth=2, label='$n=10^6$')
+    ax12.plot(linewidths*FWHM, tem8,  'r-.', zorder=-5, alpha=0.5, linewidth=2, label='$n=10^5$ $T_D(rad)=25$')
+    ax12.plot(linewidths2*FWHM, tem13, 'g-', zorder=-5, alpha=0.5, linewidth=2, label=r'$n=10^{4.25}\sigma_5^{-2}$, $L=5\sigma_5^{0.7}$')
+    ax12.plot(linewidths*FWHM, tem14, 'g:',  zorder=-5, alpha=0.5, linewidth=2, label=r'$\zeta_{CR}=1e-14$, no turbulence')
 
     ax12.set_xlim([2,70])
     ax12.set_ylim([0,150])

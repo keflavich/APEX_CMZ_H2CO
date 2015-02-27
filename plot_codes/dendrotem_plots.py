@@ -46,11 +46,11 @@ for cat,dendro,smooth in zipped[:1]:
     sn = (cat['ratio303321']/cat['eratio303321'])
     sngt50 = sn > 50
     sn25_50 = (sn > 25) & (sn < 50)
-    ok = (np.isfinite(sn) & (cat['Stot321'] < cat['Stot303']) & ~(cat['bad'] ==
-                                                                  'True') &
+    ok = (np.isfinite(sn) & (cat['Stot321'] < cat['Stot303']) & ~(cat['bad']) &
           (cat['Smean321'] > 0) &
           (cat['e321'] > 0) &
           (~cat['IsNotH2CO']) & (~cat['IsAbsorption']))
+    ok = np.array(ok, dtype='bool')
     gt5 = (sn>5)
 
     hot = cat['temperature_chi2'] > 150
@@ -58,7 +58,7 @@ for cat,dendro,smooth in zipped[:1]:
     gcorfactor = cat['gausscorrfactor']
 
     # This was corrected with fix_bool...
-    is_leaf = np.array(cat['is_leaf'])# == 'True')
+    is_leaf = np.array(cat['is_leaf'], dtype='bool')
     
 
     for ii in range(1,13): pl.figure(ii).clf()
@@ -514,6 +514,7 @@ for cat,dendro,smooth in zipped[:1]:
     fig27 = pl.figure(27)
     fig27.clf()
     ax27 = fig27.gca()
+    desphot = (cat['DespoticTem'] > 180) & (gcorfactor < 3)
     mask = (hot|hot_lolim) & is_leaf & (gcorfactor < 3)
     ax27.errorbar(cat['DespoticTem'][mask],
                   cat['elo_t'][mask],
@@ -546,9 +547,17 @@ for cat,dendro,smooth in zipped[:1]:
                   markeredgewidth=0.3,
                   markeredgecolor=color)
 
+        ax27.errorbar([178] * (desphot & is_leaf & mask).sum(),
+                      cat['temperature_chi2'][desphot&is_leaf&mask],
+                      lolims=True, linestyle='none', capsize=0, alpha=0.3,
+                      markersize=10,
+                      marker='>', color=color)
+
+
     ax27.plot([0,200], [0,200], 'k--', alpha=0.5, zorder=-5)
     ax27.set_ylim([0,155])
-    ax27.set_xlim([cat['DespoticTem'][is_leaf].min()-2,cat['DespoticTem'][is_leaf].max()+2])
+    ax27.set_xlim([0,180])
+    #ax27.set_xlim([cat['DespoticTem'][is_leaf].min()-2,cat['DespoticTem'][is_leaf].max()+2])
     ax27.set_xlabel("Turbulence-driven Temperature (K)")
     ax27.set_ylabel("H$_2$CO Temperature (K)")
 
@@ -581,8 +590,16 @@ for cat,dendro,smooth in zipped[:1]:
                   markeredgewidth=0.3,
                   markeredgecolor=color)
 
+
+        ax27.errorbar([178] * (desphot & ~is_leaf & mask).sum(),
+                      cat['temperature_chi2'][desphot&~is_leaf&mask],
+                      lolims=True, linestyle='none', capsize=0, alpha=0.3,
+                      markersize=10,
+                      marker='>', color=color)
+
     ax27.set_ylim([0,155])
-    ax27.set_xlim([cat['DespoticTem'][is_leaf].min()-2,cat['DespoticTem'][is_leaf].max()+2])
+    ax27.set_xlim([0,180])
+    #ax27.set_xlim([cat['DespoticTem'][is_leaf].min()-2,cat['DespoticTem'][is_leaf].max()+2])
 
     fig27.savefig(fpath('dendrotem/temperature_vs_Despoticturbtemperature_withtrunks{0}.pdf'.format(smooth)))
 

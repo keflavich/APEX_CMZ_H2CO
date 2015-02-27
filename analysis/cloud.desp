@@ -29,7 +29,8 @@ emitter    = co   1.0e-4 extrapolate    # CO, abundance 1.0e-4
 emitter    = 13co 5.0e-7 extrapolate    # ^13CO, abundance 5.0e-7
 emitter    = c18o 5.0e-8 extrapolate    # C^18O, abundance 5.0e-8
 emitter    = c    5.0e-7 extrapolate    # C, abundance 5.0e-7
-emitter    = o    5.0e-6 extrapolate    # O, abundance 5.0e-7
+emitter    = c+   5.0e-10 extrapolate   # C+, assumed negligible
+emitter    = o    5.0e-6 extrapolate    # O, abundance 5.0e-6
 # Ignore these: they're never strong coolants
 #emitter    = hco+ 1.0e-8 extrapolate    # HCO^+, abundance 1.0e-8
 #emitter    = p-nh3 1.0e-8 extrapolate   # para NH_3, abundance 1.0e-8

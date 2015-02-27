@@ -90,9 +90,13 @@ if 'DespoticTem' not in catalog.colnames:
     from astropy import units as u
     import gaussian_correction
     gcorfactor = gaussian_correction.gaussian_correction(catalog['Smin303']/catalog['Smax303'])
+    # use 2*reff because we care about diameter, not radius
+    # then deconvolve out the beam
+    # (see paper: 28" -> 30" beam because of gridding_
+    beam_pc = (30/(np.sqrt(8*np.log(2)))*u.arcsec*8.5*u.kpc).to(u.pc, u.dimensionless_angles())
     dtems = [tkin_all(density=10**row['density_chi2']*u.cm**-3,
                       sigma=row['v_rms']*u.km/u.s*gf,
-                      lengthscale=row['reff']*u.pc*gf,
+                      lengthscale=2*((row['reff']*u.pc*gf)**2-(beam_pc)**2)**0.5,
                       gradient=5*u.km/u.s/u.pc, #min(5,row['v_rms']/row['reff'])*u.km/u.s/u.pc,
                       tdust=row['higaldusttem']*u.K,
                       crir=1e-17*u.s**-1,

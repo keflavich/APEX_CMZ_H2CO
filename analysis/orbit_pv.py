@@ -15,6 +15,7 @@ from astropy.io import ascii, fits
 from astropy import log
 from astropy.wcs import WCS
 from astropy import wcs
+from piecewise_rtotem import pwtem
 import paths
 import matplotlib
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
@@ -66,8 +67,11 @@ molecules = molecules + ('H2CO_TemperatureFromRatio',
                          #'H2CO_DendrogramTemperature_Leaves',
                          #'H2CO_DendrogramTemperature_Leaves_smooth'
                         )
-filenames.append(hpath('TemperatureCube_PiecewiseFromRatio.fits'))
-filenames.append(hpath('TemperatureCube_smooth_PiecewiseFromRatio.fits'))
+# make_piecewise_temcube:
+#filenames.append(hpath('TemperatureCube_PiecewiseFromRatio.fits'))
+#filenames.append(hpath('TemperatureCube_smooth_PiecewiseFromRatio.fits'))
+filenames.append(hpath('H2CO_321220_to_303202_cube_bl.fits'))
+filenames.append(hpath('H2CO_321220_to_303202_cube_smooth_bl.fits'))
 filenames.append(hpath('H2CO_321220_to_303202_cube_bl.fits'))
 filenames.append(hpath('H2CO_321220_to_303202_cube_smooth_bl.fits'))
 #filenames.append(hpath('TemperatureCube_DendrogramObjects.fits'))
@@ -152,9 +156,15 @@ for weight in ("_weighted",""):
             if not os.path.isdir(os.path.dirname(pvfilename)):
                 os.mkdir(os.path.dirname(pvfilename))
             pv.writeto(pvfilename)
+
+
         bad_cols = np.isnan(np.nanmax(pv.data, axis=0))
         nandata = np.isnan(pv.data)
         pv.data[nandata & ~bad_cols] = 0
+        ok = ~nandata & ~bad_cols
+
+        if 'TemperatureFromRatio' in molecule:
+            pv.data[ok] = pwtem(pv.data[ok])
 
         fig1 = pl.figure(1, figsize=figsize)
         fig1.clf()
@@ -167,7 +177,7 @@ for weight in ("_weighted",""):
         dx = xext[1]-xext[0]
         #F = aplpy.FITSFigure(pv, figure=fig1)
         actual_aspect = pv.shape[0]/float(pv.shape[1])
-        if 'Temperature' in fn:
+        if 'Temperature' in molecule:
             #F.show_colorscale(cmap=cmap, aspect=0.5/actual_aspect, vmin=vmin, vmax=vmax)
             im = ax.imshow(pv.data, extent=[xext[0], xext[1], yext[0], yext[1]],
                            aspect=0.5*dx/dy, vmin=vmin, vmax=vmax, cmap=cmap)
@@ -263,9 +273,14 @@ for weight in ("_weighted",""):
 
         else:
             img = cube.mean(axis=0).hdu
+        ok = ~np.isnan(img.data)
         img.data[np.isnan(img.data)] = 0
+        if 'TemperatureFromRatio' in molecule:
+            img.data[ok] = pwtem(img.data[ok])
+
+
         F2 = aplpy.FITSFigure(img, convention='calabretta', figure=fig2)
-        if 'Temperature' in fn:
+        if 'Temperature' in molecule:
             F2.show_colorscale(cmap=cmap, vmin=vmin, vmax=vmax)
             F2.add_colorbar()
             F2.colorbar.set_ticks(np.arange(20,240,40))
@@ -354,7 +369,7 @@ for weight in ("_weighted",""):
 
         ax3.plot(time-reftime, pv.data.T, 'k.', alpha=0.5, markersize=3)
         ax3.set_xlabel("Time since 1$^\\mathrm{st}$ pericenter passage [Myr]", size=24, labelpad=10)
-        if 'Temperature' in fn:
+        if 'Temperature' in molecule:
             ax3.set_ylim(0,vmax)
             ax3.set_ylabel("Temperature [K]", size=24, labelpad=10)
             ytext = 180
