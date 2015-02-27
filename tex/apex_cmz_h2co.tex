@@ -11,9 +11,9 @@
 \date{Date: \today ~~ Time: \currenttime}
 
 \abstract
-{The Galactic center is the best region to study star formation under `extreme'
-conditions.  It has an apparent star formation rate per unit `dense' gas below
-that of normal molecular clouds and disk galaxies.}
+{The Galactic center is the best region to study star formation under extreme
+physical conditions.  It has an apparent star formation rate per unit `dense'
+gas below that of normal molecular clouds and disk galaxies.}
 {To measure the temperature of gas in the CMZ.}
 {We have mapped the inner 300 pc of the Central Molecular Zone (CMZ) in \para
 and measured temperatures in the dense ($n\sim10^4-10^5$ \percc) gas.}
@@ -23,10 +23,13 @@ We measure an upper limit on the cosmic ray ionization ray
 $\zeta_{CR}<10^{-14}$ \pers.}
 {The Galactic Center resembles that of other nearby galaxies in its bulk molecular
 temperature ($T\sim60$ K).  Turbulent heating can readily explain the observed
-temperatures given the observed line widths.  The predicted temperature assuming
-standard cold cloud chemistry is often higher than the observed temperature, so
-we propose that the hotter CMZ clouds are able to cool via line emission more
-efficiently than local clouds.}
+temperatures given the observed line widths.  Cosmic rays cannot explain the
+observed variation in gas temperatures, so CMZ cloud temperatures are not
+dominated by cosmic ray heating.  The predicted temperature assuming standard
+cold cloud chemistry is often higher than the observed temperature, so the
+hotter CMZ clouds are able to cool via line emission more efficiently than
+local clouds.}
+
 %{This is an abstract.}
 %{To fill it in.}
 %{Please write your own version of this and send it to Adam.
@@ -832,12 +835,17 @@ penetration depths, we expect that cosmic ray heating is entirely uniform
 everywhere within the CMZ, independent of column density.  If this uniformity
 holds, then we can set an upper limit on the cosmic ray ionization rate,
 $\zeta_{CR} \lesssim 10^{-14}$ \pers, since a higher rate would result in a
-minimum gas temperature above what we have measured.  
+minimum gas temperature above what we have measured.  The limit is consistent
+with previous measurements of the CRIR \citep{Yusef-Zadeh2013b,Goto2013a}.
 For a fiducial upper limit measurement, we use $n=10^{4.5}$ \percc, $dv/dr=5$
 \kms \perpc, $T_{rad,dust}=10$ K, and $\zeta_{CR} = 10^{-14}$ \pers, which
 yields $T_{gas}=75$ K in the absence of any other heating mechanisms.  This
 upper limit could be violated if the gas is about an order of magnitude denser
-than the dust-derived average density, which is not likely.
+than the dust-derived average density, which is not likely.  This limit leads
+to the conclusion that cosmic ray heating is either not dominant in the CMZ or
+not uniform, as uniform cosmic ray heating cannot satisfy the requirement for
+both high ($>100$ K) and low ($\lesssim40$ K) temperatures to be present in the
+CMZ.
 
 
 %If one instead imposes a Larson relationship, with $\sigma_V \propto \ell$, and
@@ -911,10 +919,12 @@ temperatures below the turbulence prediction.  Some of these regions
 %, e.g. the regions denoted ``CoolSpot'' and
 %``WarmSpot'' in the catalog,
 include at least one velocity component that seems
-to be genuinely cool and broad.  A possible explanation for these
-regions is that their linewidths are an indication of bulk motion rather than
-turbulent motion, and therefore they may be good regions to examine as possible
-expanding bubble edges, either supernova or \hii-region driven.
+to be genuinely cool and broad.  A possible explanation for these regions is
+that their linewidths are an indication of bulk motion rather than turbulent
+motion, and therefore they may be good regions to examine as possible expanding
+bubble edges, either supernova or \hii-region driven.  Alternatively, they may
+contain denser gas and therefore be able to cool more efficiently; these regions
+would then be good regions to search for star formation.
 
 The dendrogram-extracted points plotted include only those with a gaussian
 correction factor $<3$, as larger corrections are regarded as unreliable
@@ -933,7 +943,11 @@ coolants), which does not obviously hold under CMZ conditions.  The other
 possibility is that we have overestimated the line width or underestimated the
 size scale of the clump via our extraction method.  While we have tried to
 account for this source of error by correcting for clipping, we are nonetheless
-extrapolating our measurements to some degree.
+extrapolating our measurements.  The small fraction of sources with measured
+temperatures exceeding the predictions are all consistent with the predictions
+at the $2-\sigma$ level and therefore are not a significant concern, though
+they may be explained by having slightly higher densities than the lower limit
+density we have assumed.
 
 \FigureTwo
 {figures/chi2_temperature_vs_turbulenttemperature_fieldsandsources.pdf}
@@ -1195,8 +1209,7 @@ used thermometer sensitive to gas temperatures $5 \lesssim T \lesssim 40$ K,
 with weak sensitivity up to $\sim80$ K \citep[][Figure 1]{Mangum2013a}.  The
 \ammonia lines also have lower critical densities by about an order of
 magnitude, $n_{crit}(\textrm{\ammonia}~(1,1))\sim10^3$ \percc while $n_{crit}(\para~
-\threeohthree)\sim10^4$ \percc \citep[Figure
-\ref{fig:nh3vsh2co};][]{Shirley2015a}.  The temperatures derived from the
+\threeohthree)\sim10^4$ \percc \citep[][]{Shirley2015a}.  The temperatures derived from the
 \ammonia line ratio are lower by construction than those we have
 measured.  Nonetheless, we compare our temperature map to that of
 \citet{Ott2014a} to look for common trends and significant differences.
@@ -1417,71 +1430,33 @@ are shown in the legend.  A single-component fit was used, though many
 subtler individual components are evident.}
 {fig:wholecmzspec}{0.5}{0}
 
-% However, it is still possible
-% to distinguish cosmic ray and turbulent heating if one dominates over the
-% other: turbulent heating depends strongly on the velocity dispersion ($\Gamma
-% \propto \sigma_V^3$), while CR heating should have no dependence on the
-% velocity dispersion.  Additionally, turbulence has a scale dependence, since
-% the global dynamics (rotation) dominates over turbulence on scales larger than
-% the scale height in the CMZ: $h\sim10$ pc (4\arcmin) in the 100-pc `ring',
-% $h\sim50$ pc (20\arcmin) in the $\ell=1.3\arcdeg$ cloud \citep{Kruijssen2013a}.
-% I'm not sure this really makes sense.  Is it even possible to measure the gas
-% temperature on larger physical/angular scales?
+\subsection{Implications for star formation}
+The star formation properties of the CMZ appear to be different than in the
+rest of the Galaxy
+\citep{Yusef-Zadeh2009a,Yusef-Zadeh2010a,Immer2012a,Longmore2013b}.  It
+generally appears deficient in star formation tracers relative to its dense gas
+mass.  \citet{Kruijssen2014c} suggested that the driving factor in this low
+star formation rate is an increased threshold for gravitational collapse caused
+by turbulent pressure.  \citet{Rathborne2014b} support this claim with
+observations that the gas column probability distribution function in The Brick
+is consistent with a purely turbulent origin.
 
-% These differences result in testable predictions.  If turbulence is the
-% dominant heating mechanism in the CMZ clouds, there should be a correlation
-% between the observed line width and the gas kinetic temperature.
+Our observations further confirm that turbulence is an energetically dominant
+process in the CMZ.  We provide an important constraint on the isothermal sound
+speed, $c_s = 0.5-0.9$ \kms, which is important for setting the Mach number that
+is an important ingredient in turbulence calculations.  The high temperature
+also means that the thermal Jeans mass is about a factor of 5 higher than in
+local clouds (assuming $T_{CMZ}=60$ K, $T_{local}=20$ K, $M_{J,CMZ}(n=10^5)
+\approx 9$ \msun, $M_{J,local}(n=10^5) \approx 2$ \msun); naively this implies
+a larger typical fragmentation scale and perhaps a preference toward forming
+high mass stars, though the connection between the Jeans scale and stellar mass
+is not at all clear.   However, the high temperatures and high Jeans mass
+provide an interesting opportunity to search for other fragmentation
+mechanisms.  If turbulence is responsible for setting the core fragmentation
+scale \citep{Offner2013b,Hopkins2013a}, it should be possible to find
+sub-Jeans-mass fragments, and in the warm CMZ it should be easier than in cold,
+less turbulent local clouds.
 
-% \todo{This is speculative.}  In a highly turbulent medium, most of the power
-% dissipation happens on the smallest size scale (if $L > \sigma_v^3$).  If the
-% cooling rate is enhanced in the postshock medium, the high gas temperature will
-% be isolated to high-density, compact clumps, but these clumps will also
-% dominate the line emission.  \todo{This should result in a density dependence
-% of the temperature or observed temperature $T(n) > n^1$, maybe $T(n) \sim n^2$ ?}
-% Cosmic rays should not exhibit this behavior; they should heat all scales equally
-% and care only about the \emph{mean} density.
-
-%\subsection{Shocks}
-%Assuming the dust temperature reflects the mean gas temperature and only a subset
-%of the gas has been heated to the high observed temperatures, we can determine the
-%shock velocity required to supply the heating.  Assuming an adiabatic strong shock,
-%$T_{ps} = \frac{3}{16}\frac{\mu v_s^2}{k}$, where $\mu = \mu_{\hh} = 2.8$.  A 1 \kms
-%strong shock can produce a postshock temperature of 65 K.  With observed linewidths 
-
-%\section{Examination of Individual Spectra}
-%%\todo{The modeling is ambiguous still: it is necessary to impose some sort of
-%%restriction on the abundance or column density in order to acquire reasonable
-%%constraints on the temperature.}
-%In order to maximize the signal-to-noise and acquire the strongest constraint
-%on the temperature, we extract spectra for regions with bright lines.  This
-%approach is similar to the approach adopted in \citet{Ao2013a}, but for a much
-%larger area.
-%
-%\subsection{Sources in the Ring}
-%
-%\subsubsection{The Brick: G0.253+0.016}
-%We examine two lines of sight through The Brick, in the northeast at
-%G0.241+0.006 and in the southwest at G0.261+0.028.  The northeast line of sight
-%has two independent velocity components with dramatically different
-%temperatures: a 30 \kms component with only a lower limit on temperature,
-%$T>300$ K, and a 0 \kms component with $T=73\pm3$ K.  The southwest line of
-%sight has only one component with $T=157\pm10$ K.
-%
-%\subsubsection{Cloud d: G0.38+0.04}
-%Cloud ``d'' is one of the possible protoclusters identified in
-%\citet{Longmore2013a}.  It exhibits bright and relatively narrow (FWHM$\sim7.3$
-%\kms) \para emission and has a tightly constrained temperature $T=84\pm5$ K.
-%
-%\Figure{figures/G0.38+0.04_fit_h2co_mm_radex.pdf}
-%{The 218-219 GHz spectrum of Cloud d}
-%{fig:cloudcspec}{0.5}{0.0}
-%
-%\subsection{Clouds e/f: G0.47+0.01}
-%Clouds ``e'' and ``f'' together make another proto-cluster in
-%\citet{Longmore2013a}.  These clouds are marginally warmer than cloud d, with
-%$T=110\pm20$ K.  However, because of the region of parameter space the lines
-%allow, the density is reasonably constrained to be $n(\hh)\sim10^{4\pm0.2}$ \percc,
-%much lower than in cloud d and more comparable to The Brick.
 
 \section{Conclusion}
 We present the largest gas temperature map of the CMZ to date.  There is warm
@@ -1490,11 +1465,12 @@ there is also significant contrast in gas temperature, with massive clouds such
 as The Brick, Sgr B2, and the Sgr A cloud complex exhibiting temperatures in
 excess of $T>100$ K.
 
-The high gas temperatures throughout the CMZ suggest that turbulent heating is
-dominant in many locations.  Cosmic rays may dominate in less turbulent
-sub-regions within the CMZ, but we are able to place an upper limit $\zeta_{CR}
-< 10^{-14}$ \pers because a higher CRIR would result in a higher floor
-temperature for our observations.  
+The high but variable gas temperatures throughout the CMZ suggest that
+turbulent heating is the dominant heating mechanism in Galactic Center dense
+gas.  Cosmic rays may be important in less turbulent sub-regions within the
+CMZ, but we are able to place an upper limit $\zeta_{CR} < 10^{-14}$ \pers
+because a higher CRIR would result in a higher floor temperature than we
+observe.  
 
 There are many regions with predicted temperatures substantially higher than
 observed.  These regions may have chemistry significantly different from that
@@ -1522,6 +1498,8 @@ We thank the staff and observers at APEX for carrying out the service-mode
 observations.  We are grateful to Arnaud Belloche, Axel Weiß, and Carlos de
 Breuck for assistance in developing the observing strategy, and Per Bergman for
 his assistance in understanding the SHFI-1 baseline issues.
+We thank Erik Rosolowsky for advice concerning treatment of the biases inherent
+in clump extraction.
 \todo{Please provide any acknowledgements that are needed here.}
 
 \textbf{Code Bibliography}:
