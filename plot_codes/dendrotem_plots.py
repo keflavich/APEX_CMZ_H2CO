@@ -437,10 +437,25 @@ for cat,dendro,smooth in zipped[:1]:
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
         ax24.plot([14,38], [14,38], 'k--')
-        ax24.set_ylim([13,150])
-        ax24.set_xlabel("HiGal Dust Column Density")
-        ax24.set_ylabel("Temperature (K)")
+    ax24.set_xlim([0,2e23])
+    ax24.set_ylim([13,150])
+    ax24.set_xlabel("HiGal Dust Column Density")
+    ax24.set_ylabel("Temperature (K)")
     fig24.savefig(fpath('dendrotem/temperature_vs_dustcol{0}.pdf'.format(smooth)))
+
+    fig27 = pl.figure(27)
+    fig27.clf()
+    ax27 = fig27.gca()
+    for mask,color,alpha,markersize in masks_colors:
+        ax27.errorbar(10**cat['logh2column'][mask],
+                      2.35*(gcorfactor*cat['v_rms'])[mask],
+                    #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
+                    linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
+    ax27.set_xlim([0,2e23])
+    ax27.set_ylim([0,80])
+    ax27.set_xlabel("HiGal Dust Column Density")
+    ax27.set_ylabel("Line FWHM")
+    fig27.savefig(fpath('dendrotem/linewidth_vs_dustcol{0}.pdf'.format(smooth)))
 
     fig26 = pl.figure(26)
     fig26.clf()

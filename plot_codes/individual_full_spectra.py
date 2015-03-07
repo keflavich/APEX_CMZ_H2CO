@@ -17,11 +17,18 @@ from astropy import log
 from astropy.utils.console import ProgressBar
 import pylab as pl
 from astroquery.splatalogue import Splatalogue
+import itertools
+import matplotlib
+import paths
+matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 from shfi_otf_pipeline.lines import all_lines,lines_tex
 
+etamb=0.75
+
 pl.ioff()
 pl.figure(1, figsize=(10,6)).clf()
+fig2 = pl.figure(2, figsize=(10,6))
 
 def fpath(x, figurepath=os.path.join(figurepath, 'fullspectra')):
     return os.path.join(figurepath, x)
@@ -40,6 +47,27 @@ ftemplate =  'APEX_H2CO_2014_merge_{0}.fits'
 #names = np.array(['{0}_{1}'.format(a,b) for a,b in zip(line_table['Species'],
 #                                                       line_table['Resolved QNs'])])
 #lfreq = line_table['Freq-GHz']
+
+def velo_overlays(fullcube, lines):
+
+    # 300 / 3e5 = 0.001; we want only the lines >300 km/s from a band edge
+    cubes = {line: fullcube.with_spectral_unit(u.km/u.s,
+                                               rest_value=all_lines[line]*u.GHz,
+                                               velocity_convention='radio').spectral_slab(-300*u.km/u.s, 300*u.km/u.s)
+             for line in lines
+             if all_lines[line]*u.GHz > fullcube.spectral_axis.min()*1.001
+             and all_lines[line]*u.GHz < fullcube.spectral_axis.max()/1.001
+            }
+
+    spectra = {line: pyspeckit.Spectrum(data=cube.apply_numpy_function(np.nanmean, axis=(1,2)),
+                                        xarr=pyspeckit.units.SpectroscopicAxis(cube.spectral_axis.value,
+                                             unit=str(cube.spectral_axis.unit),
+                                             refX=cube.wcs.wcs.restfrq,
+                                             refX_units='Hz'),
+                                        header=cube.wcs.to_header())
+               for line,cube in cubes.iteritems()}
+
+    return cubes,spectra
 
 for lh in ('low','high'):
     cube = SpectralCube.read(mpath(ftemplate.format(lh)))
@@ -64,7 +92,7 @@ for lh in ('low','high'):
             scube = cube.subcube_from_ds9region(shape)
             data = scube.apply_numpy_function(np.nanmean, axis=(1,2))
             error = ((noise[mask & noiseokmask]**2).sum()**0.5/np.count_nonzero(mask))
-            sp = pyspeckit.Spectrum(data=data,
+            sp = pyspeckit.Spectrum(data=data/etamb,
                                     error=np.ones(data.size)*error,
                                     xarr=xarr, header=cube.wcs.to_header())
             sp.xarr.convert_to_unit('GHz')
@@ -74,7 +102,8 @@ for lh in ('low','high'):
             # Error is already computed above; this is an old hack
             #sp.error[:] = sp.stats((218e9,218.1e9))['std']
             spectra[name] = sp
-            sp.unit = "$T_{A}$ [K]"
+            #sp.unit = "$T_{A}$ [K]"
+            sp.unit = "$T_{MB}$ (K)"
         else:
             sp = spectra[name]
 
@@ -97,5 +126,30 @@ for lh in ('low','high'):
             print ex
 
         spname = sp.specname.replace(" ","_")
-        sp.plotter.savefig(fpath("{0}_{1}.png".format(spname, lh)), bbox_inches='tight')
+        sp.plotter.savefig(fpath("{0}_{1}.png".format(spname, lh)), bbox_inches='tight', dpi=300)
         sp.plotter.savefig(fpath("{0}_{1}.pdf".format(spname, lh)), bbox_inches='tight', rasterized=True)
+
+        cubes,spectra = velo_overlays(scube, all_lines.keys())
+
+        colors = (list('rgbkc') + ['purple', 'navy', '#444444', '#DDBB66', 'k', 'r', 'g'])
+
+        line_peaks = [spectra[line].data[100:-100].max() for line in spectra]
+        line_order = np.argsort(line_peaks)
+        lines_ordered = np.array(spectra.keys())[line_order]
+
+        fig2.clf()
+        ax = fig2.gca()
+        ylim=(np.inf,-np.inf)
+        for ii,(line,color) in enumerate(zip(lines_ordered,colors)):
+            offset = ii*0.3 - np.percentile(spectra[line].data, 25)
+            spectra[line].plotter(offset=offset, clear=False, figure=fig2,
+                                  axis=ax, color=color, linewidth=1, alpha=1)
+            ax.text(-280, offset+0.03, lines_tex[line], color=color, size=16)
+            ylim = (min(ylim[0], ax.get_ylim()[0]),
+                    max(ylim[1], ax.get_ylim()[1]))
+        ax.set_ylim(ylim)
+        ax.set_xlabel("Velocity (km s$^{-1}$)", size=20)
+        ax.set_ylabel("$T_A^*$ (K)", size=20)
+
+        fig2.savefig(fpath("velo_overlay_{0}_{1}.png".format(spname, lh)),
+                     bbox_inches='tight', dpi=300)

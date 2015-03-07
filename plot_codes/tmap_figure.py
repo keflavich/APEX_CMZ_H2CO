@@ -7,6 +7,8 @@ from astropy import log
 from paths import h2copath, figurepath
 import paths
 import matplotlib
+from scipy import stats as ss
+from astropy.io import fits
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 pl.ioff()
@@ -138,6 +140,44 @@ for ftemplate,outtype in toloop:
         F.recenter(**big_recen)
         F.save(os.path.join(figurepath, "big_maps",'big_lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
         log.info(os.path.join(figurepath, "big_maps",'big_lores{0}{1}_tmap_withtdustcontours.pdf'.format(smooth, outtype)))
+
+
+        im = fits.getdata(h2copath+ftemplate.format(smooth))
+        data = im[np.isfinite(im)]
+
+        fig9 = pl.figure(9)
+        fig9.clf()
+        ax9 = fig9.gca()
+        h,l,p = ax9.hist(data, bins=np.linspace(0,300), alpha=0.5)
+        shape, loc, scale = ss.lognorm.fit(data, floc=0)
+        # from http://nbviewer.ipython.org/url/xweb.geos.ed.ac.uk/~jsteven5/blog/lognormal_distributions.ipynb
+        mu = np.log(scale) # Mean of log(X) [but I want mean(x)]
+        sigma = shape # Standard deviation of log(X)
+        M = np.exp(mu) # Geometric mean == median
+        s = np.exp(sigma) # Geometric standard deviation
+        lnf = ss.lognorm(s=shape, loc=loc, scale=scale)
+        pdf = lnf.pdf(np.arange(300))
+        label1 = ("$\sigma_{{\mathrm{{ln}} x}} = {0:0.2f}$\n"
+                  "$\mu_x = {1:0.2f}$\n"
+                  "$\sigma_x = {2:0.2f}$".format(sigma, scale,s))
+        pm = np.abs(ss.lognorm.interval(0.683, s=shape, loc=0, scale=scale) - scale)
+        label2 = ("$x = {0:0.1f}^{{+{1:0.1f}}}_{{-{2:0.1f}}}$\n"
+                  "$\sigma_{{\mathrm{{ln}} x}} = {3:0.1f}$\n"
+                  .format(scale,
+                          pm[1],
+                          pm[0],
+                          sigma,
+                         ))
+        ax9.plot(np.arange(300), pdf*h.max()/pdf.max(), linewidth=4, alpha=0.5,
+                 label=label2)
+        ax9.legend(loc='best')
+        ax9.set_xlim(0,300)
+
+        fig9.savefig(os.path.join(figurepath, "big_maps",
+                                  'histogram_{0}{1}_tmap.pdf'.format(smooth,
+                                                                     outtype)),
+                     bbox_inches='tight')
+
     #F.show_contour('h2co218222_all.fits', levels=[1,7,11,20,38], colors=['g']*5, smooth=1, zorder=5)
     #F.show_contour(datapath+'APEX_H2CO_merge_high_smooth_noise.fits', levels=[0.05,0.1], colors=['#0000FF']*2, zorder=3, convention='calabretta')
     #F.show_contour(datapath+'APEX_H2CO_merge_high_nhits.fits', levels=[9], colors=['#0000FF']*2, zorder=3, convention='calabretta',smooth=3)

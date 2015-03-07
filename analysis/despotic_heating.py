@@ -3,6 +3,7 @@ Copied from despotic/examples/gmcChem and modified
 """
 import matplotlib
 import pylab as pl
+pl.switch_backend('Qt4Agg')
 from astropy import units as u
 from astropy import constants
 import paths
@@ -92,6 +93,8 @@ def case_study(row, gmc=gmc):
     cool0 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
     print "CO cooling: ",cool0['LambdaLine']['co']
     print "O cooling: ",cool0['LambdaLine']['o']
+    print "C cooling: ",cool0['LambdaLine']['c']
+    print "C+ cooling: ",cool0['LambdaLine']['c+']
     gmc.setChemEq(network=NL99)
 
     T1 = tkin_all(density=10**row['density_chi2']*u.cm**-3,
@@ -108,6 +111,8 @@ def case_study(row, gmc=gmc):
     cool1 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
     print "CO cooling: ",cool1['LambdaLine']['co']
     print "O cooling: ",cool1['LambdaLine']['o']
+    print "C cooling: ",cool1['LambdaLine']['c']
+    print "C+ cooling: ",cool1['LambdaLine']['c+']
 
     print 
     print "The same, but with an enhanced IRSF = 1000x local"
@@ -125,6 +130,8 @@ def case_study(row, gmc=gmc):
     cool0 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
     print "CO cooling: ",cool0['LambdaLine']['co']
     print "O cooling: ",cool0['LambdaLine']['o']
+    print "C cooling: ",cool0['LambdaLine']['c']
+    print "C+ cooling: ",cool0['LambdaLine']['c+']
     gmc.setChemEq(network=NL99)
 
     T1 = tkin_all(density=10**row['density_chi2']*u.cm**-3,
@@ -141,6 +148,8 @@ def case_study(row, gmc=gmc):
     cool1 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
     print "CO cooling: ",cool1['LambdaLine']['co']
     print "O cooling: ",cool1['LambdaLine']['o']
+    print "C cooling: ",cool1['LambdaLine']['c']
+    print "C+ cooling: ",cool1['LambdaLine']['c+']
 
 
 if __name__ == "__main__":
@@ -220,6 +229,7 @@ if __name__ == "__main__":
     def L(sig, L_5kms=5*u.pc):
         return L_5kms *(sig/(5*u.km/u.s))**0.7
     tem13 = []
+    tem15 = []
     lambdaline = []
     lambdadust = []
     gammaturb = []
@@ -234,6 +244,17 @@ if __name__ == "__main__":
         lambdaline.append(np.sum(dedt['LambdaLine'].values()))
         gammaturb.append(dedt['PsiUserGas'])
         lambdadust.append(dedt['LambdaDust'])
+        tem15.append(tkin_all(density=1e4*u.cm**-3,
+                      sigma=sigma*u.km/u.s,
+                      lengthscale=L(sigma*u.km/u.s),
+                      tdust_rad=10*u.K,
+                      gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                      crir=1e-17*u.s**-1))
+
+
+    print "Polynomial approximations for the fiducial case: "
+    print "Linear (bad fit): T = sigma*{0} + {1}".format(*np.polyfit(linewidths, tem2, 1))
+    print "2nd order (good fit): T = sigma**2*{0} + sigma*{1} + {2}".format(*np.polyfit(linewidths, tem2, 2))
 
     # Plotting starts here
     FWHM = np.sqrt(8*np.log(2))
@@ -255,6 +276,7 @@ if __name__ == "__main__":
     ax.plot(linewidths*FWHM, tem6,  'r-',  zorder=-5, alpha=0.5, linewidth=2, label='$n=10^5$ $L=1$')
     ax.plot(linewidths*FWHM, tem8,  'r-.', zorder=-5, alpha=0.5, linewidth=2, label='$n=10^5$ $T_D(rad)=25$')
     ax.plot(linewidths2*FWHM, tem13, 'g-', zorder=-5, alpha=0.5, linewidth=2, label=r'$n=10^{4.25}\sigma_5^{-2}$, $L=5\sigma_5^{0.7}$')
+    ax.plot(linewidths2*FWHM, tem15, 'g--', zorder=-5, alpha=0.5, linewidth=2, label=r'$L=5\sigma_5^{0.7}$')
     ax.plot(linewidths*FWHM, tem14, 'g:',  zorder=-5, alpha=0.5, linewidth=2, label=r'$\zeta_{CR}=1e-14$, no turbulence')
     ax.set_xlabel("Line FWHM (km s$^{-1}$)")
     ax.set_ylabel("Temperature (K)")
@@ -266,6 +288,51 @@ if __name__ == "__main__":
     ax.legend(loc='center left', fontsize=16, bbox_to_anchor=(1.0, 0.55))
     pl.savefig(paths.fpath("despotic/TvsSigma.png"), bbox_inches='tight')
     pl.savefig(paths.fpath("despotic/TvsSigma.pdf"), bbox_inches='tight')
+
+    def plot_one_component(linewidths, data, markerline, alpha=0.5, linewidth=2, label='', figname=None, **kwargs):
+        fig3 = pl.figure(3)
+        fig3.clf()
+        ax3 = fig3.gca()
+        ax3.plot(linewidths, data, markerline,  zorder=-5, alpha=alpha, linewidth=linewidth, label=label, **kwargs)
+        ax3.set_xlabel("Line FWHM (km s$^{-1}$)")
+        ax3.set_ylabel("Temperature (K)")
+        ax3.set_ylim(0,150)
+        ax3.set_xlim(2,linewidths.max())
+        if figname is not None:
+            fig3.savefig(figname, bbox_inches='tight')
+
+    plot_one_component(linewidths*FWHM, tem2,  'k--', alpha=0.5, linewidth=2,
+                       label='$\zeta_{CR}=1e-17$ s$^{-1}$\n $n=10^4$ cm$^{-3}$\n'
+                             '$L=5$ pc\n $dv/dr=5$ km/s/pc\n'
+                             '$T_D=25$K\n $T_D(rad)=10$K',
+                      figname=paths.fpath("despotic/TvsSigma_fiducial.pdf"))
+    plot_one_component(linewidths*FWHM, tem14, 'g:',  alpha=0.5, linewidth=2, label=r'$\zeta_{CR}=1e-14$, no turbulence',
+                       figname=paths.fpath("despotic/TvsSigma_CRonly.pdf"))
+    plot_one_component(linewidths2*FWHM, tem15, 'g--', alpha=0.5, linewidth=2, label=r'$L=5\sigma_5^{0.7}$',
+                       figname=paths.fpath("despotic/TvsSigma_sizelinewidthonly.pdf"))
+    plot_one_component(linewidths*FWHM, tem7,  'k:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$',
+                       figname=paths.fpath("despotic/TvsSigma_CRm14_only.pdf"))
+    plot_one_component(linewidths*FWHM, tem4,  'r:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^5$',
+                       figname=paths.fpath("despotic/TvsSigma_CRm14_n5_only.pdf"))
+    plot_one_component(linewidths*FWHM, tem10, 'b:',  alpha=0.5, linewidth=2, label='$\zeta_{CR}=1e-14$, $n=10^6$',
+                       figname=paths.fpath("despotic/TvsSigma_CRm14_n6_only.pdf"))
+    plot_one_component(linewidths*FWHM, tem11, 'k-',  alpha=0.2, linewidth=6, label='$\zeta_{CR}=2e-14$',
+                       figname=paths.fpath("despotic/TvsSigma_CR2m14_only.pdf"))
+    plot_one_component(linewidths*FWHM, tem12, 'k-',  alpha=0.3, linewidth=4, label='$\zeta_{CR}=1e-15$',
+                       figname=paths.fpath("despotic/TvsSigma_CRm15_only.pdf"))
+    plot_one_component(linewidths*FWHM, tem9,  'k-',  alpha=0.5, linewidth=2, label='$dv/dr=20$',
+                       figname=paths.fpath("despotic/TvsSigma_dvdr20_only.pdf"))
+    plot_one_component(linewidths*FWHM, tem3,  'r--', alpha=0.5, linewidth=2, label='$n=10^5$',
+                       figname=paths.fpath("despotic/TvsSigma_n5_only.pdf"))
+    plot_one_component(linewidths*FWHM, tem5,  'b--', alpha=0.5, linewidth=2, label='$n=10^6$',
+                       figname=paths.fpath("despotic/TvsSigma_n6_only.pdf"))
+    plot_one_component(linewidths*FWHM, tem6,  'r-',  alpha=0.5, linewidth=2, label='$n=10^5$ $L=1$',
+                       figname=paths.fpath("despotic/TvsSigma_n5_L1_only.pdf"))
+    plot_one_component(linewidths*FWHM, tem8,  'r-.', alpha=0.5, linewidth=2, label='$n=10^5$ $T_D(rad)=25$',
+                       figname=paths.fpath("despotic/TvsSigma_n5_td25_only.pdf"))
+    plot_one_component(linewidths2*FWHM, tem13, 'g-', alpha=0.5, linewidth=2, label=r'$n=10^{4.25}\sigma_5^{-2}$, $L=5\sigma_5^{0.7}$',
+                       figname=paths.fpath("despotic/TvsSigma_isobar_L0.7_only.pdf"))
+
 
     from astropy.table import Table
     pcfittable = Table.read(paths.apath('fitted_line_parameters_Chi2Constraints.ipac'),
@@ -392,6 +459,7 @@ if __name__ == "__main__":
     ax12.plot(linewidths*FWHM, tem5,  'b--', zorder=-5, alpha=0.5, linewidth=2, label='$n=10^6$')
     ax12.plot(linewidths*FWHM, tem8,  'r-.', zorder=-5, alpha=0.5, linewidth=2, label='$n=10^5$ $T_D(rad)=25$')
     ax12.plot(linewidths2*FWHM, tem13, 'g-', zorder=-5, alpha=0.5, linewidth=2, label=r'$n=10^{4.25}\sigma_5^{-2}$, $L=5\sigma_5^{0.7}$')
+    ax12.plot(linewidths2*FWHM, tem15, 'g--', zorder=-5, alpha=0.5, linewidth=2, label=r'$L=5\sigma_5^{0.7}$')
     ax12.plot(linewidths*FWHM, tem14, 'g:',  zorder=-5, alpha=0.5, linewidth=2, label=r'$\zeta_{CR}=1e-14$, no turbulence')
 
     ax12.set_xlim([2,70])
@@ -411,5 +479,9 @@ if __name__ == "__main__":
     ax12.set_xlim([2,25])
     fig12.savefig(fpath('despotic/temperature_vs_rmsvelocity_xzoom{0}.pdf'.format(smooth)))
 
+
+    brick_id = ((catalog['x_cen'] - 0.253)**2 + (catalog['y_cen']+0.016)**2).argmin()
+    row = catalog[brick_id]
+    case_study(row)
 
     pl.draw(); pl.show()
