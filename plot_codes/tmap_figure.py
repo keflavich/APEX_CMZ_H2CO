@@ -57,7 +57,8 @@ toloop = zip((
               'dendro','dendro_weighted'))
 
 
-for vmax,vmax_str in zip((100,200),("_vmax100","")):
+#for vmax,vmax_str in zip((100,200),("_vmax100","")):
+for vmax,vmax_str in zip((200,),("",)):
     for ftemplate,outtype in toloop:
 
         for smooth in ("","_smooth",):#"_vsmooth"):
@@ -88,7 +89,8 @@ for vmax,vmax_str in zip((100,200),("_vmax100","")):
                            filled=True,
                            #linewidths=[1.0]*5,
                            layer='mask',
-                           zorder=10, convention='calabretta')
+                           zorder=10, convention='calabretta',
+                           rasterized=True)
             F.add_colorbar()
             F.colorbar.set_axis_label_text('T (K)')
             F.colorbar.set_axis_label_font(size=18)

@@ -259,6 +259,9 @@ if __name__ == "__main__":
     regs = (pyregion.open(regpath+'spectral_apertures.reg') +
             pyregion.open(regpath+'target_fields_8x8_gal.reg'))
 
+    #regs = regs[:8]
+    log.info(str({r.attr[1]['text']:r for r in regs}))
+
     name_column = table.Column(data=[reg.attr[1]['text'] 
                                      for reg in regs 
                                      for ii in range(pars[reg.attr[1]['text']]['ncomp'])],

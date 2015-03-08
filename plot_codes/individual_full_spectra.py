@@ -37,6 +37,9 @@ def fpath(x, figurepath=os.path.join(figurepath, 'fullspectra')):
     return os.path.join(figurepath, x)
 
 regs = pyregion.open(regpath+'spectral_apertures.reg')
+#regs = regs[:8]
+log.info(str({r.attr[1]['text']:r for r in regs}))
+
 with open(regpath+'spectral_ncomp.txt') as f:
     pars = eval(f.read())
 
@@ -53,13 +56,13 @@ ftemplate =  'APEX_H2CO_2014_merge_{0}.fits'
 
 def velo_overlays(fullcube, lines):
 
-    # 300 / 3e5 = 0.001; we want only the lines >300 km/s from a band edge
+    # 150 / 3e5 = 0.0005; we want only the lines >150 km/s from a band edge
     cubes = {line: fullcube.with_spectral_unit(u.km/u.s,
                                                rest_value=all_lines[line]*u.GHz,
                                                velocity_convention='radio').spectral_slab(-300*u.km/u.s, 300*u.km/u.s)
              for line in lines
-             if all_lines[line]*u.GHz > fullcube.spectral_axis.min()*1.001
-             and all_lines[line]*u.GHz < fullcube.spectral_axis.max()/1.001
+             if all_lines[line]*u.GHz > fullcube.spectral_axis.min()*1.0005
+             and all_lines[line]*u.GHz < fullcube.spectral_axis.max()/1.0005
             }
 
     spectra = {line: pyspeckit.Spectrum(data=cube.apply_numpy_function(np.nanmean, axis=(1,2)),

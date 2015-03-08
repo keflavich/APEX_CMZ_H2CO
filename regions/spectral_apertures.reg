@@ -1,6 +1,14 @@
 # Region file format: DS9 version 4.1
 global color=green dashlist=8 3 width=1 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1
 galactic
+circle(1.5750,-0.0183,60") # text={Menten1}
+circle(1.5939,-0.0148,60") # text={Menten2}
+circle(1.6418,-0.0641,60") # text={Menten3}
+circle(1.2829,-0.0289,60") # text={Menten4}
+circle(1.3690,-0.1000,60") # text={Menten5}
+circle(1.3168,-0.0650,60") # text={Menten6}
+circle(1.4110,+0.0260,60") # text={Menten7}
+circle(1.48211,+0.0264,60") # text={Menten9}
 box(0.8297763,0.015330175,601.25357",169.92428",358.172) # text={G0.83stream}
 box(1.2608165,-0.11940142,852.08522",156.50986",11.3862) # text={G1.25stream}
 box(1.0286263,-0.037775502,979.16666",149.30555",25.8595) # text={G1.00stream}
@@ -51,7 +59,7 @@ circle(359.61777,-0.2415243,47.69748") # text={G359.62-0.24}
 circle(0.32833933,-0.076211816,41.6718") # text={G0.33-0.08}
 circle(1.1421561,-0.083211953,229.61628") # text={SgrD}
 circle(0.75681794,-0.076825786,28.485612") # text={G0.76-0.08}
-circle(0.71169974,-0.10054773,53.7066") # text={G0.71-0.10} # weird completely arbitrary selection; averaged two components perfectly
+circle(0.71169974,-0.10054773,53.7066") # text={G0.71-0.10}
 box(0.77131749,-0.059530996,829.86116",840.27773",0) # text={G0.8_box}
 box(0.55768457,-0.067499575,246.15001",78.701025",0) # text={G0.56-0.07box}
 circle(0.39113235,-0.083654055,41.6718") # text={G0.39-0.08}

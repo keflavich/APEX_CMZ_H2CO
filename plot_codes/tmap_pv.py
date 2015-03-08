@@ -43,7 +43,8 @@ toloop = zip((
               '_directpv1e5','_directpv3e4',
               '_directpv1e4_masked','_directpv1e5_masked','_directpv3e4_masked',))
 
-for vmax,vmax_str in zip((100,200),("_vmax100","")):
+#for vmax,vmax_str in zip((100,200),("_vmax100","")):
+for vmax,vmax_str in zip((200,),("",)):
     for weight in ("_weight",""):
         for smooth in ("",):#("_smooth",""):#"_vsmooth"):
             sncubefile = hpath('APEX_H2CO_303_202{0}_signal_to_noise_cube.fits'.format(smooth))
@@ -147,6 +148,7 @@ for vmax,vmax_str in zip((100,200),("_vmax100","")):
                                        [color + (alpha,) for alpha in
                                         np.exp(-(np.logspace(0.20,2)-1.7)**2/(2.5**2*2.))]),
                                filled=True,
+                               rasterized=True,
                                smooth=3,
                                zorder=10, convention='calabretta')
 
