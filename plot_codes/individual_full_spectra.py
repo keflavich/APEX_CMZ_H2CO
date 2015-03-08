@@ -23,6 +23,9 @@ import paths
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 from shfi_otf_pipeline.lines import all_lines,lines_tex
+lines_tex_b = {x:y for x,y in lines_tex.items()}
+lines_tex_b['13CO'] = lines_tex['13CO'] + " / 10"
+lines_tex_b['C18O'] = lines_tex['C18O'] + " / 5"
 
 etamb=0.75
 
@@ -137,6 +140,10 @@ for lh in ('low','high'):
         line_order = np.argsort(line_peaks)
         lines_ordered = np.array(spectra.keys())[line_order]
 
+        if '13CO' in spectra:
+            spectra['13CO'].data /= 10
+            spectra['C18O'].data /= 5
+
         fig2.clf()
         ax = fig2.gca()
         ylim=(np.inf,-np.inf)
@@ -144,7 +151,7 @@ for lh in ('low','high'):
             offset = ii*0.3 - np.percentile(spectra[line].data, 25)
             spectra[line].plotter(offset=offset, clear=False, figure=fig2,
                                   axis=ax, color=color, linewidth=1, alpha=1)
-            ax.text(-280, offset+0.03, lines_tex[line], color=color, size=16)
+            ax.text(-280, offset+0.03, lines_tex_b[line], color=color, size=16)
             ylim = (min(ylim[0], ax.get_ylim()[0]),
                     max(ylim[1], ax.get_ylim()[1]))
         ax.set_ylim(ylim)

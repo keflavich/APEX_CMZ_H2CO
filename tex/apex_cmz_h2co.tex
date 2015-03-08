@@ -759,7 +759,7 @@ from the Herschel SED fit maps.
 
 % tmap_pv
 \RotFigureTwoAA
-{figures/big_maps/pv_tmap_weight_masked.pdf}
+{figures/big_maps/pv_tmap_weight_directpv1e4_masked.pdf}
 {figures/big_maps/pv_peaksn.pdf}
 {(a) A Galactic longitude-velocity diagram made by taking the weighted average
 of the ratio PPV cube along Galactic latitude and using the $n=10^4$ \percc curve
@@ -974,6 +974,13 @@ temperatures exceeding the predictions are all consistent with the predictions
 at the $2-\sigma$ level and therefore are not a significant concern, though
 they may be explained by having slightly higher densities than the lower limit
 density we have assumed.
+
+The predicted temperatures for the hand-extracted regions are more uncertain.
+Most of the hand-extracted regions agree with the prediction at a 1$\sigma$ and
+all but a few at a 2$\sigma$ level.  Given that the sizes used for these
+regions is uncertain by a large factor (for square apertures especially), there
+is no significant disagreement between $T_{turb}$ and $T_{measured}$.
+
 
 \FigureTwo
 {figures/chi2_temperature_vs_turbulenttemperature_fieldsandsources.pdf}
@@ -1444,10 +1451,12 @@ because of dramatically reduced turbulent line spreading and therefore
 increased line trapping.  Such an effect would require a transition from
 supersonically turbulent to coherent (subsonically turbulent) gas motion
 \citep[e.g.][]{Pineda2010a} and could reduce the required column densities by
-$\sim100\times$.  Still, the fact that we observe \para emission spread over a
-wide range of velocities renders this scenario unlikely, since it would require
-many high-column-density, coherent clumps moving at high velocity with respect
-to one another.
+$\sim100\times$.   \citet{Kauffmann2013a} observed a few clumps within The
+Brick with narrow velocity dispersions that could represent subsonic regions,
+and such clumps could in principle mimic the observed signal since their
+relative line-of-sight velocities are high.  However, there are not enough of
+these to account for the observed line brightness, and there were also equally
+many high-velocity-dispersion clumps detected. 
 
 
 \subsection{The CMZ average}
