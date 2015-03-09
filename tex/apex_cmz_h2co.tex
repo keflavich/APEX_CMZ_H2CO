@@ -12,17 +12,18 @@
 
 \abstract
 {The Galactic center is the closest region in which we can study star formation
-under extreme physical conditions.  It has an apparent star formation rate per
-unit `dense'
-gas below that of normal molecular clouds and disk galaxies.}
-{To measure the temperature of gas in the Central Molecular Zone (CMZ)and determine what drives it.}
-{We have mapped the inner 300 pc of the CMZ  in para-\formaldehyde
-and measured temperatures in the dense ($n\sim10^4-10^5$ \percc) gas.}
+under extreme physical conditions like those in high-redshift galaxies.
+However, it has an apparent star formation rate per unit `dense' gas below that
+of normal molecular clouds and disk galaxies.}
+{To measure the temperature of the dense gas in the Central Molecular Zone
+(CMZ) and determine what drives it.}
+{We have mapped the inner 300 pc of the CMZ in the temperature-sensitive
+$J=3-2$ para-formaldehyde (\para) transitions.}
 {We produce temperature maps and cubes and publish them in FITS form with
 doi:10.7910/DVN/27601.
 Gas temperatures in the Galactic center range from $\sim60$ K to $>100$ K in
 selected regions.  Gas temperatures are consistent with purely turbulent
-heating.  We measure an upper limit on the cosmic ray ionization ray
+heating.  We measure an upper limit on the cosmic ray ionization rate
 $\zeta_{CR}<10^{-14}$ \pers. }
 {
 The bulk molecular gas temperatures of the region around our Galactic center
@@ -92,7 +93,7 @@ observed in the interstellar medium.
 
 Prior gas temperature measurements in the CMZ primarily used the popular
 ammonia metastable inversion transition thermometer \citep[\ammonia (1,1) -
-(5,5);][]{Guesten1981a,Huettemeister1993a,Ott2014a}, which is sensitive to
+(7,7);][]{Guesten1981a,Huettemeister1993a,Ott2014a,Mauersberger1986a}, which is sensitive to
 moderate density gas \citep[$n(\hh) \sim 10^3-10^4$ \percc;][]{Shirley2015a}.
 While this thermometer is generally reliable in cold regions, the population of
 the higher energy states - those sensitive to temperatures $T\gtrsim60$ K - may
@@ -116,7 +117,7 @@ theoretically a problem, as the gas and dust may remain collisionally uncoupled
 up to moderately high densities given a high enough heating rate, it is an
 important empirical difference between CMZ and Galactic disk clouds.
 Dust and \ammonia derived temperatures are usually assumed and often observed
-to agree in Galactic clouds
+to agree in Galactic disk clouds
 \citep{Pillai2006a,Dunham2010a,Juvela2012a,Battersby2014a}, but the difference
 can no longer be ignored in the Galactic center.
 
@@ -126,11 +127,14 @@ turbulent clouds thought to be associated with the intersection point between
 the x1 and x2 orbits \citep{Rodriguez-Fernandez2006b,Riquelme2013a}.  We
 describe the new
 observations in Section \ref{sec:observations}.  In Section \ref{sec:signal},
-we describe the analysis process used to extract signal from the data cubes and
-derive temperatures.  We discuss various implications of our data in Section
+we describe the analysis process used to extract signal from the data cubes.
+In Section \ref{sec:linemodeling}, we describe how we 
+derive temperatures from the line ratios.
+We discuss various implications of our data in Section
 \ref{sec:discussion}.  In the appendices, we describe further details of the
 data reduction process, provide additional tables, and provide the source code
-for this project.
+for all aspects of this project, from data reduction through figure generation
+for the paper.
 
 
 \section{Observations \& data reduction}
@@ -157,11 +161,21 @@ The 2014 observing strategy was modified to use larger $8\arcmin \times
 range was also shifted to cover windows over 217-219.5 and 218.4-220.9 GHz, thus
 including the bright \thirteenco and \ceighteeno 2-1 lines.
 
- The detected lines were \para \threeohthree 218.22219 GHz, \para \threetwotwo
- 218.47563 GHz, \para \threetwoone 218.76007 GHz, SiO 5-4 217.10498 GHz,
- \methanol \fourtwotwo 218.44005 GHz, OCS 18-17 218.90336 GHz, HC$_3$N 24-23
- 218.32471 GHz, \ceighteeno 2-1 219.56036 GHz, and \thirteenco 2-1 220.39868
- GHz.  
+Additionally, for the \para data, we incorporated the 41 hours of observations
+from \citet{Ao2013a} using the older fast fourier transform spectrometer (FFTS)
+backend.  These data covered 2 GHz of bandwidth, including all three of the
+\para lines and SiO 5-4, but they did not cover the CO isotopologue lines.
+
+The detected lines were \para \threeohthree 218.22219 GHz, \para \threetwotwo
+218.47563 GHz, \para \threetwoone 218.76007 GHz, SiO 5-4 217.10498 GHz,
+\methanol \fourtwotwo 218.44005 GHz, OCS 18-17 218.90336 GHz, HC$_3$N 24-23
+218.32471 GHz, SO $6_5-5_4$ 219.94944 GHz, HNCO $10_{0,10}-9_{0,9}$ 219.79828
+GHz, \ceighteeno 2-1 219.56036 GHz, and \thirteenco 2-1 220.39868 GHz.  We do
+not include in this list many lines, e.g. \methylcyanide 12-11, that were
+included in the observed band but were detected only in Sgr B2, since complete
+surveys of the rich molecular heimat in this band have been compiled elsewhere
+\citep{Nummelin1998a,Belloche2013a}.  Of the detected lines, the SO, HNCO,
+\ceighteeno, and \thirteenco were not covered by the \citet{Ao2013a} data.  
 
 
 The raw data were acquired with 32768 spectral channels in each window,
@@ -170,11 +184,6 @@ yielding 0.1 \kms resolution.  We expect to see no lines narrower than a few
 have acquired.  We therefore downsampled the data by a factor of 8 to 0.8 \kms
 resolution prior to resampling onto a 1 \kms grid to make the data more
 manageable.  
-
-Additionally, for the \para data, we incorporated the 41 hours of observations
-using the older fast fourier transform spectrometer (FFTS) backend from
-\citet{Ao2013a}.  These data covered 2 GHz of bandwidth, including all three of
-the \para lines and SiO 5-4, but they did not cover the CO isotopologue lines.
 
 The system temperature ranged from $120 < T_{sys} < 200$ K for the majority of
 the observations, with a mean $T_{sys}=165$ K.  A small fraction (10\%) of
@@ -189,7 +198,7 @@ small number ($<1\%$) with much higher system temperatures ($300 < T_{sys} <
 {figures/fullspectra/20_kms_low.pdf}
 {figures/fullspectra/20_kms_high.pdf}
 {Spectra toward one \formaldehyde-bright cloud, the 20 \kms cloud, over the full
-APEX band.  All detected lines are identified.  The grey background indicates
+APEX band.  All detected lines are identified.  The gray background indicates
 the approximate $1-\sigma$ errorbars. The feature overlapping the \ceighteeno
 2-1
 line at about 219.5 GHz is the \twelveco line from the upper sideband,
@@ -223,7 +232,7 @@ the usual $\sim10\%$.
 Spectra were removed if they showed excessive noise compared to the
 theoretical expectation given the measured system temperature.  As in
 \citet{Ao2013a}, the threshold was set to $1.5\times$ the theoretical noise,
-i.e. $1.5 \sqrt{2} T_{sys} (\Delta\nu t_{exp})^{0.5}$, where $t_{exp}$ is the
+i.e. $3 T_{sys} (2 \Delta\nu t_{exp})^{-0.5}$, where $t_{exp}$ is the
 exposure time (integration time) per spectrum in seconds and $\Delta\nu$ is the
 channel width in Hz.  This approach resulted in $\sim0.2\%$ of the data being
 removed.  
@@ -377,7 +386,7 @@ analysis excludes the \threetwotwo line.
 
 Integrated intensity maps are shown in Figure
 \ref{fig:integ303}a for the \threeohthree map masked with the above method
-in and Figure \ref{fig:integ303}b for the \threetwoone map
+and in Figure \ref{fig:integ303}b for the \threetwoone map
 using the mask created from the \threeohthree data.
 
 
@@ -438,7 +447,7 @@ divide-by-zero numerical errors.
 {figures/big_maps/big_H2CO_321220_to_303202_bl_integ_masked_weighted.pdf}
 %{figures/big_maps/big_lores_tmap_withcontours.pdf} % tmap_figure
 {(a) Map of the ratio of the integrated emission of
-\Rone.  The grey areas indicate pixels that were completely masked out in the
+\Rone.  The gray areas indicate pixels that were completely masked out in the
 PPV cubes.  The Sgr B2 peaks exhibit \formaldehyde absorption and therefore do
 not contain reliable measurements.  Higher ratios
 (red) correspond
@@ -525,19 +534,16 @@ shown in Figure \ref{fig:regions}.
 \section{Analysis: temperature determination}
 \subsection{Line modeling}
 \label{sec:linemodeling}
-% TODO: I switched from 15.1 to 17 in column on Jan 14.  This may break all
-% of the code when I re-run it because it is changing the underlying prior!
-%
 We use RADEX \citep{van-Der-Tak2007a} and a related solver (Fujun Du's
 \texttt{myRadex}; \url{https://github.com/fjdu/myRadex}) to create model grids
 for the p-\formaldehyde lines over a grid of 20 density ($n=10^{2.5}$-$10^{7}$
 \percc), a fixed assumed\footnote{The line gradient is selected because
 observed line widths have FWHM larger than 5 \kms in 30\arcsec (1.2 pc) beams
 throughout the CMZ.  The temperature measurements are
-robust against this assumption, with a change of $dT/T < 5\%$ for a gradient
-$4\times$ larger; if the gradient is significantly smaller, the gas temperature
-must be higher than we report.} line gradient of 5 \perkmspc, 30 \formaldehyde
-column densities $N(\formaldehyde) = 1\ee{11}-1\ee{15.1}$ \persc, and 50
+robust against this assumption, with a typical change of $dT/T < 25\%$ for a
+gradient $4\times$ larger or smaller.} line gradient of 5
+\perkmspc, 30 \formaldehyde column densities $N(\formaldehyde) =
+1\ee{11}-1\ee{15.1}$ \persc, and 50
 temperatures from 10 to 350 K.  The grid was created using the \texttt{pyradex}
 wrapper of RADEX\footnote{\url{https://github.com/adamginsburg/pyradex}} and
 collision rates retrieved from LAMDA \citep{Wiesenfeld2013a}.  We then
@@ -676,7 +682,8 @@ abundance and the
 varying column density.  The points are color coded by signal-to-noise in the
 ratio $R_1$, with gray $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$,
 and red $S/N > 50$.  The black lines show the modeled temperature as a function of
-$R_1$ for three different assumed densities with a constant assumed abundance.
+$R_1$ for three different assumed densities with a constant assumed abundance
+$X_{\formaldehyde} = 1.2\ee{-9}$.
 }
 {fig:ratiovstem}{0.5}{0}
 
@@ -705,7 +712,7 @@ being mixed.
 These temperature maps do not have uniform reliability.  There is some spatial
 variation in the noise, but the variation in the signal is much more important.
 In regions where the peak signal is low, the reliability of these maps is
-substantially reduced.  We have also applied a mask to both panels of
+substantially reduced.  We have also applied a mask to the lower panels of
 Figure \ref{fig:temmapnosmooth} to make the low-reliability regions blend into
 the background by adding a foreground gray layer with opacity set by the
 inverse S/N (see Appendix \ref{appendix:smoothed}).
@@ -761,8 +768,9 @@ from the Herschel SED fit maps.
 \RotFigureTwoAA
 {figures/big_maps/pv_tmap_weight_directpv1e4_masked.pdf}
 {figures/big_maps/pv_peaksn.pdf}
-{(a) A Galactic longitude-velocity diagram made by taking the weighted average
-of the ratio PPV cube along Galactic latitude and using the $n=10^4$ \percc curve
+{(a) A Galactic longitude-velocity diagram made by taking the
+\threeohthree-weighted average of the $R_1$ PPV cube along Galactic latitude
+and using the $n=10^4$ \percc curve
 from Figure \ref{fig:ratiovstem} to derive temperature.  (b) A Galactic
 longitude-velocity map of peak
 signal-to-noise along Galactic latitude, which is used as a mask in (a).  The
@@ -888,7 +896,7 @@ very bad approximation, so we use the gaussian-corrected (see next footnote)
 moment-derived radius.}, of the selected sources as the length scale, the
 measured linewidth\footnote{We correct the linewidth and the radius of
 dendrogram-extracted clumps for clipping assuming the underlying source is
-gaussian following \citet{Rosolowsky2005b} Appendix B.}
+gaussian following \citet[][Appendix B]{Rosolowsky2005b}.}
 $\sigma_v$, the
 measured dust temperature $T_{d}$ scaled down by an optical depth correction
 $1-\exp\left[-N(\hh)/10^{24}~\percc\right]$, and we assume the velocity gradient
@@ -902,15 +910,16 @@ arbitrary radii but well-measured linewidths, and the dendrogram leaf sources.
 {figures/despotic/temperature_vs_rmsvelocity} % despotic_heating
 {
 Plots of temperature vs linewidth.  The curves in both plots show theoretical
-curves given different assumptions as computed by \texttt{DESPOTIC}.  The legend
+curves given different assumptions as computed by \texttt{DESPOTIC}.  
+A version of this plot with no data is shown in Figure
+\ref{fig:tvssigma_despotic}.
+The legend
 shows the various assumptions, with the fiducial assumptions indicated at the
 top, associated with the dashed gray line; these fiducial values are kept fixed
 except where indicated.  The colors each correspond to a different density, while
 different line styles indicate changes in other physical constants.
 The green solid curve shows a pressure equilibrium case ($n\propto\sigma^{-2}$)
 with a Larson relation ($L\propto\sigma^{0.7}$) based on \citet{Shetty2012a}.
-A version of this plot with no data is shown in Figure
-\ref{fig:tvssigma_despotic}.
 (a) 
 The fitted temperature as described in Section \ref{sec:linemodeling} plotted
 against the fitted line width for the by-eye selected regions.  The blue
@@ -1020,10 +1029,10 @@ shows that the modified chemistry at these high temperatures should be
 accounted for when predicting the gas temperature.
 
 We may be able to further constrain the heating mechanisms using this same data
-set if more precise velocity structure information is obtained for the clouds,
-combining the line fitting analysis of the hand-selected regions with the
-systematic blob extraction of the dendrogram extraction in order to avoid using
-the extrapolated correction factors.  This analysis is left for a future work.
+set if more precise velocity structure information is obtained for the clouds.
+Better velocity structure measurements can be achieved by combining line
+fitting analysis with systematic blob extraction in order to avoid using the
+extrapolated correction factors.  This analysis is left for a future work.
 
 
 
@@ -1211,7 +1220,7 @@ against overinterpretation.
 {figures/orbits/KDL2014_orbitpath_on_H2CO_TemperatureFromRatio_weighted.pdf}
 {(a) A position-velocity slice through the temperature cube along the
 \citet{Kruijssen2015a} orbit.  
-Grey regions have no gas detected or inadequate signal to measure a
+Gray regions have no gas detected or inadequate signal to measure a
 temperature.
 (b) The path used to create the slice shown in (a).  The path consists of a series
 of transparent $7.2\arcsec\times300\arcsec$
@@ -1229,8 +1238,13 @@ landmarks for comparison between the two figures.
 {figures/orbits/dendro_temperature_vs_time_firstMyr_trendline.pdf}
 {The observed temperature vs time since the most recent pericenter passage of
 The Brick and the dust ridge clouds on the \citet{Kruijssen2015a} orbit for
-dendrogram-extracted clumps within 35 \kms and 12 pc of the orbital path.  The
-darker symbols represent `leaves'
+dendrogram-extracted clumps within 35 \kms and 12 pc of the orbital path.  
+(a) shows the entire orbit
+while (b) shows an expanded
+view of the first Myr.  The colored bar along the bottom of the figure shows the
+modeled orbit velocity at each position.
+In both panels,
+the darker symbols represent `leaves'
 in the dendrogram structure, i.e. compact clumps, while the fainter symbols
 represent their parent structures. There is a \emph{hint} of an 
 increase in temperature with time, from an initial temperature $T\lesssim50$ K
@@ -1240,19 +1254,16 @@ at a significantly different velocity and therefore cannot be part of the same
 stream.  The Brick is an outlier (it is hotter) whether or not there is a
 trend.  The symbol sizes are proportional to the \para \threetwoone brightness
 and are meant to give
-an indication of how reliable the temperature measurements are.  The grey
+an indication of how reliable the temperature measurements are.  The gray
 vertical lines through the circles indicate the formal $1-\sigma$ errors on the
 temperature.
-(a) shows the entire orbit
-while (b) shows an expanded
-view of the first Myr.  The colored bar along the bottom of the figure shows the
-modeled orbit velocity at each position.}
+}
 {fig:kdltemvstime}{0.4}{3.5in}
 
 \subsection{Comparison to \citet{Ott2014a} \ammonia temperature map}
 \label{sec:ammoniacompare}
 \citet{Ott2014a} measured the \ammonia (1,1) and (2,2) lines over a subset of the
-region we mapped, from $-0.2\arcdeg < \ell < 0.8\arcdeg$.  These two lines are
+region we mapped, from $-0.2\arcdeg$ to $0.8\arcdeg$.  These two lines are
 a frequently
 used thermometer sensitive to gas temperatures $5 \lesssim T \lesssim 40$ K,
 with weak sensitivity up to $\sim80$ K \citep[][Figure 1]{Mangum2013a}.  The
@@ -1420,12 +1431,12 @@ that allows the observed ratios to be produced by very dense gas in addition to
 hot gas.  Indeed, ratios approaching $R_1=1$ occur for relatively low
 temperatures ($T\sim30$ K) at very high densities ($n>10^{6}$ \percc)
 and very high column densities ($N(\para)>10^{16}$ \perkms \persc) because
-the lines become optically thick and have LTE temperatures.
+the lines become optically thick and have LTE excitation temperatures.
 
 Since the mean densities at 30\arcsec resolution are always significantly lower
 ($n\lesssim\mathrm{few}\ee{5}$ \percc), such high-density,
 optically thick gas would have to have a very low filling factor.  The peak
-\para \threeohthree brightness ranged from $0.2 \lesssim T_{mb} \lesssim 2$ K
+\para \threeohthree brightness ranges from $0.2 \lesssim T_{mb} \lesssim 2$ K
 in the detected regions, implying upper limits on the filling factor 1-7\% if
 we assume the resolved brightness temperature equals the dust temperature,
 $T_B=T_{dust}$.
@@ -1604,9 +1615,9 @@ the SPP (priority program) 1573 ‘Physics of the ISM’.
 \appendix
 \section{Baseline removal}
 \label{sec:baselineappendix}
-The baselines in our SHFI-1 data were particularly problematic, more than is
+The baselines in our APEX-1 (SHFI) data were particularly problematic, more than is
 usual in modern heterodyne obervations.  The 218 GHz window we have observed is
-particularly sensitive to resonances within the SHFI-1 receiver that vary on
+particularly sensitive to resonances within the APEX-1 receiver that vary on
 $<1$ minute timescales; our off-position calibrations were performed about once
 per minute and therefore were not rapid enough to mitigate this problem
 completely.  The baselines can broadly be described as smoothly varying ripples
@@ -1619,7 +1630,7 @@ In practice, we discovered that it was not possible to remove the dominant
 baseline structure on either scale without significantly affecting the
 underlying spectral data.  We simulated a variety of fourier-space suppression
 approaches by adding synthetic signal to baseline spectra extracted from the
-first few PCA components of the real spectra.
+first few principle component analysis (PCA) components of the real spectra.
 The PCA extraction approach is able to pull out the dominant baseline
 components very effectively, but it inevitably includes significant signal in
 the top few most correlated components, especially for the strong \formaldehyde
@@ -1923,8 +1934,9 @@ visual reference for comparison between the temperature maps.
 % $L$ is the turbulent length scale.
 
 \section{Temperature balance plots without data}
-Figure \ref{fig:temvsfwhm_regions} shows theoretical curves with all data points
-superposed.  For clarity, we reproduce that figure with no data plotted here.
+Figure \ref{fig:temvsfwhm_regions} shows theoretical curves with all data
+points superposed.  For clarity, we reproduce that figure with no data plotted
+here in Figure \ref{fig:tvssigma_despotic}.
 
 \Figure{figures/despotic/TvsSigma}
 {Plots of the DESPOTIC-derived equilibrium temperature as a function of line width
