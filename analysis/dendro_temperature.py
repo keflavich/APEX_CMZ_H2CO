@@ -306,12 +306,15 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             width = row['v_rms']*u.km/u.s
             lengthscale = reff
 
-            columns['tkin_turb'].append(heating.tkin_all(10**row_data['density_chi2']*u.cm**-3,
-                                                         width,
-                                                         lengthscale,
-                                                         width/lengthscale,
-                                                         columns['higaldusttem'][-1]*u.K,
-                                                         crir=0./u.s))
+            #REMOVED in favor of despotic version
+            # we use the analytic version here; the despotic version is
+            # computed elsewhere (with appropriate gcor factors)
+            #columns['tkin_turb'].append(heating.tkin_all(10**row_data['density_chi2']*u.cm**-3,
+            #                                             width,
+            #                                             lengthscale,
+            #                                             width/lengthscale,
+            #                                             columns['higaldusttem'][-1]*u.K,
+            #                                             crir=0./u.s))
 
         if len(set(len(c) for k,c in columns.iteritems())) != 1:
             print("Columns are different lengths.  This is not allowed.")

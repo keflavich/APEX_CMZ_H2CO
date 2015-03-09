@@ -209,13 +209,13 @@ F2.save(os.path.join(figurepath, "big_maps",'H2COtemperatureOnDust.pdf'))
 F2.recenter(**big_recen)
 F2.save(os.path.join(figurepath, "big_maps",'big_H2COtemperatureOnDust.pdf'))
 
-fig = pl.figure(6, figsize=figsize)
-fig.clf()
-F = aplpy.FITSFigure('/Users/adam/work/gc/Tkin-GC.fits.gz',
-                     convention='calabretta',
-                     figure=fig)
-
 for vmax in (100,200):
+    fig = pl.figure(6, figsize=figsize)
+    fig.clf()
+    F = aplpy.FITSFigure('/Users/adam/work/gc/Tkin-GC.fits.gz',
+                         convention='calabretta',
+                         figure=fig)
+
     cm = copy.copy(cmap)
     cm.set_bad((0.5,)*3)
     F.show_colorscale(cmap=cm,vmin=vmin,vmax=vmax)

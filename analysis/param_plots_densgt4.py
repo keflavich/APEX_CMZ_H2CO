@@ -23,7 +23,7 @@ from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
 from constrain_parameters import paraH2COmodel
 from h2co_modeling import grid_fitter
 from astropy import table
-import heating
+import despotic_heating as heating
 
 
 pl.rcParams['font.size'] = 16.0
@@ -116,7 +116,7 @@ for row in fittable:
                        taline303=par1, etaline303=epar1,
                        taline321=par2, etaline321=epar2,
                        mindens=mindens,
-                       linewidth=linewidth)
+                       linewidth=5) # for consistency with dendro
 
 
     chi2r = mf.chi2_r303321

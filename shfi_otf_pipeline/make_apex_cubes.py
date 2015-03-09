@@ -383,7 +383,7 @@ def select_apex_data(spectra,headers,indices, sourcename=None,
     return data,hdrs,gal
 
 def process_data(data, gal, hdrs, dataset, scanblsub=False,
-                 subspectralmeans=True, verbose=False, noisefactor=1.5,
+                 subspectralmeans=True, verbose=False, noisefactor=3.0,
                  linemask=False, automask=2,
                  zero_edge_pixels=0,
                  subtract_time_average=False,
@@ -472,8 +472,10 @@ def process_data(data, gal, hdrs, dataset, scanblsub=False,
     freq_step = np.array([h['FRES'] for h in hdrs])
     exptime = np.array([h['EXPOSURE'] for h in hdrs])
     tsys = np.array([h['TSYS'] for h in hdrs])
-    theoretical_rms = 2.0**0.5*tsys/(np.abs(freq_step*1.0e6)*exptime)**0.5
-    # extra factor 1.5 to avoid overflagging... don't know why really
+    # 2 for 2 polarizations; otherwise this is Wilson 2009 eqn 4.41
+    theoretical_rms = tsys/(2.*np.abs(freq_step*1.0e6)*exptime)**0.5
+    # extra factor 3.0 to avoid overflagging; this means flagging
+    # only 3-sigma outliers.
     bad = noise > (theoretical_rms*noisefactor)
 
     # SgrB2 has higher noise.  Don't flag it out.
