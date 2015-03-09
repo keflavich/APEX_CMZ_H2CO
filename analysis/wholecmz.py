@@ -27,3 +27,33 @@ sp.specfit(fittype='h2co_simple', multifit=True,
 sp.specfit.plot_fit(show_components=True)
 sp.plotter.savefig(paths.fpath('simple/WholeCMZ_6parameter.pdf'),
                    bbox_inches='tight')
+
+import pyregion
+lat,lon = full_cubes.cube_merge_high.world[0,:,:][1:]
+sgrb2_cloud_mask = ((lon-0.674*u.deg)**2 + (lat+0.027*u.deg)**2)**0.5 < 5*u.arcmin
+spd_nob2 = full_cubes.cube_merge_high.with_mask(~sgrb2_cloud_mask).mean(axis=(1,2)).value
+sp2 = pyspeckit.Spectrum(xarr=full_cubes.cube_merge_high.spectral_axis, data=spd_nob2)
+sp2.xarr.refX = full_cubes.pcube_merge_high.xarr.refX
+sp2.xarr.refX_units = full_cubes.pcube_merge_high.xarr.refX_units
+sp2.specname = 'Whole CMZ'
+sp2.unit = 'K'
+
+sp2.plotter()
+sp2.specfit.Registry.add_fitter('h2co_simple', simple_fitter2, 6,
+                               multisingle='multi')
+sp2.baseline(exclude=[151, 761, 916, 1265], selectregion=True,
+            highlight_fitregion=True, xtype='pixel', subtract=True)
+
+sp2.error[:] = sp2.data[761:916].std()
+
+sp2.plotter()
+sp2.specfit(fittype='h2co_simple', multifit=True,
+           guesses=[0.06, 10, 20, 0.5, 0.7, 0.03],
+           limited=[(True,True)] * 6,
+           limits=[(0,20),[-150,150],(1, 60),(0,1),(0.3,1.1),(0,1e5)],
+          )
+
+sp2.specfit.plot_fit(show_components=True)
+sp2.plotter.savefig(paths.fpath('simple/WholeCMZ_NoSgrB2_6parameter.pdf'),
+                   bbox_inches='tight')
+

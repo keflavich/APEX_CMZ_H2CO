@@ -31,6 +31,9 @@ emitter    = c18o 5.0e-8 extrapolate    # C^18O, abundance 5.0e-8
 emitter    = c    5.0e-7 extrapolate    # C, abundance 5.0e-7
 emitter    = c+   5.0e-10 extrapolate   # C+, assumed negligible
 emitter    = o    5.0e-6 extrapolate    # O, abundance 5.0e-6
+emitter    = oh2  0.75 extrapolate file:oH2_Selection_Lambda.dat # ortho molecular hydrogen
+emitter    = ph2  0.25 extrapolate file:pH2_Selection_Lambda.dat # para molecular hydrogen
+emitter    = hd   1.0e-5 extrapolate file:HD_Lambda.dat # deuterated molecular hydrogen
 # Ignore these: they're never strong coolants
 #emitter    = hco+ 1.0e-8 extrapolate    # HCO^+, abundance 1.0e-8
 #emitter    = p-nh3 1.0e-8 extrapolate   # para NH_3, abundance 1.0e-8

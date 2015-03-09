@@ -76,7 +76,8 @@ def velo_overlays(fullcube, lines):
     return cubes,spectra
 
 for lh in ('low','high'):
-    cube = SpectralCube.read(mpath(ftemplate.format(lh)))
+    # reject < 217 GHz
+    cube = SpectralCube.read(mpath(ftemplate.format(lh))).spectral_slab(217*u.GHz, 250*u.GHz)
     noisehdu = cube.std(axis=0).hdu
     noisehdr = noisehdu.header
     noise = noisehdu.data

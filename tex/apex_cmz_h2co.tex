@@ -19,8 +19,8 @@ of normal molecular clouds and disk galaxies.}
 (CMZ) and determine what drives it.}
 {We have mapped the inner 300 pc of the CMZ in the temperature-sensitive
 $J=3-2$ para-formaldehyde (\para) transitions.}
-{We produce temperature maps and cubes and publish them in FITS form with
-doi:10.7910/DVN/27601.
+{We produce temperature maps and cubes and publish all data in FITS form; they
+can be recovered from digital object identifier \texttt{doi:10.7910/DVN/27601}.
 Gas temperatures in the Galactic center range from $\sim60$ K to $>100$ K in
 selected regions.  Gas temperatures are consistent with purely turbulent
 heating.  We measure an upper limit on the cosmic ray ionization rate
@@ -86,10 +86,8 @@ The thermal properties of this gas are a crucial component for understanding
 the conditions governing both star formation and interstellar chemistry.  The
 gas temperature sets the sound speed in the gas and therefore the Mach number
 within a turbulent medium.  It also governs the thermal Jeans mass.  Whether
-turbulence or gravity governs the fragmentation scale, the gas temperature is
-clearly important.  For interstellar chemistry, the gas temperature determines
-which species freeze out onto grains and therefore which can be readily
-observed in the interstellar medium.
+turbulence or gravity controls the fragmentation scale, the gas temperature is
+clearly important.  
 
 Prior gas temperature measurements in the CMZ primarily used the popular
 ammonia metastable inversion transition thermometer \citep[\ammonia (1,1) -
@@ -832,10 +830,13 @@ We expand upon the \citet{Ao2013a} analysis by solving for the temperature
 assuming that both cosmic ray ionization and turbulent heating are present and
 that the dust temperature is nonzero.  We have used the \texttt{DESPOTIC} code
 \citep{Krumholz2014c} to determine the equilibrium temperature.  We have
-included CO, O, C+, and C as line coolants\footnote{We assume a very low
-abundance for C+, $X_{C+}=5\ee{-10}$, assuming that cloud shielding will
-prevent photoionization and collisions with \hh will destroy CR-generated C+
-rapidly, which is confirmed by the \citet{Nelson1999a} chemical model.
+included CO, O, C+, C, o\hh, p\hh, and HD\footnote{The collision rate files for
+\hh and HD were provided by Wing-fai Thi from work by the ProDiMo team from
+\citet{Le-Bourlot1999a,Wrathmall2007a,Flower2000a,Wolniewicz1998a}.} as line
+coolants\footnote{We assume a
+very low abundance for C+, $X_{C+}=5\ee{-10}$, assuming that cloud shielding
+will prevent photoionization and collisions with \hh will destroy CR-generated
+C+ rapidly, which is confirmed by the \citet{Nelson1999a} chemical model.
 \citet{Lis1998a} and \citet{Lis1999a} observed bright C+ emission from The
 Brick; we interpret this emission as coming from a heated outer skin of the
 cloud at lower densities, not coincident with the observed \formaldehyde
@@ -1330,27 +1331,31 @@ covered.
 
 There have also been observations of \para temperatures with interferometers.
 \citet{Johnston2014a} noted a very high temperature peak, $T>320$ K, using these
-lines of \para toward The Brick, G0.253+0.015.  We measure similar line
-ratios toward The Brick, but our observations are on larger scales.  The
-interpretation of these
-line ratios is subject to some question, though.  Above 300K, the collision
-rates provided by LAMDA \citep{Green1991a,Schoier2005a,Wiesenfeld2013a} must be
-extrapolated.  Additionally, very high $R_1$ values cannot be
-reproduced by high temperatures with the current suite of collision rates, but
-instead require that the lines be optically thick and thermalized and therefore
-that the gas be at very high densities.   Given the low brightness temperatures
-observed, if
-the emission is optically thick, it must be coming from an extremely small
-area (it must have a small filling factor).  A small filling factor is
-inconsistent with the observed large extent of the emission
-unless the emission is also extremely patchy on small scales.
-Patchy, low-filling-factor, high-column gas may exist, but it is unlikely because 
-the high observed turbulence should prevent the gas from becoming optically
-thick if the filling factor is low.  We discuss this topic further in Section
-\ref{sec:thickorwarm}.  We conclude, therefore, that a lower limit on the gas
-temperature in The Brick, $T\gtrsim120$ K, is consistent with our observations,
-and that the \citet{Johnston2014a} measurement should also be regarded as a
-lower limit closer to $T\gtrsim120$ K.
+lines of \para toward The Brick, G0.253+0.015.  The ratio of the
+SMA to APEX measurements of both the \threeohthree and \threetwoone line in the
+southwest portion of The Brick is $\approx0.25$, but the ratio $R_1\approx0.45$
+is approximately the same within the $r=25\arcsec$ aperture we used.  The high
+temperature in \citet{Johnston2014a} comes from smaller regions in which a
+higher $R_1\approx0.71$ is observed.
+
+We interpret the measured ratios differently.  Above 300K, the collision rates
+provided by LAMDA \citep{Green1991a,Schoier2005a,Wiesenfeld2013a} must be
+extrapolated, which means the models do not produce reliable results.
+Very high $R_1$ values above about 0.7 cannot be reproduced by
+high temperatures with the current suite of collision rates if the temperature
+is bounded to $T<300$K, but instead require that the lines be optically thick
+and thermalized and therefore that the gas be at very high densities.   Given
+the low brightness temperatures observed ($\sim2$ K even in the SMA $\sim4$\arcsec
+beams), if the emission is optically thick, it must be coming from an extremely
+small area (it must have a small filling factor).  A small filling factor for
+the cloud-scale APEX observations is inconsistent with the observed large
+extent of the emission and the low interferometer to single-dish ratio.  We
+discuss this topic further in Section \ref{sec:thickorwarm}.  We conclude,
+therefore, that a lower limit on the gas temperature in The Brick,
+$T\gtrsim120$ K, is consistent with our observations, and that the
+\citet{Johnston2014a} measurement should also be regarded as a lower limit
+closer to $T>300$ K or a suggestion that there is optically thick \para
+\threeohthree emission at the brightness peaks.
 
 
 
@@ -1589,6 +1594,8 @@ We thank the staff and observers at APEX for carrying out the service-mode
 observations.  We are grateful to Arnaud Belloche, Axel Weiß, and Carlos de
 Breuck for assistance in developing the observing strategy, and Per Bergman for
 his assistance in understanding the SHFI-1 baseline issues.
+We thank Katharine Johnston for providing the SMA \para \threetwoone
+data cube for The Brick.
 We thank Erik Rosolowsky for advice concerning treatment of the biases inherent
 in clump extraction.  T.P. acknowledges support from the Deutsche
 Forschungsgemeinschaft (DFG) via

@@ -39,13 +39,16 @@ def turb_heating_generator(lengthscale=1*u.pc, turbulence=True):
 
 
 def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
-             ISRF=1, tdust_rad=None, turbulence=True, gmc=gmc):
+             ISRF=1, tdust_rad=None, turbulence=True, gmc=gmc, reload_gmc=True):
 
     assert density.unit.is_equivalent(u.cm**-3)
     assert sigma.unit.is_equivalent(u.km/u.s)
     assert lengthscale.unit.is_equivalent(u.pc)
     assert gradient.unit.is_equivalent(u.km/u.s/u.pc)
     assert crir.unit.is_equivalent(1/u.s)
+
+    if reload_gmc:
+        gmc=cloud('cloud.desp')
 
     gmc.sigmaNT = sigma.to(u.cm/u.s).value
     gmc.Td = tdust.to(u.K).value
@@ -66,7 +69,8 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
     return gmc.Tg
 
 def case_study(row, gmc=gmc):
-    beam_pc = (30/(np.sqrt(8*np.log(2)))*u.arcsec*8.5*u.kpc).to(u.pc, u.dimensionless_angles())
+    beam_pc = (30/(np.sqrt(8*np.log(2)))*u.arcsec*8.5*u.kpc).to(u.pc,
+                                                                u.dimensionless_angles())
     print "Case study for object ID ",row['_idx']
     gf=row['gausscorrfactor']
     print "Gaussian correction factor: ",gf
@@ -95,6 +99,9 @@ def case_study(row, gmc=gmc):
     print "O cooling: ",cool0['LambdaLine']['o']
     print "C cooling: ",cool0['LambdaLine']['c']
     print "C+ cooling: ",cool0['LambdaLine']['c+']
+    print "oH2 cooling: ",cool0['LambdaLine']['oh2']
+    print "pH2 cooling: ",cool0['LambdaLine']['ph2']
+    print "HD cooling: ",cool0['LambdaLine']['hd']
     gmc.setChemEq(network=NL99)
 
     T1 = tkin_all(density=10**row['density_chi2']*u.cm**-3,
@@ -113,6 +120,9 @@ def case_study(row, gmc=gmc):
     print "O cooling: ",cool1['LambdaLine']['o']
     print "C cooling: ",cool1['LambdaLine']['c']
     print "C+ cooling: ",cool1['LambdaLine']['c+']
+    print "oH2 cooling: ",cool1['LambdaLine']['oh2']
+    print "pH2 cooling: ",cool1['LambdaLine']['ph2']
+    print "HD cooling: ",cool1['LambdaLine']['hd']
 
     print 
     print "The same, but with an enhanced IRSF = 1000x local"
@@ -132,6 +142,9 @@ def case_study(row, gmc=gmc):
     print "O cooling: ",cool0['LambdaLine']['o']
     print "C cooling: ",cool0['LambdaLine']['c']
     print "C+ cooling: ",cool0['LambdaLine']['c+']
+    print "oH2 cooling: ",cool0['LambdaLine']['oh2']
+    print "pH2 cooling: ",cool0['LambdaLine']['ph2']
+    print "HD cooling: ",cool0['LambdaLine']['hd']
     gmc.setChemEq(network=NL99)
 
     T1 = tkin_all(density=10**row['density_chi2']*u.cm**-3,
@@ -150,6 +163,9 @@ def case_study(row, gmc=gmc):
     print "O cooling: ",cool1['LambdaLine']['o']
     print "C cooling: ",cool1['LambdaLine']['c']
     print "C+ cooling: ",cool1['LambdaLine']['c+']
+    print "oH2 cooling: ",cool1['LambdaLine']['oh2']
+    print "pH2 cooling: ",cool1['LambdaLine']['ph2']
+    print "HD cooling: ",cool1['LambdaLine']['hd']
 
 
 if __name__ == "__main__":
@@ -480,8 +496,19 @@ if __name__ == "__main__":
     fig12.savefig(fpath('despotic/temperature_vs_rmsvelocity_xzoom{0}.pdf'.format(smooth)))
 
 
-    brick_id = ((catalog['x_cen'] - 0.253)**2 + (catalog['y_cen']+0.016)**2).argmin()
-    row = catalog[brick_id]
+    brick_sw_id = ((catalog['x_cen'] - 0.241)**2 + (catalog['y_cen']+0.0057)**2).argmin()
+    print("Brick SW: {0}".format(brick_sw_id))
+    print(catalog['_idx','Smean303','ratio303321','higaldusttem','tmin1sig_chi2','temperature_chi2','tmax1sig_chi2'][brick_sw_id])
+    row = catalog[brick_sw_id]
+    case_study(row)
+
+    print()
+    print()
+
+    brick_ne_id = ((catalog['x_cen'] - 0.2615)**2 + (catalog['y_cen']+0.0283)**2).argmin()
+    print("Brick NE: {0}".format(brick_ne_id))
+    print(catalog['_idx','Smean303','ratio303321','higaldusttem','tmin1sig_chi2','temperature_chi2','tmax1sig_chi2'][brick_ne_id])
+    row = catalog[brick_ne_id]
     case_study(row)
 
     pl.draw(); pl.show()
