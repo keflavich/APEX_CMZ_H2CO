@@ -58,10 +58,11 @@ molecules = ('13CO_2014_merge', 'C18O_2014_merge', 'H2CO_303_202_bl', 'SiO_54_bl
 filenames = [molpath('APEX_{0}.fits'.format(molecule))
             for molecule in molecules]
 
-molecules = molecules + ('H2CO_TemperatureFromRatio',
-                         'H2CO_TemperatureFromRatio_smooth',
+molecules = molecules + (
                          'H2CO_Ratio',
-                         'H2CO_Ratio_smooth',
+                         #'H2CO_Ratio_smooth',
+                         'H2CO_TemperatureFromRatio',
+                         #'H2CO_TemperatureFromRatio_smooth',
                          #'H2CO_DendrogramTemperature',
                          #'H2CO_DendrogramTemperature_smooth',
                          #'H2CO_DendrogramTemperature_Leaves',
@@ -71,9 +72,9 @@ molecules = molecules + ('H2CO_TemperatureFromRatio',
 #filenames.append(hpath('TemperatureCube_PiecewiseFromRatio.fits'))
 #filenames.append(hpath('TemperatureCube_smooth_PiecewiseFromRatio.fits'))
 filenames.append(hpath('H2CO_321220_to_303202_cube_bl.fits'))
-filenames.append(hpath('H2CO_321220_to_303202_cube_smooth_bl.fits'))
+#filenames.append(hpath('H2CO_321220_to_303202_cube_smooth_bl.fits'))
 filenames.append(hpath('H2CO_321220_to_303202_cube_bl.fits'))
-filenames.append(hpath('H2CO_321220_to_303202_cube_smooth_bl.fits'))
+#filenames.append(hpath('H2CO_321220_to_303202_cube_smooth_bl.fits'))
 #filenames.append(hpath('TemperatureCube_DendrogramObjects.fits'))
 #filenames.append(hpath('TemperatureCube_DendrogramObjects_smooth.fits'))
 #filenames.append(hpath('TemperatureCube_DendrogramObjects_leaves.fits'))
@@ -83,8 +84,8 @@ filenames.append(hpath('H2CO_321220_to_303202_cube_smooth_bl.fits'))
 cmap = copy.copy(pl.cm.RdYlBu_r)
 cmap.set_under((0.9,0.9,0.9,0.5))
 
-for weight in ("_weighted",""):
-    for molecule,fn in zip(molecules[-4:],filenames[-4:]):
+for weight in ("","_weighted"):
+    for molecule,fn in zip(molecules[-2:],filenames[-2:]):
         log.info(molecule)
         cube = spectral_cube.SpectralCube.read(fn)
 
@@ -171,16 +172,17 @@ for weight in ("_weighted",""):
         ax = fig1.gca()
         mywcs = WCS(pv.header)
         xext, = mywcs.sub([1]).wcs_pix2world((0,pv.shape[1]), 0)
+        print "xext: ",xext
         yext, = mywcs.sub([2]).wcs_pix2world((0,pv.shape[0]), 0)
         yext /= 1e3
         dy = yext[1]-yext[0]
         dx = xext[1]-xext[0]
         #F = aplpy.FITSFigure(pv, figure=fig1)
-        actual_aspect = pv.shape[0]/float(pv.shape[1])
+        #actual_aspect = pv.shape[0]/float(pv.shape[1])
         if 'Temperature' in molecule:
             #F.show_colorscale(cmap=cmap, aspect=0.5/actual_aspect, vmin=vmin, vmax=vmax)
             im = ax.imshow(pv.data, extent=[xext[0], xext[1], yext[0], yext[1]],
-                           aspect=0.5*dx/dy, vmin=vmin, vmax=vmax, cmap=cmap)
+                           aspect=0.6*dx/dy, vmin=vmin, vmax=vmax, cmap=cmap)
             #divider = make_axes_locatable(ax)
             #cax = divider.append_axes("right", size="2%", pad=0.05)
             cb = fig1.colorbar(im)
@@ -195,13 +197,13 @@ for weight in ("_weighted",""):
             #pl.colorbar(F._ax1.images[0], cax=cax)
         elif 'Ratio' in fn:
             im = ax.imshow(pv.data, extent=[xext[0], xext[1], yext[0], yext[1]],
-                           aspect=0.5*dx/dy, vmin=0, vmax=0.5, cmap=cmap)
+                           aspect=0.6*dx/dy, vmin=0, vmax=0.5, cmap=cmap)
             cb = fig1.colorbar(im)
             cb.set_label("Ratio $R_1$")
         else:
             #F.show_grayscale(aspect=0.5/actual_aspect)
             im = ax.imshow(pv.data, extent=[xext[0], xext[1], yext[0], yext[1]],
-                           aspect=0.5*dx/dy, cmap=cmap)
+                           aspect=0.6*dx/dy, cmap=cmap)
 
         ax2 = ax.twiny()
         ax2.xaxis.set_label_position('top')
