@@ -212,6 +212,7 @@ if __name__ == "__main__":
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                      tdust_rad=10*u.K,
                     crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
+    tem6[-2] = np.nan # this point is bad
     tem7 = [tkin_all(1e4*u.cm**-3, sigma*u.km/u.s, lengthscale=5*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                      tdust_rad=10*u.K,
