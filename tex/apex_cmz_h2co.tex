@@ -3,7 +3,7 @@
 \begin{document}
 
 %\title{APEX CMZ \para 218 GHz Survey: Temperature Map of the CMZ}
-\title{Temperature Map of the Galactic Central Molecular Zone with \formaldehyde}
+\title{Dense gas in the Galactic Central Molecular Zone is warm: temperature maps with \formaldehyde}
 \titlerunning{APEX CMZ \formaldehyde}
 \authorrunning{Ginsburg et al}
 \input{authors}
@@ -14,10 +14,10 @@
 {The Galactic center is the closest region in which we can study star formation
 under extreme physical conditions like those in high-redshift galaxies.  Like
 in other galactic centers, the dense gas is warmer than the dust.}
-{To measure the temperature of the dense gas in the Central Molecular Zone
+{We measure the temperature of the dense gas in the Central Molecular Zone
 (CMZ) and determine what drives it.}
 {We have mapped the inner 300 pc of the CMZ in the temperature-sensitive
-$J=3-2$ para-formaldehyde (\para) transitions, which has critical and effective
+$J=3-2$ para-formaldehyde (\para) transitions, which have critical and effective
 densities both $n\gtrsim10^5$ \percc.}
 {We produce temperature maps and cubes and publish all data in FITS form; they
 can be recovered from digital object identifier \texttt{doi:10.7910/DVN/27601}.
@@ -127,6 +127,19 @@ Dust and \ammonia derived temperatures are usually assumed and often observed
 to agree in Galactic disk clouds
 \citep{Pillai2006a,Dunham2010a,Juvela2012a,Battersby2014a}, but the difference
 can no longer be ignored in the Galactic center.
+
+Within both our own Galactic center and many nearby galactic nuclei, there is
+controversy over which heating mechanisms dominate.  In the CMZ,
+\citet{Ao2013a} were able to rule out X-ray heating as an energetically
+important mechanism, leaving cosmic rays and turbulence (mechanical heating) as
+viable candidates.  Studies of the CO spectral line energy distribution (SLED)
+around Sgr A* and Sgr B2 argued for mechanical heating and UV heating,
+respectively \citep{Goicoechea2013a,Etxaluze2013a}.  Nearby infrared-luminous
+galaxies have properties that resemble these regions
+\citep{Kamenetzky2012a,Kamenetzky2014a}, but the debate about the dominant
+heating mechanism remains open in many galaxies, allowing for photon-dominated,
+X-ray-dominated, mechanical/turbulent, or cosmic ray heating
+\citep{Loenen2008a,Meijerink2011a,Bayet2011a,Mangum2013a}.
 
 We have expanded the \formaldehyde mapping project of \citet{Ao2013a} to a
 $\sim5\times$ larger area, including the dust ridge and the positive-longitude
@@ -966,9 +979,13 @@ Note that in both panels, any correlation is even weaker than that observed in
 Figure 6 of \citet{Huettemeister1993a}, who make the same plot for \ammonia (4,4)
 and (5,5).  \citet{Riquelme2013a} also found no correlation using \ammonia over a similar
 range of velocity dispersions.
-It is clear from these plots that no single cosmic ray ionization rate is
+While there is no clear correlation between velocity dispersion and
+temperature, most data points fall within a range that is consistent with
+turbulent heating \emph{if} the appropriate size scale is selected; see Figure
+\ref{fig:turbtem} for plots that account for the differing source sizes.
+No single cosmic ray ionization rate is
 capable of reproducing our observations, and the higher CRIRs ($\zeta_{CR} >
-10^{-14}$ \pers) are inconsistent with much of the data.
+10^{-14}$ \pers) are inconsistent with most of the data.
 }
 {fig:temvsfwhm_regions}
 {1}{3.5in}
@@ -1028,6 +1045,13 @@ is no significant disagreement between $T_{turb}$ and $T_{measured}$.
 {figures/dendrotem/temperature_vs_Despoticturbtemperature.pdf} % despotic_heating
 {Plots of the \formaldehyde-measured temperature against the predicted
 turbulent-driven temperature as discussed in Section \ref{sec:heating}.
+While no trend is obvious in the data, most of the high signal-to-noise
+data points are fairly close to the  $T_{turb} = T_{measured}$ line.
+There are few points with $T_{measured} > T_{turb}$, so turbulence generally provides
+enough - and sometimes too much - energy to heat the gas to the observed temperatures.
+The regions with predicted temperatures higher than observed require additional
+explanation: either their heating rate has been overestimated or their cooling
+rate underestimated.
 (a) The hand-selected regions as described in Figure
 \ref{fig:temvstem_regions}; the blue symbols are compact `clump' sources and
 the red symbols are large-area square regions. 
@@ -1043,10 +1067,6 @@ The points are color coded by signal-to-noise in the ratio $R_1$, with black
 $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$, and red $S/N > 50$. 
 If the lower signal-to-noise points in blue and grey are ignored, the agreement
 between the predicted temperature and observed temperature is fairly good.
-There are few points with measured temperatures higher than predicted, but the
-regions with predicted temperatures higher than observed require additional
-explanation: either their heating rate has been overestimated or their cooling
-rate underestimated.
 }
 {fig:turbtem}{1}{3.5in}
 
@@ -1178,7 +1198,9 @@ are measured.  High gas temperatures, $T\sim100-120$ K, were previously
 measured in a ridge to the Galactic northeast of Sgr B2 N using \methylcyanide
 \citep[][Figure 4b]{de-Vicente1997a}, which we now confirm, though our data
 show $T\gtrsim150$ K.  \citet{Ott2014a} also showed relatively high \ammonia
-temperatures in this hot ridge.
+temperatures in this hot ridge, and \citet{Etxaluze2013a} found a
+high-temperature component ($\sim50-84$ K) in their high-J CO spectral line
+energy distribution analysis.
 % The high temperatures in the Sgr B2 region, $T>80$ K, extend to a radius of
 % $\sim10$ pc (5\arcmin), and nearly 30 pc (12.5\arcmin) in the
 % northwest/southeast directions. 
@@ -1539,6 +1561,17 @@ relative line-of-sight velocities are high.  However, there are not enough of
 these to account for the observed line brightness, and there were also equally
 many high-velocity-dispersion clumps detected. 
 
+A related argument is that the high temperatures come from a very small
+fraction of the gas heated in high velocity shocks, i.e. that we are seeing
+intermittent high temperatures \citep[e.g.][]{Falgarone1995a}.  Given the high
+observed velocity dispersions, high velocity shocks capable of heating the gas
+far above the observed temperatures are possible.  Very high velocity shocks,
+with $v_s \gtrsim 50 \kms$ will dissociate molecules, so in this scenario the
+emission must come from intermediate velocity shocks \citep{Neufeld1989a}.  The
+primary distinction between this intermittent model and the more generic
+turbulent dissipation heating model is timescale: in the intermittent model,
+the shock-heated gas is not well-mixed with the rest of the gas and therefore
+represents a distinct phase.  
 
 \subsection{The CMZ average}
 For comparison to extragalactic observations, we have included a spectrum
