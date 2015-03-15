@@ -146,7 +146,8 @@ def multiscale_fit(pcube, centerx, centery, offset_scale=0.3, savedir=None,
 
     ax2 = pl.subplot(2,1,2)
     pl.subplots_adjust(hspace=0)
-    ax2.errorbar(np.arange(1,10)*7.2, sig, yerr=esig, linestyle='none', marker='s', color='k')
+    ax2.errorbar(np.arange(1,10)*7.2, sig, yerr=esig, linestyle='none',
+                 marker='s', color='k')
     ax2.set_xlim(0.5*7.2,9.5*7.2)
     ax2.set_xlabel("Aperture Radius (arcseconds)")
     ax2.set_ylabel("$\sigma$ (km s$^{-1}$)")
@@ -218,11 +219,13 @@ def multiscale_fit_g1pt6(center=(53,143)):
                                   [0.1, 60,  9, 0.3, 0.9, 0.2],
                           offset_scale=0.4)
 
-from fit_the_brick import brick_pcube
+from fit_the_brick import brick_pcube,brick_cube
 
 def multiscale_fit_brick(pcube=brick_pcube, centerx=21, centery=10,
                          offset_scale=0.3, savedir='brick_examples',
                          savepre='brick_sw_specfit', **kwargs):
+    print("Fit position is {0},{1}".format(*brick_cube.world[0,centery,centerx][1:]))
+          
     return multiscale_fit(pcube=pcube, centerx=centerx, centery=centery,
                           offset_scale=offset_scale, savedir=savedir,
                           savepre=savepre, **kwargs)
@@ -251,3 +254,14 @@ if __name__ == "__main__":
     # Plots for paper
     mfb    = multiscale_fit_brick()
     mfg1p2 = multiscale_fit_g1pt2_cool()
+    
+    (cenx,ceny), = brick_cube.wcs.sub([wcs.WCSSUB_CELESTIAL]).wcs_world2pix([[0.25539, 0.02080]], 0)
+    mfb2   = multiscale_fit_brick(centerx=cenx, centery=ceny,
+                                  guesses=[0.5,20,5,0.4,0.4,0.2,
+                                           0.3,50,5,0.4,0.4,0.2],
+                                  savepre='brick_total_specfit')
+
+    mfb3   = multiscale_fit_brick(centerx=cenx, centery=ceny,
+                                  guesses=[0.5,50,5,0.4,0.4,0.2,
+                                           0.3,20,5,0.4,0.4,0.2],
+                                  savepre='brick_total_specfit_comp2')
