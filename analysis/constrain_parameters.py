@@ -128,6 +128,8 @@ class paraH2COmodel(object):
         return chi2_h2
 
     def chi2_abundance(self, logabundance, elogabundance):
+        # Should there be a factor of np.log10(np.sqrt(np.pi) * linewidth) here?
+        # Should linewidth be treated as FWHM instead of sigma, as it presently is?
         model_logabundance = self.columnarr - np.log10(u.pc.to(u.cm)) - self.densityarr
         chi2X = ((model_logabundance-logabundance)/elogabundance)**2
         return chi2X

@@ -182,7 +182,7 @@ class paraH2COmodel(object):
     def list_parameters():
         return ['taline303',  'etaline303', 'taline321',  'etaline321',
                 'taline322',  'etaline322', 'logabundance',  'elogabundance',
-                'logh2column',  'elogh2column', 'ratio303321',  'eratio303321',
+                'logh2column',  'elogh2column', 'ratio321303',  'eratio321303',
                 'ratio321322',  'eratio321322', 'linewidth']
 
     def set_constraints_fromrow(self, row, **kwargs):
@@ -190,13 +190,13 @@ class paraH2COmodel(object):
         mapping = {'e321':'etaline321',
                    'Smean321':'taline321',
                    'Smean303':'taline303',
-                   'er303321':'eratio303321',
-                   'eratio303321':'eratio303321',
+                   'er321303':'eratio321303',
+                   'eratio321303':'eratio321303',
                    'e303':'etaline303',
-                   'r303321':'ratio303321',
-                   'ratio303321':'ratio303321',
-                   'r321303':'ratio303321',
-                   'er321303':'eratio303321',
+                   'r321303':'ratio321303',
+                   'ratio321303':'ratio321303',
+                   'r321303':'ratio321303',
+                   'er321303':'eratio321303',
                    'logabundance':'logabundance',
                    'elogabundance':'elogabundance',
                    'logh2column':'logh2column',
@@ -218,7 +218,7 @@ class paraH2COmodel(object):
                         taline423=None, etaline423=None,
                         logabundance=None, elogabundance=None,
                         logh2column=None, elogh2column=None,
-                        ratio303321=None, eratio303321=None,
+                        ratio321303=None, eratio321303=None,
                         ratio321322=None, eratio321322=None,
                         ratio404303=None, eratio404303=None,
                         ratio422404=None, eratio422404=None,
@@ -256,13 +256,13 @@ class paraH2COmodel(object):
                          else 0)
 
 
-        self.chi2_r303321 = (self.grid_getmatch_321to303(ratio303321,
-                                                         eratio303321)
-                             if not any(arg is None for arg in (ratio303321,
-                                                                eratio303321))
+        self.chi2_r321303 = (self.grid_getmatch_321to303(ratio321303,
+                                                         eratio321303)
+                             if not any(arg is None for arg in (ratio321303,
+                                                                eratio321303))
                              else 0)
-        if np.all(~np.isfinite(self.chi2_r303321)):
-            self.chi2_r303321 = 0
+        if np.all(~np.isfinite(self.chi2_r321303)):
+            self.chi2_r321303 = 0
 
         self.chi2_r423404 = (self.grid_getmatch_321to303(ratio423404,
                                                          eratio423404)
@@ -314,7 +314,7 @@ class paraH2COmodel(object):
         Compute the total chi2 from the individual chi2 components
         """
         self.chi2 = (self.chi2_X + self.chi2_h2 + self.chi2_ff1 + self.chi2_ff2
-                     + self.chi2_r321322 + self.chi2_r303321 + self.chi2_dens +
+                     + self.chi2_r321322 + self.chi2_r321303 + self.chi2_dens +
                      self.chi2_r404303 + self.chi2_r423404 + self.chi2_r422404)
 
 
@@ -360,18 +360,39 @@ class paraH2COmodel(object):
 
         fig = pl.gcf()
         fig.clf()
-        ax1 = pl.subplot(2,2,1)
-        pl.contourf(xax, yax, self.chi2_r303321.min(axis=axis),
-                    levels=self.chi2_r303321.min()+np.arange(nlevs), alpha=0.5)
-        pl.contour(xax, yax, self.chi2.min(axis=axis),
-                   levels=self.chi2.min()+np.arange(nlevs))
-        if self.chi2_r321322:
-            pl.contour(xax, yax, self.chi2_r321322.min(axis=axis),
-                       levels=self.chi2_r321322.min()+np.arange(nlevs),
-                       cmap=pl.cm.bone)
-        pl.title("Ratio $3_{0,3}-2_{0,2}/3_{2,1}-2_{2,0}$")
+        if self.chi2_r321303 is not 0:
+            ax1 = pl.subplot(2,3,1)
+            pl.contourf(xax, yax, self.chi2_r321303.min(axis=axis),
+                        levels=self.chi2_r321303.min()+np.arange(nlevs), alpha=0.5)
+            pl.contour(xax, yax, self.chi2.min(axis=axis),
+                       levels=self.chi2.min()+np.arange(nlevs))
+            if self.chi2_r321322:
+                pl.contour(xax, yax, self.chi2_r321322.min(axis=axis),
+                           levels=self.chi2_r321322.min()+np.arange(nlevs),
+                           cmap=pl.cm.bone)
+            pl.title("Ratio $3_{2,1}-2_{2,0}/3_{0,3}-2_{0,2}$")
 
-        ax4 = pl.subplot(2,2,2)
+        if self.chi2_r404303 is not 0:
+            ax5 = pl.subplot(2,3,5)
+            pl.contourf(xax, yax, self.chi2_r404303.min(axis=axis),
+                        levels=self.chi2_r404303.min()+np.arange(nlevs), alpha=0.5)
+            pl.contour(xax, yax, self.chi2.min(axis=axis),
+                       levels=self.chi2.min()+np.arange(nlevs))
+            pl.title("Ratio $4_{0,4}-3_{2,2}/3_{0,3}-2_{0,2}$")
+
+        if self.chi2_r422404 is not 0:
+            ax6 = pl.subplot(2,3,6)
+            pl.contourf(xax, yax, self.chi2_r422404.min(axis=axis),
+                        levels=self.chi2_r422404.min()+np.arange(nlevs), alpha=0.5)
+            pl.contour(xax, yax, self.chi2.min(axis=axis),
+                       levels=self.chi2.min()+np.arange(nlevs))
+            if self.chi2_r423404 is not 0:
+                pl.contour(xax, yax, self.chi2_r423404.min(axis=axis),
+                           levels=self.chi2_r423404.min()+np.arange(nlevs),
+                           cmap=pl.cm.bone)
+            pl.title("Ratio $4_{2,2}-3_{2,1}/4_{0,4}-3_{2,2}$")
+
+        ax4 = pl.subplot(2,3,2)
         if hasattr(self.chi2_X, 'size'):
             pl.contourf(xax, yax, self.chi2_X.min(axis=axis),
                         levels=self.chi2_X.min()+np.arange(nlevs), alpha=0.5)
@@ -381,7 +402,7 @@ class paraH2COmodel(object):
                  "$= {0:0.1f}\pm{1:0.1f}$".format(self.logabundance,
                                                   self.elogabundance))
 
-        ax3 = pl.subplot(2,2,3)
+        ax3 = pl.subplot(2,3,3)
         if hasattr(self.chi2_h2, 'size'):
             pl.contourf(xax, yax, self.chi2_h2.min(axis=axis),
                         levels=self.chi2_h2.min()+np.arange(nlevs), alpha=0.5)
@@ -390,7 +411,7 @@ class paraH2COmodel(object):
         pl.title("Total log$(N(\\mathrm{{H}}_2))$ ")
         #         "= {0:0.1f}\pm{1:0.1f}$".format(self.logh2column,
         #                                         self.elogh2column))
-        ax5 = pl.subplot(2,2,4)
+        ax5 = pl.subplot(2,3,4)
         #if hasattr(self.chi2_ff1, 'size'):
         #    pl.contourf(xax, yax, (self.chi2_ff1.min(axis=axis)),
         #                levels=self.chi2_ff1.min()+np.arange(nlevs), alpha=0.5)
@@ -414,7 +435,7 @@ class paraH2COmodel(object):
 
         if par1 == 'col':
             for ss in range(1,5):
-                ax = pl.subplot(2,2,ss)
+                ax = pl.subplot(2,3,ss)
                 ax.xaxis.set_ticks(np.arange(self.carr.min(), self.carr.max()))
 
         pl.subplots_adjust(wspace=0.25, hspace=0.45)
