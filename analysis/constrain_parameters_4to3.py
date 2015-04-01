@@ -4,14 +4,19 @@ plus whatever other constraints are available
 """
 import inspect
 import time
+import os
 
 import numpy as np
 from scipy.ndimage.interpolation import map_coordinates
 from astropy import units as u
 from astropy import log
 import pylab as pl
+from astropy.io import fits
 
 from h2co_modeling import grid_fitter
+
+def gpath(fn, gridpath='/Users/adam/work/h2co/radex/thermom/'):
+    return os.path.join(gridpath, fn)
 
 class paraH2COmodel(object):
 
