@@ -60,6 +60,9 @@ def compute_grid(densities=densities, temperatures=temperatures,
     key_303 = 2
     key_321 = 9
     key_322 = 12
+    key_404 = 3
+    key_423 = 16
+    key_422 = 19
     #key_303 = np.where((table['upperlevel'] == '3_0_3') &
     #                   (table['frequency'] > 218) &
     #                   (table['frequency'] < 220))[0]
@@ -89,6 +92,15 @@ def compute_grid(densities=densities, temperatures=temperatures,
         taugrid_322 = np.full(shape, np.nan),
         texgrid_322 = np.full(shape, np.nan),
         fluxgrid_322 = np.full(shape, np.nan),
+        taugrid_404 = np.full(shape, np.nan),
+        texgrid_404 = np.full(shape, np.nan),
+        fluxgrid_404 = np.full(shape, np.nan),
+        taugrid_423 = np.full(shape, np.nan),
+        texgrid_423 = np.full(shape, np.nan),
+        fluxgrid_423 = np.full(shape, np.nan),
+        taugrid_422 = np.full(shape, np.nan),
+        texgrid_422 = np.full(shape, np.nan),
+        fluxgrid_422 = np.full(shape, np.nan),
     )
 
     for iTem,tt in enumerate(ProgressBar(temperatures)):
@@ -115,6 +127,15 @@ def compute_grid(densities=densities, temperatures=temperatures,
                 pars['taugrid_322'][iTem,iDens,iCol] = R.tau[key_322]
                 pars['texgrid_322'][iTem,iDens,iCol] = R.tex[key_322].value
                 pars['fluxgrid_322'][iTem,iDens,iCol] = TI[key_322].value
+                pars['taugrid_404'][iTem,iDens,iCol] = R.tau[key_404]
+                pars['texgrid_404'][iTem,iDens,iCol] = R.tex[key_404].value
+                pars['fluxgrid_404'][iTem,iDens,iCol] = TI[key_404].value
+                pars['taugrid_422'][iTem,iDens,iCol] = R.tau[key_422]
+                pars['texgrid_422'][iTem,iDens,iCol] = R.tex[key_422].value
+                pars['fluxgrid_422'][iTem,iDens,iCol] = TI[key_422].value
+                pars['taugrid_423'][iTem,iDens,iCol] = R.tau[key_423]
+                pars['texgrid_423'][iTem,iDens,iCol] = R.tex[key_423].value
+                pars['fluxgrid_423'][iTem,iDens,iCol] = TI[key_423].value
 
     return (TI, pars, bad_pars)
 
