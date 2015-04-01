@@ -213,6 +213,9 @@ class paraH2COmodel(object):
                         taline303=None, etaline303=None,
                         taline321=None, etaline321=None,
                         taline322=None, etaline322=None,
+                        taline404=None, etaline404=None,
+                        taline422=None, etaline422=None,
+                        taline423=None, etaline423=None,
                         logabundance=None, elogabundance=None,
                         logh2column=None, elogh2column=None,
                         ratio303321=None, eratio303321=None,
@@ -251,6 +254,7 @@ class paraH2COmodel(object):
                          if not any(arg is None for arg in (taline321,
                                                             etaline321))
                          else 0)
+
 
         self.chi2_r303321 = (self.grid_getmatch_321to303(ratio303321,
                                                          eratio303321)
@@ -311,7 +315,7 @@ class paraH2COmodel(object):
         """
         self.chi2 = (self.chi2_X + self.chi2_h2 + self.chi2_ff1 + self.chi2_ff2
                      + self.chi2_r321322 + self.chi2_r303321 + self.chi2_dens +
-                     self.chi2_r404303 + self.chi2_423404 + self.chi2_422404)
+                     self.chi2_r404303 + self.chi2_r423404 + self.chi2_r422404)
 
 
     def get_parconstraints(self):
