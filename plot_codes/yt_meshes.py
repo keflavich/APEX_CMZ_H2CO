@@ -1,18 +1,27 @@
+import numpy as np
 import yt
 import paths
 from temperature_cubes import tcube,tcube_direct
 from masked_cubes import cube303m
 from spectral_cube import SpectralCube
+from astropy.io import fits
 
 tcube_direct._header['BTYPE'] = 'Temperature'
 tcube_direct._header['BUNIT'] = 'K'
 cube303m._header['BTYPE'] = 'flux'
-hdulist = fits.HDUList([cube303m.hdu, tcube_direct.hdu])
-hdu  = cube303m.hdu
-hdu.data = np.rollaxis(np.array([cube303m.hdu.data, tcube_direct.hdu.data]),0,3)
+#hdulist = fits.HDUList([cube303m.hdu, tcube_direct.hdu])
+#hdu  = cube303m.hdu
+#hdu.data = np.rollaxis(np.array([cube303m.hdu.data, tcube_direct.hdu.data]),0,3)
 
 
-ytds = yt.load(fits.HDUList(hdu), nan_mask=0.0, z_axis_decomp=True)
+#ytds = yt.load(fits.HDUList(hdu), nan_mask=0.0, z_axis_decomp=True)
+hdu1 = cube303m.hdu
+hdu1.header['BTYPE'] = 'Brightness'
+hdu1.header['BUNIT'] = 'K'
+hdu2 = tcube_direct.hdu
+hdu2.header['BTYPE'] = 'tkin'
+hdu2.header['BUNIT'] = 'K'
+ytds = yt.frontends.fits.FITSDataset(hdu1, auxiliary_files=[hdu2])
 
 ytds.periodicity = (True,)*3
 
