@@ -21,7 +21,9 @@ hdu1.header['BUNIT'] = 'K'
 hdu2 = tcube_direct.hdu
 hdu2.header['BTYPE'] = 'tkin'
 hdu2.header['BUNIT'] = 'K'
-ytds = yt.frontends.fits.FITSDataset(hdu1, auxiliary_files=[hdu2])
+ytds = yt.frontends.fits.FITSDataset(hdu1, auxiliary_files=[hdu2],
+                                     nan_mask=0.0,
+                                     z_axis_decomp=True)
 
 ytds.periodicity = (True,)*3
 
@@ -30,29 +32,39 @@ surface = ytds.surface(ytds.all_data(), ('fits','brightness'), 0.2)
 surface.export_sketchfab(title='H2CO brightness colored by temperature',
                          description='none', color_field='tkin',
                          color_log=False, color_map='Blue-Red',
-                         #color_field_min=20, color_field_max=300,
+                         color_field_min=20, color_field_max=200,
+                         #dist_fac=[0.2,1,1],
                         )
 
-surface.export_obj('h2co_temperatures'.format(level),
+surface.export_obj('h2co_temperatures',
                    color_field='tkin', color_log=False,
                    color_map='Blue-Red',
-                   #color_field_min=20, color_field_max=300,
+                   color_field_min=20, color_field_max=200,
+                   #dist_fac=[0.2,1,1],
                    #transparency=0.5,
                   )
 
 surface.export_sketchfab(title='H2CO brightness colored by temperature',
                          description='none', color_field='tkin',
                          color_log=False, color_map='Blue-Red',
-                         #color_field_min=20, color_field_max=300,
+                         color_field_min=20, color_field_max=200,
+                         #dist_fac=[0.2,1,1],
                         )
 
-for level in (0.1,0.2,0.3,0.4,0.5,0.6):
+for index,level in enumerate((0.1,0.2,0.3,0.4,0.5,0.6)):
 
+    surface = ytds.surface(ytds.all_data(), ytds.field_list[0], level)
 
-    surface = ytds.surface(ytds_sm.all_data(), ytds_sm.field_list[0], level)
-
-    surface.export_ply('h2co_temperatures_cut{0:f}.ply'.format(level),
-                       color_field='tkin', color_log=False,
-                       color_map='Blue-Red',
-                       #color_field_min=20, color_field_max=300,
+    # in principle, should be able to output multiple layers to the same
+    # obj file to get layered transparency.  In practice, this has never
+    # worked
+    surface.export_obj('h2co_temperatures_cut{0:f}.obj'.format(level),
+                       transparency=level,
+                       plot_index=index,
+                       #color_field='tkin',
+                       #color_log=False,
+                       #color_map='Blue-Red',
+                       #color_field_min=20,
+                       #color_field_max=200,
+                       #dist_fac=[5,1,1],
                       )
