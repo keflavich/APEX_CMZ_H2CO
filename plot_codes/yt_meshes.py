@@ -40,7 +40,7 @@ surface.export_obj('h2co_temperatures',
                    color_field='tkin', color_log=False,
                    color_map='Blue-Red',
                    color_field_min=20, color_field_max=200,
-                   #dist_fac=[0.2,1,1],
+                   #dist_fac=[5,1,1],
                    #transparency=0.5,
                   )
 
