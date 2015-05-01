@@ -226,6 +226,24 @@ class paraH2COmodel(object):
                         linmindens=None,
                         mindens=None, emindens=0.2,
                         linewidth=None):
+        """
+        Set parameter constraints from a variety of inputs.  This will fill in
+        a variety of .chi2_[x] values.
+
+        All errors are 1-sigma Gaussian errors.
+
+        The ``taline`` parameters are only used as lower limits.  
+
+        Logabundance and logh2column are both log_10 values, so the errorbars
+        are effectively lognormal 1-sigma errors.
+
+        The ratios are generally the most important constraints.
+
+        A minimum volume density, with 1-sigma lognormal one-sided error
+        ``emindens``, can be included.  ``mindens`` is logarithmic, but you can
+        use ``linmindens`` instead.  ``linewidth`` also needs to be specified
+        in km/s.
+        """
 
         argspec=inspect.getargvalues(inspect.currentframe())
         for arg in argspec.args:
@@ -320,6 +338,8 @@ class paraH2COmodel(object):
 
     def get_parconstraints(self):
         """
+        If parameter constraints have been set with set_constraints or
+        set_constraints_fromrow
         """
         if not hasattr(self, 'chi2'):
             raise AttributeError("Run set_constraints first")
