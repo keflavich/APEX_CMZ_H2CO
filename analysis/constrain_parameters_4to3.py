@@ -137,12 +137,12 @@ class paraH2COmodel(object):
                                                             self.modelratio_404_303)
             return chi2r
 
-    def grid_getmatch_422_404(self, ratio, eratio):
+    def grid_getmatch_422to404(self, ratio, eratio):
             match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio,
                                                             self.modelratio_422_404)
             return chi2r
 
-    def grid_getmatch_423_404(self, ratio, eratio):
+    def grid_getmatch_423to404(self, ratio, eratio):
             match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio,
                                                             self.modelratio_423_404)
             return chi2r
@@ -282,7 +282,7 @@ class paraH2COmodel(object):
         if np.all(~np.isfinite(self.chi2_r321303)):
             self.chi2_r321303 = 0
 
-        self.chi2_r423404 = (self.grid_getmatch_321to303(ratio423404,
+        self.chi2_r423404 = (self.grid_getmatch_423to404(ratio423404,
                                                          eratio423404)
                              if not any(arg is None for arg in (ratio423404,
                                                                 eratio423404))
@@ -290,7 +290,7 @@ class paraH2COmodel(object):
         if np.all(~np.isfinite(self.chi2_r423404)):
             self.chi2_r423404 = 0
 
-        self.chi2_r422404 = (self.grid_getmatch_321to303(ratio422404,
+        self.chi2_r422404 = (self.grid_getmatch_422to404(ratio422404,
                                                          eratio422404)
                              if not any(arg is None for arg in (ratio422404,
                                                                 eratio422404))
@@ -298,7 +298,7 @@ class paraH2COmodel(object):
         if np.all(~np.isfinite(self.chi2_r422404)):
             self.chi2_r422404 = 0
 
-        self.chi2_r404303 = (self.grid_getmatch_321to303(ratio404303,
+        self.chi2_r404303 = (self.grid_getmatch_404to303(ratio404303,
                                                          eratio404303)
                              if not any(arg is None for arg in (ratio404303,
                                                                 eratio404303))
@@ -306,7 +306,7 @@ class paraH2COmodel(object):
         if np.all(~np.isfinite(self.chi2_r404303)):
             self.chi2_r404303 = 0
 
-        self.chi2_r321322 = (self.grid_getmatch_321to303(ratio321322,
+        self.chi2_r321322 = (self.grid_getmatch_322to321(ratio321322,
                                                          eratio321322)
                              if not any(arg is None for arg in (ratio321322,
                                                                 eratio321322))
