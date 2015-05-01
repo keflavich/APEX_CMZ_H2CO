@@ -336,10 +336,16 @@ class paraH2COmodel(object):
                      self.chi2_r404303 + self.chi2_r423404 + self.chi2_r422404)
 
 
-    def get_parconstraints(self):
+    def get_parconstraints(self, chi2level=1.0):
         """
         If parameter constraints have been set with set_constraints or
         set_constraints_fromrow
+
+        Parameters
+        ----------
+        chi2level : float
+            The maximum Delta-chi^2 value to include: this will be used to
+            determine the min/max 1-sigma errorbars
         """
         if not hasattr(self, 'chi2'):
             raise AttributeError("Run set_constraints first")
@@ -351,7 +357,7 @@ class paraH2COmodel(object):
         for parname,pararr in zip(('temperature','column','density'),
                                   (self.temparr,self.columnarr,self.densityarr)):
             row['{0}_chi2'.format(parname)] = pararr.flat[indbest]
-            OK = deltachi2b<1
+            OK = deltachi2b<chi2level
             if np.count_nonzero(OK) > 0:
                 row['{0:1.1s}min1sig_chi2'.format(parname)] = pararr[OK].min()
                 row['{0:1.1s}max1sig_chi2'.format(parname)] = pararr[OK].max()
@@ -367,7 +373,7 @@ class paraH2COmodel(object):
 
         return row
 
-    def parplot(self, par1='dens', par2='col', nlevs=5):
+    def parplot(self, par1='dens', par2='col', nlevs=5, levels=None):
 
         xax = self.axes[par1]
         yax = self.axes[par2]
@@ -377,47 +383,50 @@ class paraH2COmodel(object):
                 ('dens','tem'): 2,
                 ('col','tem'): 1}[(par1,par2)]
 
+        if levels is None:
+            levels = np.arange(nlevs)
+
 
         fig = pl.gcf()
         fig.clf()
         if self.chi2_r321303 is not 0:
             ax1 = pl.subplot(2,3,1)
             pl.contourf(xax, yax, self.chi2_r321303.min(axis=axis),
-                        levels=self.chi2_r321303.min()+np.arange(nlevs), alpha=0.5)
+                        levels=self.chi2_r321303.min()+levels, alpha=0.5)
             pl.contour(xax, yax, self.chi2.min(axis=axis),
-                       levels=self.chi2.min()+np.arange(nlevs))
+                       levels=self.chi2.min()+levels)
             if self.chi2_r321322:
                 pl.contour(xax, yax, self.chi2_r321322.min(axis=axis),
-                           levels=self.chi2_r321322.min()+np.arange(nlevs),
+                           levels=self.chi2_r321322.min()+levels,
                            cmap=pl.cm.bone)
             pl.title("Ratio $3_{2,1}-2_{2,0}/3_{0,3}-2_{0,2}$")
 
         if self.chi2_r404303 is not 0:
             ax5 = pl.subplot(2,3,5)
             pl.contourf(xax, yax, self.chi2_r404303.min(axis=axis),
-                        levels=self.chi2_r404303.min()+np.arange(nlevs), alpha=0.5)
+                        levels=self.chi2_r404303.min()+levels, alpha=0.5)
             pl.contour(xax, yax, self.chi2.min(axis=axis),
-                       levels=self.chi2.min()+np.arange(nlevs))
+                       levels=self.chi2.min()+levels)
             pl.title("Ratio $4_{0,4}-3_{2,2}/3_{0,3}-2_{0,2}$")
 
         if self.chi2_r422404 is not 0:
             ax6 = pl.subplot(2,3,6)
             pl.contourf(xax, yax, self.chi2_r422404.min(axis=axis),
-                        levels=self.chi2_r422404.min()+np.arange(nlevs), alpha=0.5)
+                        levels=self.chi2_r422404.min()+levels, alpha=0.5)
             pl.contour(xax, yax, self.chi2.min(axis=axis),
-                       levels=self.chi2.min()+np.arange(nlevs))
+                       levels=self.chi2.min()+levels)
             if self.chi2_r423404 is not 0:
                 pl.contour(xax, yax, self.chi2_r423404.min(axis=axis),
-                           levels=self.chi2_r423404.min()+np.arange(nlevs),
+                           levels=self.chi2_r423404.min()+levels,
                            cmap=pl.cm.bone)
             pl.title("Ratio $4_{2,2}-3_{2,1}/4_{0,4}-3_{2,2}$")
 
         ax4 = pl.subplot(2,3,2)
         if hasattr(self.chi2_X, 'size'):
             pl.contourf(xax, yax, self.chi2_X.min(axis=axis),
-                        levels=self.chi2_X.min()+np.arange(nlevs), alpha=0.5)
+                        levels=self.chi2_X.min()+levels, alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
-                   levels=self.chi2.min()+np.arange(nlevs))
+                   levels=self.chi2.min()+levels)
         pl.title("log(p-H$_2$CO/H$_2$) "
                  "$= {0:0.1f}\pm{1:0.1f}$".format(self.logabundance,
                                                   self.elogabundance))
@@ -425,21 +434,21 @@ class paraH2COmodel(object):
         ax3 = pl.subplot(2,3,3)
         if hasattr(self.chi2_h2, 'size'):
             pl.contourf(xax, yax, self.chi2_h2.min(axis=axis),
-                        levels=self.chi2_h2.min()+np.arange(nlevs), alpha=0.5)
+                        levels=self.chi2_h2.min()+levels, alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
-                   levels=self.chi2.min()+np.arange(nlevs))
+                   levels=self.chi2.min()+levels)
         pl.title("Total log$(N(\\mathrm{{H}}_2))$ ")
         #         "= {0:0.1f}\pm{1:0.1f}$".format(self.logh2column,
         #                                         self.elogh2column))
         ax5 = pl.subplot(2,3,4)
         #if hasattr(self.chi2_ff1, 'size'):
         #    pl.contourf(xax, yax, (self.chi2_ff1.min(axis=axis)),
-        #                levels=self.chi2_ff1.min()+np.arange(nlevs), alpha=0.5)
+        #                levels=self.chi2_ff1.min()+levels, alpha=0.5)
         if hasattr(self.chi2_dens, 'size'):
             pl.contourf(xax, yax, (self.chi2_dens.min(axis=axis)),
-                        levels=self.chi2_dens.min()+np.arange(nlevs), alpha=0.5)
+                        levels=self.chi2_dens.min()+levels, alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
-                   levels=self.chi2.min()+np.arange(nlevs))
+                   levels=self.chi2.min()+levels)
         pl.contour(xax, yax, (self.tline303 < 10*self.taline303).max(axis=axis),
                    levels=[0.5], colors='k')
         #pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis), levels=[0.5], colors='k')
