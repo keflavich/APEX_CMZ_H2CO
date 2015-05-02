@@ -227,7 +227,7 @@ class paraH2COmodel(object):
 
         if mindens is not None:
             self.chi2_dens = (((self.densityarr - mindens)/emindens)**2
-                              * (self.densityarr < (mindens-emindens)))
+                              * (self.densityarr < mindens))
         else:
             self.chi2_dens = 0
 
@@ -270,7 +270,7 @@ class paraH2COmodel(object):
 
         return row
 
-    def parplot(self, par1='dens', par2='col', nlevs=5):
+    def parplot(self, par1='col', par2='dens', nlevs=5):
 
         xax = self.axes[par1]
         yax = self.axes[par2]
@@ -322,8 +322,9 @@ class paraH2COmodel(object):
                         levels=self.chi2_dens.min()+np.arange(nlevs), alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
                    levels=self.chi2.min()+np.arange(nlevs))
-        pl.contour(xax, yax, (self.tline303 < 10*self.taline303).max(axis=axis),
-                   levels=[0.5], colors='k')
+        if hasattr(self, 'taline303'):
+            pl.contour(xax, yax, (self.tline303 < 10*self.taline303).max(axis=axis),
+                       levels=[0.5], colors='k')
         #pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis), levels=[0.5], colors='k')
         #pl.contour(xax, yax, (tline321 < 10*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
         #pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
