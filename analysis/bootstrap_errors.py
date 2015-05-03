@@ -2,6 +2,15 @@
 Determine what the real errors in the model are given errors on the parameters
 by finding the best fit model for a series of measurements within the measured
 error distribution
+
+EDIT 5/3/2015: After some further thinking, this approach doesn't really make sense.
+We already have the likelihood of the model given the data.  This computes the
+distribution of the maximum-likelihood model, which simply isn't the same
+thing.
+
+However, I think we *can* take the modeled parconstraints and sample from
+within those to see what ratios we get out and whether that distribution matches
+the input distribution.  
 """
 import numpy as np
 from constrain_parameters import paraH2COmodel
