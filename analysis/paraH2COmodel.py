@@ -5,7 +5,7 @@ import numpy as np
 from scipy.ndimage.interpolation import map_coordinates
 from astropy import units as u
 from astropy import log
-import pylab as pl
+from scipy import stats
 
 from h2co_modeling import grid_fitter
 
@@ -50,7 +50,8 @@ class generic_paraH2COmodel(object):
         return chi2X
 
 
-    def get_parconstraints(self, chi2level=1.0):
+    def get_parconstraints(self,
+                           chi2level=stats.chi2.ppf(stats.norm.cdf(1)-stats.norm.cdf(-1), 3)):
         """
         If parameter constraints have been set with set_constraints or
         set_constraints_fromrow
