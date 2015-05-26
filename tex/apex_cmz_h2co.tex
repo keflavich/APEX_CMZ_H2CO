@@ -18,12 +18,15 @@ in other galactic centers, the dense gas is warmer than the dust.}
 (CMZ) and determine what drives it.}
 {We have mapped the inner 300 pc of the CMZ in the temperature-sensitive
 $J=3-2$ para-formaldehyde (\para) transitions, which have critical and effective
-densities both $n\gtrsim10^5$ \percc.}
-{We produce temperature maps and cubes and publish all data in FITS form; they
-can be recovered from digital object identifier \texttt{doi:10.7910/DVN/27601}.
-Gas temperatures in the Galactic center range from $\sim60$ K to $>100$ K in
+densities both $n\gtrsim10^5$ \percc.  We use the ratio of the \threeohthree /
+\threetwoone line to determine the gas temperature.
+We produce temperature maps and cubes with 30\arcsec and 1 \kms resolution and
+publish all data in FITS form; they can be recovered from digital object
+identifier \texttt{doi:10.7910/DVN/27601}.}
+{Gas temperatures in the Galactic center range from $\sim60$ K to $>100$ K in
 selected regions.  Gas temperatures are consistent with purely turbulent
-heating, though cosmic ray heating may also be significant.  We infer an upper
+heating, though cosmic ray heating still affects less turbulent clouds.  We
+infer an upper
 limit on the cosmic ray ionization rate $\zeta_{CR}<10^{-14}$ \pers. 
 The highest gas temperatures $T>100$ K are observed around the Sgr B2 cores, in
 the extended Sgr B2 cloud, the 20 \kms and 50 \kms clouds, and in `The Brick'
@@ -100,8 +103,9 @@ ammonia metastable inversion transition thermometer \citep[\ammonia (1,1) -
 (7,7);][]{Guesten1981a,Huettemeister1993a,Ott2014a,Mauersberger1986a}, which is
 sensitive to moderate density gas \citep[$n(\hh) \sim 10^3-10^4$
 \percc;][]{Shirley2015a}.  While this thermometer is generally reliable in cold
-regions, the population of the higher energy states \emph{may} be affected by
-`formation heating', a mechanism recently discovered to affect H$_3$O+ in the
+regions (e.g., the (1-1)/(2-2) ratio is accurate to $T\lesssim40$ K), the
+population of the higher energy states \emph{may} be affected by `formation
+heating', a mechanism recently discovered to affect H$_3$O+ in the
 CMZ and suggested to affect \ammonia, in which the excess energy from molecule
 formation leaves a significant fraction of the molecules in a rotationally
 excited state \citep[][]{Lis2014a}, so confirmation of high temperatures seen
@@ -537,7 +541,7 @@ change dramatically with small changes in the selected parameters.  The number
 and location of voxels included in the catalog is, however, relatively robust
 against small parameter changes.
 
-For each extracted blob, we measured the corresponding integrated and peak
+For each extracted clump, we measured the corresponding integrated and peak
 emission in the \threeohthree, \threetwoone, and \thirteenco cubes.  We also extracted the mean
 dust temperature and column density from SED fits to Herschel HiGal 170-500\um
 maps \citep{Molinari2010a,Traficante2011a}.  The SED fits were performed on
@@ -567,7 +571,7 @@ shown in Figure \ref{fig:regions}.
 \label{sec:linemodeling}
 We use RADEX \citep{van-Der-Tak2007a} and a related solver (Fujun Du's
 \texttt{myRadex}; \url{https://github.com/fjdu/myRadex}) to create model grids
-for the p-\formaldehyde lines over a grid of 20 density ($n=10^{2.5}$-$10^{7}$
+for the p-\formaldehyde lines over a grid of 20 densities ($n=10^{2.5}$-$10^{7}$
 \percc), a fixed assumed\footnote{The line gradient is selected because
 observed line widths have FWHM larger than 5 \kms in 30\arcsec (1.2 pc) beams
 throughout the CMZ.  The temperature measurements are
@@ -593,7 +597,9 @@ velocity\footnote{We assume the \methanol and \formaldehyde lines have the same
 centroid velocity, and we find no counterexamples to that assumption within our
 data.}, the line width ($\sigma$), the ratio $R_1 = \Rone$, the ratio $R_2 =
 \Rtwo$, and the
-amplitude of the \methanol \fourtwotwo line, where $S_\nu$ is the surface
+amplitude of the \methanol \fourtwotwo line\footnote{The parameters $R_2$ and
+the \methanol brightness are essential for fully fitting the spectrum, but they
+are not used for further analysis.}, where $S_\nu$ is the surface
 brightness.  For these spectra, we performed a different baseline subtraction
 to that described in Section
 \ref{sec:baseline}.  We first fit the described 6-parameter model, then fit a
@@ -655,7 +661,10 @@ statistical uncertainty is much smaller than the systematic unknowns, including
 the dust opacity per unit mass, the presence of multiple line-of-sight cloud
 components, and the presence of multiple temperature components within any
 given cloud.}.  We treat the error as $10\times$ (instead of $\sim2-3\times$)
-to account for the additional uncertainty in the abundance of \para.  To
+to account for the additional uncertainty in the abundance of \para.
+The effective range of $N(\para)$ is therefore $10^{12} < N < 10^{15}$ \persc,
+allowing for $10^{22} < N(\hh) < 10^{23}$ \persc and $\pm1\sigma$ in abundance.
+To
 constrain the dust density, we assume the selected area has a mass given by the
 Herschel dust-derived mass and a spherical volume, which sets a conservative
 (but nonetheless highly constraining) lower limit on the volume density.
@@ -668,9 +677,11 @@ parameter space in the multi-paneled Figures
 \ref{fig:coltemconstraints}-\ref{fig:parsonbrightness}.  The fitted parameters
 are displayed in Figure \ref{fig:parsonbrightness}.
 
-While $R_2$ can, in some cases, provide significant constraints on various
-parameters, we do not use it because of the ambiguity imposed by the overlap
-with the \methanol \fourtwotwo line.
+While $R_2$ can provide significant constraints on various parameters, we do
+not use it for our general analysis because of the ambiguity imposed by the
+overlap with the \methanol \fourtwotwo line.  Blending between the \methanol
+\fourtwotwo and \formaldehyde \threetwotwo line occurs frequently, in $\sim1/4$
+of all sightlines.
 
 % TODO: bootstrap-ish analysis?  For a given *known* set of physical parameters,
 % what will we derive?
@@ -687,9 +698,9 @@ errors are shown in the legend as in Figure \ref{fig:twospectra_hotcold}.}
 
 
 
-\subsection{Blob modeling}
+\subsection{Clump modeling}
 \label{sec:dendromod}
-We derived temperatures for each dendrogram catalog blob using the same
+We derived temperatures for each dendrogram catalog clump using the same
 measured quantities as in Section \ref{sec:linemodeling} as constraints.  The
 $\chi^2$ grid approach described in Section \ref{sec:linemodeling} was used to
 extract the temperature and associated error.
@@ -724,9 +735,11 @@ $X_{\formaldehyde} = 1.2\ee{-9}$.
 \label{sec:formaldehydetemmap}
 Using the relations shown in Figure \ref{fig:ratiovstem}, we converted the
 ratio map shown in Figure \ref{fig:ratiomaps} to a temperature map in Figure
-\ref{fig:temmapnosmooth}a.  Because this map includes the full line-of-sight integrated
-emission, there are many regions where multiple independent components are
-being mixed.
+\ref{fig:temmapnosmooth} with a constant abundance $X(\formaldehyde)=1.2\ee{-9}$ 
+and two constant densities $n=10^4$ (Figure \ref{fig:temmapnosmooth}a/b) and
+$n=10^5$ \percc (Figure \ref{fig:temmapnosmooth}c).  Because this map includes
+the full line-of-sight integrated emission, there are many regions where
+multiple independent components are being mixed.
 
 %Figure \ref{fig:temmap}b shows a temperature map created by measuring the
 %temperature in each clump from the dendrogram clump extraction based on the
@@ -807,7 +820,7 @@ and using the $n=10^4$ \percc curve
 from Figure \ref{fig:ratiovstem} to derive temperature.  (b) A Galactic
 longitude-velocity map of peak
 signal-to-noise along Galactic latitude, which is used as a mask in (a).  The
-apparently cold blobs at -80 \kms in Sgr
+apparently cold clumps at -80 \kms in Sgr
 B2 and -90 \kms in Sgr A are from a different line, HC$_3$N 24-23: the
 temperatures from these positions are meaningless.
 The apparent high temperatures around the cloud edges are artifacts caused by
@@ -1074,7 +1087,7 @@ between the predicted temperature and observed temperature is fairly good.
 To explore the possibility that our cooling rates are underestimated, we examine
 a particular clump from the catalog, with $n=10^{4.2}$ \percc, $\sigma=8.6
 f_g = 14.3$\kms, $L = 2r = 2(0.588)f_g = 1.65$ pc (beam-deconvolved), $T_D=21$ K,
-and $T_{D,rad} = 1.2$ K.  This blob has a predicted temperature $T=156$ K,
+and $T_{D,rad} = 1.2$ K.  This clump has a predicted temperature $T=156$ K,
 but a measured temperature $T=91$ K.  With local chemistry, the dominant
 coolant is CO by 2 orders of magnitude.  In \texttt{DESPOTIC}, we set chemical
 equilibrium using the \citet{Nelson1999a} chemical network code and find that
@@ -1089,7 +1102,7 @@ accounted for when predicting the gas temperature.
 We may be able to further constrain the heating mechanisms using this same data
 set if more precise velocity structure information is obtained for the clouds.
 Better velocity structure measurements can be achieved by combining line
-fitting analysis with systematic blob extraction in order to avoid using the
+fitting analysis with systematic clump extraction in order to avoid using the
 extrapolated correction factors.  This analysis is left for a future work.
 
 
@@ -1340,6 +1353,9 @@ densities than the \formaldehyde 3-2 transitions by a few orders of magnitude,
 $n_{crit}(\textrm{\ammonia}~(1,1))\sim1\ee{3}$ \percc while $n_{crit}(\para~
 \threeohthree)\sim8\ee{5}$ \percc and $n_{eff}(\textrm{\ammonia}~(1,1))\sim1e3$
 while $n_{eff}(\para~\threeohthree)\sim1\ee{5}$ \citep[][]{Shirley2015a}.
+The energy levels of the \threeohthree and \threetwoone lines are 21 and 68 K
+respectively, while p-\ammonia \oneone, \twotwo, and \fourfour have $E_U = 1,
+42, $ and $178$ K.
 
 The temperatures derived from the \ammonia line ratio may be lower for a
 variety of reasons.  The lower critical density means that \ammonia is
