@@ -1,6 +1,7 @@
 import pylab as pl
 import numpy as np
 from constrain_parameters import paraH2COmodel
+import paths
 
 mf = paraH2COmodel()
 mf.set_constraints(ratio321303=0.35, eratio321303=0.01, logh2column=23,
@@ -18,6 +19,14 @@ pl.figure(3)
 mf.parplot1d('col')
 pl.figure(4)
 mf.parplot1d_all(levels=[0.68268949213708585])
+pl.savefig(paths.fpath('param_fits/oned_fit_parameters_example.png'),
+           bbox_inches='tight')
+pl.figure(5)
+mf.denstemplot()
+pl.figure(7)
+mf.denscolplot()
+pl.figure(8)
+mf.coltemplot()
 
 pl.draw()
 pl.show()

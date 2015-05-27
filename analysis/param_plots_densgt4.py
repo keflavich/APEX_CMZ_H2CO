@@ -87,6 +87,10 @@ for row in fittable:
     ratio2 = row['spline_h2coratio322321']
     eratio2 = row['espline_h2coratio322321']
 
+    if ratio == 0 or np.isnan(ratio):
+        print("Skipped {0} because it had no fit ratio".format(row['Source_Name']))
+        continue
+
     # We can impose a "loose" abundance constraint
     # Given that we know the H2 density, and the line width is ~5-10 km/s,
     # abundance = column / pc / density

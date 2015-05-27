@@ -4,6 +4,8 @@ plus whatever other constraints are available
 """
 import inspect
 import time
+import collections
+import warnings
 
 import numpy as np
 from scipy.ndimage.interpolation import map_coordinates
@@ -348,10 +350,13 @@ class paraH2COmodel(generic_paraH2COmodel):
         ax.vlines((xexpect_v2,), 0, like.max(), linestyle='--', color='c',
                   zorder=-1)
         print("par:{4} xmaxlike: {0}, xexpect: {1}, xexpect_v2: {2},"
-              "maxlike: {3}".format(xmaxlike, xexpect, xexpect_v2, like.max(),
-                                    par))
+              "maxlike: {3}, diff:{5}"
+              .format(xmaxlike, xexpect, xexpect_v2, like.max(), par,
+                      xexpect-xmaxlike))
 
         if levels is not None:
+            if not isinstance(levels, collections.Iterable):
+                levels = [levels]
             cdf_inds = np.argsort(like)
             ppf = 1-like[cdf_inds].cumsum()
             cutoff_likes = [like[cdf_inds[np.argmin(np.abs(ppf-lev))]]
@@ -366,7 +371,8 @@ class paraH2COmodel(generic_paraH2COmodel):
                 print("Levels: {0}".format(levels))
                 if np.abs(like[selection].sum() - levels[0]) > 0.05:
                     # we want the sum of the likelihood to be right!
-                    import ipdb; ipdb.set_trace()
+                    #import ipdb; ipdb.set_trace()
+                    warnings.warn("Likelihood is not self-consistent.")
 
 
 
