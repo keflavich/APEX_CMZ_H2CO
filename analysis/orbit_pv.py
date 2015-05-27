@@ -236,9 +236,9 @@ for weight in ("","_weighted"):
         #F.show_markers([offset_to_point(0.47, -0.01)],[30.404e3], edgecolor='r', marker='x')
         #F.show_markers([offset_to_point(0.38, 0.04)], [39.195e3], edgecolor='b', marker='x')
         #F.show_markers([offset_to_point(0.253, 0.016)], [36.5e3], edgecolor='purple', marker='x')
-        ax.plot(offset_to_point(0.47, -0.01),30.404, color='r', marker='x')
-        ax.plot(offset_to_point(0.38, 0.04), 39.195, color='b', marker='x')
-        ax.plot(offset_to_point(0.253, 0.016), 36.5, color='purple', marker='x')
+        ax.plot(offset_to_point(0.47, -0.01),30.404, color='r', marker='x', markersize=25)
+        ax.plot(offset_to_point(0.38, 0.04), 39.195, color='b', marker='x', markersize=25)
+        ax.plot(offset_to_point(0.253, 0.016), 36.5, color='purple', marker='x', markersize=25)
 
         #F.refresh()
         #F._ax1.set_ylabel("$V_{LSR} (\mathrm{km\ s}^{-1})$")
@@ -329,9 +329,9 @@ for weight in ("","_weighted"):
         F2.recenter(0, -0.03, width=1.8, height=0.3)
         F2.set_tick_labels_format('d.dd','d.dd')
 
-        F2.show_markers([0.47], [-0.01], edgecolor='r', marker='x', zorder=1500)
-        F2.show_markers([0.38], [0.04], edgecolor='b', marker='x', zorder=1500)
-        F2.show_markers([0.253], [0.016], edgecolor='purple', marker='x', zorder=1500)
+        F2.show_markers([0.47], [-0.01], edgecolor='r', marker='x', s=25, zorder=1500)
+        F2.show_markers([0.38], [0.04], edgecolor='b', marker='x', s=25, zorder=1500)
+        F2.show_markers([0.253], [0.016], edgecolor='purple', marker='x', s=25, zorder=1500)
 
         F2.save(fpath('orbits/KDL2014_orbitpath_on_{0}{1}.pdf'.format(molecule, weight)))
 

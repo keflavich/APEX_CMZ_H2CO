@@ -1,19 +1,19 @@
+import matplotlib
+from paths import hpath, apath, fpath, pcpath
+matplotlib.rc_file(pcpath('pubfiguresrc'))
 import numpy as np
 import pylab as pl
-import matplotlib
 
 from astropy.table import Table, Column
 from astropy import log
 from astropy import units as u
 from scipy.interpolate import PiecewisePolynomial
 
-from paths import hpath, apath, fpath, pcpath
 from temperature_mapper import ph2cogrid, TemperatureMapper
 from dendrograms import (catalog, catalog_sm, dend, dendsm)
 import heating
 import gaussian_correction
 
-matplotlib.rc_file(pcpath('pubfiguresrc'))
 
 if 'tm' not in locals():
     tm = TemperatureMapper(logdensities=[3,4,5])
@@ -84,7 +84,8 @@ for cat,dendro,smooth in zipped[:1]:
         ax1.set_xscale('log')
         ax1.set_xlabel("Size Scale (pixels?)")
         ax1.set_ylabel("Temperature (K)")
-    fig1.savefig(fpath('dendrotem/area_vs_temperature{0}.pdf'.format(smooth)))
+    fig1.savefig(fpath('dendrotem/area_vs_temperature{0}.pdf'.format(smooth)),
+                 bbox_inches='tight')
 
     fig2, ax2 = pl.subplots(num=2)
     for mask,color,alpha,markersize in masks_colors:
@@ -96,7 +97,8 @@ for cat,dendro,smooth in zipped[:1]:
                      color=color, linewidth=0.3)
         ax2.set_xlabel("Ratio $S(3_{2,1}-2_{2,0})/S(3_{0,3}-2_{0,2})$")
         ax2.set_ylabel("Temperature (K)")
-    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}.pdf'.format(smooth)))
+    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}.pdf'.format(smooth)),
+                 bbox_inches='tight')
 
     if not hasattr(tm, 'temperatures'):
         tm.init()
@@ -109,7 +111,8 @@ for cat,dendro,smooth in zipped[:1]:
     L3, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e5], tm.temperatures, 'k:',  label=r'$n(H_2)=10^5$ cm$^{-3}$', zorder=-5)
     leg = pl.legend(loc='best')
     ax2.axis([0,0.55,10,200])
-    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay.pdf'.format(smooth)))
+    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay.pdf'.format(smooth)),
+                 bbox_inches='tight')
 
     L4, = ax2.plot(tm2.Xarr[1.2e-9]['ratio1'][1e4],
                    tm2.temperatures, 'b--', alpha=0.2,
@@ -117,12 +120,14 @@ for cat,dendro,smooth in zipped[:1]:
     L5, = ax2.plot(tm3.Xarr[1.2e-9]['ratio1'][1e4],
                    tm3.temperatures, 'r--', alpha=0.2,
                    label=r'$n(H_2)=10^4$ cm$^{-3}$, $dv=1$ km s$^{-1}$', zorder=-10)
-    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_dv.pdf'.format(smooth)))
+    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_dv.pdf'.format(smooth)),
+                 bbox_inches='tight')
     L4.set_visible(False)
     L5.set_visible(False)
 
     ax2.set_yscale('log')
-    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_log.pdf'.format(smooth)))
+    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_log.pdf'.format(smooth)),
+                 bbox_inches='tight')
     ax2.set_yscale('linear')
 
     L1.set_visible(False)
@@ -180,7 +185,8 @@ for cat,dendro,smooth in zipped[:1]:
         #l0, = ax2.plot(x, func(x), 'k-', alpha=0.5, zorder=-10)
         #ax2.set_xlim(0.,0.6)
         #ax2.set_ylim(0.,350)
-        #fig2.savefig(fpath('dendrotem/ratio_vs_temperature_piecewise{0}.pdf'.format(smooth)))
+        #fig2.savefig(fpath('dendrotem/ratio_vs_temperature_piecewise{0}.pdf'.format(smooth)),
+        #bbox_inches='tight')
         #l1, = ax2.plot(x, p1(x), 'k--', alpha=0.5)
         #l2, = ax2.plot(x, p2(x), 'k:', alpha=0.5)
         #l3, = ax2.plot(x, p3(x), 'k-.', alpha=0.5)
@@ -194,7 +200,8 @@ for cat,dendro,smooth in zipped[:1]:
         log.info("Polynomial parameters: {0}".format(pars))
         ax2.plot(x, np.polyval(pars, x), 'r--', alpha=0.5)
         ax2.axis([0,0.55,0,200])
-        fig2.savefig(fpath('dendrotem/ratio_vs_temperature_powerlaw.pdf'))
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature_powerlaw.pdf'),
+                     bbox_inches='tight')
 
     elif cat is catalog_sm:
         sel = cat['ratio303321'][ok] < 0.6
@@ -205,7 +212,8 @@ for cat,dendro,smooth in zipped[:1]:
                       label=r"$y={0:0.2f}x^2 {1:+0.2f}x {2:+0.2f}$".format(*pars))
         ax2.axis([0,0.55,0,200])
         pl.legend(loc='lower right')
-        fig2.savefig(fpath('dendrotem/ratio_vs_temperature_powerlaw_smooth.pdf'))
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature_powerlaw_smooth.pdf'),
+                     bbox_inches='tight')
         
 
     fig3, ax3 = pl.subplots(num=3)
@@ -231,7 +239,8 @@ for cat,dendro,smooth in zipped[:1]:
         ax4b.set_xlabel("Density from dust")
         ax4b.set_ylabel("Temperature")
         ax4b.set_xlim(*ax4a.get_xlim())
-    fig4.savefig(fpath("dendrotem/temperature_vs_density{0}.pdf".format(smooth)))
+    fig4.savefig(fpath("dendrotem/temperature_vs_density{0}.pdf".format(smooth)),
+                 bbox_inches='tight')
 
     fig5, ax5 = pl.subplots(num=5)
     lon = cat['x_cen']
@@ -251,7 +260,8 @@ for cat,dendro,smooth in zipped[:1]:
         ax5.set_xlabel("Galactic Longitude")
         ax5.set_ylabel("Temperature (K)")
     ax5.set_ylim([0,150])
-    fig5.savefig(fpath('dendrotem/temperature_vs_longitude{0}.pdf'.format(smooth)))
+    fig5.savefig(fpath('dendrotem/temperature_vs_longitude{0}.pdf'.format(smooth)),
+                 bbox_inches='tight')
 
     fig5 = pl.figure(5)
     fig5.clf()
@@ -284,7 +294,8 @@ for cat,dendro,smooth in zipped[:1]:
     sm._A = []
     cb = fig5.colorbar(sm)
     cb.set_label(cblabel)
-    fig5.savefig(fpath('dendrotem/temperature_vs_longitude_velocolor{0}.pdf'.format(smooth)))
+    fig5.savefig(fpath('dendrotem/temperature_vs_longitude_velocolor{0}.pdf'.format(smooth)),
+                 bbox_inches='tight')
 
 
     fig6, ax6 = pl.subplots(num=6)
@@ -382,7 +393,8 @@ for cat,dendro,smooth in zipped[:1]:
               linestyle=':', color='purple', label='$n=10^5$ cm$^{-3}$, $\zeta_{CR}=10^{-14}$ s$^{-1}$', zorder=-10, alpha=0.25, linewidth=4)
 
     ax12.set_ylim([0,150])
-    fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
+    fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
     wide = cat['v_rms']*gcorfactor > 48/np.sqrt(8*np.log(2))
     ax12.errorbar([50.5] * (wide & is_leaf).sum(),
                   cat['temperature_chi2'][wide&is_leaf],
@@ -395,7 +407,8 @@ for cat,dendro,smooth in zipped[:1]:
                   markersize=5,
                   marker='>', color='r')
     ax12.set_xlim([0,25])
-    fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity_xzoom{0}.pdf'.format(smooth)))
+    fig12.savefig(fpath('dendrotem/temperature_vs_rmsvelocity_xzoom{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
     fig22 = pl.figure(22)
     fig22.clf()
@@ -422,7 +435,9 @@ for cat,dendro,smooth in zipped[:1]:
     ax22.set_ylim([13,150])
     ax22.set_xlabel("HiGal Dust Temperature (K)")
     ax22.set_ylabel("Temperature (K)")
-    fig22.savefig(fpath('dendrotem/temperature_vs_dusttem{0}.pdf'.format(smooth)))
+    ax22.set_title("Dendrogram-selected regions")
+    fig22.savefig(fpath('dendrotem/temperature_vs_dusttem{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
     fig24 = pl.figure(24)
     fig24.clf()
@@ -441,7 +456,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax24.set_ylim([13,150])
     ax24.set_xlabel("HiGal Dust Column Density")
     ax24.set_ylabel("Temperature (K)")
-    fig24.savefig(fpath('dendrotem/temperature_vs_dustcol{0}.pdf'.format(smooth)))
+    fig24.savefig(fpath('dendrotem/temperature_vs_dustcol{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
     fig27 = pl.figure(27)
     fig27.clf()
@@ -455,7 +471,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax27.set_ylim([0,80])
     ax27.set_xlabel("HiGal Dust Column Density")
     ax27.set_ylabel("Line FWHM")
-    fig27.savefig(fpath('dendrotem/linewidth_vs_dustcol{0}.pdf'.format(smooth)))
+    fig27.savefig(fpath('dendrotem/linewidth_vs_dustcol{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
     #REMOVED in favor of DESPOTIC version
     # fig26 = pl.figure(26)
@@ -496,7 +513,8 @@ for cat,dendro,smooth in zipped[:1]:
     # ax26.set_xlabel("Turbulence-driven Temperature (K)")
     # ax26.set_ylabel("H$_2$CO Temperature (K)")
 
-    # fig26.savefig(fpath('dendrotem/temperature_vs_turbtemperature{0}.pdf'.format(smooth)))
+    # fig26.savefig(fpath('dendrotem/temperature_vs_turbtemperature{0}.pdf'.format(smooth)),
+    # bbox_inches='tight')
 
     # for mask,color,alpha,markersize in masks_colors:
     #     mask = (mask & (~hot_lolim) & ~is_leaf)
@@ -525,7 +543,8 @@ for cat,dendro,smooth in zipped[:1]:
     # ax26.set_ylim([0,155])
     # ax26.set_xlim([cat['tkin_turb'][is_leaf].min()-2,cat['tkin_turb'][is_leaf].max()+2])
 
-    # fig26.savefig(fpath('dendrotem/temperature_vs_turbtemperature_withtrunks{0}.pdf'.format(smooth)))
+    # fig26.savefig(fpath('dendrotem/temperature_vs_turbtemperature_withtrunks{0}.pdf'.format(smooth)),
+    # bbox_inches='tight')
 
     fig27 = pl.figure(27)
     fig27.clf()
@@ -577,7 +596,9 @@ for cat,dendro,smooth in zipped[:1]:
     ax27.set_xlabel("Turbulence-driven Temperature (K)")
     ax27.set_ylabel("H$_2$CO Temperature (K)")
 
-    fig27.savefig(fpath('dendrotem/temperature_vs_Despoticturbtemperature{0}.pdf'.format(smooth)))
+    ax27.set_title("Dendrogram-selected regions")
+    fig27.savefig(fpath('dendrotem/temperature_vs_Despoticturbtemperature{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
     for mask,color,alpha,markersize in masks_colors:
         mask = (mask & (~hot_lolim) & ~is_leaf) & (gcorfactor < 3)
@@ -617,7 +638,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax27.set_xlim([0,180])
     #ax27.set_xlim([cat['DespoticTem'][is_leaf].min()-2,cat['DespoticTem'][is_leaf].max()+2])
 
-    fig27.savefig(fpath('dendrotem/temperature_vs_Despoticturbtemperature_withtrunks{0}.pdf'.format(smooth)))
+    fig27.savefig(fpath('dendrotem/temperature_vs_Despoticturbtemperature_withtrunks{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
 
 
@@ -638,7 +660,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax25.set_xlabel("Ratio $R_1$")
     #ax25.set_axis_bgcolor((0.6,0.6,0.6))
     pl.colorbar(sc)
-    fig25.savefig(fpath('dendrotem/ratio_vs_density{0}.pdf'.format(smooth)))
+    fig25.savefig(fpath('dendrotem/ratio_vs_density{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
 
     fig13, ax13 = pl.subplots(num=13)
@@ -731,7 +754,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax14.set_xscale('log')
     ax14.set_xlabel("Area (square arcseconds)")
     ax14.set_ylabel("Ratio 321/303")
-    fig14.savefig(fpath('dendrotem/sgra_ratio_vs_sizescale{0}.pdf'.format(smooth)))
+    fig14.savefig(fpath('dendrotem/sgra_ratio_vs_sizescale{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
 
     fig15 = pl.figure(15)
@@ -741,7 +765,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax15.set_xscale('log')
     ax15.set_xlabel("Area (square arcseconds)")
     ax15.set_ylabel(r"$\bar{S_\nu}(3_{03}-2_{02})$")
-    fig15.savefig(fpath('dendrotem/flux303mean_vs_area{0}.pdf'.format(smooth)))
+    fig15.savefig(fpath('dendrotem/flux303mean_vs_area{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
     fig16 = pl.figure(16)
     fig16.clf()
@@ -751,7 +776,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax16.set_yscale('log')
     ax16.set_xlabel("Area (square arcseconds)")
     ax16.set_ylabel(r"$\Sigma S_\nu(3_{03}-2_{02})$")
-    fig16.savefig(fpath('dendrotem/flux303sum_vs_area{0}.pdf'.format(smooth)))
+    fig16.savefig(fpath('dendrotem/flux303sum_vs_area{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
 
     fig17 = pl.figure(17)
@@ -761,7 +787,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax17.set_xscale('log')
     ax17.set_xlabel("Area (square arcseconds)")
     ax17.set_ylabel(r"Temperature (K)")
-    fig17.savefig(fpath('dendrotem/temperature_vs_area{0}.pdf'.format(smooth)))
+    fig17.savefig(fpath('dendrotem/temperature_vs_area{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
     fig17.clf()
     ax17 = fig17.gca()
@@ -769,7 +796,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax17.set_xscale('log')
     ax17.set_xlabel(r"$\bar{S_\nu}(3_{03}-2_{02})$")
     ax17.set_ylabel(r"Temperature (K)")
-    fig17.savefig(fpath('dendrotem/temperature_vs_flux{0}.pdf'.format(smooth)))
+    fig17.savefig(fpath('dendrotem/temperature_vs_flux{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
     fig18 = pl.figure(18)
     fig18.clf()
@@ -778,7 +806,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax18.set_xscale('log')
     ax18.set_xlabel("Area (square arcseconds)")
     ax18.set_ylabel("Temperature (K)")
-    fig18.savefig(fpath('dendrotem/all_temperature_vs_sizescale{0}.pdf'.format(smooth)))
+    fig18.savefig(fpath('dendrotem/all_temperature_vs_sizescale{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
     fig19 = pl.figure(19)
     fig19.clf()
@@ -793,7 +822,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax19.axis([0.1,2,0.01,1])
     ax19.set_xscale('log')
     ax19.set_yscale('log')
-    fig19.savefig(fpath('dendrotem/S303vsS321{0}.pdf'.format(smooth)))
+    fig19.savefig(fpath('dendrotem/S303vsS321{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
     fig20 = pl.figure(20)
     fig20.clf()
@@ -803,7 +833,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax20.set_ylabel(r"$v_{cen}$")
     ax20.set_xlabel(r"Area")
     ax20.set_xscale('log')
-    fig20.savefig(fpath('dendrotem/vlsr_vs_area{0}.pdf'.format(smooth)))
+    fig20.savefig(fpath('dendrotem/vlsr_vs_area{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
 
     fig21 = pl.figure(21)
@@ -814,7 +845,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax21.set_ylabel(r"$v_{rms}=\sigma_v$")
     ax21.set_xlabel(r"Area")
     ax21.set_xscale('log')
-    fig21.savefig(fpath('dendrotem/vrms_vs_area{0}.pdf'.format(smooth)))
+    fig21.savefig(fpath('dendrotem/vrms_vs_area{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
     fig23 = pl.figure(23)
     fig23.clf()
@@ -839,7 +871,8 @@ for cat,dendro,smooth in zipped[:1]:
                highlight_monotonic=False,)
     ax23.set_xlabel(r"Line FWHM (km s$^{-1}$)")
     ax23.set_ylabel(r"H$_2$CO Temperature (K)")
-    fig23.savefig(fpath('dendrotem/dendro_temperature_vs_rmsvelocity{0}.pdf'.format(smooth)))
+    fig23.savefig(fpath('dendrotem/dendro_temperature_vs_rmsvelocity{0}.pdf'.format(smooth)),
+                  bbox_inches='tight')
 
 
 
@@ -859,14 +892,16 @@ for cat,dendro,smooth in zipped[:1]:
     dview.hub.select(1, structure)
     dview.ax_image.axis((710,740,131,154))
     dview.slice_slider.set_val(brick_coords[0])
-    dview.fig.savefig(fpath('dendrotem/dendrogram_viewer_brick{0}.pdf'.format(smooth)))
+    dview.fig.savefig(fpath('dendrotem/dendrogram_viewer_brick{0}.pdf'.format(smooth)),
+                      bbox_inches='tight')
 
     dview = dendro.viewer()
     structure = dendro.structure_at(sgra_coords).ancestor
     dview.hub.select(1, structure)
     dview.ax_image.axis([sgra_coords[2]-20, sgra_coords[2]+20, sgra_coords[1]-20, sgra_coords[1]+20])
     dview.slice_slider.set_val(sgra_coords[0])
-    dview.fig.savefig(fpath('dendrotem/dendrogram_viewer_sgra{0}.pdf'.format(smooth)))
+    dview.fig.savefig(fpath('dendrotem/dendrogram_viewer_sgra{0}.pdf'.format(smooth)),
+                      bbox_inches='tight')
 
 
     # SgrA total, 20kms, 50kms

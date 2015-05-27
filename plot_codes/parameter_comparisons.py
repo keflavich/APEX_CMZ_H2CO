@@ -1,14 +1,14 @@
+import matplotlib
+import paths
+matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 import os
 import pylab as pl
-import paths
 from astropy import table
 from paths import analysispath
 import numpy as np
 from astropy import coordinates
 from astropy import units as u
-import matplotlib
 import heating
-matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 pcfittable = table.Table.read(os.path.join(analysispath,
                                          'fitted_line_parameters_Chi2Constraints.ipac'),
@@ -113,6 +113,7 @@ ax6.plot(pcfittable['higaldusttem'][mask],
 
 ax6.set_ylim(10,150)
 ax6.set_xlim(15,30)
+ax6.set_title("Hand-selected regions")
 fig6.savefig(paths.fpath('chi2_temperature_vs_higaltemperature_fieldsandsources.pdf'),
                          bbox_inches='tight')
 
@@ -449,5 +450,6 @@ ax15.plot(pcfittable['tkin_turb'][mask],
          linestyle='none')
 
 ax15.set_ylim(10,150)
+ax15.set_title("Hand-selected regions")
 fig15.savefig(paths.fpath('chi2_temperature_vs_turbulenttemperature_fieldsandsources.pdf'),
                          bbox_inches='tight')
