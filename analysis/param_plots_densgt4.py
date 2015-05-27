@@ -20,7 +20,8 @@ from paths import analysispath, tpath
 from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
                                texgrid322, taugrid322, hdr)
 
-from h2co_modeling.constrain_parameters import paraH2COmodel
+# use the local constrain_parameters; h2co_modeling's version is... not exactly up to date.
+from constrain_parameters import paraH2COmodel
 from h2co_modeling import grid_fitter
 from astropy import table
 import despotic_heating as heating
