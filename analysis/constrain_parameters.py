@@ -194,7 +194,7 @@ class paraH2COmodel(generic_paraH2COmodel):
 
         if mindens is not None:
             self.chi2_dens = (((self.densityarr - mindens)/emindens)**2
-                              * (self.densityarr < (mindens-emindens)))
+                              * (self.densityarr < (mindens)))
         else:
             self.chi2_dens = 0
 
@@ -204,6 +204,7 @@ class paraH2COmodel(generic_paraH2COmodel):
         """
         Compute the total chi2 from the individual chi2 components
         """
+        self._parconstraints = None # not determined until get_parconstraints run
         self.chi2 = (self.chi2_X + self.chi2_h2 + self.chi2_ff1 + self.chi2_ff2
                      + self.chi2_r321322 + self.chi2_r321303 + self.chi2_dens)
 
@@ -232,19 +233,20 @@ class paraH2COmodel(generic_paraH2COmodel):
 
         xmaxlike = self.parconstraints['{0}_chi2'.format(short_mapping[par1])]
         ymaxlike = self.parconstraints['{0}_chi2'.format(short_mapping[par2])]
-        xexpect = self.parconstraints['E({0})'.format(short_mapping[par1])]
-        yexpect = self.parconstraints['E({0})'.format(short_mapping[par2])]
+        xexpect = self.parconstraints['expected_{0}'.format(short_mapping[par1])]
+        yexpect = self.parconstraints['expected_{0}'.format(short_mapping[par2])]
 
         fig = pl.gcf()
         fig.clf()
         ax1 = pl.subplot(2,2,1)
-        pl.contourf(xax, yax, self.chi2_r321303.min(axis=axis).swapaxes(*swaps),
-                    levels=self.chi2_r321303.min()+levels, alpha=0.5)
+        if self.chi2_r321303 is not 0:
+            pl.contourf(xax, yax, self.chi2_r321303.min(axis=axis).swapaxes(*swaps),
+                        levels=self.chi2_r321303.min()+levels, alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
                    levels=self.chi2.min()+levels)
-        pl.plot(xmaxlike, ymaxlike, 'o', facecolor='none', edgecolor='k')
-        pl.plot(xexpect, yexpect, 'x', facecolor='none', edgecolor='k')
-        if self.chi2_r321322:
+        pl.plot(xmaxlike, ymaxlike, 'o', markerfacecolor='none', markeredgecolor='k')
+        pl.plot(xexpect, yexpect, 'x', markerfacecolor='none', markeredgecolor='k')
+        if self.chi2_r321322 is not 0:
             pl.contour(xax, yax, self.chi2_r321322.min(axis=axis).swapaxes(*swaps),
                        levels=self.chi2_r321322.min()+levels,
                        cmap=pl.cm.bone)
@@ -256,8 +258,8 @@ class paraH2COmodel(generic_paraH2COmodel):
                         levels=self.chi2_X.min()+levels, alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
                    levels=self.chi2.min()+levels)
-        pl.plot(xmaxlike, ymaxlike, 'o', facecolor='none', edgecolor='k')
-        pl.plot(xexpect, yexpect, 'x', facecolor='none', edgecolor='k')
+        pl.plot(xmaxlike, ymaxlike, 'o', markerfacecolor='none', markeredgecolor='k')
+        pl.plot(xexpect, yexpect, 'x', markerfacecolor='none', markeredgecolor='k')
         pl.title("log(p-H$_2$CO/H$_2$) "
                  "$= {0:0.1f}\pm{1:0.1f}$".format(self.logabundance,
                                                   self.elogabundance))
@@ -268,8 +270,8 @@ class paraH2COmodel(generic_paraH2COmodel):
                         levels=self.chi2_h2.min()+levels, alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
                    levels=self.chi2.min()+levels)
-        pl.plot(xmaxlike, ymaxlike, 'o', facecolor='none', edgecolor='k')
-        pl.plot(xexpect, yexpect, 'x', facecolor='none', edgecolor='k')
+        pl.plot(xmaxlike, ymaxlike, 'o', markerfacecolor='none', markeredgecolor='k')
+        pl.plot(xexpect, yexpect, 'x', markerfacecolor='none', markeredgecolor='k')
         pl.title("Total log$(N(\\mathrm{{H}}_2))$ ")
         #         "= {0:0.1f}\pm{1:0.1f}$".format(self.logh2column,
         #                                         self.elogh2column))
@@ -283,13 +285,13 @@ class paraH2COmodel(generic_paraH2COmodel):
         pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
                    levels=self.chi2.min()+levels)
         if hasattr(self, 'taline303'):
-            pl.contour(xax, yax, (self.tline303 < 10*self.taline303).max(axis=axis),
+            pl.contour(xax, yax, (self.tline303 < 10*self.taline303).max(axis=axis).swapaxes(*swaps),
                        levels=[0.5], colors='k')
-        pl.plot(xmaxlike, ymaxlike, 'o', facecolor='none', edgecolor='k')
-        pl.plot(xexpect, yexpect, 'x', facecolor='none', edgecolor='k')
-        #pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis), levels=[0.5], colors='k')
-        #pl.contour(xax, yax, (tline321 < 10*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
-        #pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
+        pl.plot(xmaxlike, ymaxlike, 'o', markerfacecolor='none', markeredgecolor='k')
+        pl.plot(xexpect, yexpect, 'x', markerfacecolor='none', markeredgecolor='k')
+        #pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis).swapaxes(*swaps), levels=[0.5], colors='k')
+        #pl.contour(xax, yax, (tline321 < 10*par2).max(axis=axis).swapaxes(*swaps), levels=[0.5], colors='k', linestyles='--')
+        #pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis).swapaxes(*swaps), levels=[0.5], colors='k', linestyles='--')
         #pl.title("Line Brightness + $ff\leq1$")
         pl.title("Minimum Density")
         fig.text(0.05, 0.5, ylabel, horizontalalignment='center',
@@ -304,3 +306,102 @@ class paraH2COmodel(generic_paraH2COmodel):
                 ax.xaxis.set_ticks(np.arange(self.carr.min(), self.carr.max()))
 
         pl.subplots_adjust(wspace=0.25, hspace=0.45)
+
+    def parplot1d(self, par='col', levels=None, clf=True,
+                  legend=True, legendfontsize=14):
+
+        xax = self.axes[par]
+        xlabel = self.labels[par]
+        amapping = {'col':(2,(0,1)),
+                    'dens':(1,(0,2)),
+                    'tem':(0,(1,2))}
+        axis,axes = amapping[par]
+
+
+        xmaxlike = self.parconstraints['{0}_chi2'.format(short_mapping[par])]
+        xexpect = self.parconstraints['expected_{0}'.format(short_mapping[par])]
+
+        like = self.likelihood.sum(axis=axes)
+        like /= like.sum()
+        inds_cdf = np.argsort(like)
+        cdf = like[inds_cdf]
+
+        fig = pl.gcf()
+        if clf:
+            fig.clf()
+        ax = fig.gca()
+        ax.plot(xax, like, 'k-', label='Posterior')
+
+        for key in self.individual_likelihoods:
+            if key in ('chi2','_chi2'):
+                continue # already done
+            ilike = self.individual_likelihoods[key].sum(axis=axes)
+            ilike /= ilike.sum()
+            ax.plot(xax, ilike, label=key.replace("chi2_",""))
+
+        ax.vlines((xmaxlike,), 0, like.max(), linestyle='--', color='r',
+                  label='Maximum Likelihood')
+
+        ax.vlines((xexpect,), 0, like.max(), linestyle='--', color='b',
+                  label='E[{0}]'.format(xlabel))
+        xexpect_v2 = (like*xax).sum()/like.sum()
+        ax.vlines((xexpect_v2,), 0, like.max(), linestyle='--', color='c',
+                  zorder=-1)
+        print("par:{4} xmaxlike: {0}, xexpect: {1}, xexpect_v2: {2},"
+              "maxlike: {3}".format(xmaxlike, xexpect, xexpect_v2, like.max(),
+                                    par))
+
+        if levels is not None:
+            cdf_inds = np.argsort(like)
+            ppf = 1-like[cdf_inds].cumsum()
+            cutoff_likes = [like[cdf_inds[np.argmin(np.abs(ppf-lev))]]
+                            for lev in levels]
+
+            for fillind,cutoff in enumerate(sorted(cutoff_likes)):
+                selection = like > cutoff
+                ax.fill_between(xax[selection], like[selection]*0,
+                                like[selection], alpha=0.1, zorder=fillind-20)
+                print("Likelihood > {0}: {1}".format(cutoff,
+                                                     like[selection].sum()))
+                print("Levels: {0}".format(levels))
+                if np.abs(like[selection].sum() - levels[0]) > 0.05:
+                    # we want the sum of the likelihood to be right!
+                    import ipdb; ipdb.set_trace()
+
+
+
+        if legend:
+            ax.legend(loc='best', fontsize=legendfontsize)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel('$P(${0}$)$'.format(xlabel))
+
+    def parplot1d_all(self, legendfontsize=14, **kwargs):
+
+        fig = pl.gcf()
+        if not all(fig.get_size_inches() == [12,16]):
+            num = fig.number
+            pl.close(fig)
+            fig = pl.figure(num, figsize=(12,16))
+
+        for axindex,par in enumerate(('col','dens','tem')):
+            ax = fig.add_subplot(3,1,axindex+1)
+            self.parplot1d(par=par, clf=False, legend=False, **kwargs)
+
+            box = ax.get_position()
+            ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+            if axindex == 1:
+                ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),
+                          fontsize=legendfontsize)
+                
+
+    @property
+    def individual_likelihoods(self):
+        if hasattr(self, '_likelihoods') and self._likelihoods is not None:
+            return self._likelihoods
+        else:
+            self._likelihoods = {}
+            for key in self.__dict__:
+                if 'chi2' in key and getattr(self,key) is not 0:
+                    self._likelihoods[key] = np.exp(-getattr(self,key)/2.)
+            return self._likelihoods

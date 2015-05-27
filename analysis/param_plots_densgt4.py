@@ -10,6 +10,8 @@ execfile(paths.pcpath('parameter_comparisons.py'))
 """
 import paths
 import os
+import matplotlib
+#matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 import pylab as pl
 import numpy as np
 from scipy import stats
@@ -37,11 +39,11 @@ fittable = table.Table.read(tpath("fitted_line_parameters.ipac"),
                             format='ascii.ipac')
 fittable.add_columns([table.Column(name=name, dtype='float', length=len(fittable))
                       for name in ['temperature_chi2','tmin1sig_chi2','tmax1sig_chi2',
-                                   'E(temperature)',
+                                   'expected_temperature',
                                    'column_chi2','cmin1sig_chi2','cmax1sig_chi2',
-                                   'E(column)',
+                                   'expected_column',
                                    'density_chi2','dmin1sig_chi2','dmax1sig_chi2',
-                                   'E(density)',
+                                   'expected_density',
                                    'logh2column','elogh2column',
                                    'logabundance','elogabundance',
                                    'tkin_turb', 'reff_pc',
@@ -50,12 +52,9 @@ fittable.add_columns([table.Column(name=name, dtype='float', length=len(fittable
 if not os.path.exists(paths.fpath('param_fits')):
     os.makedirs(paths.fpath('param_fits'))
 
-nlevs = 5
-ndof = 3
-levels = ([0]+
-          [stats.chi2.ppf(stats.norm.cdf(ii)-stats.norm.cdf(-ii),
-                          ndof)
-           for ii in range(1,nlevs)])
+nlevs = 4
+levels = [stats.norm.cdf(ii)-stats.norm.cdf(-ii)
+           for ii in range(1,nlevs)]
 
 density_label = 'Density $n(\mathrm{H}_2)$ [log cm$^{-3}$]'
 column_label = 'Column p-H$_2$CO [log cm$^{-2}$/(km s$^{-1}$ pc)]'
@@ -151,7 +150,7 @@ for row in fittable:
     vmin = np.max([mf.tline303.min(), 0.1])
     vmax = np.min([mf.tline303.max(), par1+10])
     ax1 = pl.subplot(3,3,1)
-    im1 = pl.imshow(mf.tline303[zz,:,:], cmap=pl.cm.bone_r, interpolation='spline36',
+    im1 = pl.imshow(mf.tline303[zz,:,:], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               extent=mf.crange+mf.drange, vmin=vmin, vmax=vmax)
     pl.contour(mf.carr, mf.darr, chi2b[zz,:,:], levels=chi2b.min()+levels)
@@ -161,7 +160,7 @@ for row in fittable:
     ax1.set_xticks(np.arange(11,16))
 
     ax2 = pl.subplot(3,3,2)
-    im2 = pl.imshow(mf.tline303[:,yy,:], cmap=pl.cm.bone_r, interpolation='spline36',
+    im2 = pl.imshow(mf.tline303[:,yy,:], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.crange)/np.diff(mf.trange),
               extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
@@ -172,7 +171,7 @@ for row in fittable:
     #ax2.set_title("p-H$_2$CO $3_{0,3}-2_{0,2}$")
 
     ax3 = pl.subplot(3,3,3)
-    im3 = pl.imshow(mf.tline303[:,:,xx], cmap=pl.cm.bone_r, interpolation='spline36',
+    im3 = pl.imshow(mf.tline303[:,:,xx], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.drange)/np.diff(mf.trange),
               extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
@@ -187,7 +186,7 @@ for row in fittable:
     vmin = np.max([mf.tline321.min(), 0.1])
     vmax = np.min([mf.tline321.max(), par2+10])
     ax4 = pl.subplot(3,3,4)
-    pl.imshow(mf.tline321[zz,:,:], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline321[zz,:,:], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               extent=mf.crange+mf.drange, vmin=vmin, vmax=vmax)
     pl.contour(mf.carr, mf.darr, chi2b[zz,:,:], levels=chi2b.min()+levels)
@@ -196,7 +195,7 @@ for row in fittable:
     pl.ylabel(density_label_short)
 
     ax5 = pl.subplot(3,3,5)
-    im5 = pl.imshow(mf.tline321[:,yy,:], cmap=pl.cm.bone_r, interpolation='spline36',
+    im5 = pl.imshow(mf.tline321[:,yy,:], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.crange)/np.diff(mf.trange),
               extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
@@ -207,7 +206,7 @@ for row in fittable:
     #ax5.set_title("p-H$_2$CO $3_{2,1}-2_{2,0}$")
 
     ax6 = pl.subplot(3,3,6)
-    im6 = pl.imshow(mf.tline321[:,:,xx], cmap=pl.cm.bone_r, interpolation='spline36',
+    im6 = pl.imshow(mf.tline321[:,:,xx], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.drange)/np.diff(mf.trange),
               extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
@@ -222,7 +221,7 @@ for row in fittable:
     vminr = 0.05
     vmaxr = 0.7
     ax7 = pl.subplot(3,3,7)
-    im7 = ax7.imshow(mf.modelratio1[zz,:,:], cmap=pl.cm.bone_r,
+    im7 = ax7.imshow(mf.modelratio1[zz,:,:], cmap=pl.cm.gray_r,
                      interpolation='spline36',
                      #norm=pl.matplotlib.colors.LogNorm(),
                      extent=mf.crange+mf.drange, vmin=vminr, vmax=vmaxr)
@@ -233,7 +232,7 @@ for row in fittable:
     ax7.set_xticks(np.arange(11,16))
 
     ax8 = pl.subplot(3,3,8)
-    im8 = ax8.imshow(mf.modelratio1[:,yy,:], cmap=pl.cm.bone_r,
+    im8 = ax8.imshow(mf.modelratio1[:,yy,:], cmap=pl.cm.gray_r,
                      interpolation='spline36',
                      #norm=pl.matplotlib.colors.LogNorm(),
                       aspect=np.diff(mf.crange)/np.diff(mf.trange),
@@ -245,7 +244,7 @@ for row in fittable:
     #ax2.set_title("p-H$_2$CO $3_{0,3}-2_{0,2}$")
 
     ax9 = pl.subplot(3,3,9)
-    im9 = ax9.imshow(mf.modelratio1[:,:,xx], cmap=pl.cm.bone_r,
+    im9 = ax9.imshow(mf.modelratio1[:,:,xx], cmap=pl.cm.gray_r,
                      interpolation='spline36',
                      #norm=pl.matplotlib.colors.LogNorm(),
                      aspect=np.diff(mf.drange)/np.diff(mf.trange),
@@ -256,6 +255,8 @@ for row in fittable:
     pl.ylabel(temperature_label)
     cax3 = fig1.add_axes([0.91,0.1,0.02,0.22])
     cb = fig1.colorbar(mappable=im8, cax=cax3, ax=ax8)
+    cb.ax.hlines(cb.norm((ratio+eratio, ratio-eratio)), 0, 1, color='r', linestyle='-', alpha=0.5)
+    cb.ax.hlines(cb.norm((ratio)), 0, 1, color='b', linestyle=':', linewidth=1, alpha=0.5)
     cb.set_label("$3_{2,1}-2_{2,0}$ / $3_{0,3}-2_{0,2}$")
 
 
@@ -265,7 +266,7 @@ for row in fittable:
     pl.savefig(paths.fpath('param_fits/{name}_{num}_h2coratio.pdf'.format(name=row['Source_Name'],
                                                                           num=num)), bbox_inches='tight')
 
-    fig2 = pl.figure(2)
+    fig2 = pl.figure(2, figsize=(12,12))
     fig2.clf()
     ax1 = pl.subplot(3,3,1)
     yi, xi = np.indices(mf.tline303.shape[1:])
@@ -274,19 +275,19 @@ for row in fittable:
     # hard to explain: revert to using a *slice* for a background but a chi^2
     # *projection* for the contours
     inds = [zz, slice(None), slice(None)]
-    pl.imshow(mf.tline303[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline303[inds], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               extent=mf.crange+mf.drange, vmin=vmin, vmax=vmax)
     pl.contour(mf.carr, mf.darr, chi2b.min(axis=0), levels=chi2b.min()+levels)
     pl.xlabel(column_label_short)
     ax1.set_xticks(np.arange(11,16))
-    pl.ylabel(density_label_short)
+    #pl.ylabel(density_label_short)
 
     ax2 = pl.subplot(3,3,2)
     zi, xi = np.indices([mf.tline303.shape[0], mf.tline303.shape[2],])
     inds = [zi, chi2b.argmin(axis=1), xi]
     inds = [slice(None), yy, slice(None)]
-    pl.imshow(mf.tline303[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline303[inds], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.crange)/np.diff(mf.trange),
               extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
@@ -299,7 +300,7 @@ for row in fittable:
     zi, yi = np.indices([mf.tline303.shape[0], mf.tline303.shape[2],])
     inds = [zi, yi, chi2b.argmin(axis=2)]
     inds = [slice(None), slice(None), xx]
-    pl.imshow(mf.tline303[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline303[inds], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.drange)/np.diff(mf.trange),
               extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
@@ -307,7 +308,10 @@ for row in fittable:
     pl.xlabel(density_label_short)
     ax3.xaxis.set_ticks(np.arange(mf.darr.min(), mf.darr.max()))
     pl.ylabel(temperature_label)
-    cax = fig2.add_axes([0.91,0.55,0.02,0.35])
+    #cax = fig2.add_axes([0.91,0.55,0.02,0.35])
+    #cb = fig2.colorbar(mappable=im3, cax=cax, ax=ax2)
+    #cb.set_label("$T_B$ (p-H$_2$CO $3_{0,3}-2_{0,2}$)")
+    cax = fig2.add_axes([0.91,0.68,0.02,0.22])
     cb = fig2.colorbar(mappable=im3, cax=cax, ax=ax2)
     cb.set_label("$T_B$ (p-H$_2$CO $3_{0,3}-2_{0,2}$)")
 
@@ -315,7 +319,7 @@ for row in fittable:
     yi, xi = np.indices(mf.tline303.shape[1:])
     inds = [chi2b.argmin(axis=0), yi, xi]
     inds = [zz, slice(None), slice(None)]
-    pl.imshow(mf.tline321[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline321[inds], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               extent=mf.crange+mf.drange, vmin=vmin, vmax=vmax)
     pl.contour(mf.carr, mf.darr, chi2b.min(axis=0), levels=chi2b.min()+levels)
@@ -327,7 +331,7 @@ for row in fittable:
     zi, xi = np.indices([mf.tline303.shape[0], mf.tline303.shape[2],])
     inds = [zi, chi2b.argmin(axis=1), xi]
     inds = [slice(None), yy, slice(None)]
-    pl.imshow(mf.tline321[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    pl.imshow(mf.tline321[inds], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.crange)/np.diff(mf.trange),
               extent=mf.crange+mf.trange, vmin=vmin, vmax=vmax)
@@ -340,7 +344,7 @@ for row in fittable:
     zi, yi = np.indices([mf.tline303.shape[0], mf.tline303.shape[2],])
     inds = [zi, yi, chi2b.argmin(axis=2)]
     inds = [slice(None), slice(None), xx]
-    im6 = pl.imshow(mf.tline321[inds], cmap=pl.cm.bone_r, interpolation='spline36',
+    im6 = pl.imshow(mf.tline321[inds], cmap=pl.cm.gray_r, interpolation='spline36',
               norm=pl.matplotlib.colors.LogNorm(),
               aspect=np.diff(mf.drange)/np.diff(mf.trange),
               extent=mf.drange+mf.trange, vmin=vmin, vmax=vmax)
@@ -348,14 +352,17 @@ for row in fittable:
     pl.xlabel(density_label_short)
     ax6.xaxis.set_ticks(np.arange(mf.darr.min(), mf.darr.max()))
     pl.ylabel(temperature_label)
-    cax = fig2.add_axes([0.91,0.1,0.02,0.35])
+    #cax = fig2.add_axes([0.91,0.1,0.02,0.35])
+    #cb = fig2.colorbar(mappable=im6, cax=cax, ax=ax5)
+    #cb.set_label("$T_B$ (p-H$_2$CO $3_{2,1}-2_{2,0}$)")
+    cax = fig2.add_axes([0.91,0.40,0.02,0.22])
     cb = fig2.colorbar(mappable=im6, cax=cax, ax=ax5)
     cb.set_label("$T_B$ (p-H$_2$CO $3_{2,1}-2_{2,0}$)")
 
     vminr = 0.05
     vmaxr = 0.7
     ax7 = pl.subplot(3,3,7)
-    im7 = ax7.imshow(mf.modelratio1[zz,:,:], cmap=pl.cm.bone_r,
+    im7 = ax7.imshow(mf.modelratio1[zz,:,:], cmap=pl.cm.gray_r,
                      interpolation='spline36',
                      #norm=pl.matplotlib.colors.LogNorm(),
                      extent=mf.crange+mf.drange, vmin=vminr, vmax=vmaxr)
@@ -366,7 +373,7 @@ for row in fittable:
     ax7.set_xticks(np.arange(11,16))
 
     ax8 = pl.subplot(3,3,8)
-    im8 = ax8.imshow(mf.modelratio1[:,yy,:], cmap=pl.cm.bone_r,
+    im8 = ax8.imshow(mf.modelratio1[:,yy,:], cmap=pl.cm.gray_r,
                      interpolation='spline36',
                      #norm=pl.matplotlib.colors.LogNorm(),
                       aspect=np.diff(mf.crange)/np.diff(mf.trange),
@@ -378,7 +385,7 @@ for row in fittable:
     #ax2.set_title("p-H$_2$CO $3_{0,3}-2_{0,2}$")
 
     ax9 = pl.subplot(3,3,9)
-    im9 = ax9.imshow(mf.modelratio1[:,:,xx], cmap=pl.cm.bone_r,
+    im9 = ax9.imshow(mf.modelratio1[:,:,xx], cmap=pl.cm.gray_r,
                      interpolation='spline36',
                      #norm=pl.matplotlib.colors.LogNorm(),
                      aspect=np.diff(mf.drange)/np.diff(mf.trange),
@@ -387,8 +394,10 @@ for row in fittable:
     pl.xlabel(density_label_short)
     ax9.xaxis.set_ticks(np.arange(mf.darr.min(), mf.darr.max()))
     pl.ylabel(temperature_label)
-    cax3 = fig1.add_axes([0.91,0.1,0.02,0.22])
-    cb = fig1.colorbar(mappable=im8, cax=cax3, ax=ax8)
+    cax3 = fig2.add_axes([0.91,0.1,0.02,0.22])
+    cb = fig2.colorbar(mappable=im8, cax=cax3, ax=ax8)
+    cb.ax.hlines(cb.norm((ratio+eratio, ratio-eratio)), 0, 1, color='r', linestyle='-', alpha=0.5)
+    cb.ax.hlines(cb.norm((ratio)), 0, 1, color='b', linestyle=':', linewidth=1, alpha=0.5)
     cb.set_label("$3_{2,1}-2_{2,0}$ / $3_{0,3}-2_{0,2}$")
 
     pl.suptitle(row['Source_Name'])
@@ -399,85 +408,10 @@ for row in fittable:
                                                                                   num=num)), bbox_inches='tight')
 
 
-    # shape is temperature, density, column
-    # but we want the order shown here
-    # so we're going to (very very very dangerously) swapaxes everything
-    if hasattr(chi2r,'min'):
-        chi2r = chi2r.swapaxes(1,2)
-    if hasattr(chi2r2,'min'):
-        chi2r2 = chi2r2.swapaxes(1,2)
-    chi2b = chi2b.swapaxes(1,2)
-    chi2X = chi2X.swapaxes(1,2)
-    chi2_h2 = chi2_h2.swapaxes(1,2)
-    chi2_ff = chi2_ff.swapaxes(1,2)
-    chi2_dens = chi2_dens.swapaxes(1,2)
-    tline303 = mf.tline303.swapaxes(1,2)
+    # IGNORE 321/322: it is generally not well constrained anyway
+    mf.chi2_r321322 = 0
+    mf.compute_chi2_fromcomponents()
 
-    #for xax,yax,xlabel,ylabel,axis,ptype in zip((mf.darr,mf.darr,mf.carr),
-    #                                            (mf.carr,mf.tarr,mf.tarr),
-    #                                            (density_label, density_label,
-    #                                             column_label),
-    #                                            (column_label,
-    #                                             temperature_label,
-    #                                             temperature_label),
-    #                                            (0, 1, 2),
-    #                                            ('dens_col','dens_tem','col_tem')):
-
-    #    # Show the constraints provided by individual parameters
-    #    fig3 = pl.figure(3)
-    #    fig3.clf()
-    #    # chi2b = chi2r + chi2_1 + chi2_2 + chi2X + chi2_h2
-    #    ax1 = pl.subplot(2,2,1)
-    #    if hasattr(chi2r, 'min'):
-    #        pl.contourf(xax, yax, chi2r.min(axis=axis), levels=chi2r.min()+levels, alpha=0.5)
-    #    pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+levels)
-    #    #if hasattr(chi2r2, 'min'):
-    #    #    pl.contour(xax, yax, chi2r2.min(axis=axis),
-    #    #               levels=chi2r2.min()+levels,
-    #    #               cmap=pl.cm.bone)
-    #    pl.title(r"Ratio $R_1={0:0.3f}\pm{1:0.3f}$"
-    #             .format(ratio,eratio))
-    #    ax4 = pl.subplot(2,2,2)
-    #    pl.contourf(xax, yax, chi2X.min(axis=axis), levels=chi2X.min()+levels, alpha=0.5)
-    #    pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+levels)
-    #    pl.title("log(p-H$_2$CO/H$_2$) $= {0:0.1f}\pm{1:0.1f}$".format(logabundance, elogabundance))
-    #    ax3 = pl.subplot(2,2,3)
-    #    #pl.contourf(xax, yax, chi2_h2.min(axis=axis), levels=chi2_h2.min()+levels, alpha=0.5)
-    #    pl.contourf(xax, yax, chi2_dens.min(axis=axis), levels=chi2_dens.min()+levels, alpha=0.5)
-    #    pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+levels)
-    #    #pl.title("Total log$(N(\\mathrm{{H}}_2)) = {0:0.1f}\pm{1:0.1f}$".format(logh2column,
-    #    #                                                                        elogh2column))
-    #    pl.title("Density $n>10^{{{0:0.1f}}}$cm$^{{-3}}$".format(mindens))
-
-    #    #ax5 = pl.subplot(2,2,4)
-    #    #pl.contourf(xax, yax, (chi2_ff.min(axis=axis)),
-    #    #            levels=chi2_ff.min()+levels, alpha=0.5)
-    #    #pl.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+levels)
-    #    #pl.contour(xax, yax, (tline303 < 10*par1).max(axis=axis), levels=[0.5], colors='k')
-    #    ##pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis), levels=[0.5], colors='k')
-    #    ##pl.contour(xax, yax, (tline321 < 10*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
-    #    ##pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
-    #    #pl.xlabel(xlabel)
-    #    #pl.ylabel(ylabel)
-    #    #pl.title("Line Brightness + $ff\leq1$")
-
-    #    ax5 = pl.subplot(2,2,4)
-    #    ax5.contourf(xax, yax, chi2_h2.min(axis=axis), levels=chi2_h2.min()+levels, alpha=0.5)
-    #    ax5.contour(xax, yax, chi2b.min(axis=axis), levels=chi2b.min()+levels)
-    #    ax5.set_title("Total log$(N(\\mathrm{{H}}_2)) = {0:0.1f}\pm{1:0.1f}$"
-    #                  .format(logh2column, elogh2column))
-
-    #    pl.text(0.05, 0.5, ylabel, horizontalalignment='center',
-    #            verticalalignment='center',
-    #            rotation='vertical', transform=fig3.transFigure)
-    #    pl.text(0.5, 0.02, xlabel, horizontalalignment='center', transform=fig3.transFigure)
-
-    #    if xax is mf.carr:
-    #        for ss in range(1,5):
-    #            ax = pl.subplot(2,2,ss)
-    #            ax.xaxis.set_ticks(np.arange(mf.carr.min(), mf.carr.max()))
-
-    #    pl.subplots_adjust(wspace=0.2, hspace=0.4)
     for par1,par2 in (('dens','col'),('dens','tem'),('col','tem')):
         ptype = '{0}_{1}'.format(par1,par2)
         fig3 = pl.figure(3)
@@ -488,8 +422,11 @@ for row in fittable:
                                                                                               num=num))
         pl.savefig(outf, bbox_inches='tight')
 
-    # IGNORE 321/322: it is generally not well constrained anyway
-    mf.chi2 -= mf.chi2_r321322
+    # levels[0] = 0.68
+    mf.parplot1d_all(levels=levels[0])
+    outf = paths.fpath('param_fits/{name}_oneD_{num}_parameter_constraints.pdf'.format(name=row['Source_Name'],
+                                                                                       num=num))
+    pl.savefig(outf, bbox_inches='tight')
 
     row_data = mf.get_parconstraints()
     for key,value in row_data.iteritems():

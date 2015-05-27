@@ -66,29 +66,34 @@ class generic_paraH2COmodel(object):
 
 
     def get_parconstraints(self,
-                           chi2level=stats.chi2.ppf(stats.norm.cdf(1)-stats.norm.cdf(-1), 3)):
+                           nsigma=1):
         """
         If parameter constraints have been set with set_constraints or
         set_constraints_fromrow
 
         Parameters
         ----------
-        chi2level : float
-            The maximum Delta-chi^2 value to include: this will be used to
-            determine the min/max 1-sigma errorbars
+        nsigma : float
+            The number of sigmas to go out to when determining errors
         """
         if not hasattr(self, 'chi2'):
             raise AttributeError("Run set_constraints first")
 
         row = {}
 
-        indbest = np.argmin(self.chi2)
-        deltachi2b = (self.chi2-self.chi2.min())
+        inds = np.argsort(self.likelihood.flat)
+        cdf = np.cumsum(self.likelihood.flat[inds])
+        cdf = cdf/cdf[-1]
+        frac_above = (stats.norm.cdf(nsigma)-stats.norm.cdf(-nsigma))
+        cdfmin = np.argmin(np.abs(cdf - (1-frac_above)))
+        sigma_like = self.likelihood.flat[inds][cdfmin]
+
+        indbest = np.argmax(self.likelihood)
         for parname,pararr in zip(('temperature','column','density'),
                                   (self.temparr,self.columnarr,self.densityarr)):
             row['{0}_chi2'.format(parname)] = pararr.flat[indbest]
-            row['E({0})'.format(parname)] = (pararr*self.likelihood).sum() / self.likelihood.sum()
-            OK = deltachi2b<chi2level
+            row['expected_{0}'.format(parname)] = (pararr*self.likelihood).sum() / self.likelihood.sum()
+            OK = self.likelihood > sigma_like
             if np.count_nonzero(OK) > 0:
                 row['{0:1.1s}min1sig_chi2'.format(parname)] = pararr[OK].min()
                 row['{0:1.1s}max1sig_chi2'.format(parname)] = pararr[OK].max()
