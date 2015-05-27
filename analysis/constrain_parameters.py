@@ -1,3 +1,4 @@
+raise Exception("Use h2co_modeling.constrain_parameters instead")
 """
 Functions for fitting temperature (and density and column) from the line ratio
 plus whatever other constraints are available
@@ -13,6 +14,10 @@ import pylab as pl
 
 from h2co_modeling import grid_fitter
 from paraH2COmodel import generic_paraH2COmodel
+
+short_mapping = {'dens': 'density',
+                 'col': 'column',
+                 'tem': 'temperature'}
 
 class paraH2COmodel(generic_paraH2COmodel):
 
@@ -99,7 +104,7 @@ class paraH2COmodel(generic_paraH2COmodel):
     def list_parameters():
         return ['taline303',  'etaline303', 'taline321',  'etaline321',
                 'taline322',  'etaline322', 'logabundance',  'elogabundance',
-                'logh2column',  'elogh2column', 'ratio303321',  'eratio303321',
+                'logh2column',  'elogh2column', 'ratio321303',  'eratio321303',
                 'ratio321322',  'eratio321322', 'linewidth']
 
     def set_constraints_fromrow(self, row, **kwargs):
@@ -107,13 +112,13 @@ class paraH2COmodel(generic_paraH2COmodel):
         mapping = {'e321':'etaline321',
                    'Smean321':'taline321',
                    'Smean303':'taline303',
-                   'er303321':'eratio303321',
-                   'eratio303321':'eratio303321',
+                   'er321303':'eratio321303',
+                   'eratio321303':'eratio321303',
                    'e303':'etaline303',
-                   'r303321':'ratio303321',
-                   'ratio303321':'ratio303321',
-                   'r321303':'ratio303321',
-                   'er321303':'eratio303321',
+                   'r321303':'ratio321303',
+                   'ratio321303':'ratio321303',
+                   'r321303':'ratio321303',
+                   'er321303':'eratio321303',
                    'logabundance':'logabundance',
                    'elogabundance':'elogabundance',
                    'logh2column':'logh2column',
@@ -132,7 +137,7 @@ class paraH2COmodel(generic_paraH2COmodel):
                         taline322=None, etaline322=None,
                         logabundance=None, elogabundance=None,
                         logh2column=None, elogh2column=None,
-                        ratio303321=None, eratio303321=None,
+                        ratio321303=None, eratio321303=None,
                         ratio321322=None, eratio321322=None,
                         linmindens=None,
                         mindens=None, emindens=0.2,
@@ -166,13 +171,13 @@ class paraH2COmodel(generic_paraH2COmodel):
                                                             etaline321))
                          else 0)
 
-        self.chi2_r303321 = (self.grid_getmatch_321to303(ratio303321,
-                                                         eratio303321)
-                             if not any(arg is None for arg in (ratio303321,
-                                                                eratio303321))
+        self.chi2_r321303 = (self.grid_getmatch_321to303(ratio321303,
+                                                         eratio321303)
+                             if not any(arg is None for arg in (ratio321303,
+                                                                eratio321303))
                              else 0)
-        if np.all(~np.isfinite(self.chi2_r303321)):
-            self.chi2_r303321 = 0
+        if np.all(~np.isfinite(self.chi2_r321303)):
+            self.chi2_r321303 = 0
 
         self.chi2_r321322 = (self.grid_getmatch_321to303(ratio321322,
                                                          eratio321322)
@@ -189,7 +194,7 @@ class paraH2COmodel(generic_paraH2COmodel):
 
         if mindens is not None:
             self.chi2_dens = (((self.densityarr - mindens)/emindens)**2
-                              * (self.densityarr < mindens))
+                              * (self.densityarr < (mindens-emindens)))
         else:
             self.chi2_dens = 0
 
@@ -200,10 +205,10 @@ class paraH2COmodel(generic_paraH2COmodel):
         Compute the total chi2 from the individual chi2 components
         """
         self.chi2 = (self.chi2_X + self.chi2_h2 + self.chi2_ff1 + self.chi2_ff2
-                     + self.chi2_r321322 + self.chi2_r303321 + self.chi2_dens)
+                     + self.chi2_r321322 + self.chi2_r321303 + self.chi2_dens)
 
 
-    def parplot(self, par1='col', par2='dens', nlevs=5):
+    def parplot(self, par1='col', par2='dens', nlevs=5, levels=None):
 
         xax = self.axes[par1]
         yax = self.axes[par2]
@@ -213,26 +218,37 @@ class paraH2COmodel(generic_paraH2COmodel):
                 ('dens','tem'): 2,
                 ('col','tem'): 1}[(par1,par2)]
 
+        if levels is None:
+            levels = np.arange(nlevs)
+
+        xmaxlike = self.parconstraints['{0}_chi2'.format(short_mapping[par1])]
+        ymaxlike = self.parconstraints['{0}_chi2'.format(short_mapping[par2])]
+        xexpect = self.parconstraints['E({0})'.format(short_mapping[par1])]
+        yexpect = self.parconstraints['E({0})'.format(short_mapping[par2])]
 
         fig = pl.gcf()
         fig.clf()
         ax1 = pl.subplot(2,2,1)
-        pl.contourf(xax, yax, self.chi2_r303321.min(axis=axis),
-                    levels=self.chi2_r303321.min()+np.arange(nlevs), alpha=0.5)
+        pl.contourf(xax, yax, self.chi2_r321303.min(axis=axis),
+                    levels=self.chi2_r321303.min()+levels, alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
-                   levels=self.chi2.min()+np.arange(nlevs))
+                   levels=self.chi2.min()+levels)
+        pl.plot(xmaxlike, ymaxlike, 'o', facecolor='none', edgecolor='k')
+        pl.plot(xexpect, yexpect, 'x', facecolor='none', edgecolor='k')
         if self.chi2_r321322:
             pl.contour(xax, yax, self.chi2_r321322.min(axis=axis),
-                       levels=self.chi2_r321322.min()+np.arange(nlevs),
+                       levels=self.chi2_r321322.min()+levels,
                        cmap=pl.cm.bone)
         pl.title("Ratio $3_{0,3}-2_{0,2}/3_{2,1}-2_{2,0}$")
 
         ax4 = pl.subplot(2,2,2)
         if hasattr(self.chi2_X, 'size'):
             pl.contourf(xax, yax, self.chi2_X.min(axis=axis),
-                        levels=self.chi2_X.min()+np.arange(nlevs), alpha=0.5)
+                        levels=self.chi2_X.min()+levels, alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
-                   levels=self.chi2.min()+np.arange(nlevs))
+                   levels=self.chi2.min()+levels)
+        pl.plot(xmaxlike, ymaxlike, 'o', facecolor='none', edgecolor='k')
+        pl.plot(xexpect, yexpect, 'x', facecolor='none', edgecolor='k')
         pl.title("log(p-H$_2$CO/H$_2$) "
                  "$= {0:0.1f}\pm{1:0.1f}$".format(self.logabundance,
                                                   self.elogabundance))
@@ -240,24 +256,28 @@ class paraH2COmodel(generic_paraH2COmodel):
         ax3 = pl.subplot(2,2,3)
         if hasattr(self.chi2_h2, 'size'):
             pl.contourf(xax, yax, self.chi2_h2.min(axis=axis),
-                        levels=self.chi2_h2.min()+np.arange(nlevs), alpha=0.5)
+                        levels=self.chi2_h2.min()+levels, alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
-                   levels=self.chi2.min()+np.arange(nlevs))
+                   levels=self.chi2.min()+levels)
+        pl.plot(xmaxlike, ymaxlike, 'o', facecolor='none', edgecolor='k')
+        pl.plot(xexpect, yexpect, 'x', facecolor='none', edgecolor='k')
         pl.title("Total log$(N(\\mathrm{{H}}_2))$ ")
         #         "= {0:0.1f}\pm{1:0.1f}$".format(self.logh2column,
         #                                         self.elogh2column))
         ax5 = pl.subplot(2,2,4)
         #if hasattr(self.chi2_ff1, 'size'):
         #    pl.contourf(xax, yax, (self.chi2_ff1.min(axis=axis)),
-        #                levels=self.chi2_ff1.min()+np.arange(nlevs), alpha=0.5)
+        #                levels=self.chi2_ff1.min()+levels, alpha=0.5)
         if hasattr(self.chi2_dens, 'size'):
             pl.contourf(xax, yax, (self.chi2_dens.min(axis=axis)),
-                        levels=self.chi2_dens.min()+np.arange(nlevs), alpha=0.5)
+                        levels=self.chi2_dens.min()+levels, alpha=0.5)
         pl.contour(xax, yax, self.chi2.min(axis=axis),
-                   levels=self.chi2.min()+np.arange(nlevs))
+                   levels=self.chi2.min()+levels)
         if hasattr(self, 'taline303'):
             pl.contour(xax, yax, (self.tline303 < 10*self.taline303).max(axis=axis),
                        levels=[0.5], colors='k')
+        pl.plot(xmaxlike, ymaxlike, 'o', facecolor='none', edgecolor='k')
+        pl.plot(xexpect, yexpect, 'x', facecolor='none', edgecolor='k')
         #pl.contour(xax, yax, (tline303 < 100*par1).max(axis=axis), levels=[0.5], colors='k')
         #pl.contour(xax, yax, (tline321 < 10*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')
         #pl.contour(xax, yax, (tline321 < 100*par2).max(axis=axis), levels=[0.5], colors='k', linestyles='--')

@@ -10,15 +10,30 @@ from scipy import stats
 from h2co_modeling import grid_fitter
 
 class generic_paraH2COmodel(object):
-    def grid_getmatch_321to303(self, ratio, eratio):
+    def grid_getmatch_321to303(self, ratio, eratio, chi2thresh=1):
             match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio,
-                                                            self.modelratio1)
+                                                            self.modelratio1,
+                                                            chi2thresh=chi2thresh)
             return chi2r
 
-    def grid_getmatch_322to321(self, ratio, eratio):
+    def grid_getmatch_322to321(self, ratio, eratio, chi2thresh=1):
             match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio,
-                                                            self.modelratio2)
+                                                            self.modelratio2,
+                                                            chi2thresh=chi2thresh)
             return chi2r
+
+    @property
+    def chi2(self):
+        return self._chi2
+
+    @chi2.setter
+    def chi2(self, value):
+        self._chi2 = value
+        self._likelihood = np.exp(-value/2)
+
+    @property
+    def likelihood(self):
+        return self._likelihood
 
     def chi2_fillingfactor(self, tline, etline, lineid):
         """
@@ -72,6 +87,7 @@ class generic_paraH2COmodel(object):
         for parname,pararr in zip(('temperature','column','density'),
                                   (self.temparr,self.columnarr,self.densityarr)):
             row['{0}_chi2'.format(parname)] = pararr.flat[indbest]
+            row['E({0})'.format(parname)] = (pararr*self.likelihood).sum() / self.likelihood.sum()
             OK = deltachi2b<chi2level
             if np.count_nonzero(OK) > 0:
                 row['{0:1.1s}min1sig_chi2'.format(parname)] = pararr[OK].min()
@@ -88,6 +104,12 @@ class generic_paraH2COmodel(object):
 
         return row
 
+    @property
+    def parconstraints(self):
+        if not hasattr(self,'_parconstraints') or self._parconstraints is None:
+            return self.get_parconstraints()
+        else:
+            return self._parconstraints
 
 
     def denstemplot(self):

@@ -20,7 +20,7 @@ from paths import analysispath, tpath
 from pyspeckit_fitting import (texgrid303, taugrid303, texgrid321, taugrid321,
                                texgrid322, taugrid322, hdr)
 
-from constrain_parameters import paraH2COmodel
+from h2co_modeling.constrain_parameters import paraH2COmodel
 from h2co_modeling import grid_fitter
 from astropy import table
 import despotic_heating as heating
@@ -35,8 +35,11 @@ fittable = table.Table.read(tpath("fitted_line_parameters.ipac"),
                             format='ascii.ipac')
 fittable.add_columns([table.Column(name=name, dtype='float', length=len(fittable))
                       for name in ['temperature_chi2','tmin1sig_chi2','tmax1sig_chi2',
+                                   'E(temperature)',
                                    'column_chi2','cmin1sig_chi2','cmax1sig_chi2',
+                                   'E(column)',
                                    'density_chi2','dmin1sig_chi2','dmax1sig_chi2',
+                                   'E(density)',
                                    'logh2column','elogh2column',
                                    'logabundance','elogabundance',
                                    'tkin_turb', 'reff_pc',
@@ -109,7 +112,7 @@ for row in fittable:
     # We therefore *increase* the chi^2 value wherever the model is fainter
     # than the line, enforcing a soft lower limit
 
-    mf.set_constraints(ratio303321=ratio, eratio303321=eratio,
+    mf.set_constraints(ratio321303=ratio, eratio321303=eratio,
                        ratio321322=ratio2, eratio321322=eratio2,
                        logh2column=logh2column, elogh2column=elogh2column,
                        logabundance=logabundance, elogabundance=elogabundance,
@@ -119,7 +122,7 @@ for row in fittable:
                        linewidth=5) # for consistency with dendro
 
 
-    chi2r = mf.chi2_r303321
+    chi2r = mf.chi2_r321303
     chi2r2 = mf.chi2_r321322
     chi2_h2 = mf.chi2_h2
     chi2X = mf.chi2_X

@@ -22,6 +22,7 @@ analysispath = os.path.join(root, 'apex_cmz_h2co/analysis/')
 plotcodepath = os.path.join(root, 'apex_cmz_h2co/plot_codes/')
 observingpath = os.path.join(root, 'apex_cmz_h2co/observing/')
 tablepath = os.path.join(root, 'apex_cmz_h2co/tables/')
+alldatapath = os.path.join(root, 'apex_cmz_h2co/data/')
 
 def mpath(x, mergepath=mergepath):
     return os.path.join(mergepath,x)
@@ -54,3 +55,6 @@ def molpath(x, molcubepath=molcubepath):
 
 def tpath(x, tablepath=tablepath):
     return os.path.join(tablepath, x)
+
+def adpath(x, alldatapath=alldatapath):
+    return os.path.join(alldatapath, x)
