@@ -30,6 +30,7 @@ class generic_paraH2COmodel(object):
     def chi2(self, value):
         self._chi2 = value
         self._likelihood = np.exp(-value/2)
+        self._likelihood /= self._likelihood.sum()
 
     @property
     def likelihood(self):

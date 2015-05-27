@@ -53,8 +53,13 @@ if not os.path.exists(paths.fpath('param_fits')):
     os.makedirs(paths.fpath('param_fits'))
 
 nlevs = 4
-levels = [stats.norm.cdf(ii)-stats.norm.cdf(-ii)
-           for ii in range(1,nlevs)]
+#levels = [stats.norm.cdf(ii)-stats.norm.cdf(-ii)
+#           for ii in range(1,nlevs)]
+ndof = 3
+levels = ([0]+
+          [stats.chi2.ppf(stats.norm.cdf(ii)-stats.norm.cdf(-ii),
+                          ndof)
+           for ii in range(1,nlevs)])
 
 density_label = 'Density $n(\mathrm{H}_2)$ [log cm$^{-3}$]'
 column_label = 'Column p-H$_2$CO [log cm$^{-2}$/(km s$^{-1}$ pc)]'
@@ -420,14 +425,14 @@ for row in fittable:
         ptype = '{0}_{1}'.format(par1,par2)
         fig3 = pl.figure(3)
         fig3.clf()
-        mf.parplot(par1=par1, par2=par2, levels=levels)
+        mf.parplot(par1=par1, par2=par2)
         outf = paths.fpath('param_fits/{name}_{ptype}_{num}_parameter_constraints.pdf'.format(name=row['Source_Name'],
                                                                                               ptype=ptype,
                                                                                               num=num))
         pl.savefig(outf, bbox_inches='tight')
 
     # levels[0] = 0.68
-    mf.parplot1d_all(levels=levels[0])
+    mf.parplot1d_all(levels=[0.68])
     outf = paths.fpath('param_fits/{name}_oneD_{num}_parameter_constraints.pdf'.format(name=row['Source_Name'],
                                                                                        num=num))
     pl.savefig(outf, bbox_inches='tight')

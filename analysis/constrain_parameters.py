@@ -211,7 +211,8 @@ class paraH2COmodel(generic_paraH2COmodel):
                      + self.chi2_r321322 + self.chi2_r321303 + self.chi2_dens)
 
 
-    def parplot(self, par1='col', par2='dens', nlevs=5, levels=None, ndof=3):
+    def parplot(self, par1='col', par2='dens', nlevs=5, levels=None, ndof=3,
+                colors=['b','c','r','y','m']):
 
         xax = self.axes[par1]
         yax = self.axes[par2]
@@ -228,10 +229,8 @@ class paraH2COmodel(generic_paraH2COmodel):
             swaps = (0,1)
 
         if levels is None:
-            levels = ([0]+
-                      [stats.chi2.ppf(stats.norm.cdf(ii)-stats.norm.cdf(-ii),
-                                      ndof)
-                       for ii in range(1,nlevs)])
+            levels = ([0]+[(stats.norm.cdf(ii)-stats.norm.cdf(-ii))
+                           for ii in range(1,nlevs)])
 
         xmaxlike = self.parconstraints['{0}_chi2'.format(short_mapping[par1])]
         ymaxlike = self.parconstraints['{0}_chi2'.format(short_mapping[par2])]
@@ -241,25 +240,28 @@ class paraH2COmodel(generic_paraH2COmodel):
         fig = pl.gcf()
         fig.clf()
         ax1 = pl.subplot(2,2,1)
-        if self.chi2_r321303 is not 0:
-            pl.contourf(xax, yax, self.chi2_r321303.min(axis=axis).swapaxes(*swaps),
-                        levels=self.chi2_r321303.min()+levels, alpha=0.5)
-        pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
-                   levels=self.chi2.min()+levels)
+        if 'chi2_r321303' in self.individual_likelihoods:
+            like = (self.individual_likelihoods['chi2_r321303'])
+            pl.contourf(xax, yax, cdf_of_like(like.sum(axis=axis)).swapaxes(*swaps),
+                        levels=levels, alpha=0.5, colors=colors)
+        pl.contour(xax, yax, cdf_of_like(self.likelihood.sum(axis=axis)).swapaxes(*swaps),
+                   levels=levels, colors=colors)
         pl.plot(xmaxlike, ymaxlike, 'o', markerfacecolor='none', markeredgecolor='k')
         pl.plot(xexpect, yexpect, 'x', markerfacecolor='none', markeredgecolor='k')
         if self.chi2_r321322 is not 0:
-            pl.contour(xax, yax, self.chi2_r321322.min(axis=axis).swapaxes(*swaps),
-                       levels=self.chi2_r321322.min()+levels,
+            like = cdf_of_like(self.individual_likelihoods['chi2_r321322'])
+            pl.contour(xax, yax, like.sum(axis=axis).swapaxes(*swaps),
+                       levels=levels,
                        cmap=pl.cm.bone)
         pl.title("Ratio $3_{0,3}-2_{0,2}/3_{2,1}-2_{2,0}$")
 
         ax4 = pl.subplot(2,2,2)
         if hasattr(self.chi2_X, 'size'):
-            pl.contourf(xax, yax, self.chi2_X.min(axis=axis).swapaxes(*swaps),
-                        levels=self.chi2_X.min()+levels, alpha=0.5)
-        pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
-                   levels=self.chi2.min()+levels)
+            like = self.individual_likelihoods['chi2_X']
+            pl.contourf(xax, yax, cdf_of_like(like.sum(axis=axis)).swapaxes(*swaps),
+                        levels=levels, alpha=0.5, colors=colors)
+        pl.contour(xax, yax, cdf_of_like(self.likelihood.sum(axis=axis)).swapaxes(*swaps),
+                   levels=levels, colors=colors)
         pl.plot(xmaxlike, ymaxlike, 'o', markerfacecolor='none', markeredgecolor='k')
         pl.plot(xexpect, yexpect, 'x', markerfacecolor='none', markeredgecolor='k')
         pl.title("log(p-H$_2$CO/H$_2$) "
@@ -268,10 +270,11 @@ class paraH2COmodel(generic_paraH2COmodel):
 
         ax3 = pl.subplot(2,2,3)
         if hasattr(self.chi2_h2, 'size'):
-            pl.contourf(xax, yax, self.chi2_h2.min(axis=axis).swapaxes(*swaps),
-                        levels=self.chi2_h2.min()+levels, alpha=0.5)
-        pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
-                   levels=self.chi2.min()+levels)
+            like = (self.individual_likelihoods['chi2_h2'])
+            pl.contourf(xax, yax, cdf_of_like(like.sum(axis=axis)).swapaxes(*swaps),
+                        levels=levels, alpha=0.5, colors=colors)
+        pl.contour(xax, yax, cdf_of_like(self.likelihood.sum(axis=axis)).swapaxes(*swaps),
+                   levels=levels, colors=colors)
         pl.plot(xmaxlike, ymaxlike, 'o', markerfacecolor='none', markeredgecolor='k')
         pl.plot(xexpect, yexpect, 'x', markerfacecolor='none', markeredgecolor='k')
         pl.title("Total log$(N(\\mathrm{{H}}_2))$ ")
@@ -282,12 +285,14 @@ class paraH2COmodel(generic_paraH2COmodel):
         #    pl.contourf(xax, yax, (self.chi2_ff1.min(axis=axis)),
         #                levels=self.chi2_ff1.min()+levels, alpha=0.5)
         if hasattr(self.chi2_dens, 'size'):
-            pl.contourf(xax, yax, (self.chi2_dens.min(axis=axis)).swapaxes(*swaps),
-                        levels=self.chi2_dens.min()+levels, alpha=0.5)
-        pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
-                   levels=self.chi2.min()+levels)
+            like = (self.individual_likelihoods['chi2_dens'])
+            pl.contourf(xax, yax, cdf_of_like(like.sum(axis=axis)).swapaxes(*swaps),
+                        levels=levels, alpha=0.5, colors=colors)
+        pl.contour(xax, yax, cdf_of_like(self.likelihood.sum(axis=axis)).swapaxes(*swaps),
+                   levels=levels, colors=colors)
         if hasattr(self, 'taline303'):
-            pl.contour(xax, yax, (self.tline303 < 10*self.taline303).max(axis=axis).swapaxes(*swaps),
+            ff1_mask = (self.tline303 < 10*self.taline303)
+            pl.contour(xax, yax, ff1_mask.max(axis=axis).swapaxes(*swaps),
                        levels=[0.5], colors='k')
         pl.plot(xmaxlike, ymaxlike, 'o', markerfacecolor='none', markeredgecolor='k')
         pl.plot(xexpect, yexpect, 'x', markerfacecolor='none', markeredgecolor='k')
@@ -410,4 +415,17 @@ class paraH2COmodel(generic_paraH2COmodel):
             for key in self.__dict__:
                 if 'chi2' in key and getattr(self,key) is not 0:
                     self._likelihoods[key] = np.exp(-getattr(self,key)/2.)
+                    self._likelihoods[key] /= self._likelihoods[key].sum()
             return self._likelihoods
+
+def cdf_of_like(like):
+    """
+    There is probably an easier way to do this, BUT it works:
+    Turn a likelihood image into a CDF image
+    """
+    order = np.argsort(like.flat)[::-1]
+    cdf = like.flat[order].cumsum()[np.argsort(order)].reshape(like.shape)
+    return cdf
+
+def ppf_of_like(like):
+    return 1-cdf_of_like(like)
