@@ -329,9 +329,9 @@ for weight in ("","_weighted"):
         F2.recenter(0, -0.03, width=1.8, height=0.3)
         F2.set_tick_labels_format('d.dd','d.dd')
 
-        F2.show_markers([0.47], [-0.01], edgecolor='r', marker='x', s=25, zorder=1500)
-        F2.show_markers([0.38], [0.04], edgecolor='b', marker='x', s=25, zorder=1500)
-        F2.show_markers([0.253], [0.016], edgecolor='purple', marker='x', s=25, zorder=1500)
+        F2.show_markers([0.47], [-0.01], edgecolor='r', marker='x', s=100, zorder=1500)
+        F2.show_markers([0.38], [0.04], edgecolor='b', marker='x', s=100, zorder=1500)
+        F2.show_markers([0.253], [0.016], edgecolor='purple', marker='x', s=100, zorder=1500)
 
         F2.save(fpath('orbits/KDL2014_orbitpath_on_{0}{1}.pdf'.format(molecule, weight)))
 
