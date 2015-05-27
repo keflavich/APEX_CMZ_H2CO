@@ -1,4 +1,3 @@
-raise Exception("Use h2co_modeling.constrain_parameters instead")
 """
 Functions for fitting temperature (and density and column) from the line ratio
 plus whatever other constraints are available
@@ -8,6 +7,7 @@ import time
 
 import numpy as np
 from scipy.ndimage.interpolation import map_coordinates
+from scipy import stats
 from astropy import units as u
 from astropy import log
 import pylab as pl
@@ -208,18 +208,27 @@ class paraH2COmodel(generic_paraH2COmodel):
                      + self.chi2_r321322 + self.chi2_r321303 + self.chi2_dens)
 
 
-    def parplot(self, par1='col', par2='dens', nlevs=5, levels=None):
+    def parplot(self, par1='col', par2='dens', nlevs=5, levels=None, ndof=3):
 
         xax = self.axes[par1]
         yax = self.axes[par2]
         xlabel = self.labels[par1]
         ylabel = self.labels[par2]
-        axis = {('col','dens'): 0,
-                ('dens','tem'): 2,
-                ('col','tem'): 1}[(par1,par2)]
+        amapping = {('col','dens'): 0,
+                    ('dens','tem'): 2,
+                    ('col','tem'): 1}
+        if (par1,par2) in amapping:
+            axis = amapping[(par1,par2)]
+            swaps = (0,0)
+        elif (par2,par1) in amapping:
+            axis = amapping[(par2,par1)]
+            swaps = (0,1)
 
         if levels is None:
-            levels = np.arange(nlevs)
+            levels = ([0]+
+                      [stats.chi2.ppf(stats.norm.cdf(ii)-stats.norm.cdf(-ii),
+                                      ndof)
+                       for ii in range(1,nlevs)])
 
         xmaxlike = self.parconstraints['{0}_chi2'.format(short_mapping[par1])]
         ymaxlike = self.parconstraints['{0}_chi2'.format(short_mapping[par2])]
@@ -229,23 +238,23 @@ class paraH2COmodel(generic_paraH2COmodel):
         fig = pl.gcf()
         fig.clf()
         ax1 = pl.subplot(2,2,1)
-        pl.contourf(xax, yax, self.chi2_r321303.min(axis=axis),
+        pl.contourf(xax, yax, self.chi2_r321303.min(axis=axis).swapaxes(*swaps),
                     levels=self.chi2_r321303.min()+levels, alpha=0.5)
-        pl.contour(xax, yax, self.chi2.min(axis=axis),
+        pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
                    levels=self.chi2.min()+levels)
         pl.plot(xmaxlike, ymaxlike, 'o', facecolor='none', edgecolor='k')
         pl.plot(xexpect, yexpect, 'x', facecolor='none', edgecolor='k')
         if self.chi2_r321322:
-            pl.contour(xax, yax, self.chi2_r321322.min(axis=axis),
+            pl.contour(xax, yax, self.chi2_r321322.min(axis=axis).swapaxes(*swaps),
                        levels=self.chi2_r321322.min()+levels,
                        cmap=pl.cm.bone)
         pl.title("Ratio $3_{0,3}-2_{0,2}/3_{2,1}-2_{2,0}$")
 
         ax4 = pl.subplot(2,2,2)
         if hasattr(self.chi2_X, 'size'):
-            pl.contourf(xax, yax, self.chi2_X.min(axis=axis),
+            pl.contourf(xax, yax, self.chi2_X.min(axis=axis).swapaxes(*swaps),
                         levels=self.chi2_X.min()+levels, alpha=0.5)
-        pl.contour(xax, yax, self.chi2.min(axis=axis),
+        pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
                    levels=self.chi2.min()+levels)
         pl.plot(xmaxlike, ymaxlike, 'o', facecolor='none', edgecolor='k')
         pl.plot(xexpect, yexpect, 'x', facecolor='none', edgecolor='k')
@@ -255,9 +264,9 @@ class paraH2COmodel(generic_paraH2COmodel):
 
         ax3 = pl.subplot(2,2,3)
         if hasattr(self.chi2_h2, 'size'):
-            pl.contourf(xax, yax, self.chi2_h2.min(axis=axis),
+            pl.contourf(xax, yax, self.chi2_h2.min(axis=axis).swapaxes(*swaps),
                         levels=self.chi2_h2.min()+levels, alpha=0.5)
-        pl.contour(xax, yax, self.chi2.min(axis=axis),
+        pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
                    levels=self.chi2.min()+levels)
         pl.plot(xmaxlike, ymaxlike, 'o', facecolor='none', edgecolor='k')
         pl.plot(xexpect, yexpect, 'x', facecolor='none', edgecolor='k')
@@ -269,9 +278,9 @@ class paraH2COmodel(generic_paraH2COmodel):
         #    pl.contourf(xax, yax, (self.chi2_ff1.min(axis=axis)),
         #                levels=self.chi2_ff1.min()+levels, alpha=0.5)
         if hasattr(self.chi2_dens, 'size'):
-            pl.contourf(xax, yax, (self.chi2_dens.min(axis=axis)),
+            pl.contourf(xax, yax, (self.chi2_dens.min(axis=axis)).swapaxes(*swaps),
                         levels=self.chi2_dens.min()+levels, alpha=0.5)
-        pl.contour(xax, yax, self.chi2.min(axis=axis),
+        pl.contour(xax, yax, self.chi2.min(axis=axis).swapaxes(*swaps),
                    levels=self.chi2.min()+levels)
         if hasattr(self, 'taline303'):
             pl.contour(xax, yax, (self.tline303 < 10*self.taline303).max(axis=axis),

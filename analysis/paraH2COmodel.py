@@ -10,16 +10,16 @@ from scipy import stats
 from h2co_modeling import grid_fitter
 
 class generic_paraH2COmodel(object):
-    def grid_getmatch_321to303(self, ratio, eratio, chi2thresh=1):
+    def grid_getmatch_321to303(self, ratio, eratio, chi2_thresh=1):
             match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio,
                                                             self.modelratio1,
-                                                            chi2thresh=chi2thresh)
+                                                            chi2_thresh=chi2_thresh)
             return chi2r
 
-    def grid_getmatch_322to321(self, ratio, eratio, chi2thresh=1):
+    def grid_getmatch_322to321(self, ratio, eratio, chi2_thresh=1):
             match,indbest,chi2r = grid_fitter.grid_getmatch(ratio, eratio,
                                                             self.modelratio2,
-                                                            chi2thresh=chi2thresh)
+                                                            chi2_thresh=chi2_thresh)
             return chi2r
 
     @property
