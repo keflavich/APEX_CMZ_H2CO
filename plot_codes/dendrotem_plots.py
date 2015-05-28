@@ -16,9 +16,10 @@ import gaussian_correction
 
 
 if 'tm' not in locals():
-    tm = TemperatureMapper(logdensities=[3,4,5])
+    tm = TemperatureMapper(logdensities=[3,4,5], abundances=(1.2e-9))
     tm2 = TemperatureMapper(logdensities=[4], deltav=20.0)
     tm3 = TemperatureMapper(logdensities=[4], deltav=1.0)
+    tm4 = TemperatureMapper(logdensities=[4], abundances=(1e-8,1e-10))
 
 segmentdata = {'alpha': [(0.0, 1.0, 1.0), (0.5, 1.0, 1.0), (1.0, 1.0, 1.0)],
                'blue': [(0.0, 1.0, 1.0), (0.5, 0.0, 0.0), (1.0, 0.0, 0.0)],
@@ -43,7 +44,7 @@ for cat,dendro,smooth in zipped[:1]:
         pl.figure(ii)
         pl.clf()
 
-    sn = (cat['ratio303321']/cat['eratio303321'])
+    sn = (cat['ratio321303']/cat['eratio321303'])
     sngt50 = sn > 50
     sn25_50 = (sn > 25) & (sn < 50)
     ok = (np.isfinite(sn) & (cat['Stot321'] < cat['Stot303']) & ~(cat['bad']) &
@@ -87,80 +88,97 @@ for cat,dendro,smooth in zipped[:1]:
     fig1.savefig(fpath('dendrotem/area_vs_temperature{0}.pdf'.format(smooth)),
                  bbox_inches='tight')
 
+
     fig2, ax2 = pl.subplots(num=2)
-    for mask,color,alpha,markersize in masks_colors:
-        ax2.errorbar(cat['ratio303321'][mask], cat['temperature_chi2'][mask],
-                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
-                     #xerr=[cat['eratio303321'][mask], cat['eratio303321'][mask]],
-                     linestyle='none', capsize=0, alpha=alpha, marker='.',
-                     markersize=10 if any(mask & is_leaf) else 5,
-                     color=color, linewidth=0.3)
-        ax2.set_xlabel("Ratio $S(3_{2,1}-2_{2,0})/S(3_{0,3}-2_{0,2})$")
-        ax2.set_ylabel("Temperature (K)")
-    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}.pdf'.format(smooth)),
+    ax2.plot(cat['temperature_chi2'], cat['expected_temperature'], '.')
+    ax2.plot([0,250], [0,250], 'k--', label="$E[T] = T_{ML}$", zorder=-2)
+    ax2.plot([0,250], [0,250*1.5], 'k:', label="$E[T] = 1.5*T_{ML}$", zorder=-2)
+    ax2.plot([0,250], [0,250*0.5], 'k-.', label="$E[T] = 0.5*T_{ML}$", zorder=-2)
+    ax2.set_xlabel("$T_{ML}$")
+    ax2.set_xlabel("$E[T]$")
+    fig2.savefig(fpath('dendrotem/expected_vs_maxlike_temperature{0}.pdf'.format(smooth)),
                  bbox_inches='tight')
 
-    if not hasattr(tm, 'temperatures'):
-        tm.init()
-    if not hasattr(tm2, 'temperatures'):
-        tm2.init()
-    if not hasattr(tm3, 'temperatures'):
-        tm3.init()
-    L1, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e3], tm.temperatures, 'k-.', label=r'$n(H_2)=10^3$ cm$^{-3}$', zorder=-5)
-    L2, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e4], tm.temperatures, 'k--', label=r'$n(H_2)=10^4$ cm$^{-3}$', zorder=-5)
-    L3, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e5], tm.temperatures, 'k:',  label=r'$n(H_2)=10^5$ cm$^{-3}$', zorder=-5)
-    leg = pl.legend(loc='best')
-    ax2.axis([0,0.55,10,200])
-    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay.pdf'.format(smooth)),
-                 bbox_inches='tight')
-    L4, = ax2.plot(tm.Xarr[1e-8]['ratio1'][1e4], tm.temperatures, 'r--', label=r'$n(H_2)=10^4$ cm$^{-3}$ $X=10^{-8}$', zorder=-5)
-    L5, = ax2.plot(tm.Xarr[1e-10]['ratio1'][1e4], tm.temperatures, 'r:', label=r'$n(H_2)=10^4$ cm$^{-3}$ $X=10^{-10}$', zorder=-5)
-    leg = pl.legend(loc='best')
-    ax2.axis([0,0.55,10,200])
-    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_withabund.pdf'.format(smooth)),
-                 bbox_inches='tight')
 
-    L6, = ax2.plot(tm2.Xarr[1.2e-9]['ratio1'][1e4],
-                   tm2.temperatures, 'b--', alpha=0.2,
-                   label=r'$n(H_2)=10^4$ cm$^{-3}$, $dv=20$ km s$^{-1}$', zorder=-10)
-    L7, = ax2.plot(tm3.Xarr[1.2e-9]['ratio1'][1e4],
-                   tm3.temperatures, 'b:', alpha=0.2,
-                   label=r'$n(H_2)=10^4$ cm$^{-3}$, $dv=1$ km s$^{-1}$', zorder=-10)
-    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_dv.pdf'.format(smooth)),
-                 bbox_inches='tight')
-    L4.set_visible(False)
-    L5.set_visible(False)
-    L6.set_visible(False)
-    L7.set_visible(False)
+    for temperature_type, tsuffix in zip(('temperature_chi2', 'expected_temperature'), ('', '_expectation')):
 
-    ax2.set_yscale('log')
-    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_log.pdf'.format(smooth)),
-                 bbox_inches='tight')
-    ax2.set_yscale('linear')
+        fig2.clf()
+        ax2 = fig2.gca()
+        for mask,color,alpha,markersize in masks_colors:
+            ax2.errorbar(cat['ratio321303'][mask], cat[temperature_type][mask],
+                         #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
+                         #xerr=[cat['eratio321303'][mask], cat['eratio321303'][mask]],
+                         linestyle='none', capsize=0, alpha=alpha, marker='.',
+                         markersize=10 if any(mask & is_leaf) else 5,
+                         color=color, linewidth=0.3)
+            ax2.set_xlabel("Ratio $S(3_{2,1}-2_{2,0})/S(3_{0,3}-2_{0,2})$")
+            ax2.set_ylabel("Temperature (K)")
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}.pdf'.format(smooth)),
+                     bbox_inches='tight')
 
-    L1.set_visible(False)
-    L2.set_visible(False)
-    L3.set_visible(False)
+        if not hasattr(tm, 'temperatures'):
+            tm.init()
+        if not hasattr(tm2, 'temperatures'):
+            tm2.init()
+        if not hasattr(tm3, 'temperatures'):
+            tm3.init()
+        if not hasattr(tm4, 'temperatures'):
+            tm4.init()
+        L1, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e3], tm.temperatures, 'k-.', label=r'$n(H_2)=10^3$ cm$^{-3}$', zorder=-5)
+        L2, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e4], tm.temperatures, 'k--', label=r'$n(H_2)=10^4$ cm$^{-3}$', zorder=-5)
+        L3, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e5], tm.temperatures, 'k:',  label=r'$n(H_2)=10^5$ cm$^{-3}$', zorder=-5)
+        leg = pl.legend(loc='best')
+        ax2.axis([0,0.55,10,200])
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay{1}.pdf'.format(smooth, tsuffix)),
+                     bbox_inches='tight')
+        L4, = ax2.plot(tm4.Xarr[1e-8]['ratio1'][1e4], tm4.temperatures, 'r--', label=r'$n(H_2)=10^4$ cm$^{-3}$ $X=10^{-8}$', zorder=-5)
+        L5, = ax2.plot(tm4.Xarr[1e-10]['ratio1'][1e4], tm4.temperatures, 'r:', label=r'$n(H_2)=10^4$ cm$^{-3}$ $X=10^{-10}$', zorder=-5)
+        leg = pl.legend(loc='best')
+        ax2.axis([0,0.55,10,200])
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay{1}_withabund.pdf'.format(smooth, tsuffix)),
+                     bbox_inches='tight')
+
+        L6, = ax2.plot(tm2.Xarr[1.2e-9]['ratio1'][1e4],
+                       tm2.temperatures, 'b--', alpha=0.2,
+                       label=r'$n(H_2)=10^4$ cm$^{-3}$, $dv=20$ km s$^{-1}$', zorder=-10)
+        L7, = ax2.plot(tm3.Xarr[1.2e-9]['ratio1'][1e4],
+                       tm3.temperatures, 'b:', alpha=0.2,
+                       label=r'$n(H_2)=10^4$ cm$^{-3}$, $dv=1$ km s$^{-1}$', zorder=-10)
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay{1}_dv.pdf'.format(smooth, tsuffix)),
+                     bbox_inches='tight')
+        L4.set_visible(False)
+        L5.set_visible(False)
+        L6.set_visible(False)
+        L7.set_visible(False)
+
+        ax2.set_yscale('log')
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay{1}_log.pdf'.format(smooth, tsuffix)),
+                     bbox_inches='tight')
+        ax2.set_yscale('linear')
+
+        L1.set_visible(False)
+        L2.set_visible(False)
+        L3.set_visible(False)
 
         
     if cat is catalog:
         ## Determine approximate best-fit
         #sel = cat['temperature_chi2'][ok] < 70
-        #fparslt60 = np.polyfit(cat['ratio303321'][ok][sel],
+        #fparslt60 = np.polyfit(cat['ratio321303'][ok][sel],
         #                       cat['temperature_chi2'][ok][sel], 2)
         #p1 = np.polynomial.polynomial.Polynomial(fparslt60[::-1])
 
         #sel = ((cat['temperature_chi2'][ok] > 70) &
         #       (cat['temperature_chi2'][ok] < 120) &
-        #       (cat['ratio303321'][ok] < 0.6))
-        #fparsgt60 = np.polyfit(cat['ratio303321'][ok][sel],
+        #       (cat['ratio321303'][ok] < 0.6))
+        #fparsgt60 = np.polyfit(cat['ratio321303'][ok][sel],
         #                       cat['temperature_chi2'][ok][sel], 1)
         #p2 = np.polynomial.polynomial.Polynomial(fparsgt60[::-1])
 
         #sel = ((cat['temperature_chi2'][ok] > 120) &
         #       (cat['temperature_chi2'][ok] < 355) &
-        #       (cat['ratio303321'][ok] < 0.6))
-        #fparsgt150 = np.polyfit(cat['ratio303321'][ok][sel],
+        #       (cat['ratio321303'][ok] < 0.6))
+        #fparsgt150 = np.polyfit(cat['ratio321303'][ok][sel],
         #                        cat['temperature_chi2'][ok][sel], 1)
         #p3 = np.polynomial.polynomial.Polynomial(fparsgt150[::-1])
 
@@ -202,8 +220,8 @@ for cat,dendro,smooth in zipped[:1]:
         #for ll in l1,l2,l3,l0:
         #    ll.set_visible(False)
 
-        sel = cat['ratio303321'][ok] < 0.6
-        pars = np.polyfit(cat['ratio303321'][ok][sel],
+        sel = cat['ratio321303'][ok] < 0.6
+        pars = np.polyfit(cat['ratio321303'][ok][sel],
                           cat['temperature_chi2'][ok][sel],2)
         log.info("Polynomial parameters: {0}".format(pars))
         ax2.plot(x, np.polyval(pars, x), 'r--', alpha=0.5)
@@ -212,8 +230,8 @@ for cat,dendro,smooth in zipped[:1]:
                      bbox_inches='tight')
 
     elif cat is catalog_sm:
-        sel = cat['ratio303321'][ok] < 0.6
-        pars = np.polyfit(cat['ratio303321'][ok][sel],
+        sel = cat['ratio321303'][ok] < 0.6
+        pars = np.polyfit(cat['ratio321303'][ok][sel],
                           cat['temperature_chi2'][ok][sel],2)
         log.info("Polynomial parameters (smooth): {0}".format(pars))
         L, = ax2.plot(x, np.polyval(pars, x), 'k--', alpha=0.5,
@@ -655,11 +673,11 @@ for cat,dendro,smooth in zipped[:1]:
     fig25.clf()
     ax25 = fig25.gca()
     tem_to_color = pl.cm.RdYlBu_r((cat['temperature_chi2']-15)/(200-15.))
-    sc = ax25.scatter(cat['ratio303321'][is_leaf], np.log10(cat['dustmindens'][is_leaf]),
+    sc = ax25.scatter(cat['ratio321303'][is_leaf], np.log10(cat['dustmindens'][is_leaf]),
                       c=cat['temperature_chi2'][is_leaf], cmap=pl.cm.RdYlBu_r,
                       marker='o', vmin=15, vmax=200, alpha=0.8,
                       lw=0, s=40, edgecolors='k')
-    sc2 = ax25.scatter(cat['ratio303321'][~is_leaf], np.log10(cat['dustmindens'][~is_leaf]),
+    sc2 = ax25.scatter(cat['ratio321303'][~is_leaf], np.log10(cat['dustmindens'][~is_leaf]),
                        c=cat['temperature_chi2'][~is_leaf], cmap=pl.cm.RdYlBu_r,
                        marker='o', vmin=15, vmax=200, alpha=0.2,
                        lw=0, s=25, edgecolors='k')
@@ -721,7 +739,7 @@ for cat,dendro,smooth in zipped[:1]:
     fig14 = pl.figure(14)
     fig14.clf()
     ax14 = fig14.gca()
-    def dendroplot(axis=ax14, axname1='area_exact', axname2='ratio303321',
+    def dendroplot(axis=ax14, axname1='area_exact', axname2='ratio321303',
                    axscale1=1.,
                    axscale2=1.,
                    leaves_list=[sgra_leaves],
@@ -913,7 +931,7 @@ for cat,dendro,smooth in zipped[:1]:
 
 
     # SgrA total, 20kms, 50kms
-    #catalog_sm[np.array([126,247,346])]['_idx','ratio303321','dustmindens','temperature_chi2'].pprint()
+    #catalog_sm[np.array([126,247,346])]['_idx','ratio321303','dustmindens','temperature_chi2'].pprint()
 
     
 
