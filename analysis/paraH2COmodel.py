@@ -54,17 +54,17 @@ class generic_paraH2COmodel(object):
 
     def chi2_column(self, logh2column, elogh2column, h2coabundance, linewidth):
 
-        h2fromh2co = (self.columnarr + np.log10(np.sqrt(np.pi) * linewidth) -
+        h2fromh2co = (self.columnarr + np.log10(np.sqrt(np.pi)/2.35 * linewidth) -
                       h2coabundance)
         chi2_h2 = ((h2fromh2co-logh2column)/elogh2column)**2
 
         return chi2_h2
 
-    def chi2_abundance(self, logabundance, elogabundance):
-        # Should there be a factor of np.log10(np.sqrt(np.pi) * linewidth) here?
-        # Should linewidth be treated as FWHM instead of sigma, as it presently is?
-        model_logabundance = (self.columnarr - np.log10(u.pc.to(u.cm)) -
-                              self.densityarr)
+    def chi2_abundance(self, logabundance, elogabundance, linewidth):
+        model_logabundance = (self.columnarr
+                              - np.log10(u.pc.to(u.cm))
+                              - np.log10(np.sqrt(np.pi)/2.35 * linewidth)
+                              - self.densityarr)
         chi2X = ((model_logabundance-logabundance)/elogabundance)**2
         return chi2X
 

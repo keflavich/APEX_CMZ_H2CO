@@ -160,9 +160,11 @@ class paraH2COmodel(generic_paraH2COmodel):
             if argspec.locals[arg] is not None:
                 setattr(self, arg, argspec.locals[arg])
 
-        self.chi2_X = (self.chi2_abundance(logabundance, elogabundance) 
+        self.chi2_X = (self.chi2_abundance(logabundance, elogabundance,
+                                           linewidth) 
                        if not any(arg is None for arg in (logabundance,
-                                                          elogabundance))
+                                                          elogabundance,
+                                                          linewidth))
                        else 0)
 
         self.chi2_h2 = (self.chi2_column(logh2column, elogh2column,
