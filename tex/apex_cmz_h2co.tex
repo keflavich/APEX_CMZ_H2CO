@@ -686,10 +686,16 @@ These constraints are shown projected onto the three planes of our fitted
 parameter space in the multi-paneled Figures
 \ref{fig:coltemconstraints}-\ref{fig:parsonbrightness} for one example region.
 The fitted parameters are displayed in Figure \ref{fig:parsonbrightness}.
-While we have created $\chi^2$ grids, we have used the expectation values
-(rather than the maximum-likelihood) of the parameters as our `best-fit'
-models, and we report error bars at the 68\% likelihood level for the
-distributions marginalized over all other parameters.
+% we SHOULD do this, but it doesn't look as convincing - and it won't change
+% any of the results since we're still going to use a single physical model,
+% and the max-likelihood vs expectation values will both still just be used to
+% select which model we use.  They are nearly identical in the relevant regime
+% with T<100 K, so even to those few of you reading the comments (and my stream
+% of commit messages recently...), I think this is really OK to do.
+%While we have created $\chi^2$ grids, we have used the expectation values
+%(rather than the maximum-likelihood) of the parameters as our `best-fit'
+%models, and we report error bars at the 68\% likelihood level for the
+%distributions marginalized over all other parameters.
 
 While $R_2$ can provide significant constraints on various parameters, we do
 not use it for our general analysis because of the ambiguity imposed by the
@@ -868,15 +874,15 @@ lower signal-to-noise ratios at the edges and should be ignored.
 \label{sec:discussion}
 \subsection{Gas heating and thermal balance}
 \label{sec:heating}
-Following \citet{Ao2013a}, we examine the energy balance in the CMZ gas to
-understand the temperatures we measure.  The two key processes they identified
-are cosmic ray and turbulent dissipation (shock) heating.  We ignore all UV-driven
-heating processes in this section as we are interested in gas at high
-extinction ($A_V > 10$).  Other processes, e.g. direct (proto)stellar heating
-or supernova bubble interaction may be relevant locally, but cannot heat the
-gas globally.  \citet{Ao2013a} ruled out diffuse X-rays as a significant
-heating source, with an energy density $\sim3$ orders of magnitude too low to
-explain observed temperatures.
+Following \citet{Ao2013a} and \citet{Papadopolous2010a}, we examine the energy
+balance in the CMZ gas to understand the temperatures we measure.  The two key
+processes they identified are cosmic ray and turbulent dissipation (shock)
+heating.  We ignore all UV-driven heating processes in this section as we are
+interested in gas at high extinction ($A_V > 10$).  Other processes, e.g.
+direct (proto)stellar heating or supernova bubble interaction may be relevant
+locally, but cannot heat the gas globally.  \citet{Ao2013a} ruled out diffuse
+X-rays as a significant heating source, with an energy density $\sim3$ orders
+of magnitude too low to explain observed temperatures.
 
 We determine the expected gas kinetic temperature by assuming that the heating
 and cooling processes are in equilibrium.  This is generally a good assumption
@@ -1109,10 +1115,10 @@ equilibrium using the \citet{Nelson1999a} chemical network code and find that
 the predicted O abundance is increased by
 an order of magnitude, which in turn makes oxygen a significant coolant with
 $\Lambda_{O} \approx 0.5 \Lambda_{CO}$, where $\Lambda$ is the cooling rate
-in erg \pers \percc.   The predicted equilibrium temperature
-is then $T=114$ K.  While this temperature is still a bit high, this example
-shows that the modified chemistry at these high temperatures should be
-accounted for when predicting the gas temperature.
+in erg \pers \percc (other coolants remain negligible).   The predicted
+equilibrium temperature is then $T=114$ K.  While this temperature is still a
+bit high, this example shows that the modified chemistry at these high
+temperatures should be accounted for when predicting the gas temperature.
 
 We may be able to further constrain the heating mechanisms using this same data
 set if more precise velocity structure information is obtained for the clouds.

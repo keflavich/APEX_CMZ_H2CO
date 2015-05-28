@@ -16,7 +16,7 @@ import gaussian_correction
 
 
 if 'tm' not in locals():
-    tm = TemperatureMapper(logdensities=[3,4,5], abundances=(1.2e-9))
+    tm = TemperatureMapper(logdensities=[3,4,5], abundances=(1.2e-9,))
     tm2 = TemperatureMapper(logdensities=[4], deltav=20.0)
     tm3 = TemperatureMapper(logdensities=[4], deltav=1.0)
     tm4 = TemperatureMapper(logdensities=[4], abundances=(1e-8,1e-10))
@@ -133,7 +133,8 @@ for cat,dendro,smooth in zipped[:1]:
                      bbox_inches='tight')
         L4, = ax2.plot(tm4.Xarr[1e-8]['ratio1'][1e4], tm4.temperatures, 'r--', label=r'$n(H_2)=10^4$ cm$^{-3}$ $X=10^{-8}$', zorder=-5)
         L5, = ax2.plot(tm4.Xarr[1e-10]['ratio1'][1e4], tm4.temperatures, 'r:', label=r'$n(H_2)=10^4$ cm$^{-3}$ $X=10^{-10}$', zorder=-5)
-        leg = pl.legend(loc='best')
+        leg.remove()
+        leg = pl.legend(loc='best', fontsize=14)
         ax2.axis([0,0.55,10,200])
         fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay{1}_withabund.pdf'.format(smooth, tsuffix)),
                      bbox_inches='tight')
@@ -144,6 +145,8 @@ for cat,dendro,smooth in zipped[:1]:
         L7, = ax2.plot(tm3.Xarr[1.2e-9]['ratio1'][1e4],
                        tm3.temperatures, 'b:', alpha=0.2,
                        label=r'$n(H_2)=10^4$ cm$^{-3}$, $dv=1$ km s$^{-1}$', zorder=-10)
+        leg.remove()
+        leg = pl.legend(loc='best', fontsize=14)
         fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay{1}_dv.pdf'.format(smooth, tsuffix)),
                      bbox_inches='tight')
         L4.set_visible(False)
