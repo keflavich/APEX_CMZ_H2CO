@@ -31,6 +31,7 @@ import despotic_heating as heating
 
 
 pl.rcParams['font.size'] = 16.0
+pl.close(4)
 
 # mf means modelfitter
 mf = paraH2COmodel()
@@ -431,6 +432,7 @@ for row in fittable:
                                                                                               num=num))
         pl.savefig(outf, bbox_inches='tight')
 
+    pl.figure(4, figsize=(12,16))
     # levels[0] = 0.68
     mf.parplot1d_all(levels=[0.68])
     outf = paths.fpath('param_fits/{name}_oneD_{num}_parameter_constraints.pdf'.format(name=row['Source_Name'],
