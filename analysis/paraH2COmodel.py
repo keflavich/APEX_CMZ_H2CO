@@ -62,15 +62,21 @@ class generic_paraH2COmodel(object):
             is spread among multiple 'cells'
             ncells = linewidth / gradient
             N(H2) = n(H2) * ncells * cellsize
-            N(H2) = N(h2co) / X(H2CO) * ncells
+            N(H2) = N_real_tot / X
+                  = N_real / X * ncells
+                  = N_lvg * G * L / X * ncells
+                  = N_lvg * linewidth * L / X
+                  L = 1 pc
+            What is N_lvg? G=gradient L=length
+            N_lvg = N_real / G / L
+            X = N_real / (n(H2) * L)
+              = N_lvg * G / (n(H2) * L->cm)
 
-        ncells = linewidth(FWHM) / grid_linewidth (NOT the integral)
+        ncells = linewidth(FWHM) / grid_gradient (NOT the integral)
         """
 
-        ncells = linewidth / self.grid_linewidth
-
         h2fromh2co = (self.columnarr
-                      + np.log10(ncells)
+                      + np.log10(linewidth)
                       - h2coabundance)
         chi2_h2 = ((h2fromh2co-logh2column)/elogh2column)**2
 
@@ -78,10 +84,10 @@ class generic_paraH2COmodel(object):
 
     def chi2_abundance(self, logabundance, elogabundance):
         """
-        The linewidth does not enter the abundance discussion because both the
-        density and column (per km/s/pc) are on a per-cell basis.
+        See chi2_column for linewidth discussion
         """
         model_logabundance = (self.columnarr
+                              + np.log10(self.grid_linewidth)
                               - np.log10(u.pc.to(u.cm))
                               - self.densityarr)
         chi2X = ((model_logabundance-logabundance)/elogabundance)**2

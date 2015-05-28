@@ -404,9 +404,6 @@ class paraH2COmodel(generic_paraH2COmodel):
                 selection = like > cutoff
                 ax.fill_between(xax[selection], like[selection]*0,
                                 like[selection], alpha=0.1, zorder=fillind-20)
-                print("Likelihood > {0}: {1}".format(cutoff,
-                                                     like[selection].sum()))
-                print("Levels: {0}".format(levels))
                 if np.abs(like[selection].sum() - levels[0]) > 0.05:
                     # we want the sum of the likelihood to be right!
                     #import ipdb; ipdb.set_trace()
