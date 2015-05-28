@@ -24,13 +24,12 @@ We produce temperature maps and cubes with 30\arcsec and 1 \kms resolution and
 publish all data in FITS form; they can be recovered from digital object
 identifier \texttt{doi:10.7910/DVN/27601}.}
 {Gas temperatures in the Galactic center range from $\sim60$ K to $>100$ K in
-selected regions.  Gas temperatures are consistent with purely turbulent
+selected regions.  Gas temperatures are mostly consistent with purely turbulent
 heating, though cosmic ray heating still affects less turbulent clouds.  We
-infer an upper
-limit on the cosmic ray ionization rate $\zeta_{CR}<10^{-14}$ \pers. 
-The highest gas temperatures $T>100$ K are observed around the Sgr B2 cores, in
-the extended Sgr B2 cloud, the 20 \kms and 50 \kms clouds, and in `The Brick'
-(G0.253+0.016).
+infer an upper limit on the cosmic ray ionization rate $\zeta_{CR}<10^{-14}$
+\pers.  The highest gas temperatures $T>100$ K are observed around the Sgr B2
+cores, in the extended Sgr B2 cloud, the 20 \kms and 50 \kms clouds, and in
+`The Brick' (G0.253+0.016).
 }
 {
 The dense molecular gas temperature ($T\sim 65$K) of the region around our
@@ -151,7 +150,7 @@ the x1 and x2 orbits \citep{Rodriguez-Fernandez2006b,Riquelme2013a}.  We
 describe the new
 observations in Section \ref{sec:observations}.  In Section \ref{sec:signal},
 we describe the analysis process used to extract signal from the data cubes.
-In Section \ref{sec:linemodeling}, we describe how we 
+In Section \ref{sec:spectralmodeling}, we describe how we 
 derive temperatures from the line ratios.
 We discuss various implications of our data in Section
 \ref{sec:discussion}.  In the appendices, we describe further details of the
@@ -559,13 +558,24 @@ selections were made in two dimension rather than in the full PPV space.  We
 included a series of large square $8\arcmin \times 8\arcmin$ `apertures'
 corresponding to each observed field.  For each region extracted in this
 fashion, we fit a 1-3 component model as described in Section
-\ref{sec:linemodeling}, where each component consists of a 6-parameter
+\ref{sec:spectralmodeling}, where each component consists of a 6-parameter
 multi-gaussian model.  An example spectrum extracted from a small region around
 ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.  The extracted regions are
 shown in Figure \ref{fig:regions}.
 
 \section{Analysis: temperature determination}
-\subsection{Line modeling}
+In this Section, we describe the techniques used to derive gas temperatures.
+In Section \ref{sec:linemodeling} we model the line ratios with a radiative
+transfer code.  We fit gaussians to spectra extracted from the cubes and use
+these fits to measure line ratios in Section \ref{sec:spectralmodeling}.  In
+Section \ref{sec:dendromod}, we apply the same modeling approach to the
+dendrogram-extracted clumps from Section \ref{sec:region}.  We use the modeling
+results from Section \ref{sec:spectralmodeling} and \ref{sec:dendromod} to
+justify a simplified modeling approach that we apply to the entire map of the
+CMZ in Section \ref{sec:formaldehydetemmap}.
+
+
+\subsection{Radiative transfer modeling}
 \label{sec:linemodeling}
 We use RADEX \citep{van-Der-Tak2007a} and a related solver (Fujun Du's
 \texttt{myRadex}; \url{https://github.com/fjdu/myRadex}) to create model grids
@@ -587,6 +597,8 @@ $10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N < 10^{15.1}$
 consistent with the \texttt{RADEX} grid over most of parameter space but
 suffers fewer numerical instabilities over the region we are interested in.
 
+\subsection{Spectral modeling}
+\label{sec:spectralmodeling}
 We extracted spectra averaged over selected regions and fitted
 a 6-parameter model to the full 218-219 GHz spectral range using
 \texttt{pyspeckit} \citep{Ginsburg2011c}.  The fitted parameters are the
@@ -649,7 +661,7 @@ diffuse clouds, the filling factor of the emitting regions may be $ff<<1$ if
 the emission is isolated to compact shocked regions, as expected if highly
 supersonic $\mathcal{M}>10$ turbulence is energetically dominant in the clouds.
 We use an abundance $N(\para)/N(\hh) = X(\para) =
-10^{-9.08\pm1}$, allowing for a two order of magnitude variation in
+10^{-9.08\pm1}$, allowing for more than two orders of magnitude variation in
 the \formaldehyde abundance
 \citep{Ginsburg2013a,Carey1998a,Wootten1978a,Mundy1987a}.  To constrain the
 total column density, we use the Herschel dust maps (see Section
@@ -672,8 +684,12 @@ Herschel dust-derived mass and a spherical volume, which sets a conservative
 
 These constraints are shown projected onto the three planes of our fitted
 parameter space in the multi-paneled Figures
-\ref{fig:coltemconstraints}-\ref{fig:parsonbrightness}.  The fitted parameters
-are displayed in Figure \ref{fig:parsonbrightness}.
+\ref{fig:coltemconstraints}-\ref{fig:parsonbrightness} for one example region.
+The fitted parameters are displayed in Figure \ref{fig:parsonbrightness}.
+While we have created $\chi^2$ grids, we have used the expectation values
+(rather than the maximum-likelihood) of the parameters as our `best-fit'
+models, and we report error bars at the 68\% likelihood level for the
+distributions marginalized over all other parameters.
 
 While $R_2$ can provide significant constraints on various parameters, we do
 not use it for our general analysis because of the ambiguity imposed by the
@@ -699,7 +715,7 @@ errors are shown in the legend as in Figure \ref{fig:twospectra_hotcold}.}
 \subsection{Clump modeling}
 \label{sec:dendromod}
 We derived temperatures for each dendrogram catalog clump using the same
-measured quantities as in Section \ref{sec:linemodeling} as constraints.  The
+measured quantities as in Section \ref{sec:spectralmodeling} as constraints.  The
 $\chi^2$ grid approach described in Section \ref{sec:linemodeling} was used to
 extract the temperature and associated error.
 
@@ -975,7 +991,7 @@ different line styles indicate changes in other physical constants.
 The green solid curve shows a pressure equilibrium case ($n\propto\sigma^{-2}$)
 with a Larson relation ($L\propto\sigma^{0.7}$) based on \citet{Shetty2012a}.
 (a) 
-The fitted temperature as described in Section \ref{sec:linemodeling} plotted
+The fitted temperature as described in Section \ref{sec:spectralmodeling} plotted
 against the fitted line width for the by-eye selected regions.  The blue
 symbols are compact `clump' sources and the red symbols are large-area
 ($8\arcmin$) square regions.  The very broad line regions, FWHM $\gtrsim$ 40
@@ -1120,7 +1136,7 @@ We have examined the radial profiles of temperature and velocity
 dispersion for selected clouds.  We measured the ratio $R_1$ and the line width
 as a function of aperture size by extracting progressively larger circular
 apertures centered on the same point.  For each spectrum extracted, we have
-fitted the 6-parameter model described in Section \ref{sec:linemodeling} to
+fitted the 6-parameter model described in Section \ref{sec:spectralmodeling} to
 derive the ratio and linewidth.
 
 Different variations with scale are observed.  For example, around `The Brick',
@@ -1193,7 +1209,7 @@ not in equilibrium.
 {figures/chi2_temperature_vs_higaltemperature_fieldsandsources.pdf} % parameter_comparisons
 {figures/dendrotem/temperature_vs_dusttem.pdf} % dendrotem_plots
 {(a) The fitted temperature of region-averaged spectra as described in
-Section \ref{sec:linemodeling} plotted against the HiGal fitted dust
+Section \ref{sec:spectralmodeling} plotted against the HiGal fitted dust
 temperature.  As in Figure \ref{fig:temvsfwhm_regions}, the blue symbols are
 compact `clump' sources and the red symbols are large-area square regions.  The
 black dashed line shows the $T_g = T_d$ relation.  Nearly all of the data
@@ -1694,11 +1710,12 @@ to a radius $\sim200$ pc.
 We have examined the thermal balance in CMZ clouds.
 The high but variable gas temperatures throughout the CMZ suggest that
 turbulent heating is the dominant heating mechanism in Galactic Center dense
-gas.  Cosmic rays may be important in less turbulent sub-regions within the
-CMZ, but we are able to place an upper limit $\zeta_{CR} < 10^{-14}$ \pers in
-the dense gas because a higher CRIR would result in a higher floor temperature
-than we observe.  Dust is a coolant in CMZ dense gas, and no other heating
-mechanisms should be able to affect the centers of dense clouds.
+gas.  Cosmic rays are not dominant, but may be important in less turbulent
+sub-regions within the CMZ, but we are able to place an upper limit $\zeta_{CR}
+< 10^{-14}$ \pers in the dense gas because a higher CRIR would result in a
+higher floor temperature than we observe.  Dust is a coolant in CMZ dense gas,
+and no other heating mechanisms should be able to affect the centers of dense
+clouds.
 
 There are many regions with expected temperatures based on heating from
 turbulent energy distribution substantially higher than observed.  These
@@ -1840,7 +1857,7 @@ In the attached electronic table, three types of region are included:
     \item $8\arcmin \times 8\arcmin$ square observation fields (Figure \ref{fig:regions}c)
 \end{enumerate}
 The fit tables include multicomponent spectral fits with and without
-spline-based baseline removal (see Section \ref{sec:linemodeling}).
+spline-based baseline removal (see Section \ref{sec:spectralmodeling}).
 Spatial parameters for the box (\texttt{GLON}, \texttt{GLAT},
 \texttt{boxheight}, and \texttt{boxwidth}) or circle (\texttt{GLON},
 \texttt{GLAT}, and \texttt{radius}) regions are included.  The average dust
@@ -1887,7 +1904,7 @@ substantially longer than the data reduction.
 
 
 \section{A detailed example showing parameter constraints}
-In Section \ref{sec:linemodeling}, we discussed the fitting approach used
+In Section \ref{sec:spectralmodeling}, we discussed the fitting approach used
 to determine a best-fit temperature and uncertainties on that temperature.
 Here, we go through a detailed example showing projections of the full 3D
 temperature-density-column parameter space we explored and the constraints
@@ -1902,6 +1919,13 @@ Figure \ref{fig:parsonbrightness} shows slices through the LVG models at the
 maximum likelihood position.  The panels show the predicted line brightness of
 the \threeohthree and \threetwoone lines in each direction through the LVG
 parameter cube.
+
+Figure \ref{fig:oneddistributions} shows the marginalized one-dimensional
+distributions for each parameter along with the constraints provided by each
+measurement.  Note that the posterior is not simply the product of the other
+displayed distributions; for example, very high temperatures require low
+volume and high column densities that occupy a small fraction of the total
+integrated likelihood.
 
 % param_plots
 \Figure{figures/param_fits/c:G0.38+0.04_col_tem_0_parameter_constraints.pdf}
@@ -1955,6 +1979,13 @@ location of the best-fit parameter.  The colored contours show the allowed
 marginalized regions in each parameter space as described in the
 Figure \ref{fig:coltemconstraints} caption.}
 {fig:parsonbrightness}{0.5}{0}
+
+\Figure{figures/param_fits/c:G0.38+0.04_oneD_0_parameter_constraints.pdf}
+{The one-dimensional probability distributions for each parameter.  The legend
+describes the lines.  The blue shaded area shows the highest 68\% probability
+region.  The maximum-likelihood and expectation value are generally
+close for temperature but can be very different for column and density.}
+{fig:oneddistributions}{0.75}{0}
 
 \section{Smoothed maps}
 \label{appendix:smoothed}
