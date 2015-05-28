@@ -53,17 +53,36 @@ class generic_paraH2COmodel(object):
         return chi2
 
     def chi2_column(self, logh2column, elogh2column, h2coabundance, linewidth):
+        """
+        Linewidth discussion:
+            the grid is in cm^-2 / km/s /pc
+            the grid linewidth is a gradient, km/s/pc
+            X = N(H2CO) * gradient / density
+            if the line is wider than the gradient, the column
+            is spread among multiple 'cells'
+            ncells = linewidth / gradient
+            N(H2) = n(H2) * ncells * cellsize
+            N(H2) = N(h2co) / X(H2CO) * ncells
 
-        h2fromh2co = (self.columnarr + np.log10(np.sqrt(np.pi)/2.35 * linewidth) -
-                      h2coabundance)
+        ncells = linewidth(FWHM) / grid_linewidth (NOT the integral)
+        """
+
+        ncells = linewidth / self.grid_linewidth
+
+        h2fromh2co = (self.columnarr
+                      + np.log10(ncells)
+                      - h2coabundance)
         chi2_h2 = ((h2fromh2co-logh2column)/elogh2column)**2
 
         return chi2_h2
 
-    def chi2_abundance(self, logabundance, elogabundance, linewidth):
+    def chi2_abundance(self, logabundance, elogabundance):
+        """
+        The linewidth does not enter the abundance discussion because both the
+        density and column (per km/s/pc) are on a per-cell basis.
+        """
         model_logabundance = (self.columnarr
                               - np.log10(u.pc.to(u.cm))
-                              - np.log10(np.sqrt(np.pi)/2.35 * linewidth)
                               - self.densityarr)
         chi2X = ((model_logabundance-logabundance)/elogabundance)**2
         return chi2X

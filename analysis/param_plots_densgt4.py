@@ -135,7 +135,7 @@ for row in fittable:
                        taline303=par1, etaline303=epar1,
                        taline321=par2, etaline321=epar2,
                        mindens=mindens,
-                       linewidth=5) # for consistency with dendro
+                       linewidth=10) # for consistency with dendro
 
 
     chi2r = mf.chi2_r321303

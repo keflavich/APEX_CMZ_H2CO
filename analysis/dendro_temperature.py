@@ -286,7 +286,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                                taline303=Smean303, etaline303=error,
                                taline321=Smean321, etaline321=error,
                                mindens=mindens,
-                               linewidth=5)
+                               linewidth=10)
             row_data = mf.get_parconstraints()
             row_data['ratio321303'] = r321303
             row_data['eratio321303'] = er321303
@@ -361,12 +361,12 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         if k not in catalog.keys():
             catalog.add_column(table.Column(name=k, data=columns[k]))
 
-    for mid,lo,hi in (('expected_temperature','tmin1sig_chi2','tmax1sig_chi2'),
-                      ('expected_density','dmin1sig_chi2','dmax1sig_chi2'),
-                      ('expected_column','cmin1sig_chi2','cmax1sig_chi2')):
-        catalog.add_column(table.Column(name='elo_'+mid[0],
+    for mid,lo,hi,letter in (('expected_temperature','tmin1sig_chi2','tmax1sig_chi2','t'),
+                             ('expected_density','dmin1sig_chi2','dmax1sig_chi2','d'),
+                             ('expected_column','cmin1sig_chi2','cmax1sig_chi2','c')):
+        catalog.add_column(table.Column(name='elo_'+letter,
                                         data=catalog[mid]-catalog[lo]))
-        catalog.add_column(table.Column(name='ehi_'+mid[0],
+        catalog.add_column(table.Column(name='ehi_'+letter,
                                         data=catalog[hi]-catalog[mid]))
 
     if write:
