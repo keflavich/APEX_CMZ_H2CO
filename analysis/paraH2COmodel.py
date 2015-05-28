@@ -86,20 +86,36 @@ class generic_paraH2COmodel(object):
 
         inds = np.argsort(self.likelihood.flat)
         cdf = np.cumsum(self.likelihood.flat[inds])
-        cdf = cdf/cdf[-1]
         frac_above = (stats.norm.cdf(nsigma)-stats.norm.cdf(-nsigma))
         cdfmin = np.argmin(np.abs(cdf - (1-frac_above)))
         sigma_like = self.likelihood.flat[inds][cdfmin]
 
         indbest = np.argmax(self.likelihood)
-        for parname,pararr in zip(('temperature','column','density'),
-                                  (self.temparr,self.columnarr,self.densityarr)):
+        # Compute the *marginal* 1-sigma regions
+        for parname,pararr,ax in zip(('temperature','column','density'),
+                                     (self.temparr,self.columnarr,self.densityarr),
+                                     (0,2,1)):
             row['{0}_chi2'.format(parname)] = pararr.flat[indbest]
-            row['expected_{0}'.format(parname)] = (pararr*self.likelihood).sum() / self.likelihood.sum()
-            OK = self.likelihood > sigma_like
-            if np.count_nonzero(OK) > 0:
-                row['{0:1.1s}min1sig_chi2'.format(parname)] = pararr[OK].min()
-                row['{0:1.1s}max1sig_chi2'.format(parname)] = pararr[OK].max()
+            row['expected_{0}'.format(parname)] = ((pararr*self.likelihood).sum() / self.likelihood.sum())
+
+            axes = tuple(x for x in (0,1,2) if x != ax) 
+            like = self.likelihood.sum(axis=axes)
+            cdf_inds = np.argsort(like)
+            ppf = 1-like[cdf_inds].cumsum()
+            cutoff_like = like[cdf_inds[np.argmin(np.abs(ppf-frac_above))]]
+            selection = like > cutoff_like
+
+            slc = [slice(None) if x==ax else 0 for x in (0,1,2)]
+            pararr = pararr[slc]
+
+            if np.abs(like[selection].sum() - frac_above) > 0.05:
+                # we want the sum of the likelihood to be right!
+                #import ipdb; ipdb.set_trace()
+                warnings.warn("Likelihood is not self-consistent.")
+
+            if np.count_nonzero(selection) > 0:
+                row['{0:1.1s}min1sig_chi2'.format(parname)] = pararr[selection].min()
+                row['{0:1.1s}max1sig_chi2'.format(parname)] = pararr[selection].max()
             else:
                 row['{0:1.1s}min1sig_chi2'.format(parname)] = np.nan
                 row['{0:1.1s}max1sig_chi2'.format(parname)] = np.nan

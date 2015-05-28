@@ -66,17 +66,21 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
     metadata['velocity_scale'] = u.km/u.s
     metadata['wcs'] = cube303.wcs
 
-    keys = ['cmin1sig_chi2',
+    keys = [
             'density_chi2',
+            'expected_density',
             'dmin1sig_chi2',
-            'cmax1sig_chi2',
-            'tmax1sig_chi2',
-            'column_chi2',
-            'temperature_chi2',
-            'tmin1sig_chi2',
-            'eratio303321',
             'dmax1sig_chi2',
-            'ratio303321',
+            'column_chi2',
+            'expected_column',
+            'cmin1sig_chi2',
+            'cmax1sig_chi2',
+            'temperature_chi2',
+            'expected_temperature',
+            'tmin1sig_chi2',
+            'tmax1sig_chi2',
+            'eratio321303',
+            'ratio321303',
             'logh2column',
             'elogh2column',
             'logabundance',
@@ -92,8 +96,8 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             'npix',
             'e303',
             'e321',
-            'r303321',
-            'er303321',
+            'r321303',
+            'er321303',
             '13cosum',
             'c18osum',
             '13comean',
@@ -111,7 +115,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             'dustmass',
             'dustmindens',
             'bad',
-            'tkin_turb',
+            #'tkin_turb',
     ]
     columns = {k:[] for k in (keys+obs_keys)}
 
@@ -223,8 +227,8 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         columns['npix'].append(npix)
         columns['e303'].append(error)
         columns['e321'].append(error)
-        columns['r303321'].append(r321303)
-        columns['er303321'].append(er321303)
+        columns['r321303'].append(r321303)
+        columns['er321303'].append(er321303)
         columns['13cosum'].append(co13sum)
         columns['c18osum'].append(co18sum)
         columns['13comean'].append(co13sum/npix)
@@ -275,7 +279,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             # Replace negatives for fitting
             if Smean321 <= 0:
                 Smean321 = error
-            mf.set_constraints(ratio303321=r321303, eratio303321=er321303,
+            mf.set_constraints(ratio321303=r321303, eratio321303=er321303,
                                #ratio321322=ratio2, eratio321322=eratio2,
                                logh2column=logh2column, elogh2column=elogh2column,
                                logabundance=logabundance, elogabundance=elogabundance,
@@ -284,8 +288,8 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                                mindens=mindens,
                                linewidth=5)
             row_data = mf.get_parconstraints()
-            row_data['ratio303321'] = r321303
-            row_data['eratio303321'] = er321303
+            row_data['ratio321303'] = r321303
+            row_data['eratio321303'] = er321303
 
             for k in row_data:
                 columns[k].append(row_data[k])
@@ -297,9 +301,9 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
                 is_bad = True
             else:
                 is_bad = False
-                tcubedata[dend_obj_mask.include()] = row_data['temperature_chi2']
+                tcubedata[dend_obj_mask.include()] = row_data['expected_temperature']
                 if structure.is_leaf:
-                    tcubeleafdata[dend_obj_mask.include()] = row_data['temperature_chi2']
+                    tcubeleafdata[dend_obj_mask.include()] = row_data['expected_temperature']
 
             columns['bad'].append(is_bad)
 
@@ -325,18 +329,22 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
 
         if plot_some and not is_bad and (ii-nbad % 100 == 0 or ii-nbad < 50):
             try:
-                log.info("T: [{tmin1sig_chi2:7.2f},{temperature_chi2:7.2f},{tmax1sig_chi2:7.2f}]"
-                         "  R={ratio303321:8.4f}+/-{eratio303321:8.4f}"
+                log.info("T: [{tmin1sig_chi2:7.2f},{expected_temperature:7.2f},{tmax1sig_chi2:7.2f}]"
+                         "  R={ratio321303:8.4f}+/-{eratio321303:8.4f}"
                          "  Smean303={Smean303:8.4f} +/- {e303:8.4f}"
                          "  Stot303={Stot303:8.2e}  npix={npix:6d}"
                          .format(Smean303=Smean303, Stot303=Stot303,
                                  npix=npix, e303=error, **row_data))
 
+                pl.figure(1)
                 pl.clf()
                 mf.denstemplot()
+                pl.savefig(fpath("dendrotem/diagnostics/{0}_{1}.png".format(suffix,ii)))
+                pl.figure(2).clf()
+                mf.parplot1d_all(levels=[0.68268949213708585])
+                pl.savefig(fpath("dendrotem/diagnostics/1dplot{0}_{1}.png".format(suffix,ii)))
                 pl.draw()
                 pl.show()
-                pl.savefig(fpath("dendrotem/diagnostics/{0}_{1}.png".format(suffix,ii)))
             except Exception as ex:
                 print ex
                 pass
@@ -353,9 +361,9 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
         if k not in catalog.keys():
             catalog.add_column(table.Column(name=k, data=columns[k]))
 
-    for mid,lo,hi in (('temperature_chi2','tmin1sig_chi2','tmax1sig_chi2'),
-                      ('density_chi2','dmin1sig_chi2','dmax1sig_chi2'),
-                      ('column_chi2','cmin1sig_chi2','cmax1sig_chi2')):
+    for mid,lo,hi in (('expected_temperature','tmin1sig_chi2','tmax1sig_chi2'),
+                      ('expected_density','dmin1sig_chi2','dmax1sig_chi2'),
+                      ('expected_column','cmin1sig_chi2','cmax1sig_chi2')):
         catalog.add_column(table.Column(name='elo_'+mid[0],
                                         data=catalog[mid]-catalog[lo]))
         catalog.add_column(table.Column(name='ehi_'+mid[0],
