@@ -287,11 +287,11 @@ class paraH2COmodel(generic_paraH2COmodel):
             cdict = {x:   [(0.0, 0.0, 0.0),
                            (1.0, 0.0, 0.0)]
                      for x in ('red','green','blue')}
-            cdict['alpha'] = [(0.0, 0.0, 0.0), (1.0, 1.0, 1.0)]
-            cm = matplotlib.colors.LinearSegmentedColormap('darker', cdict)
+            cdict['alpha'] = [(0.0, 0.0, 0.0), (1.0, 0.2, 0.2)]
+            darker = matplotlib.colors.LinearSegmentedColormap('darker', cdict)
             like = (self.individual_likelihoods['chi2_ff1'])
             plim = cdf_of_like(like.sum(axis=axis)).swapaxes(*swaps)
-            pl.contourf(xax, yax, plim, levels=levels, alpha=0.1,
+            pl.contourf(xax, yax, plim, levels=levels,
                         cmap=darker, zorder=5)
         if hasattr(self.chi2_dens, 'size'):
             like = (self.individual_likelihoods['chi2_dens'])
