@@ -113,17 +113,25 @@ for cat,dendro,smooth in zipped[:1]:
     ax2.axis([0,0.55,10,200])
     fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay.pdf'.format(smooth)),
                  bbox_inches='tight')
+    L4, = ax2.plot(tm.Xarr[1e-8]['ratio1'][1e4], tm.temperatures, 'r--', label=r'$n(H_2)=10^4$ cm$^{-3}$ $X=10^{-8}$', zorder=-5)
+    L5, = ax2.plot(tm.Xarr[1e-10]['ratio1'][1e4], tm.temperatures, 'r:', label=r'$n(H_2)=10^4$ cm$^{-3}$ $X=10^{-10}$', zorder=-5)
+    leg = pl.legend(loc='best')
+    ax2.axis([0,0.55,10,200])
+    fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_withabund.pdf'.format(smooth)),
+                 bbox_inches='tight')
 
-    L4, = ax2.plot(tm2.Xarr[1.2e-9]['ratio1'][1e4],
+    L6, = ax2.plot(tm2.Xarr[1.2e-9]['ratio1'][1e4],
                    tm2.temperatures, 'b--', alpha=0.2,
                    label=r'$n(H_2)=10^4$ cm$^{-3}$, $dv=20$ km s$^{-1}$', zorder=-10)
-    L5, = ax2.plot(tm3.Xarr[1.2e-9]['ratio1'][1e4],
-                   tm3.temperatures, 'r--', alpha=0.2,
+    L7, = ax2.plot(tm3.Xarr[1.2e-9]['ratio1'][1e4],
+                   tm3.temperatures, 'b:', alpha=0.2,
                    label=r'$n(H_2)=10^4$ cm$^{-3}$, $dv=1$ km s$^{-1}$', zorder=-10)
     fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_dv.pdf'.format(smooth)),
                  bbox_inches='tight')
     L4.set_visible(False)
     L5.set_visible(False)
+    L6.set_visible(False)
+    L7.set_visible(False)
 
     ax2.set_yscale('log')
     fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay_log.pdf'.format(smooth)),

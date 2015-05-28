@@ -2036,7 +2036,9 @@ and $n(\hh)$.  The maps in (b) and (c) are masked by signal-to-noise as in Figur
 \percc from the Herschel SED fit maps.
 (a) $n(\hh) = 10^4$ \percc, no mask
 (b) $n(\hh) = 10^4$ \percc
-(c) $n(\hh) = 10^5$ \percc
+(c) $n(\hh) = 10^5$ \percc.
+Figure \ref{fig:temmapnosmooth_abund} shows the same figures, but with varying
+abundance and fixed $n(\hh)$.
 }
 {fig:temmap}{1}{9.5in}
 
@@ -2127,6 +2129,23 @@ visual reference for comparison between the temperature maps.
 % be 2.8.  $\zeta_{cr}$ is the cosmic ray ionization rate in ionizations per second.
 % $m_h$ is the mass of a proton in grams.  $\sigma$ is the velocity dispersion.
 % $L$ is the turbulent length scale.
+
+% tmap_figure
+%\RotFigureTwoAA
+\RotFigureThreeAA
+%{figures/big_maps/big_lores_smooth_tmap_withcontours.pdf}
+{figures/big_maps/big_loresdens1e4_abund1e-8_weighted_tmap_withmask.pdf}
+{figures/big_maps/big_loresdens1e4_weighted_tmap_withmask.pdf}
+{figures/big_maps/big_loresdens1e4_abund1e-10_weighted_tmap_withmask.pdf}
+{Temperature maps assuming fixed $X(\para)$ and $n(\hh)=1\ee{4}$ \percc.  The
+maps are masked by signal-to-noise as in Figure \ref{fig:ratiomaps}.  The thin
+black contours are at a column $N(\hh)=5\ee{22}$ \percc from the Herschel SED
+fit maps.
+(a) $X(\para) = 1\ee{-8}$
+(b) $X(\para) = 1.2\ee{-9}$
+(c) $X(\para) = 1\ee{-10}$
+}
+{fig:temmapnosmooth_abund}{1}{9.5in}
 
 \section{Temperature balance plots without data}
 Figure \ref{fig:temvsfwhm_regions} shows theoretical curves with all data

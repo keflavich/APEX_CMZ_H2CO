@@ -142,9 +142,9 @@ def do_temperature(ratio=True, h2copath=h2copath):
     temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4',
                    density=1e4)
     temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4_abund1e-8',
-                   density=1e4, abundances=(1e-8,))
+                   density=1e4, abundance=1e-8)
     temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4_abund1e-10',
-                   density=1e4, abundances=(1e-10,))
+                   density=1e4, abundance=1e-10)
 
 def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
                    **kwargs):

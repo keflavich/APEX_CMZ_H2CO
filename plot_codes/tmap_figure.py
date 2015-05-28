@@ -30,11 +30,16 @@ vmax = 200
 
 dustcolumn = '/Users/adam/work/gc/gcmosaic_column_conv36.fits'
 
+# most of these come from make_ratiotem_cubesims
 toloop = zip((
               'H2CO_321220_to_303202{0}_bl_integ_temperature_dens3e4.fits',
               'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens3e4.fits',
               'H2CO_321220_to_303202{0}_bl_integ_temperature_dens1e4.fits',
               'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e4.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens1e4_abund1e-8.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e4_abund1e-8.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_temperature_dens1e4_abund1e-10.fits',
+              'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e4_abund1e-10.fits',
               'H2CO_321220_to_303202{0}_bl_integ_temperature_dens1e5.fits',
               'H2CO_321220_to_303202{0}_bl_integ_weighted_temperature_dens1e5.fits',
               'H2CO_321220_to_303202{0}_bl_integ_temperature_dens1e4_masked.fits',
@@ -49,6 +54,8 @@ toloop = zip((
               'TemperatureCube_DendrogramObjects{0}_integ_weighted.fits'),
              ('dens3e4',       'dens3e4_weighted',
               'dens1e4',       'dens1e4_weighted',
+              'dens1e4_abund1e-8',       'dens1e4_abund1e-8_weighted',
+              'dens1e4_abund1e-10',       'dens1e4_abund1e-10_weighted',
               'dens1e5',       'dens1e5_weighted',
               'dens1e4_masked','dens1e4_weighted_masked',
               'dens3e4_masked','dens3e4_weighted_masked',

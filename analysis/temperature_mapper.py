@@ -84,7 +84,7 @@ class TemperatureMapper(object):
     For lazier evaluation of temperature mapping function
     """
     def __init__(self, trange=[10,300], ntemp=100, logdensities=(4,4.5,5),
-                 abundances=(1.2e-9,), **kwargs):
+                 abundances=(1e-8, 1.2e-9, 1e-10), **kwargs):
         self.trange = trange
         self.ntemp = ntemp
         self.kwargs = kwargs
@@ -99,7 +99,7 @@ class TemperatureMapper(object):
 
 
     def get_mapper(self, lineid, tmin=np.nan, tmax=np.nan,
-                   density=1e4):
+                   density=1e4, abundance=1.2e-9):
         if not hasattr(self,'temperatures'):
             self.init()
 
@@ -108,7 +108,7 @@ class TemperatureMapper(object):
 
         # ugly hack because ph2co is indexed with floats
         # Use FIXED abundance, FIXED column, FIXED density
-        ratios = self.Xarr[self.Xarr.keys()[0]][rationame][density]
+        ratios = self.Xarr[abundance][rationame][density]
 
         def ratio_to_tem(r):
             inds = np.argsort(ratios)
