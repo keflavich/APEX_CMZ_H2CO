@@ -134,12 +134,17 @@ def do_temperature(ratio=True, h2copath=h2copath):
     #
     # Why 3 densities?  There is probably a range from 1e4-1e5
     #
+    # tm comes from temperature_mapper
     temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e5',
                    density=1e5)
     temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens3e4',
                    density=10**4.5)
     temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4',
                    density=1e4)
+    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4_abund1e-8',
+                   density=1e4, abundances=(1e-8,))
+    temperaturemap(tm, path=h2copath, ratio=False, Nnsuffix='_dens1e4_abund1e-10',
+                   density=1e4, abundances=(1e-10,))
 
 def temperaturemap(ratio_to_tem, path=h2copath, Nnsuffix="", ratio=True,
                    **kwargs):

@@ -9,6 +9,7 @@ import paths
 from paths import hpath
 import copy
 
+""" Generated in make_ratiotem_cubesims.py """
 im1 = fits.getdata(hpath('H2CO_321220_to_303202_bl_integ_temperature_dens1e4_masked.fits'))
 im2 = fits.getdata(hpath('H2CO_321220_to_303202_bl_integ_temperature_dens1e4.fits'))
 im3 = fits.getdata(hpath('H2CO_321220_to_303202_bl_integ_weighted_temperature_dens1e4_masked.fits'))
