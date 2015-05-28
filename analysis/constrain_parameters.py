@@ -223,8 +223,16 @@ class paraH2COmodel(generic_paraH2COmodel):
 
     def parplot(self, par1='col', par2='dens', nlevs=5, levels=None,
                 colors=[(0.5,0,0), (0.75,0,0), (1.0,0,0), (1.0,0.25,0), (0.75,0.5,0)],
-                colorsf=[pl.cm.winter(0), pl.cm.winter(0.33),
-                         pl.cm.winter(0.66), pl.cm.winter(1.), 'w']):
+                colorsf=[0.0, 0.33, 0.66, 1.0, 'w']):
+
+        cdict = {x:   [(0.0, 0.0, 0.0),
+                       (1.0, 1.0, 1.0)]
+                 for x in ('red','green','blue')}
+        cdict['blue'] = [(0.0, 1., 1.), (1.0, 1.0, 1.0)]
+        cm = matplotlib.colors.LinearSegmentedColormap('mycm', cdict)
+        colorsf = [cm(float(ii)) if isinstance(ii, (float,int))
+                   else ii
+                   for ii in colorsf]
 
         xax = self.axes[par1]
         yax = self.axes[par2]
@@ -255,7 +263,7 @@ class paraH2COmodel(generic_paraH2COmodel):
         if 'chi2_r321303' in self.individual_likelihoods:
             like = (self.individual_likelihoods['chi2_r321303'])
             pl.contourf(xax, yax, cdf_of_like(like.sum(axis=axis)).swapaxes(*swaps),
-                        levels=levels, alpha=0.5, colors=colorsf)
+                        levels=levels, alpha=0.5, zorder=-5, colors=colorsf)
         pl.contour(xax, yax,
                    cdf_of_like(self.likelihood.sum(axis=axis)).swapaxes(*swaps),
                    levels=levels, colors=colors, zorder=10)
@@ -272,7 +280,7 @@ class paraH2COmodel(generic_paraH2COmodel):
         if hasattr(self.chi2_X, 'size'):
             like = self.individual_likelihoods['chi2_X']
             pl.contourf(xax, yax, cdf_of_like(like.sum(axis=axis)).swapaxes(*swaps),
-                        levels=levels, alpha=0.5, colors=colorsf)
+                        levels=levels, alpha=0.5, zorder=-5, colors=colorsf)
         pl.contour(xax, yax,
                    cdf_of_like(self.likelihood.sum(axis=axis)).swapaxes(*swaps),
                    levels=levels, colors=colors, zorder=10)
@@ -286,7 +294,7 @@ class paraH2COmodel(generic_paraH2COmodel):
         if hasattr(self.chi2_h2, 'size'):
             like = (self.individual_likelihoods['chi2_h2'])
             pl.contourf(xax, yax, cdf_of_like(like.sum(axis=axis)).swapaxes(*swaps),
-                        levels=levels, alpha=0.5, colors=colorsf)
+                        levels=levels, alpha=0.5, zorder=-5, colors=colorsf)
         pl.contour(xax, yax,
                    cdf_of_like(self.likelihood.sum(axis=axis)).swapaxes(*swaps),
                    levels=levels, colors=colors, zorder=10)
@@ -309,7 +317,7 @@ class paraH2COmodel(generic_paraH2COmodel):
         if hasattr(self.chi2_dens, 'size'):
             like = (self.individual_likelihoods['chi2_dens'])
             pl.contourf(xax, yax, cdf_of_like(like.sum(axis=axis)).swapaxes(*swaps),
-                        levels=levels, alpha=0.5, colors=colorsf)
+                        levels=levels, alpha=0.5, zorder=-5, colors=colorsf)
         pl.contour(xax, yax,
                    cdf_of_like(self.likelihood.sum(axis=axis)).swapaxes(*swaps),
                    levels=levels, colors=colors, zorder=10)
