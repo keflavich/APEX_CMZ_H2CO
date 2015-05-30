@@ -100,7 +100,7 @@ def diffplot_t_of_n(densities=np.linspace(3,7), column=13.5, temperatures=[50,75
         pl.hlines(tem, densities.min(), densities.max(), label='T={0}K'.format(tem), color=color)
     pl.plot([], 'k', label='Expectation Value')
     pl.plot([], 'k--', label='Maximum Likelihood')
-    pl.xlabel("log $n$(H$_2$) cm$^{-3}$")
+    pl.xlabel("log $n$(H$_2$) [cm$^{-3}$]")
     pl.ylabel("Temperature (K)")
     pl.legend(loc='best', fontsize=14)
 
@@ -111,7 +111,7 @@ def diffplot_t_of_n(densities=np.linspace(3,7), column=13.5, temperatures=[50,75
         pl.plot(densities, (grid_ML[:,ii]-tem)/tem, '--', color=color)
     pl.plot([], 'k', label='Expectation Value')
     pl.plot([], 'k--', label='Maximum Likelihood')
-    pl.xlabel("log N(H$_2$CO) cm$^{-2}$")
+    pl.xlabel("log n(H$_2$CO) [cm$^{-3}$]")
     pl.ylabel("Fractional Difference")
     pl.legend(loc='best', fontsize=14)
     pl.ylim(-0.5,0.5)
@@ -136,7 +136,7 @@ def diffplot_t_of_c(density=4.5, columns=np.linspace(12,15), temperatures=[50,75
         pl.hlines(tem, columns.min(), columns.max(), label='T={0}K'.format(tem), color=color)
     pl.plot([], 'k', label='Expectation Value')
     pl.plot([], 'k--', label='Maximum Likelihood')
-    pl.xlabel("log N(H$_2$CO) cm$^{-2}$")
+    pl.xlabel("log N(H$_2$CO) [cm$^{-2}$]")
     pl.ylabel("Temperature (K)")
     pl.legend(loc='best', fontsize=14)
 
@@ -147,7 +147,7 @@ def diffplot_t_of_c(density=4.5, columns=np.linspace(12,15), temperatures=[50,75
         pl.plot(columns, (grid_ML[:,ii]-tem)/tem, '--', color=color)
     pl.plot([], 'k', label='Expectation Value')
     pl.plot([], 'k--', label='Maximum Likelihood')
-    pl.xlabel("log N(H$_2$CO) cm$^{-2}$")
+    pl.xlabel("log N(H$_2$CO) [cm$^{-2}$]")
     pl.ylabel("Fractional Difference")
     pl.legend(loc='best', fontsize=14)
     pl.ylim(-0.5,0.5)
@@ -165,3 +165,5 @@ def main():
     columns, cgrid_exp, cgrid_ML = diffplot_t_of_c()
     pl.figure(1).savefig(paths.fpath('param_fits/modeled_temperature_vs_column_real_vs_recovered.png'), bbox_inches='tight')
     pl.figure(2).savefig(paths.fpath('param_fits/modeled_temperature_vs_column_real_vs_recovered_fractions.png'), bbox_inches='tight')
+
+    return locals()

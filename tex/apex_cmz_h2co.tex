@@ -875,15 +875,19 @@ lower signal-to-noise ratios at the edges and should be ignored.
 \label{sec:discussion}
 \subsection{Gas heating and thermal balance}
 \label{sec:heating}
-Following \citet{Ao2013a} and \citet{Papadopolous2010a}, we examine the energy
+Following \citet{Ao2013a} and \citet{Papadopoulos2010a}, we examine the energy
 balance in the CMZ gas to understand the temperatures we measure.  The two key
 processes they identified are cosmic ray and turbulent dissipation (shock)
 heating.  We ignore all UV-driven heating processes in this section as we are
-interested in gas at high extinction ($A_V > 10$).  Other processes, e.g.
-direct (proto)stellar heating or supernova bubble interaction may be relevant
-locally, but cannot heat the gas globally.  \citet{Ao2013a} ruled out diffuse
-X-rays as a significant heating source, with an energy density $\sim3$ orders
-of magnitude too low to explain observed temperatures.
+interested in gas at high extinction ($A_V > 10$)\footnote{While some emission
+likely comes from PDRs, we expect these regions to have small filling factors
+and typically lower densities than cloud centers.  At densities $n<10^4$
+\percc, \para 3-2 emission is very weak and would contribute little to the
+observed line emission.}.  Other processes, e.g.,  direct (proto)stellar heating
+or supernova bubble interaction may be relevant locally, but cannot heat the
+gas globally.  \citet{Ao2013a} ruled out diffuse X-rays as a significant
+heating source, with an energy density $\sim3$ orders of magnitude too low to
+explain observed temperatures.
 
 We determine the expected gas kinetic temperature by assuming that the heating
 and cooling processes are in equilibrium.  This is generally a good assumption
@@ -903,26 +907,31 @@ spatial scales on kiloyear timescales.
 
 We expand upon the \citet{Ao2013a} analysis by solving for the temperature
 assuming that both cosmic ray ionization and turbulent heating are present and
-that the dust temperature is nonzero.  We have used the \texttt{DESPOTIC} code
-\citep{Krumholz2014c} to determine the equilibrium temperature.  We have
-included CO, O, C+, C, o\hh, p\hh, and HD\footnote{The collision rate files for
-\hh and HD were provided by Wing-fai Thi from work by the ProDiMo team from
+that the dust temperature is nonzero.  We assume the heating rate for cosmic
+rays is constant per cubic centimeter $\Gamma_{CR} = n \zeta_{CR}$, and the
+heating rate from turbulence $\Gamma_{turb} = n \sigma^3 / L$.  We used
+\texttt{DESPOTIC} \citep{Krumholz2014c} to determine the equilibrium
+temperature.  We included CO, O, C+, C, o\hh, p\hh, and HD\footnote{The
+collision rate files for \hh and HD were provided by Wing-fai Thi from work by
+the ProDiMo team from
 \citet{Le-Bourlot1999a,Wrathmall2007a,Flower2000a,Wolniewicz1998a}.} as line
-coolants\footnote{We assume a
-very low abundance for C+, $X_{C+}=5\ee{-10}$, assuming that cloud shielding
-will prevent photoionization and collisions with \hh will destroy CR-generated
-C+ rapidly, which is confirmed by the \citet{Nelson1999a} chemical model.
-\citet{Lis1998a} and \citet{Lis1999a} observed bright C+ emission from The
-Brick; we interpret this emission as coming from a heated outer skin of the
-cloud at lower densities, not coincident with the observed \formaldehyde
-emission.}.  We used the large velocity gradient
-(LVG) approximation for optical depth calculation.  The resulting curves for
-$T_K(\sigma_v)$ are shown in Figure \ref{fig:temvsfwhm_regions}.  We have
-assumed a size scale $L=5$ pc, a gradient $dv/dr = 5$ \kms \perpc, and a cosmic
-ray ionization rate (CRIR) $\zeta_{CR}=10^{-17}$ \pers, with exceptions noted
-in the legend.  We assume a dust temperature $T_D=25$ K, but we assume lower
-dust radiation temperatures because the dust is optically thin at long
-wavelengths in most regions.
+coolants\footnote{We assume a very low abundance for C+, $X_{C+}=5\ee{-10}$,
+assuming that cloud shielding will prevent photoionization and collisions with
+\hh will destroy CR-generated C+ rapidly, which is confirmed by the
+\citet{Nelson1999a} chemical model.  \citet{Lis1998a} and \citet{Lis1999a}
+observed bright C+ emission from The Brick; we interpret this emission as
+coming from a heated outer skin of the cloud at lower densities not coincident
+with the observed \formaldehyde emission.}.  We used the large velocity
+gradient (LVG) approximation for optical depth calculation.  The resulting
+curves for $T_K(\sigma_v)$ are shown in Figure \ref{fig:temvsfwhm_regions} (see
+Appendix \ref{sec:despoticplots} for further details).  We
+have assumed a size scale $L=5$ pc, a gradient $dv/dr = 5$ \kms \perpc, and a
+cosmic ray ionization rate (CRIR) $\zeta_{CR}=10^{-17}$ \pers, with exceptions
+noted in the legend.  We assume a dust temperature $T_D=25$ K, but we assume
+lower dust radiation temperatures because the dust is optically thin at long
+wavelengths in most regions.  We have assumed a constant interstellar radiation
+field of $G_0$, which should only weakly affect dust temperatures and has
+no effect on the gas at the high column densities being modeled.
 
 % We have used the same cosmic ray heating rate
 % and turbulence heating rate from \citet[][their equations 12 and 18]{Ao2013a}
@@ -1956,11 +1965,18 @@ displayed distributions; for example, very high temperatures require low
 volume and high column densities that occupy a small fraction of the total
 integrated likelihood.
 
-% In the script file example_parplot_constraints.py in the associated
-% repository, we examine the systematic uncertainties in the fitting process.
-% Using a known density, temperature, and column, we then use the fitting
-% process applied to the dendrogram objects and the hand-extracted regions
-% to derive our measured temperatures.  
+In the script file \texttt{example\_parplot\_constraints.py} in the associated
+repository, we examine the systematic uncertainties in the fitting process.
+Using a known density, temperature, and column, we then use the fitting process
+applied to the dendrogram objects and the hand-extracted regions to derive our
+measured temperatures.  Over a range $10^4 < n < 10^7$ \percc, the maximum
+likelihood estimator recovers the true temperature to within 25\% for all
+temperatures, and to 10\% over the range $10^{4.25} < n < 10^5.5$ \percc.  At
+densities lower than $n<10^4$ \percc, the recovered temperature is
+significantly lower than the true temperature, which is expected since we
+impose a prior that $n>10^4$ \percc.  Curiously, the expectation value is more
+biased than the maximum likelihood estimator, with errors reaching 30\% and
+with a much stronger dependence on the input temperature.
 
 % param_plots
 \Figure{figures/param_fits/c:G0.38+0.04_col_tem_0_parameter_constraints.pdf}
@@ -2181,9 +2197,23 @@ fit maps.
 {fig:temmapnosmooth_abund}{1}{9.5in}
 
 \section{Temperature balance plots without data}
+\label{sec:despoticplots}
 Figure \ref{fig:temvsfwhm_regions} shows theoretical curves with all data
 points superposed.  For clarity, we reproduce that figure with no data plotted
 here in Figure \ref{fig:tvssigma_despotic}.
+
+The legend shows the various modifications to model parameters used.  The
+fiducial model is indicated by a dashed black line with $\zeta_{CR} =
+1\ee{-17}$, $n=10^4$ \percc, $L=5$ pc, velocity gradient $dv/dr=5$ \kms
+pc$^{-1}$, dust temperature $T_D=25$ K, dust radiation temperature $T_{D,rad} =
+10$ K, and interstellar radiation field $G_0$.  The green solid curve shows a
+model that follows both a size-linewidth relation $L=5 \sigma_5^{0.7}$ pc and
+is isobaric with $n=10^{4.25} \sigma_5^2$ \percc, where $\sigma_5$ is the
+velocity dispersion in units of 5 \kms.  The green dashed curve shows the same
+with only the size-linewidth relation included.  The green dotted curve shows a
+high cosmic-ray ionization rate with no turbulent heating and is meant to show
+the absolute floor temperature guaranteed by such a high CRIR.
+
 
 \Figure{figures/despotic/TvsSigma}
 {Plots of the DESPOTIC-derived equilibrium temperature as a function of line
