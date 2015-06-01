@@ -1077,11 +1077,21 @@ coolants), which does not necessarily hold under CMZ conditions.  The other
 possibility is that we have overestimated the line width or underestimated the
 size scale of the clump via our extraction method.  While we have tried to
 account for this source of error by correcting for clipping, we are nonetheless
-extrapolating our measurements.  The small fraction of sources with measured
-temperatures exceeding the predictions are all consistent with the predictions
-at the $2-\sigma$ level and therefore are not a significant concern, though
-they may be explained by having slightly higher densities than the lower limit
-density we have assumed.
+extrapolating our measurements.
+
+% This is no longer a small fraction; it's now more like 1/3
+% MAJOR TODO: re-run despotic_heating now that sources have been reextracted
+% The small fraction of sources with measured
+% temperatures exceeding the predictions are all consistent with the predictions
+% at the $2-\sigma$ level and therefore are not a significant concern, though
+% they may be explained by having slightly higher densities than the lower limit
+% density we have assumed.
+%
+% There are some dendrogram sources with measured temperatures higher than that
+% from the turbulence-only prediction.  For these clumps, either the turbulent
+% heating rate has been underestimated because the velocity dispersion has been
+% underestimated or the clump size overestimated, or another heating mechanism
+% is significant.
 
 The predicted temperatures for the hand-extracted regions are more uncertain.
 Most of the hand-extracted regions agree with the prediction at a 1$\sigma$ and
@@ -1108,7 +1118,7 @@ rate underestimated.
 the red symbols are large-area square regions. 
 Triangles indicate regions with lower limits on
 the temperature, i.e. any region with
-a measured $1-\sigma$ upper limit on the temperature $T>150$ K.  The gray
+a measured $1-\sigma$ lower limit on the temperature $T>150$ K.  The gray
 dashed line shows the $T_{turb} = T_{measured}$ relation.  Regions that are inconsistent
 with the relation at the $1-\sigma$ level are outlined.
 (b) The same as (a) for the dendrogram-extracted regions.  Regions with a large
@@ -1121,19 +1131,19 @@ between the predicted temperature and observed temperature is fairly good.
 }
 {fig:turbtem}{1}{3.5in}
 
-To explore the possibility that our cooling rates are underestimated, we examine
-a particular clump from the catalog, with $n=10^{4.2}$ \percc, $\sigma=8.6
-f_g = 14.3$\kms, $L = 2r = 2(0.588)f_g = 1.65$ pc (beam-deconvolved), $T_D=21$ K,
-and $T_{D,rad} = 1.2$ K.  This clump has a predicted temperature $T=156$ K,
-but a measured temperature $T=91$ K.  With local chemistry, the dominant
-coolant is CO by 2 orders of magnitude.  In \texttt{DESPOTIC}, we set chemical
-equilibrium using the \citet{Nelson1999a} chemical network code and find that
-the predicted O abundance is increased by
+To explore the possibility that our cooling rates are underestimated, we
+examine a particular clump from the catalog, with $n=10^{4.2}$ \percc,
+$\sigma=8.6 f_g = 14.3$\kms, $L = 2r = 2(0.588)f_g = 1.65$ pc
+(beam-deconvolved), $T_D=21$ K, and $T_{D,rad} = 1.2$ K.  This clump has a
+predicted temperature $T_{gas}=156$ K, but a measured temperature $T_{gas}=91$
+K.  With local chemistry, the dominant coolant is CO by 2 orders of magnitude.
+In \texttt{DESPOTIC}, we set chemical equilibrium using the \citet{Nelson1999a}
+chemical network code and find that the predicted O abundance is increased by
 an order of magnitude, which in turn makes oxygen a significant coolant with
-$\Lambda_{O} \approx 0.5 \Lambda_{CO}$, where $\Lambda$ is the cooling rate
-in erg \pers \percc (other coolants remain negligible).   The predicted
-equilibrium temperature is then $T=114$ K.  While this temperature is still a
-bit high, this example shows that the modified chemistry at these high
+$\Lambda_{O} \approx 0.5 \Lambda_{CO}$, where $\Lambda$ is the cooling rate in
+erg \pers \percc (other coolants remain negligible).   The predicted
+equilibrium temperature is then $T_{gas}=114$ K.  While this temperature is
+still a bit high, this example shows that the modified chemistry at these high
 temperatures should be accounted for when predicting the gas temperature.
 
 We may be able to further constrain the heating mechanisms using this same data

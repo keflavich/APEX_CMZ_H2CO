@@ -421,7 +421,7 @@ if __name__ == "__main__":
     from dendrograms import (catalog, catalog_sm, dend, dendsm)
     smooth=''
     cat = catalog
-    sn = (cat['ratio303321']/cat['eratio303321'])
+    sn = (cat['ratio321303']/cat['eratio321303'])
     sngt50 = sn > 50
     sn25_50 = (sn > 25) & (sn < 50)
     ok = (np.isfinite(sn) & (cat['Stot321'] < cat['Stot303']) & ~(cat['bad']) &
@@ -499,7 +499,7 @@ if __name__ == "__main__":
 
     brick_sw_id = ((catalog['x_cen'] - 0.241)**2 + (catalog['y_cen']+0.0057)**2).argmin()
     print("Brick SW: {0}".format(brick_sw_id))
-    print(catalog['_idx','Smean303','ratio303321','higaldusttem','tmin1sig_chi2','temperature_chi2','tmax1sig_chi2'][brick_sw_id])
+    print(catalog['_idx','Smean303','ratio321303','higaldusttem','tmin1sig_chi2','temperature_chi2','tmax1sig_chi2'][brick_sw_id])
     row = catalog[brick_sw_id]
     case_study(row)
 
@@ -508,7 +508,7 @@ if __name__ == "__main__":
 
     brick_ne_id = ((catalog['x_cen'] - 0.2615)**2 + (catalog['y_cen']+0.0283)**2).argmin()
     print("Brick NE: {0}".format(brick_ne_id))
-    print(catalog['_idx','Smean303','ratio303321','higaldusttem','tmin1sig_chi2','temperature_chi2','tmax1sig_chi2'][brick_ne_id])
+    print(catalog['_idx','Smean303','ratio321303','higaldusttem','tmin1sig_chi2','temperature_chi2','tmax1sig_chi2'][brick_ne_id])
     row = catalog[brick_ne_id]
     case_study(row)
 
