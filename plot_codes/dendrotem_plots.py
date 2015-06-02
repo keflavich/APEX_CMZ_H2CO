@@ -463,7 +463,7 @@ for cat,dendro,smooth in zipped[:1]:
     ax22.set_xlim([13,35])
     ax22.set_ylim([13,150])
     ax22.set_xlabel("HiGal Dust Temperature (K)")
-    ax22.set_ylabel("Temperature (K)")
+    ax22.set_ylabel("H$_2$CO Temperature (K)")
     ax22.set_title("Dendrogram-selected regions")
     fig22.savefig(fpath('dendrotem/temperature_vs_dusttem{0}.pdf'.format(smooth)),
                   bbox_inches='tight')

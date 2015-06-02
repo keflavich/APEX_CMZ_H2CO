@@ -27,12 +27,12 @@ identifier \texttt{doi:10.7910/DVN/27601}.}
 selected regions.  Gas temperatures are mostly consistent with purely turbulent
 heating, though cosmic ray heating still affects less turbulent clouds.  We
 infer an upper limit on the cosmic ray ionization rate $\zeta_{CR}<10^{-14}$
-\pers.  The highest gas temperatures $T>100$ K are observed around the Sgr B2
+\pers.  The highest gas temperatures $T_G>100$ K are observed around the Sgr B2
 cores, in the extended Sgr B2 cloud, the 20 \kms and 50 \kms clouds, and in
 `The Brick' (G0.253+0.016).
 }
 {
-The dense molecular gas temperature ($T\sim 65$K) of the region around our
+The dense molecular gas temperature ($T_G\sim 65$K) of the region around our
 Galactic center is similar to values found in the central regions of other
 galaxies, in particular starburst systems.  The gas temperature is uniformly
 higher than the dust temperature, confirming that dust is a coolant in the
@@ -100,19 +100,18 @@ ammonia metastable inversion transition thermometer \citep[\ammonia (1,1) -
 (7,7);][]{Guesten1981a,Huettemeister1993a,Ott2014a,Mauersberger1986a}, which is
 sensitive to moderate density gas \citep[$n(\hh) \sim 10^3-10^4$
 \percc;][]{Shirley2015a}.  While this thermometer is generally reliable in cold
-regions (e.g., the (1-1)/(2-2) ratio is accurate to $T\lesssim40$ K), the
+regions (e.g., the (1-1)/(2-2) ratio is accurate to $T_G\lesssim40$ K), the
 population of the higher energy states \emph{may} be affected by `formation
-heating', a mechanism recently discovered to affect H$_3$O+ in the
-CMZ and suggested to affect \ammonia, in which the excess energy from molecule
+heating', a mechanism recently discovered to affect H$_3$O+ in the CMZ and
+suggested to affect \ammonia, in which the excess energy from molecule
 formation leaves a significant fraction of the molecules in a rotationally
 excited state \citep[][]{Lis2014a}, so confirmation of high temperatures seen
 in \ammonia \citep{Mills2013a} can be used to assess the significance of that
 mechanism.  \citet{Ao2013a} used the para-formaldehyde (\para) 220 GHz
-thermometer
-\citep{Mangum1993a}, which is sensitive to denser ($n\sim10^4-10^5$ \percc) and
-hotter ($T>20$ K, usually $T\sim60$ K) gas, to map out the inner $\sim75$ pc of
-the CMZ and found high temperatures comparable to those found in previous
-studies.
+thermometer \citep{Mangum1993a}, which is sensitive to denser ($n\sim10^4-10^5$
+\percc) and hotter ($T_G>20$ K, usually $T_G\sim60$ K) gas, to map out the
+inner $\sim75$ pc of the CMZ and found high temperatures comparable to those
+found in previous studies.
 
 There is a long-standing problem that the observed gas and dust temperatures do
 not agree throughout the CMZ
@@ -594,8 +593,8 @@ temperatures from 10 to 350 K.  The grid was created using the \texttt{pyradex}
 wrapper of RADEX\footnote{\url{https://github.com/adamginsburg/pyradex}} and
 collision rates retrieved from LAMDA \citep{Wiesenfeld2013a}.  We then
 upsampled these grids by spline interpolating between grid points to acquire a
-high-resolution ($T\times n \times N = 250\times100\times101$) grid covering
-$10<T<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N < 10^{15.1}$
+high-resolution ($T_G\times n \times N = 250\times100\times101$) grid covering
+$10<T_G<350$ K, $10^{2.5} < n < 10^7$ \percc, and $10^{11} < N < 10^{15.1}$
 \persc\perkmspc.  For our analysis, we used the \texttt{myRadex} grid; it is
 consistent with the \texttt{RADEX} grid over most of parameter space but
 suffers fewer numerical instabilities over the region we are interested in.
@@ -636,8 +635,8 @@ shown in the legend are the amplitude of the \formaldehyde \threeohthree line,
 the centroid velocity, the line width ($\sigma$, not FWHM), the ratio $R_1 =
 \Rone$, the ratio $R_2 = \Rtwo$, and the amplitude of the \methanol \fourtwotwo
 line.  These spectra have significantly different ratios and therefore derived
-temperatures: The Brick has $T\gtrsim100$ K while G0.42+0.03 has
-$T\approx40-50$ K.  The bottom black spectrum is the residual, and the orange
+temperatures: The Brick has $T_G\gtrsim100$ K while G0.42+0.03 has
+$T_G\approx40-50$ K.  The bottom black spectrum is the residual, and the orange
 wiggly spectrum shows the spline fit used to remove baseline ripples.
 The OCS 18-17 218.90336 GHz and HC$_3$N 24-23 218.32471 GHZ lines are also
 detected, but not fitted, in The Brick.
@@ -789,15 +788,15 @@ inverse S/N (see Appendix \ref{appendix:smoothed}).
 
 The effective range of detected temperatures is $\approx40-150$ K. While lower
 and higher temperatures appear in the map, those measurements should not be
-trusted.  Below $T\lesssim40$ K, all temperature measurements in the map are
+trusted.  Below $T_G\lesssim40$ K, all temperature measurements in the map are
 effectively $1\sigma$ upper limits\footnote{When averaged into regions in later
 sections, we measure some temperatures below this limit, albeit still at low
 significance.}.  This
 limit is due to a combination of sensitivity and excitation: below 40 K, the
 \para lines are observed to be faint; the \threetwoone line is not detected.
 In regions of high column density, we detect both lines, and in all of these
-regions, we have measured high temperatures ($T>40$ K).  
-Since $T\sim40$ K corresponds to $R_1\sim0.15$, a $5\sigma$ temperature
+regions, we have measured high temperatures ($T_G>40$ K).  
+Since $T_G\sim40$ K corresponds to $R_1\sim0.15$, a $5\sigma$ temperature
 measurement would require $T_B(\threeohthree) = (5 \times 0.07 \mathrm{K}) /
 0.15 = 2.33$ K\footnote{We can do a little better with spectral averaging,
 perhaps as low as $T_B=1$ K for a 5 \kms, but such high brightness temperaturse
@@ -809,7 +808,7 @@ The higher measured temperatures
 become lower limits above $\sim150$ K because the \para line ratio is
 intrinsically insensitive to higher temperatures, as can be seen in Figure
 \ref{fig:parsonbrightness} (rightmost column), in which the modeled line
-brightnesses are both nearly constant above $T\gtrsim150$ K.
+brightnesses are both nearly constant above $T_G\gtrsim150$ K.
 
 
 % tmap_figure
@@ -889,8 +888,8 @@ observed line emission.  Regions within actively star-forming regions
 Sgr B2, Sgr C, and near the circumnuclear disk may be locally affected
 by strong UV heating from young and forming stars, but the bulk of the dense
 gas is not.  Finally, PDR models \citep[e.g.][]{Hollenbach1999a} predict that
-$T_{dust} \approx T_{gas}$ at high densities, while we show that $T_{gas} >
-T_{dust}$; see Section\ref{sec:td_ne_tg}.}.
+$T_{D} \approx T_{G}$ at high densities, while we show that $T_{G} >
+T_{D}$; see Section\ref{sec:td_ne_tg}.}.
 Other processes, e.g.,  direct (proto)stellar heating
 or supernova bubble interaction may be relevant locally, but cannot heat the
 gas globally.  \citet{Ao2013a} ruled out diffuse X-rays as a significant
@@ -900,7 +899,7 @@ explain observed temperatures.
 We determine the expected gas kinetic temperature by assuming that the heating
 and cooling processes are in equilibrium.  This is generally a good assumption
 on the scales we observe, as typical gas cooling rates via line or dust cooling
-around $T\sim100$ K and $n\sim10^5\percc$ are $dT/dt \sim 10^{-20}
+around $T_G\sim100$ K and $n\sim10^5\percc$ are $dT/dt \sim 10^{-20}
 \mathrm{erg~s}^{-1}\percc \sim 23 (n/10^5 \percc) \mathrm{K~kyr}^{-1}$
 \citep[][and see below]{Goldsmith2001a}.  The cooling timescale is shorter than
 the timescales for any energy injection mechanisms that may plausibly heat the
@@ -910,7 +909,7 @@ expected to contribute to a diffuse cosmic ray population rather than local
 stochastic heating incidents.  Turbulence in these clouds is dynamically driven
 on scales of 10-30 pc \citep{Kruijssen2015a}.  Assuming the turbulent
 dissipation scale is close to the sonic scale with a sound speed $c_s = 0.76
-(T/100\mathrm{K})^{1/2}$ \kms, the gas temperature will be well mixed on milliparsec
+(T_G/100\mathrm{K})^{1/2}$ \kms, the gas temperature will be well mixed on milliparsec
 spatial scales on kiloyear timescales.
 
 We expand upon the \citet{Ao2013a} analysis by solving for the temperature
@@ -931,7 +930,7 @@ observed bright C+ emission from The Brick; we interpret this emission as
 coming from a heated outer skin of the cloud at lower densities not coincident
 with the observed \formaldehyde emission.}.  We used the large velocity
 gradient (LVG) approximation for optical depth calculation.  The resulting
-curves for $T_K(\sigma_v)$ are shown in Figure \ref{fig:temvsfwhm_regions} (see
+curves for $T_G(\sigma_v)$ are shown in Figure \ref{fig:temvsfwhm_regions} (see
 Appendix \ref{sec:despoticplots} for further details).  We
 have assumed a size scale $L=5$ pc, a gradient $dv/dr = 5$ \kms \perpc, and a
 cosmic ray ionization rate (CRIR) $\zeta_{CR}=10^{-17}$ \pers, with exceptions
@@ -953,7 +952,7 @@ no effect on the gas at the high column densities being modeled.
 % kinetic temperature; the code can be found in the file
 % \texttt{heating.py} in the associated repository.
 
-A first key point is that we measure gas temperatures $T\sim60$ K in many
+A first key point is that we measure gas temperatures $T_G\sim60$ K in many
 clouds everywhere throughout the CMZ.  Since cosmic rays have very high
 penetration depths, we expect that cosmic ray heating is uniform
 everywhere within the CMZ, independent of column density\footnote{However,
@@ -965,8 +964,8 @@ minimum gas temperature above what we have measured.  The limit is consistent
 with many previous measurements of the CRIR, though
 it rules out some of the more extreme values \citep{Yusef-Zadeh2013b,Goto2013a}.
 For a fiducial upper limit measurement, we use $n=10^{4.5}$ \percc, $dv/dr=5$
-\kms \perpc, $T_{rad,dust}=10$ K, and $\zeta_{CR} = 10^{-14}$ \pers, which
-yields $T_{gas}=75$ K in the absence of any other heating mechanisms.  This
+\kms \perpc, $T_{rad,D}=10$ K, and $\zeta_{CR} = 10^{-14}$ \pers, which
+yields $T_{G}=75$ K in the absence of any other heating mechanisms.  This
 upper limit could be violated if the gas in all observed clumps is about an
 order of magnitude denser than the dust-derived average density, which is not
 likely.  This limit leads to the conclusion that cosmic ray heating is either
@@ -992,7 +991,7 @@ measured linewidth\footnote{We correct the linewidth and the radius of
 dendrogram-extracted clumps for clipping assuming the underlying source is
 gaussian following \citet[][Appendix B]{Rosolowsky2005b}.}
 $\sigma_v$, the
-measured dust temperature $T_{d}$ scaled down by an optical depth correction
+measured dust temperature $T_{D}$ scaled down by an optical depth correction
 $1-\exp\left[-N(\hh)/10^{24}~\percc\right]$, and we assume the velocity gradient
 $dv/dr = 5$ \kms \perpc.  Of these measurements, the linewidth $\sigma_v$ is
 dominant in determining the predicted temperature and is the least uncertain.
@@ -1099,7 +1098,7 @@ The predicted temperatures for the hand-extracted regions are more uncertain.
 Most of the hand-extracted regions agree with the prediction at a 1$\sigma$ and
 all but a few at a 2$\sigma$ level.  Given that the sizes used for these
 regions is uncertain by a large factor (for square apertures especially), there
-is no significant disagreement between $T_{turb}$ and $T_{measured}$.
+is no significant disagreement between $T_{G,turb}$ and $T_{G,measured}$.
 
 
 \FigureTwo
@@ -1109,8 +1108,8 @@ is no significant disagreement between $T_{turb}$ and $T_{measured}$.
 {Plots of the \formaldehyde-measured temperature against the predicted
 turbulent-driven temperature as discussed in Section \ref{sec:heating}.
 While no trend is obvious in the data, most of the high signal-to-noise
-data points are fairly close to the  $T_{turb} = T_{measured}$ line.
-There are few points with $T_{measured} > T_{turb}$, so turbulence generally provides
+data points are fairly close to the  $T_{G,turb} = T_{G,measured}$ line.
+There are few points with $T_{G,measured} > T_{G,turb}$, so turbulence generally provides
 enough - and sometimes too much - energy to heat the gas to the observed temperatures.
 The regions with predicted temperatures higher than observed require additional
 explanation: either their heating rate has been overestimated or their cooling
@@ -1120,11 +1119,11 @@ rate underestimated.
 the red symbols are large-area square regions. 
 Triangles indicate regions with lower limits on
 the temperature, i.e. any region with
-a measured $1-\sigma$ lower limit on the temperature $T>150$ K.  The gray
-dashed line shows the $T_{turb} = T_{measured}$ relation.  Regions that are inconsistent
+a measured $1-\sigma$ lower limit on the temperature $T_G>150$ K.  The gray
+dashed line shows the $T_{G,turb} = T_{G,measured}$ relation.  Regions that are inconsistent
 with the relation at the $1-\sigma$ level are outlined.
 (b) The same as (a) for the dendrogram-extracted regions.  Regions with a large
-gaussian correction factor $f_g>3$ are excluded.  Regions with $T_{turb}>180$ K
+gaussian correction factor $f_g>3$ are excluded.  Regions with $T_{G,turb}>180$ K
 are indicated with triangles.
 The points are color coded by signal-to-noise in the ratio $R_1$, with black
 $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$, and red $S/N > 50$. 
@@ -1137,14 +1136,14 @@ To explore the possibility that our cooling rates are underestimated, we
 examine a particular clump from the catalog, with $n=10^{4.2}$ \percc,
 $\sigma=8.6 f_g = 14.3$\kms, $L = 2r = 2(0.588)f_g = 1.65$ pc
 (beam-deconvolved), $T_D=21$ K, and $T_{D,rad} = 1.2$ K.  This clump has a
-predicted temperature $T_{gas}=156$ K, but a measured temperature $T_{gas}=91$
+predicted temperature $T_{G}=156$ K, but a measured temperature $T_{G}=91$
 K.  With local chemistry, the dominant coolant is CO by 2 orders of magnitude.
 In \texttt{DESPOTIC}, we set chemical equilibrium using the \citet{Nelson1999a}
 chemical network code and find that the predicted O abundance is increased by
 an order of magnitude, which in turn makes oxygen a significant coolant with
 $\Lambda_{O} \approx 0.5 \Lambda_{CO}$, where $\Lambda$ is the cooling rate in
 erg \pers \percc (other coolants remain negligible).   The predicted
-equilibrium temperature is then $T_{gas}=114$ K.  While this temperature is
+equilibrium temperature is then $T_{G}=114$ K.  While this temperature is
 still a bit high, this example shows that the modified chemistry at these high
 temperatures should be accounted for when predicting the gas temperature.
 
@@ -1223,9 +1222,9 @@ Similar to the results of \citet{Ao2013a} for the inner $\sim75$ pc, we find
 that the \para and dust temperatures are not the same anywhere within the
 inner $R\lesssim200$ pc.  Figure \ref{fig:temvstem_regions} shows the fitted \para
 temperature vs the fitted dust temperature from HiGal.  The majority of the
-\formaldehyde data points are well above the $T_{dust}=T_{gas}$ line
+\formaldehyde data points are well above the $T_{D}=T_{G}$ line
 independent of the method used to extract the temperature.  The few sources
-that are consistent with $T_{dust}=T_{gas}$ represent an interesting subset
+that are consistent with $T_{D}=T_{G}$ represent an interesting subset
 of potentially very cool clouds, though they all have low signal-to-noise
 ratios in the present data set.  Overall, though, our data clearly indicate
 that, on $\sim$pc scales in the CMZ, dust is a coolant and the gas and dust are
@@ -1249,7 +1248,7 @@ heating is not a significant driver of the gas temperatures.
 Section \ref{sec:spectralmodeling} plotted against the HiGal fitted dust
 temperature.  As in Figure \ref{fig:temvsfwhm_regions}, the blue symbols are
 compact `clump' sources and the red symbols are large-area square regions.  The
-black dashed line shows the $T_g = T_d$ relation.  Nearly all of the data
+black dashed line shows the $T_G = T_D$ relation.  Nearly all of the data
 points fall above this relation, and very few are consistent with it at the
 3$\sigma$ level.
 (b) The same as (a) but for the dendrogram-extracted sources, showing a similar
@@ -1264,10 +1263,10 @@ and red $S/N > 50$.  }
 \subsection{Spatial variations in gas temperature and orbit comparison}
 There are significant spatial variations in the gas temperature.  The most
 obvious is in and around the Sgr B2 complex, where very high gas temperatures
-are measured.  High gas temperatures, $T\sim100-120$ K, were previously
+are measured.  High gas temperatures, $T_G\sim100-120$ K, were previously
 measured in a ridge to the Galactic northeast of Sgr B2 N using \methylcyanide
 \citep[][Figure 4b]{de-Vicente1997a}, which we now confirm, though our data
-show $T\gtrsim150$ K.  \citet{Ott2014a} also showed relatively high \ammonia
+show $T_G\gtrsim150$ K.  \citet{Ott2014a} also showed relatively high \ammonia
 temperatures in this hot ridge, and \citet{Etxaluze2013a} found a
 high-temperature component ($\sim50-84$ K) in their high-J CO spectral line
 energy distribution analysis.
@@ -1275,14 +1274,14 @@ energy distribution analysis.
 % $\sim10$ pc (5\arcmin), and nearly 30 pc (12.5\arcmin) in the
 % northwest/southeast directions. 
 The Brick, Sgr A, and the 50 \kms and 20 \kms clouds exhibit the
-highest temperatures outside of Sgr B2, with $T>100$ K, in agreement with measurements
+highest temperatures outside of Sgr B2, with $T_G>100$ K, in agreement with measurements
 in high-J transitions of \ammonia by \citet{Mills2013a}.  The western portion of the
-CMZ, around G359.5, shows cooler temperatures $40 $K$ < T < 60$ K.  
+CMZ, around G359.5, shows cooler temperatures $40 $K$ < T_G < 60$ K.  
 Along the `dust ridge', the high-latitude portion is slightly warmer than the
 low-latitude region; this difference is most evident when comparing The Brick
 to the region just south of it and at $\ell=0.5\arcdeg$.
 Figure \ref{fig:temvslonplot} shows the temperature of dendrogram clumps as a
-function of longitude.  The high temperatures ($T\gtrsim60$ K) persist to high
+function of longitude.  The high temperatures ($T_G\gtrsim60$ K) persist to high
 longitudes, including the enigmatic turbulent yet starless G1.6 region
 \citep{Menten2009a}.
 
@@ -1379,8 +1378,8 @@ In both panels,
 the darker symbols represent `leaves'
 in the dendrogram structure, i.e. compact clumps, while the fainter symbols
 represent their parent structures. There is a \emph{hint} of an 
-increase in temperature with time, from an initial temperature $T\lesssim50$ K
-to $T\gtrsim100$ K over a period $\tau\sim0.8$ Myr, as illustrated by the
+increase in temperature with time, from an initial temperature $T_G\lesssim50$ K
+to $T_G\gtrsim100$ K over a period $\tau\sim0.8$ Myr, as illustrated by the
 dashed line in panel (b); note that the cool features from 0.7-0.9 Myr are
 at a significantly different velocity and therefore cannot be part of the same
 stream.  The Brick is an outlier (it is hotter) whether or not there is a
@@ -1397,7 +1396,7 @@ temperature.
 \citet{Ott2014a} measured the \ammonia (1,1) and (2,2) lines over a subset of the
 region we mapped, from $-0.2\arcdeg$ to $0.8\arcdeg$.  These two lines are
 a frequently
-used thermometer sensitive to gas temperatures $5 \lesssim T \lesssim 40$ K,
+used thermometer sensitive to gas temperatures $5 \lesssim T_G \lesssim 40$ K,
 with sensitivity up to $\sim80$ K but requiring a larger $T_{rot}$ to $T_{kin}$
 correction, which means the uncertainties at high temperatures are larger
 \citep[][Figure 1]{Mangum2013a}.  The \ammonia lines have lower critical
@@ -1445,10 +1444,10 @@ somewhat cooler, and the positive latitude component of the
 component.
 
 The most significant difference occurs in the southwest portion of the Sgr B2
-cloud.  In this region, the \ammonia temperature ranges from the high ($T>80K$)
-temperatures of the Sgr B2 N hot ridge into a cooler background $T\sim30-40$ K.
+cloud.  In this region, the \ammonia temperature ranges from the high ($T_G>80K$)
+temperatures of the Sgr B2 N hot ridge into a cooler background $T_G\sim30-40$ K.
 By contrast, the \formaldehyde temperatures stay high, indicating gas
-temperatures $T>150$ K extending to the southwest of Sgr B2 S.  This difference
+temperatures $T_G>150$ K extending to the southwest of Sgr B2 S.  This difference
 probably indicates that there is a cool, diffuse component being detected in
 \ammonia, while \formaldehyde is detecting a hotter, denser component.  This
 region will provide a good comparison target for other thermometric
@@ -1476,7 +1475,7 @@ diffuse component.
 %{figures/big_maps/lores_smoothdens1e4_weighted_masked_tmap_withcontours.pdf}
 {(a) A temperature map derived from the \ammonia (1,1)/(2,2) line ratio from
 \citet{Ott2014a}.  The \ammonia thermometer has a more limited temperature
-range when using only these two lines, so the map is cut off at $T=80$ K.
+range when using only these two lines, so the map is cut off at $T_G=80$ K.
 %This map can be compared to Figure \ref{fig:temmap}.
 (b) The \para-derived temperature map over the same region from Figure
 \ref{fig:temmapnosmooth}a
@@ -1497,7 +1496,7 @@ Our survey finds a greater variety in gas temperatures due to the larger area
 covered.
 
 There have also been observations of \para temperatures with interferometers.
-\citet{Johnston2014a} noted a very high temperature peak, $T>320$ K, using these
+\citet{Johnston2014a} noted a very high temperature peak, $T_G>320$ K, using these
 lines of \para toward The Brick, G0.253+0.015.  The ratio of the
 SMA to APEX measurements of both the \threeohthree and \threetwoone line in the
 southwest portion of The Brick is $\approx0.25$, but the ratio $R_1\approx0.45$
@@ -1509,7 +1508,7 @@ Above 300K, the collision rates provided by LAMDA
 \citep{Green1991a,Schoier2005a,Wiesenfeld2013a} must be extrapolated, which
 means the models do not produce reliable results.  Very high $R_1$ values above
 about 0.7 cannot be reproduced by high temperatures with the current suite of
-collision rates if the temperature is bounded to $T<300$K, but instead require
+collision rates if the temperature is bounded to $T_G<300$K, but instead require
 that the lines be optically thick and thermalized and therefore that the gas be
 at very high densities.   Given the low brightness temperatures observed
 ($\sim2$ K even in the SMA $\sim4$\arcsec beams), if the emission is optically
@@ -1518,9 +1517,9 @@ filling factor).  A small filling factor for the cloud-scale APEX observations
 is inconsistent with the observed large extent of the emission and the low
 interferometer to single-dish ratio.  We discuss this topic further in Section
 \ref{sec:thickorwarm}.  We conclude, therefore, that a lower limit on the gas
-temperature in The Brick, $T\gtrsim120$ K, is consistent with our observations,
+temperature in The Brick, $T_G\gtrsim120$ K, is consistent with our observations,
 and that the \citet{Johnston2014a} measurement should also be regarded as a
-lower limit closer to $T>300$ K or a suggestion that there is optically thick
+lower limit closer to $T_G>300$ K or a suggestion that there is optically thick
 \para \threeohthree emission at the brightness peaks.
 
 
@@ -1600,7 +1599,7 @@ lower limit closer to $T>300$ K or a suggestion that there is optically thick
 As noted in Section \ref{sec:h2cocompare}, there is degeneracy in the modeling
 that allows the observed ratios to be produced by very dense gas in addition to
 hot gas.  Indeed, ratios approaching $R_1=1$ occur for relatively low
-temperatures ($T\sim30$ K) at very high densities ($n>10^{6}$ \percc)
+temperatures ($T_G\sim30$ K) at very high densities ($n>10^{6}$ \percc)
 and very high column densities ($N(\para)>10^{16}$ \perkms \persc) because
 the lines become optically thick and have LTE excitation temperatures.
 
@@ -1610,7 +1609,7 @@ optically thick gas would have to have a very low filling factor.  The peak
 \para \threeohthree brightness ranges from $0.2 \lesssim T_{mb} \lesssim 2$ K
 in the detected regions, implying upper limits on the filling factor 1-7\% if
 we assume the resolved brightness temperature equals the dust temperature,
-$T_B=T_{dust}$.
+$T_B=T_D$.
 In practice, the filling factor would have to be lower still, since any
 optically thin \para in surrounding lower-density gas would favor the
 \threeohthree line and contribute to a lower $R_1$.
@@ -1656,8 +1655,8 @@ represents a distinct phase.
 For comparison to extragalactic observations, we have included a spectrum
 averaged over the whole $\sim300$ pc extent of our survey in Figure
 \ref{fig:wholecmzspec}.  The peak amplitude is 50-60 mK and the measured
-line ratio $\Rone = 0.25$, corresponding to a temperature $T=65$ K at $n=10^4$
-\percc, $T=63$ K at $n=10^{4.5}$ \percc, or $T=48$ K at $n=10^5$ \percc.  
+line ratio $\Rone = 0.25$, corresponding to a temperature $T_G=65$ K at $n=10^4$
+\percc, $T_G=63$ K at $n=10^{4.5}$ \percc, or $T_G=48$ K at $n=10^5$ \percc.  
 Over the same area, the measured mean dust temperature from HiGal is 23 K,
 though on such large scales it would be more appropriate to use Planck or WMAP
 data to perform this measurement.
@@ -1665,7 +1664,7 @@ While the spectral fit does not capture all components of the line, the
 extracted line ratio is representative of the CMZ-wide average.  This
 temperature is very close
 to the \ammonia-measured temperature in M83 \citep[56 K;][]{Mangum2013a}, which
-has a similarly low dust temperature $T_{dust,M83} = 31$ K over a 600 pc
+has a similarly low dust temperature $T_{D,M83} = 31$ K over a 600 pc
 region\footnote{We also examine the HOPS \citep{Walsh2011a} \ammonia
 observations of the CMZ over the same region as our \formaldehyde survey, and
 find that the measured (1-1)/(2-2) ratio is 1.48, identical to that measured
@@ -1690,7 +1689,7 @@ have high star formation rates and hence CRIRs.
 parameters, along with the nominal errors on the parameters, are shown in the
 legend.  A single-component fit was used, though many subtler individual
 components are evident.  Assuming a constant gas density $n=10^{4.5\pm0.5}$
-\percc, the measured ratio implies $T_{CMZ} = 63^{-16}_{+2}$ K.}
+\percc, the measured ratio implies $T_{G,CMZ} = 63^{-16}_{+2}$ K.}
 {fig:wholecmzspec}{0.5}{0}
 
 \subsection{Implications for star formation}
@@ -1712,7 +1711,7 @@ $c_s$ implies a lower Mach number, the observed line widths more than make up
 for it; CMZ gas is still more turbulent than Galactic disk gas.
 
 The high temperature also means that the thermal Jeans mass is about a factor
-of 5 higher than in local clouds (assuming $T_{CMZ}=60$ K, $T_{local}=20$ K,
+of 5 higher than in local clouds (assuming $T_{G,CMZ}=60$ K, $T_{G,local}=20$ K,
 $M_{J,CMZ}(n=10^5) \approx 9$ \msun, $M_{J,local}(n=10^5) \approx 2$ \msun);
 naively this implies a larger typical fragmentation scale and perhaps a
 preference toward forming high mass cores \citep{Larson2005a}.  However, many
@@ -1763,7 +1762,7 @@ uniform.  The temperatures which we derive are higher than the dust temperature
 \citep[][see their conclusion]{Guesten1981a}.  We have added new information
 on the large scale of this uniformity and on the association of these
 temperatures with particular physical mechanisms, but overall we confirm those
-early results.  There is warm ($T\gtrsim60$ K) dense gas pervading the CMZ out
+early results.  There is warm ($T_G\gtrsim60$ K) dense gas pervading the CMZ out
 to a radius $\sim200$ pc.
 
 We have examined the thermal balance in CMZ clouds.
@@ -2122,7 +2121,7 @@ smoothing (top) and with 33.84\arcsec smoothing (bottom).
 These maps give an indication of the reliability of the temperatures extracted
 in Figure \ref{fig:temmap}.  The colorbars are intentionally saturated at
 S/N$>10$ since above this threshold, the temperatures are reliable as long as
-they are in the $T<150$ K regime.
+they are in the $T_G<150$ K regime.
 }
 {fig:peaksn}{1}{9.5in}
 

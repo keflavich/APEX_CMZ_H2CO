@@ -85,7 +85,7 @@ ax6.plot(pcfittable['higaldusttem'][mask],
          color='r',
          alpha=0.5,
          linestyle='none')
-ax6.set_xlabel("HiGal Fitted Temperature")
+ax6.set_xlabel("HiGal Dust Temperature (K)")
 ax6.set_ylabel("H$_2$CO Temperature (K)")
 ax6.set_ylim(0,200)
 ax6.set_xlim(15,30)
