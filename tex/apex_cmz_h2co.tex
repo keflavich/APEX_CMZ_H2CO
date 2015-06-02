@@ -18,12 +18,12 @@ in other galactic centers, the dense gas is warmer than the dust.}
 (CMZ) and determine what drives it.}
 {We have mapped the inner 300 pc of the CMZ in the temperature-sensitive
 $J=3-2$ para-formaldehyde (\para) transitions, which have critical and effective
-densities both $n\gtrsim10^5$ \percc.  We use the ratio of the \threeohthree /
-\threetwoone line to determine the gas temperature.
+densities both $n\gtrsim10^{5.5}$ \percc.  We use the ratio of the
+\threetwoone / \threeohthree line to determine the gas temperature.
 We produce temperature maps and cubes with 30\arcsec and 1 \kms resolution and
 publish all data in FITS form; they can be recovered from digital object
 identifier \texttt{doi:10.7910/DVN/27601}.}
-{Gas temperatures in the Galactic center range from $\sim60$ K to $>100$ K in
+{Dense gas temperatures in the Galactic center range from $\sim60$ K to $>100$ K in
 selected regions.  Gas temperatures are mostly consistent with purely turbulent
 heating, though cosmic ray heating still affects less turbulent clouds.  We
 infer an upper limit on the cosmic ray ionization rate $\zeta_{CR}<10^{-14}$
@@ -39,7 +39,7 @@ higher than the dust temperature, confirming that dust is a coolant in the
 dense gas.  Turbulent heating can readily explain the observed temperatures
 given the observed line widths.  Cosmic rays cannot explain the observed
 variation in gas temperatures, so CMZ dense gas temperatures are not dominated
-by cosmic ray heating.  The gas temperatures previously observed to be warm
+by cosmic ray heating.  The gas temperatures previously observed to be high
 in the inner $\sim75$ pc are confirmed to be high in the entire CMZ.}
 
 %{This is an abstract.}
@@ -70,7 +70,7 @@ formation \citep{Kruijssen2013a}.
 The Galactic CMZ has attracted a great deal of attention recently, as it has a
 much higher ratio of dense gas mass to star formation tracers than the rest of
 the galaxy
-\citep{Longmore2013a,Longmore2012b,Longmore2013b,Kruijssen2013a,Yusef-Zadeh2009a,Immer2012a}.
+\citep{Longmore2013a,Longmore2012b,Longmore2013b,Kruijssen2014c,Yusef-Zadeh2009a,Immer2012a}.
 The star formation rate in this region therefore appears to be suppressed
 relative to the expectations from nearby star-forming regions and nearby galaxy
 disks, where the star formation time-scale decreases with increasing gas
@@ -118,18 +118,17 @@ There is a long-standing problem that the observed gas and dust temperatures do
 not agree throughout the CMZ
 \citep{Guesten1981a,Molinari2011a,Ao2013a,Ott2014a}.  Photon-dominated region
 (PDR) models predict that gas and dust should match at high column densities
-\citep{Hollenbach1999a}.
-This discrepancy represents a significant problem for understanding the
-importance of gas temperature and pressure in the evolution of molecular
-clouds.  The dust temperature is readily estimated via multi-band continuum
-mapping and therefore is often used as a proxy for the dense gas temperature.
-While the discrepancy is not theoretically a problem, as the gas and dust may
-remain collisionally uncoupled up to moderately high densities given a high
-enough heating rate, it is an important empirical difference between CMZ and
-Galactic disk clouds.  Dust and \ammonia derived temperatures are usually
-assumed and often observed to agree in Galactic disk clouds
-\citep{Pillai2006a,Dunham2010a,Juvela2012a,Battersby2014a}, but the difference
-can no longer be ignored in the Galactic center.
+\citep{Hollenbach1999a}.  The observed discrepancy represents a significant
+problem for understanding the importance of gas temperature and pressure in the
+evolution of molecular clouds.  The dust temperature is readily estimated via
+multi-band continuum mapping and therefore is often used as a proxy for the
+dense gas temperature.  While the discrepancy is not theoretically a problem,
+as the gas and dust may remain collisionally uncoupled up to moderately high
+densities given a high enough heating rate, it is an important empirical
+difference between CMZ and Galactic disk clouds.  Dust and \ammonia derived
+temperatures are usually assumed and often observed to agree in Galactic disk
+clouds \citep{Pillai2006a,Dunham2010a,Juvela2012a,Battersby2014a}, but the
+difference can no longer be ignored in the Galactic center.
 
 Within both our own Galactic center and many nearby galactic nuclei, there is
 controversy over which heating mechanisms dominate.  In the CMZ,
@@ -151,7 +150,7 @@ the x1 and x2 orbits \citep{Rodriguez-Fernandez2006b,Riquelme2013a}.  We
 describe the new
 observations in Section \ref{sec:observations}.  In Section \ref{sec:signal},
 we describe the analysis process used to extract signal from the data cubes.
-In Section \ref{sec:spectralmodeling}, we describe how we 
+In Section \ref{sec:analysis}, we describe how we 
 derive temperatures from the line ratios.
 We discuss various implications of our data in Section
 \ref{sec:discussion}.  In the appendices, we describe further details of the
@@ -169,11 +168,13 @@ with the APEX-1 (SHFI) instrument \citep{Vassilev2008a} on the Atacama Pathfinde
 Experiment (APEX) telescope \citep{Gusten2006b} using the eXtended bandwidth
 Fast Fourier Transform
 Spectrometer (XFFTS) backend \citep{Klein2012a}.  The observations were
-performed in service mode, and were spread out over two years.  The time was
+performed in service mode and were spread out over two years.  The time was
 divided into 25 hours in June
-2013, 75 hours in April-July 2014, and 50 hours in October 2014.  The time was
-split between the ESO (E-093.C-0144A; 50h), MPIfR (M-091.F-0019 and
-M-093.F-0009; 75h), and OSO (E-093.C-0144A; 25h) queues.
+2013, 75 hours in April-July 2014, and 50 hours in October 2014.  A final
+set of observations was taken in April 2015; these data are not included in the
+analysis in this paper but will be provided in the delivered FITS files.  The
+time was split between the ESO (E-093.C-0144A; 50h, E-095.C-0242A, 25h), MPIfR
+(M-091.F-0019 and M-093.F-0009; 75h), and OSO (E-093.C-0144A; 25h) queues.
 
 The 2013 observations were taken in $4\arcmin \times 4\arcmin$ patches, and the
 frequency range covered was 217.5-220 GHz and 216-218.5 GHz in the two spectral
@@ -565,6 +566,7 @@ multi-gaussian model.  An example spectrum extracted from a small region around
 shown in Figure \ref{fig:regions}.
 
 \section{Analysis: temperature determination}
+\label{sec:analysis}
 In this Section, we describe the techniques used to derive gas temperatures.
 In Section \ref{sec:linemodeling} we model the line ratios with a radiative
 transfer code.  We fit gaussians to spectra extracted from the cubes and use
@@ -1101,9 +1103,9 @@ is no significant disagreement between $T_{turb}$ and $T_{measured}$.
 
 
 \FigureTwo
-{figures/chi2_temperature_vs_turbulenttemperature_fieldsandsources.pdf}
-%{figures/dendrotem/temperature_vs_turbtemperature.pdf} # dendrotem_plot
-{figures/dendrotem/temperature_vs_Despoticturbtemperature.pdf} % despotic_heating
+{figures/chi2_temperature_vs_turbulenttemperature_fieldsandsources.pdf} %parameter_comparisons
+%{figures/dendrotem/temperature_vs_turbtemperature.pdf} # dendrotem_plots
+{figures/dendrotem/temperature_vs_Despoticturbtemperature.pdf} % dendrotem_plots
 {Plots of the \formaldehyde-measured temperature against the predicted
 turbulent-driven temperature as discussed in Section \ref{sec:heating}.
 While no trend is obvious in the data, most of the high signal-to-noise
@@ -1696,11 +1698,11 @@ The star formation properties of the CMZ appear to be different than in the
 rest of the Galaxy
 \citep{Yusef-Zadeh2009a,Yusef-Zadeh2010a,Immer2012a,Longmore2013b}.  It
 generally appears deficient in star formation tracers relative to its dense gas
-mass.  \citet{Kruijssen2014c} suggested that the driving factor in this low
-star formation rate is an increased threshold for gravitational collapse caused
-by turbulent pressure.  \citet{Rathborne2014b} support this claim with
-observations that the gas column probability distribution function in The Brick
-is consistent with a purely turbulent origin.
+mass.  \citet{Kruijssen2014c} suggested that one of the main driving factor in
+this low star formation rate is an increased threshold for gravitational
+collapse caused by turbulent pressure.  \citet{Rathborne2014b} support this
+claim with observations that the gas column probability distribution function
+in The Brick is consistent with a purely turbulent origin.
 
 Our observations further confirm that turbulence is an energetically dominant
 process in the CMZ.  We provide an important constraint on the isothermal sound
@@ -1759,7 +1761,7 @@ The main old result from this paper is that the gas temperature in the galactic
 center molecular clouds is relatively high (50-120 K) and apparently fairly
 uniform.  The temperatures which we derive are higher than the dust temperature
 \citep[][see their conclusion]{Guesten1981a}.  We have added new information
-on the large scale of this uniformity and in the association of these
+on the large scale of this uniformity and on the association of these
 temperatures with particular physical mechanisms, but overall we confirm those
 early results.  There is warm ($T\gtrsim60$ K) dense gas pervading the CMZ out
 to a radius $\sim200$ pc.
@@ -1768,19 +1770,19 @@ We have examined the thermal balance in CMZ clouds.
 The high but variable gas temperatures throughout the CMZ suggest that
 turbulent heating is the dominant heating mechanism in Galactic Center dense
 gas.  Cosmic rays are not dominant, but may be important in less turbulent
-sub-regions within the CMZ, but we are able to place an upper limit $\zeta_{CR}
+sub-regions within the CMZ.  We are able to place an upper limit $\zeta_{CR}
 < 10^{-14}$ \pers in the dense gas because a higher CRIR would result in a
 higher floor temperature than we observe.  Dust is a coolant in CMZ dense gas,
 and no other heating mechanisms should be able to affect the centers of dense
 clouds.
 
 There are many regions with expected temperatures based on heating from
-turbulent energy distribution substantially higher than observed.  These
+turbulence substantially higher than observed.  These
 regions may have chemistry significantly different from that
 in local clouds, with more line coolants (e.g., atomic oxygen) available due to
 the high gas temperature.  While we did not investigate the chemistry of CMZ
 clouds in detail, we suggest that exploring chemistry in
-$\sim60-100$ K, $n\sim10^4$ \percc material will be essential for understanding
+$\sim60-100$ K, $n\gtrsim10^4$ \percc material will be essential for understanding
 observations of molecular lines in the CMZ.
 
 The \formaldehyde temperatures are uniformly higher than \ammonia (1-1)/(2-2)

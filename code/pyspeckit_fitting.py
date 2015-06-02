@@ -81,9 +81,9 @@ simple_fitter = SpectralModel(simplemodel, 5,
 def simplemodel2(xarr, amplitude, velocity, width, ratio321303, ratio322321, amp2):
 
     x = xarr.as_unit('km/s')
-    voff322 = x.x_to_coord(218.475632e9,'Hz')
-    voff321 = x.x_to_coord(218.760066e9,'Hz')
-    voff3 = x.x_to_coord(218.44005,'GHz')
+    voff322 = x.x_to_coord(218.475632e9,'Hz').value
+    voff321 = x.x_to_coord(218.760066e9,'Hz').value
+    voff3 = x.x_to_coord(218.44005,'GHz').value
     x = np.array(x) # make sure xarr is no longer a spectroscopic axis
     G = (amplitude*(np.exp(-(x-velocity)**2/(2.0*width**2)) +
                     np.exp(-(x-velocity-voff322)**2/(2.0*width**2))*ratio321303*ratio322321 +
@@ -111,8 +111,8 @@ def simplemodel3(xarr, amplitude, velocity, width, ratio321303):
 
     x = xarr.as_unit('km/s')
     #voff322 = x.x_to_coord(218.475632e9,'Hz')
-    voff321 = x.x_to_coord(218.760066e9,'Hz')
-    voff3 = x.x_to_coord(218.44005,'GHz')
+    voff321 = x.x_to_coord(218.760066e9,'Hz').value
+    voff3 = x.x_to_coord(218.44005,'GHz').value
     x = np.array(x) # make sure xarr is no longer a spectroscopic axis
     G = (amplitude*(np.exp(-(x-velocity)**2/(2.0*width**2)) +
                     #np.exp(-(x-velocity-voff322)**2/(2.0*width**2))*ratio321303*ratio322321 +
