@@ -307,14 +307,17 @@ class paraH2COmodel(generic_paraH2COmodel):
         #                                         self.elogh2column))
         ax5 = pl.subplot(2,2,4)
         if hasattr(self.chi2_ff1, 'size'):
-            cdict = {x:   [(0.0, 0.0, 0.0),
+            cdict = {x:   [(0.0, 0.5, 0.5),
                            (1.0, 0.0, 0.0)]
                      for x in ('red','green','blue')}
-            cdict['alpha'] = [(0.0, 0.0, 0.0), (1.0, 0.3, 0.3)]
+            cdict['green'] = [(0, 0.5, 0.5), (1,1,1)]
+            cdict['red'] = [(0, 0.5, 0.5), (1,0.7,0.7)]
+            cdict['blue'] = [(0, 0.0, 0.0), (1,0,0)]
+            #cdict['alpha'] = [(0.0, 0.0, 0.0), (1.0, 0.3, 0.3)]
             darker = matplotlib.colors.LinearSegmentedColormap('darker', cdict)
             like = (self.individual_likelihoods['chi2_ff1'])
             plim = cdf_of_like(like.sum(axis=axis)).swapaxes(*swaps)
-            pl.contourf(xax, yax, plim, levels=levels+[1],
+            pl.contour(xax, yax, plim, levels=levels,
                         cmap=darker, zorder=5)
         if hasattr(self.chi2_dens, 'size'):
             like = (self.individual_likelihoods['chi2_dens'])
