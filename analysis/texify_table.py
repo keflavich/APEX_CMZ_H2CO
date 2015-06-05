@@ -22,11 +22,17 @@ def make_column_asymm(colname, errlowcolname, errhighcolname, outcolname, unit, 
 
 columns = {'Source_Name': 'Source Name',
            'tkin_turb': '$T_{gas, turb}$',
+           'logh2column': 'log($n(H_2)$)',
           }
            #'spline_h2coratio321303': '$R_1$',
            #'espline_h2coratio321303': '$\sigma(R_1)$',}
 
+def format_float(st):
+    return exp_to_tex("{0:0.3g}".format(st))
+
 formats = {'tkin_turb': format_float,
+           'Source_Name': lambda x: x.replace("_","\_"),
+           'logh2column': format_float,
           }
 
 outtbl = Table([tbl['Source_Name'],
@@ -34,16 +40,20 @@ outtbl = Table([tbl['Source_Name'],
                 make_column('spline_width', 'espline_width', '$\sigma_v$', u.km/u.s),
                 make_column('spline_center', 'espline_center', '$v_{lsr}$', u.km/u.s),
                 make_column('spline_ampH2CO', 'espline_ampH2CO', '$T_B(H_2CO)$', u.K),
-                make_column('logh2column', 'elogh2column', 'log($n(H_2)$)', u.cm**-2),
+                #make_column('logh2column', 'elogh2column', 'log($n(H_2)$)', u.cm**-2),
+                tbl['logh2column'],
                 make_column_asymm('temperature_chi2', 'tmin1sig_chi2', 'tmax1sig_chi2', '$T_{gas}$', u.K),
-                tbl['tkin_turb'],
+                Column(data=tbl['tkin_turb'], name='tkin_turb', unit=u.K),
                ]
               )
 
+for old, new in columns.items():
+    outtbl.rename_column(old, new)
+    formats[new] = formats[old]
 
 
-latexdict['header_start'] = '\label{tab:observations}'
-latexdict['caption'] = '\\formaldehyde Line Parameters and Fit Properties'
+latexdict['header_start'] = '\label{tab:handregions}'
+latexdict['caption'] = '\\formaldehyde Line Parameters and Fit Properties for hand-selected regions'
 latexdict['tablefoot'] = ('\par\n')
 #latexdict['col_align'] = 'lllrr'
 #latexdict['tabletype'] = 'longtable'
@@ -54,3 +64,7 @@ outtbl.write(paths.tpath('line_props.tex'), format='ascii.latex',
             )
  
 
+outtbl[::10].write(paths.tpath('line_props_excerpt.tex'), format='ascii.latex',
+             latexdict=latexdict,
+             formats=formats,
+            )
