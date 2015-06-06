@@ -1949,17 +1949,16 @@ tar file and on the internet at
 \url{https://github.com/adamginsburg/APEX_CMZ_H2CO}.  Because the archives are
 public, we include scripts to download and process the raw data so that all
 steps of the analysis performed here can be performed by any individual with
-access to a computer.  Most of the data sets can be retrieved in an automated
-fashion using an \texttt{astroquery}-based script from the ESO archive, but
-some of the data is not stored in the archive and must be retrieved manually
-from the \texttt{dataverse} servers. The total data reduction process takes
-$\sim30$ hours on a 48-core, 2012-era linux machine, though most steps are not
-parallelized so the process may be faster on more recent machines with fewer
-cores.  About 300 GB of free space are required to store the raw, intermediate,
-and reduced data products, though the final products are $<30$ GB, with an
-actual size depending on whether the baseline-subtracted versions are kept
-separate from the original files.  The download process may take substantially
-longer than the data reduction.
+access to a computer.  We provide a script \texttt{download\_raw\_files.py}
+that will retrieve the raw \texttt{.apex} data from the ESO archive and from
+the dataverse; it requires a valid ESO archive account to use. The total data
+reduction process takes $\sim30$ hours on a 48-core, 2012-era linux machine,
+though most steps are not parallelized so the process may be faster on more
+recent machines with fewer cores.  About 300 GB of free space are required to
+store the raw, intermediate, and reduced data products, though the final
+products are $<30$ GB, with an actual size depending on whether the
+baseline-subtracted versions are kept separate from the original files.  The
+download process may take substantially longer than the data reduction.
 
 To fully reproduce the data products in this paper, some effort is required to
 set up the appropriate directory structure.  The file

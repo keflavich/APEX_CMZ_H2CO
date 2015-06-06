@@ -52,5 +52,5 @@ def download_all():
     retrieve_esoarchive.retrieve_ESO_files(rawpath=rawpath, username=eso_username)
 
     for ii,fn in enumerate(mpi_raw_files):
-        download_file(fn)
-        print("Completed {0} of {1} files".format(ii, len(mpi_raw_files)))
+        name = download_file(fn)
+        print("Completed {2}: {0} of {1} files".format(ii, len(mpi_raw_files), name))
