@@ -4,7 +4,7 @@ Data Table README
 Column Descriptions
 -------------------
 
-fitted_line_parameters_Chi2Constraints.ipac:
+fitted_line_parameters_Chi2Constraints.ipac::
 
     Source_Name                 str     -          Source name in the accompanying .reg files
     ComponentID                 int     -          Component # for the source (there may be multiple velocity components per source)
@@ -61,7 +61,7 @@ fitted_line_parameters_Chi2Constraints.ipac:
     expected_column             float   cm^-2      Expectation value of the derived H2CO column
     expected_density            float   cm^-3      Expectation value of the derived H2 volume density
 
-PPV_H2CO_Temperature.ipac:
+PPV_H2CO_Temperature.ipac::
 
     _idx                        int     -        ID number of the dendrogram source
     index                       int     -        ID number of the dendrogram source
