@@ -2,10 +2,31 @@ APEX_CMZ_H2CO
 =============
 
 [Data: On the Dataverse](http://thedata.harvard.edu/dvn/dv/APEX-CMZ-1mm/faces/study/StudyPage.xhtml?globalId=doi:10.7910/DVN/27601&versionNumber=1)
-(permissions required; e-mail adam.g.ginsburg@gmail.com)
 
-Observing scripts and logs from the 2013-2014 APEX survey of 218 GHz H2CO in
-the CMZ 
+Installation
+------------
+
+We recommend using conda to install the basic required packages: astropy,
+scipy, numpy, matplotlib.
+
+A few packages will need to be installed that are not on conda.  Most of these exist on pip, but not all:
+
+```
+pip install FITS_tools, sdpy, astroquery, pyspeckit, spectral_cube, agpy
+pip install https://github.com/keflavich/mpl_plot_templates/archive/master.zip
+pip install https://github.com/keflavich/image_tools/archive/master.zip
+```
+
+The install script should take care of other
+dependencies:
+
+`python setup.py install`
+
+Description
+===========
+
+A paper, reduction and analysis code, and observing scripts and logs from the
+2013-2014 APEX survey of 218 GHz H2CO in the CMZ.
 
 The MPI and ESO observing scripts are in their respective directories.  A few
 "emission-free" off positions were selected based on the Dame 2001 data.
@@ -34,6 +55,7 @@ Pipeline
 
 An [example run of the pipeline](https://rawgit.com/keflavich/63b33d71a109e294bc4c/raw/835dec4970db738b2fb68e9070084c4180dd1053/ExampleAPEXMappingReduction.html)
 is hosted on [gist](https://gist.github.com/keflavich/63b33d71a109e294bc4c).
+This is pretty outdated but kept for posterity.
 
 
 Badges

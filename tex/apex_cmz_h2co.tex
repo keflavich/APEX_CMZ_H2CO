@@ -1908,7 +1908,7 @@ extracted spectra in regions with significant \para emission and in commonly
 studied individual regions.  This catalog is intended to provide archival value
 from our data set and enable future studies of individual regions.
 
-In the attached electronic table, three types of region are included: 
+In the hand-extracted source table, three types of region are included: 
 \begin{enumerate}
     \item Circular regions-of-interest (Figure \ref{fig:regions}a)
     \item Rectangular regions-of-interest (Figure \ref{fig:regions}b)
@@ -1920,13 +1920,14 @@ Spatial parameters for the box (\texttt{GLON}, \texttt{GLAT},
 \texttt{boxheight}, and \texttt{boxwidth}) or circle (\texttt{GLON},
 \texttt{GLAT}, and \texttt{radius}) regions are included.  The average dust
 column and dust temperature are reported (\texttt{higaldusttem} and
-\texttt{higalcolumndens}).  The best fit parameters for gas temperature, \para
-column, and \hh density are included along with their $\pm1-\sigma$ marginalized
-limits.  The full column description is in the \texttt{tables/README.rst} file
-in the source code repository, along with the tables in IPAC format.
+\texttt{higalcolumndens}).  The best fit (maximum likelihood) parameters for
+gas temperature, \para column, and \hh density are included along with their
+$\pm1-\sigma$ marginalized limits.  The full column description is in the
+\texttt{tables/README.rst} file in the source code repository, along with the
+tables in IPAC format.
 
 The dendrogram property table is also included in the repository and described
-in the README.
+in the \texttt{README}.
 
 \RotFigureThreeAA
 {figures/regions/boxes_on_h2co}
@@ -1945,20 +1946,33 @@ The reduced and raw data are made available via the CfA dataverse
 
 The source code for this project in its entirety is available in the attached
 tar file and on the internet at
-\url{https://github.com/adamginsburg/APEX_CMZ_H2CO}.
-Because the archives are public, we include scripts to download and process the
-raw data so that all steps of the analysis performed here can be performed by
-any individual with access to a computer.  Most of the data sets can be retrieved
-in an automated fashion using an \texttt{astroquery}-based script from the ESO archive,
-but some of the data is not stored in the archive and must be retrieved manually from the
-\texttt{dataverse} servers. The total data reduction process
-takes $\sim30$ hours on a 48-core, 2012-era linux machine, though most steps
-are not parallelized so the process may be faster on more recent machines with
-fewer cores.  About 300 GB of free space are required to store the raw,
-intermediate, and reduced data products, though the final products are $<30$
-GB, with an actual size depending on whether the baseline-subtracted versions
-are kept separate from the original files.  The download process may take
-substantially longer than the data reduction.
+\url{https://github.com/adamginsburg/APEX_CMZ_H2CO}.  Because the archives are
+public, we include scripts to download and process the raw data so that all
+steps of the analysis performed here can be performed by any individual with
+access to a computer.  Most of the data sets can be retrieved in an automated
+fashion using an \texttt{astroquery}-based script from the ESO archive, but
+some of the data is not stored in the archive and must be retrieved manually
+from the \texttt{dataverse} servers. The total data reduction process takes
+$\sim30$ hours on a 48-core, 2012-era linux machine, though most steps are not
+parallelized so the process may be faster on more recent machines with fewer
+cores.  About 300 GB of free space are required to store the raw, intermediate,
+and reduced data products, though the final products are $<30$ GB, with an
+actual size depending on whether the baseline-subtracted versions are kept
+separate from the original files.  The download process may take substantially
+longer than the data reduction.
+
+To fully reproduce the data products in this paper, some effort is required to
+set up the appropriate directory structure.  The file
+\texttt{reduction/run\_pipeline\_cleese.py} provides a useful template for
+informing the code about the appropriate directory location, and
+\texttt{reduction/README.rst} includes more detailed instructions.  The raw
+\texttt{.apex} data files need to be stored in a common location, and output
+directories need to be specified for the merged data files, each epoch's data
+(one for the \citet{Ao2013a} data, one for the 2013 data, and one for the
+2014/2015 data), diagnostic plots, and the subcubes for each molecule.  The
+function \texttt{do\_everything} in \texttt{reduction/make\_apex\_cubes.py}
+will then run the pipeline end-to-end.
+
 
 
 \section{A detailed example showing parameter constraints}

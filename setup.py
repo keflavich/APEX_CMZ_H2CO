@@ -90,12 +90,16 @@ for root, dirs, files in os.walk(PACKAGENAME):
                     os.path.relpath(root, PACKAGENAME), filename))
 package_info['package_data'][PACKAGENAME].extend(c_files)
 
+required_packages = ['astropy', 'astroquery', 'sdpy', 'pyspeckit',
+                     'matplotlib', 'FITS_tools', 'spectral_cube', 'agpy',
+                     'pytest']
+
 setup(name=PACKAGENAME,
       version=VERSION,
       description=DESCRIPTION,
       scripts=scripts,
-      requires=['astropy'],
-      install_requires=['astropy'],
+      requires=required_packages,
+      install_requires=required_packages,
       provides=[PACKAGENAME],
       author=AUTHOR,
       author_email=AUTHOR_EMAIL,
