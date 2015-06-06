@@ -1,0 +1,24 @@
+agpy==0.1.3
+-e git+git@github.com:keflavich/APEX_CMZ_H2CO.git@1b0a9fba6c829dfdc30bc0a65915eb4f1d22f2b7#egg=apex_shfi_pipeline-master
+astropy==1.0.3
+astroquery==0.2.5
+beautifulsoup4==4.3.2
+FITS-tools==0.0.dev0
+html5lib==0.99999
+image-tools==0.1
+keyring==5.3
+matplotlib==1.4.3
+mpl-plot-templates==0.0.0.dev0
+numpy==1.9.2
+py==1.4.28
+pyparsing==2.0.3
+pyspeckit==0.1.16
+pytest==2.7.1
+python-dateutil==2.4.2
+pytz==2015.4
+requests==2.7.0
+scipy==0.15.1
+sdpy==0.1
+shfi-otf-pipeline==0.0.dev669
+six==1.9.0
+spectral-cube==0.2.2
