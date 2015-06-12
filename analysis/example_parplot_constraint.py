@@ -83,7 +83,7 @@ def make_many_models():
 
     return constraints
 
-def diffplot_t_of_n(densities=np.linspace(3,7), column=13.5, temperatures=[50,75,100]):
+def diffplot_t_of_n(densities=np.linspace(3,7), column=13.5, temperatures=[25,50,75,100,125]):
     grid_exp = np.empty([len(densities), len(temperatures)])
     grid_ML = np.empty([len(densities), len(temperatures)])
     for idens, density in enumerate(densities):
@@ -119,7 +119,7 @@ def diffplot_t_of_n(densities=np.linspace(3,7), column=13.5, temperatures=[50,75
 
     return densities, grid_exp, grid_ML
 
-def diffplot_t_of_c(density=4.5, columns=np.linspace(12,15), temperatures=[50,75,100]):
+def diffplot_t_of_c(density=4.5, columns=np.linspace(12,15), temperatures=[25,50,75,100,125]):
     grid_exp = np.empty([len(columns), len(temperatures)])
     grid_ML = np.empty([len(columns), len(temperatures)])
     for icol, column in enumerate(columns):
@@ -159,11 +159,11 @@ def main():
     make_model()
     
     densities, dgrid_exp, dgrid_ML = diffplot_t_of_n()
-    pl.figure(1).savefig(paths.fpath('param_fits/modeled_temperature_vs_density_real_vs_recovered.png'), bbox_inches='tight')
-    pl.figure(2).savefig(paths.fpath('param_fits/modeled_temperature_vs_density_real_vs_recovered_fractions.png'), bbox_inches='tight')
+    pl.figure(1).savefig(paths.fpath('param_fits/modeled_temperature_vs_density_real_vs_recovered_C=13.5.png'), bbox_inches='tight')
+    pl.figure(2).savefig(paths.fpath('param_fits/modeled_temperature_vs_density_real_vs_recovered_fractions_C=13.5.png'), bbox_inches='tight')
 
     columns, cgrid_exp, cgrid_ML = diffplot_t_of_c()
-    pl.figure(1).savefig(paths.fpath('param_fits/modeled_temperature_vs_column_real_vs_recovered.png'), bbox_inches='tight')
-    pl.figure(2).savefig(paths.fpath('param_fits/modeled_temperature_vs_column_real_vs_recovered_fractions.png'), bbox_inches='tight')
+    pl.figure(1).savefig(paths.fpath('param_fits/modeled_temperature_vs_column_real_vs_recovered_n=4.5.png'), bbox_inches='tight')
+    pl.figure(2).savefig(paths.fpath('param_fits/modeled_temperature_vs_column_real_vs_recovered_fractions_n=4.5.png'), bbox_inches='tight')
 
     return locals()
