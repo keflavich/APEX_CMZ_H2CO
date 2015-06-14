@@ -1,6 +1,7 @@
 """
 Copied from despotic/examples/gmcChem and modified
 """
+from __future__ import print_function
 import matplotlib
 import pylab as pl
 pl.switch_backend('Qt4Agg')
@@ -9,6 +10,7 @@ from astropy import constants
 import paths
 from paths import fpath
 from astropy.utils.console import ProgressBar
+import pprint
 
 # Import the despotic library and the NL99 network; also import numpy
 from despotic import cloud
@@ -36,6 +38,34 @@ def turb_heating_generator(lengthscale=1*u.pc, turbulence=True):
         else:
             return [0,0]
     return turb_heating
+
+def fiducial_case(sigma=5.0*u.km/u.s, tdust=25*u.K, tdust_rad=10*u.K,
+                  gradient=5*u.km/u.s/u.pc, ISRF=0, crir=1e-14*u.s**-1,
+                  turbulence=False, density=10**4*u.cm**-3,
+                  lengthscale=1*u.pc):
+    print()
+    print("Fiducial case from section 5.1 para 4: ")
+    cloud
+    gmc.sigmaNT = sigma.to(u.cm/u.s).value
+    gmc.Td = tdust.to(u.K).value
+    gmc.rad.TradDust = gmc.Td if tdust_rad is None else tdust_rad.to(u.K).value
+    gmc.dVdr = gradient.to(u.s**-1).value
+    gmc.rad.chi = ISRF
+
+    # These are both per hydrogen, but we want to specify per particle, and
+    # we're assuming the particles are H2
+    gmc.rad.ionRate = crir.to(u.s**-1).value * 2
+    gmc.nH = density.to(u.cm**-3).value * 2
+
+    turb_heating = turb_heating_generator(lengthscale, turbulence=turbulence)
+
+    print("Before: ",)
+    pprint.pprint(gmc.dEdt(), width=1)
+    print(gmc.setTempEq(escapeProbGeom='LVG', PsiUser=turb_heating))
+    print("After: ",)
+    pprint.pprint(gmc.dEdt(), width=1)
+
+    return gmc.Tg
 
 
 def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
@@ -71,15 +101,15 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
 def case_study(row, gmc=gmc):
     beam_pc = (30/(np.sqrt(8*np.log(2)))*u.arcsec*8.5*u.kpc).to(u.pc,
                                                                 u.dimensionless_angles())
-    print "Case study for object ID ",row['_idx']
+    print("Case study for object ID ",row['_idx'])
     gf=row['gausscorrfactor']
-    print "Gaussian correction factor: ",gf
-    print "Density: ",10**row['density_chi2']*u.cm**-3
-    print "Line width: ",row['v_rms']*u.km/u.s*gf
-    print "Lengthscale: ",2*((row['reff']*u.pc*gf)**2-(beam_pc)**2)**0.5
-    print "Tdust: ",row['higaldusttem']*u.K
-    print "Tdust,rad: ",(row['higaldusttem']*u.K *
-                         (1-np.exp(-(10**row['logh2column']/1e24))))
+    print("Gaussian correction factor: ",gf)
+    print("Density: ",10**row['density_chi2']*u.cm**-3)
+    print("Line width: ",row['v_rms']*u.km/u.s*gf)
+    print("Lengthscale: ",2*((row['reff']*u.pc*gf)**2-(beam_pc)**2)**0.5)
+    print("Tdust: ",row['higaldusttem']*u.K)
+    print("Tdust,rad: ",(row['higaldusttem']*u.K *
+                         (1-np.exp(-(10**row['logh2column']/1e24)))))
 
     lengthscale = 2*((row['reff']*u.pc*gf)**2-(beam_pc)**2)**0.5
 
@@ -93,15 +123,15 @@ def case_study(row, gmc=gmc):
                       tdust_rad=(row['higaldusttem']*u.K *
                                  (1-np.exp(-(10**row['logh2column']/1e24)))),
                   gmc=gmc)
-    print "Initial temperature: ",T0
+    print("Initial temperature: ",T0)
     cool0 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
-    print "CO cooling: ",cool0['LambdaLine']['co']
-    print "O cooling: ",cool0['LambdaLine']['o']
-    print "C cooling: ",cool0['LambdaLine']['c']
-    print "C+ cooling: ",cool0['LambdaLine']['c+']
-    print "oH2 cooling: ",cool0['LambdaLine']['oh2']
-    print "pH2 cooling: ",cool0['LambdaLine']['ph2']
-    print "HD cooling: ",cool0['LambdaLine']['hd']
+    print("CO cooling: ",cool0['LambdaLine']['co'])
+    print("O cooling: ",cool0['LambdaLine']['o'])
+    print("C cooling: ",cool0['LambdaLine']['c'])
+    print("C+ cooling: ",cool0['LambdaLine']['c+'])
+    print("oH2 cooling: ",cool0['LambdaLine']['oh2'])
+    print("pH2 cooling: ",cool0['LambdaLine']['ph2'])
+    print("HD cooling: ",cool0['LambdaLine']['hd'])
     gmc.setChemEq(network=NL99)
 
     T1 = tkin_all(density=10**row['density_chi2']*u.cm**-3,
@@ -114,18 +144,18 @@ def case_study(row, gmc=gmc):
                       tdust_rad=(row['higaldusttem']*u.K *
                                  (1-np.exp(-(10**row['logh2column']/1e24)))),
                   gmc=gmc)
-    print "Chemical equilbrium temperature: ",T1
+    print("Chemical equilbrium temperature: ",T1)
     cool1 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
-    print "CO cooling: ",cool1['LambdaLine']['co']
-    print "O cooling: ",cool1['LambdaLine']['o']
-    print "C cooling: ",cool1['LambdaLine']['c']
-    print "C+ cooling: ",cool1['LambdaLine']['c+']
-    print "oH2 cooling: ",cool1['LambdaLine']['oh2']
-    print "pH2 cooling: ",cool1['LambdaLine']['ph2']
-    print "HD cooling: ",cool1['LambdaLine']['hd']
+    print("CO cooling: ",cool1['LambdaLine']['co'])
+    print("O cooling: ",cool1['LambdaLine']['o'])
+    print("C cooling: ",cool1['LambdaLine']['c'])
+    print("C+ cooling: ",cool1['LambdaLine']['c+'])
+    print("oH2 cooling: ",cool1['LambdaLine']['oh2'])
+    print("pH2 cooling: ",cool1['LambdaLine']['ph2'])
+    print("HD cooling: ",cool1['LambdaLine']['hd'])
 
-    print 
-    print "The same, but with an enhanced IRSF = 1000x local"
+    print()
+    print("The same, but with an enhanced IRSF = 1000x local")
     T0 = tkin_all(density=10**row['density_chi2']*u.cm**-3,
                       sigma=row['v_rms']*u.km/u.s*gf,
                       lengthscale=2*((row['reff']*u.pc*gf)**2-(beam_pc)**2)**0.5,
@@ -136,15 +166,15 @@ def case_study(row, gmc=gmc):
                       tdust_rad=(row['higaldusttem']*u.K *
                                  (1-np.exp(-(10**row['logh2column']/1e24)))),
                   gmc=gmc)
-    print "Initial temperature: ",T0
+    print("Initial temperature: ",T0)
     cool0 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
-    print "CO cooling: ",cool0['LambdaLine']['co']
-    print "O cooling: ",cool0['LambdaLine']['o']
-    print "C cooling: ",cool0['LambdaLine']['c']
-    print "C+ cooling: ",cool0['LambdaLine']['c+']
-    print "oH2 cooling: ",cool0['LambdaLine']['oh2']
-    print "pH2 cooling: ",cool0['LambdaLine']['ph2']
-    print "HD cooling: ",cool0['LambdaLine']['hd']
+    print("CO cooling: ",cool0['LambdaLine']['co'])
+    print("O cooling: ",cool0['LambdaLine']['o'])
+    print("C cooling: ",cool0['LambdaLine']['c'])
+    print("C+ cooling: ",cool0['LambdaLine']['c+'])
+    print("oH2 cooling: ",cool0['LambdaLine']['oh2'])
+    print("pH2 cooling: ",cool0['LambdaLine']['ph2'])
+    print("HD cooling: ",cool0['LambdaLine']['hd'])
     gmc.setChemEq(network=NL99)
 
     T1 = tkin_all(density=10**row['density_chi2']*u.cm**-3,
@@ -157,15 +187,15 @@ def case_study(row, gmc=gmc):
                       tdust_rad=(row['higaldusttem']*u.K *
                                  (1-np.exp(-(10**row['logh2column']/1e24)))),
                   gmc=gmc)
-    print "Chemical equilbrium temperature: ",T1
+    print("Chemical equilbrium temperature: ",T1)
     cool1 = gmc.dEdt(PsiUser=turb_heating_generator(lengthscale))
-    print "CO cooling: ",cool1['LambdaLine']['co']
-    print "O cooling: ",cool1['LambdaLine']['o']
-    print "C cooling: ",cool1['LambdaLine']['c']
-    print "C+ cooling: ",cool1['LambdaLine']['c+']
-    print "oH2 cooling: ",cool1['LambdaLine']['oh2']
-    print "pH2 cooling: ",cool1['LambdaLine']['ph2']
-    print "HD cooling: ",cool1['LambdaLine']['hd']
+    print("CO cooling: ",cool1['LambdaLine']['co'])
+    print("O cooling: ",cool1['LambdaLine']['o'])
+    print("C cooling: ",cool1['LambdaLine']['c'])
+    print("C+ cooling: ",cool1['LambdaLine']['c+'])
+    print("oH2 cooling: ",cool1['LambdaLine']['oh2'])
+    print("pH2 cooling: ",cool1['LambdaLine']['ph2'])
+    print("HD cooling: ",cool1['LambdaLine']['hd'])
 
 
 if __name__ == "__main__":
@@ -269,9 +299,9 @@ if __name__ == "__main__":
                       crir=1e-17*u.s**-1))
 
 
-    print "Polynomial approximations for the fiducial case: "
-    print "Linear (bad fit): T = sigma*{0} + {1}".format(*np.polyfit(linewidths, tem2, 1))
-    print "2nd order (good fit): T = sigma**2*{0} + sigma*{1} + {2}".format(*np.polyfit(linewidths, tem2, 2))
+    print("Polynomial approximations for the fiducial case: ")
+    print("Linear (bad fit): T = sigma*{0} + {1}".format(*np.polyfit(linewidths, tem2, 1)))
+    print("2nd order (good fit): T = sigma**2*{0} + sigma*{1} + {2}".format(*np.polyfit(linewidths, tem2, 2)))
 
     # Plotting starts here
     FWHM = np.sqrt(8*np.log(2))
@@ -511,5 +541,7 @@ if __name__ == "__main__":
     print(catalog['_idx','Smean303','ratio321303','higaldusttem','tmin1sig_chi2','temperature_chi2','tmax1sig_chi2'][brick_ne_id])
     row = catalog[brick_ne_id]
     case_study(row)
+
+    fiducial_case()
 
     pl.draw(); pl.show()
