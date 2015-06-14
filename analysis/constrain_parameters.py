@@ -100,8 +100,8 @@ class paraH2COmodel(generic_paraH2COmodel):
                      'col': self.carr,
                      'tem': self.tarr}
         self.labels = {'dens': 'Density $n(\mathrm{H}_2)$ [log cm$^{-3}$]',
-                       'col': 'p-H$_2$CO [log cm$^{-2}$/(km s$^{-1}$ pc)]',
-                       'tem': 'Temperature (K)'}
+                       'col': 'p-H$_2$CO\n[log cm$^{-2}$/(km s$^{-1}$ pc)]',
+                       'tem': 'Temperature [K]'}
 
         # While the individual lines are subject to filling factor uncertainties, the
         # ratio is not.
