@@ -437,6 +437,8 @@ class paraH2COmodel(generic_paraH2COmodel):
             if axindex == 1:
                 ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),
                           fontsize=legendfontsize)
+
+        pl.subplots_adjust(hspace=0.45)
                 
 
     @property

@@ -435,6 +435,7 @@ for row in fittable:
     pl.figure(4, figsize=(12,16))
     # levels[0] = 0.68
     mf.parplot1d_all(levels=[0.68])
+    pl.subplots_adjust(hspace=0.45)
     outf = paths.fpath('param_fits/{name}_oneD_{num}_parameter_constraints.pdf'.format(name=row['Source_Name'],
                                                                                        num=num))
     pl.savefig(outf, bbox_inches='tight')
