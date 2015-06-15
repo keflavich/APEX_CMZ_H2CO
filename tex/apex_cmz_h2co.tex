@@ -115,7 +115,8 @@ found in previous studies.
 There is a long-standing problem that the observed gas and dust temperatures do
 not agree throughout the CMZ \citep{Guesten1981a, Molinari2011a, Ao2013a,
 Clark2013a, Ott2014a}.  Photon-dominated region
-(PDR) models predict that gas and dust should match at high column densities
+(PDR) models predict that gas and dust temperatures should match at high column
+densities
 \citep{Hollenbach1999a}.  The observed discrepancy represents a significant
 problem for understanding the importance of gas temperature and pressure in the
 evolution of molecular clouds.  The dust temperature is readily estimated via
@@ -171,7 +172,7 @@ performed in service mode and were spread out over two years.  The time was
 divided into 25 hours in June
 2013, 75 hours in April-July 2014, and 50 hours in October 2014.  A final
 set of observations was taken in April 2015; these data are not included in the
-analysis in this paper but will be provided in the delivered FITS files.  The
+analysis in this paper but are provided in the delivered FITS files.  The
 time was split between the ESO (E-093.C-0144A; 50h, E-095.C-0242A, 25h), MPIfR
 (M-091.F-0019 and M-093.F-0009; 75h), and OSO (E-093.C-0144A; 25h) queues.
 
@@ -206,7 +207,7 @@ listed frequencies are rest frequencies, but we do not include many, e.g.
 Sgr B2, since complete surveys of the rich molecular heimat in this band have
 been compiled elsewhere \citep{Nummelin1998a, Belloche2013a}.  Of the detected
 lines, the SO, HNCO, \ceighteeno, and \thirteenco were not covered by the
-\citet{Ao2013a} data but were in the newer XFFTS epoch data.  While we do
+\citet{Ao2013a} data but were in the newer XFFTS data.  While we do
 not analyze these lines in this paper, we provide data cubes that include
 them.
 
@@ -759,8 +760,8 @@ $X_{\formaldehyde} = 1.2\ee{-9}$.
 While the measured values appear consistent with the $n=10^4$ \percc curve, the
 systematic errors permit any density in the range $10^4~\percc < n < 10^5
 ~\percc$; this plot most importantly shows that $n\sim10^3$ \percc is not
-plausible and that the temperature does not differ very much as a function of
-$R_1$ over the plausible range of densities.
+plausible and that the temperature does not differ very much for a given value
+of $R_1$ over the plausible range of densities.
 }
 {fig:ratiovstem}{0.5}{0}
 
@@ -894,7 +895,7 @@ interested in gas at high extinction ($A_V > 10$)\footnote{While some emission
 likely comes from PDRs, we expect these regions to have small filling factors
 and typically lower densities than cloud centers.  At densities $n<10^4$
 \percc, \para 3-2 emission is very weak and would contribute little to the
-observed line emission.  Regions within the actively star-forming regions
+observed line emission.  Volumes within the actively star-forming regions
 Sgr B2, Sgr C, and near the circumnuclear disk may be locally affected
 by strong UV heating from young and forming stars, but the bulk of the dense
 gas is not.  Finally, PDR models \citep[e.g.][]{Hollenbach1999a} predict that
@@ -926,7 +927,8 @@ We expand upon the \citet{Ao2013a} analysis by solving for the temperature
 assuming that both cosmic ray ionization and turbulent heating are present and
 that the dust temperature is nonzero.  We assume the heating rate for cosmic
 rays is constant per cubic centimeter $\Gamma_{CR} = n \zeta_{CR}$, and the
-heating rate from turbulence $\Gamma_{turb} = n \sigma^3 / L$.  We used
+heating rate from turbulence $\Gamma_{turb} = n \sigma^3 / L$, where $\sigma$
+is the 3D velocity dispersion and $L$ is the length scale.  We used
 \texttt{DESPOTIC} \citep{Krumholz2014c} to determine the equilibrium
 temperature.  We included CO, O, C+, C, o-\hh, p-\hh, and HD\footnote{The
 collision rate files for \hh and HD were provided by Wing-fai Thi from work by
@@ -951,10 +953,10 @@ noted in the legend.  We assume a dust temperature $T_D=25$ K, but we assume
 lower dust radiation temperatures because the dust is optically thin at long
 wavelengths in most regions.  We have assumed a constant interstellar radiation
 field (ISRF) of $G_0$, which should only weakly affect dust temperatures and
-has no effect on the gas at the high column densities being modeled; a higher
+has no effect on the gas at the high column densities being modeled.  A higher
 ISRF may be appropriate but does not change our results, since a 1000 $G_0$
 field provides the same gas heating rate as a $\zeta_{CR}=2.5\ee{-17}$ \pers,
-which is much lower than measured CRIRs in the CMZ.
+a rate much lower than the measured CRIRs in the CMZ.
 \citet{Clark2013a} similarly find that the ISRF has little effect on the gas
 temperature.
 
@@ -1714,14 +1716,15 @@ closer to those measured for Sgr B2 than for the whole CMZ.
 M82's inner regions present an interesting contrast to the CMZ.
 \citet{Muhle2007a} report high \para-derived temperature $T\sim200$ K, while
 \citet{Weis2001a} found \ammonia-based temperature $T\sim60$ K.
-Taken at face value, this implies that both thermometers show increasing 
-temperatures in starbursts, but they each trace different gas.
+Taken at face value, these measurements imply that both thermometers show
+increasing temperatures in starbursts, but they each trace different gas.
 
-In the context of the \citet{Kruijssen2014c} and \citet{Kruijssen2015a}
-episodic star formation model for the CMZ, the global gas-dust temperature
-difference may indicate that the CMZ is currently near a star formation
-minimum, whereas the other galaxies have high star formation rates and hence
-CRIRs.
+%this is not correct!
+% In the context of the \citet{Kruijssen2014c} and \citet{Krumholz2015b}
+% episodic star formation model for the CMZ, the global gas-dust temperature
+% difference may indicate that the CMZ is currently near a star formation
+% minimum, whereas the other galaxies have high star formation rates and hence
+% CRIRs.
 
 \Figure
 {figures/simple/WholeCMZ_6parameter.pdf}
@@ -1729,7 +1732,7 @@ CRIRs.
 parameters, along with the nominal errors on the parameters, are shown in the
 legend.  A single-component fit was used, though many subtler individual
 components are evident.  Assuming a constant gas density $n=10^{4.5\pm0.5}$
-\percc, the measured ratio implies $T_{G,CMZ} = 63^{-16}_{+2}$ K.}
+\percc, the measured ratio implies $T_{G,CMZ} = 63_{-16}^{+2}$ K.}
 {fig:wholecmzspec}{0.5}{0}
 
 \subsection{Implications for star formation}
@@ -1737,7 +1740,8 @@ components are evident.  Assuming a constant gas density $n=10^{4.5\pm0.5}$
 The star formation properties of the CMZ appear to be different than in the
 rest of the Galaxy \citep{Yusef-Zadeh2009a, Yusef-Zadeh2010a, Immer2012a,
 Longmore2013b}.  It generally appears deficient in star formation tracers
-relative to its dense gas mass.  \citet{Kruijssen2014c} suggested that one of
+relative to its dense gas mass.  \citet{Kruijssen2014c} and
+\citet{Krumholz2015b} suggested that one of
 the main driving factors in this low star formation rate is an increased
 threshold for gravitational collapse caused by turbulent pressure.
 \citet{Rathborne2014b} support this claim with observations that the gas column
@@ -1854,12 +1858,12 @@ the orbital model.
 We thank the staff and observers at APEX for carrying out the service-mode
 observations.  We are grateful to Arnaud Belloche, Axel Wei{\ss}, and Carlos de
 Breuck for assistance in developing the observing strategy, and Per Bergman for
-his assistance in understanding the SHFI-1 baseline issues.
-We thank Katharine Johnston for providing the SMA \para \threetwoone
-data cube for The Brick.
-We thank Erik Rosolowsky for advice concerning treatment of the biases inherent
-in clump extraction, Padelis Papadopoulos for providing commentary on a draft
-of the paper, and Neale Gibson for discussions about parameter constraints.
+his assistance in understanding the SHFI-1 baseline issues.  We thank Katharine
+Johnston for providing the SMA \para \threetwoone data cube for The Brick.  We
+thank Erik Rosolowsky for advice concerning treatment of the biases inherent in
+clump extraction, Padelis Papadopoulos for providing commentary on a draft of
+the paper, Neale Gibson for discussions about parameter constraints, and the
+referee for a helpful review.
 T.P. acknowledges support from the Deutsche
 Forschungsgemeinschaft (DFG) via
 the SPP (priority program) 1573 `Physics of the ISM'.
@@ -2046,7 +2050,7 @@ Using a known density, temperature, and column, we then use the fitting process
 applied to the dendrogram objects and the hand-extracted regions to derive our
 measured temperatures.  Over a range $10^4 < n < 10^7$ \percc, the maximum
 likelihood estimator recovers the true temperature to within 25\% for all
-temperatures, and to 10\% over the range $10^{4.25} < n < 10^5.5$ \percc.  At
+temperatures, and to 10\% over the range $10^{4.25} < n < 10^{5.5}$ \percc.  At
 densities lower than $n<10^4$ \percc, the recovered temperature is
 significantly lower than the true temperature, which is expected since we
 impose a prior that $n>10^4$ \percc.  Curiously, the expectation value is more
@@ -2111,7 +2115,7 @@ Figure \ref{fig:coltemconstraints} caption.}
 describes the lines.  The blue shaded area shows the highest 68\% probability
 region.  The maximum-likelihood and expectation value are generally
 close for temperature but can be very different for column and density.}
-{fig:oneddistributions}{0.6}{0}
+{fig:oneddistributions}{0.55}{0}
 
 \section{Smoothed maps}
 \label{appendix:smoothed}
@@ -2157,9 +2161,9 @@ white fully opaque.
 {figures/big_maps/big_lores_smoothdens1e4_weighted_masked_tmap_withcontours.pdf}
 {figures/big_maps/big_lores_smoothdens1e5_weighted_masked_tmap_withcontours.pdf}
 {Temperature maps using the smoothed data assuming fixed $X_{\para}=1.2\ee{-9}$
-and $n(\hh)$.  The maps in (b) and (c) are masked by signal-to-noise as in Figure
-\ref{fig:ratiomaps}.  The thin black contours are at a column $N(\hh)=5\ee{22}$
-\percc from the Herschel SED fit maps.
+and $n(\hh)$.  The maps in (b) and (c) are masked by signal-to-noise as in
+Figure \ref{fig:ratiomaps}.  The thin black contours are at a column
+$N(\hh)=5\ee{22}$ \persc from the Herschel SED fit maps.
 (a) $n(\hh) = 10^4$ \percc, no mask
 (b) $n(\hh) = 10^4$ \percc
 (c) $n(\hh) = 10^5$ \percc.
@@ -2229,7 +2233,7 @@ In all three panels, regions of lower signal-to-noise, and therefore less
 reliable
 temperature, are grayed out with a filter that gets more opaque toward lower
 signal-to-noise.  The thin contours are from the Herschel HiGal
-dust SED fit at a level $N(\hh)=5\ee{22}$ \percc and are included to provide a
+dust SED fit at a level $N(\hh)=5\ee{22}$ \persc and are included to provide a
 visual reference for comparison between the temperature maps.
 }
 {fig:dendrotemmap}{1}{9.5in}
@@ -2265,7 +2269,7 @@ visual reference for comparison between the temperature maps.
 {figures/big_maps/big_loresdens1e4_abund1e-10_weighted_tmap_withmask.pdf}
 {Temperature maps assuming fixed $X(\para)$ and $n(\hh)=1\ee{4}$ \percc.  The
 maps are masked by signal-to-noise as in Figure \ref{fig:ratiomaps}.  The thin
-black contours are at a column $N(\hh)=5\ee{22}$ \percc from the Herschel SED
+black contours are at a column $N(\hh)=5\ee{22}$ \persc from the Herschel SED
 fit maps.
 (a) $X(\para) = 1\ee{-8}$
 (b) $X(\para) = 1.2\ee{-9}$
@@ -2281,7 +2285,7 @@ here in Figure \ref{fig:tvssigma_despotic}.
 
 The legend shows the various modifications to model parameters used.  The
 fiducial model is indicated by a dashed black line with $\zeta_{CR} =
-1\ee{-17}$, $n=10^4$ \percc, $L=5$ pc, velocity gradient $dv/dr=5$ \kms
+1\ee{-17}$ \pers, $n=10^4$ \percc, $L=5$ pc, velocity gradient $dv/dr=5$ \kms
 pc$^{-1}$, dust temperature $T_D=25$ K, dust radiation temperature $T_{D,rad} =
 10$ K, and interstellar radiation field $G_0$.  The green solid curve shows a
 model that follows both a size-linewidth relation $L=5 \sigma_5^{0.7}$ pc and
