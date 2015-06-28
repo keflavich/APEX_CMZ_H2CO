@@ -668,7 +668,10 @@ def make_blanks(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
     naxis1 = (lrange[1]-lrange[0])/(pixsize.to(u.deg).value)
     naxis2 = (brange[1]-brange[0])/(pixsize.to(u.deg).value)
     restfreq = (header['RESTF']*u.MHz)
-    bmaj = (1.22*10*u.m / restfreq.to(u.m,u.spectral()))*u.radian
+    # beam major/minor axis are the same, gaussian for 12m telescope
+    # we convolved with a 10" FWHM Gaussian kernel, so we add that in quadrature
+    bmaj_ = (1.22*restfreq.to(u.m,u.spectral())/(12*u.m))*u.radian
+    bmaj = (bmaj**2 + (10*u.arcsec)**2)**0.5
 
     cubeheader, flatheader = makecube.generate_header(np.mean(lrange),
                                                       np.mean(brange),
@@ -696,7 +699,7 @@ def make_blanks(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
                                flatheader=flatheader, clobber=clobber,
                                dtype='float32')
 
-def make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
+den make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
     """ complete freq covg """
 
     lrange = gal.l.wrap_at(180*u.deg).deg.min()+15/3600.,gal.l.wrap_at(180*u.deg).deg.max()+15/3600.
@@ -709,7 +712,10 @@ def make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcs
     naxis1 = int((lrange[1]-lrange[0])/(pixsize.to(u.deg).value)+10)
     naxis2 = int((brange[1]-brange[0])/(pixsize.to(u.deg).value)+10)
     restfreq = (header['RESTF']*u.MHz)
-    bmaj = (1.22*10*u.m / restfreq.to(u.m,u.spectral()))*u.radian
+    # beam major/minor axis are the same, gaussian for 12m telescope
+    # we convolved with a 10" FWHM Gaussian kernel, so we add that in quadrature
+    bmaj_ = (1.22*restfreq.to(u.m,u.spectral())/(12*u.m))*u.radian
+    bmaj = (bmaj**2 + (10*u.arcsec)**2)**0.5
     rchan = header['RCHAN']
 
     #scalefactor = 1./downsample_factor
@@ -751,7 +757,10 @@ def make_blanks_merge(cubefilename, lowhigh='low', clobber=True,
     # center is 0.55 -0.075
     naxis1 = 1150
     naxis2 = 200
-    bmaj = (1.22*10*u.m / restfreq.to(u.m,u.spectral()))**-1*u.radian
+    # beam major/minor axis are the same, gaussian for 12m telescope
+    # we convolved with a 10" FWHM Gaussian kernel, so we add that in quadrature
+    bmaj_ = (1.22*restfreq.to(u.m,u.spectral())/(12*u.m))*u.radian
+    bmaj = (bmaj**2 + (10*u.arcsec)**2)**0.5
     cd3 = ((1*u.km/u.s)/constants.c * 218.2*u.GHz).to(u.Hz).value
     naxis3 = int(np.ceil(((width / (218.2*u.GHz) * constants.c) / (u.km/u.s)).decompose().value))
     if lowest_freq is None:
