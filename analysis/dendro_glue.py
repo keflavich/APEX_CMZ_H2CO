@@ -37,8 +37,8 @@ except ImportError:
 
 #load 2 datasets from files
 dendrogram = load_dendro(hpath('DendroMask_H2CO303202.hdf5'))
-dendro,sncube = dendrogram
-sncube.label='H2CO 303202 Cube'
+dendro,h2cocube = dendrogram
+h2cocube.label='H2CO 303202 Cube'
 cube = load_data(hpath('APEX_H2CO_303_202_bl.fits'))
 table = ascii.read(hpath('PPV_H2CO_Temperature.ipac'), format='ipac')
 table['glon'] = table['lon'] - 360*(table['lon'] > 180)
@@ -68,20 +68,20 @@ for column_name in table.columns:
 catalog.join_on_key(dendro, '_idx', dendro.pixel_component_ids[0])
 dc = DataCollection(dendrogram)
 #dc = DataCollection([cube, dendrogram, catalog])
-#dc.merge(cube,sncube)
-#sncube.join_on_key(dendro, 'structure', dendro.pixel_component_ids[0])
+#dc.merge(cube,h2cocube)
+#h2cocube.join_on_key(dendro, 'structure', dendro.pixel_component_ids[0])
 #dc.merge(catalog, dendro)
 
-# UNCOMMENT THIS LINE TO BREAK THE VIEWER
+# UNCOMMENT THIS LINE TO BREAK THE VIEWER (note added July 10: I don't really know what this comment means)
 dc.append(catalog)
 
 app = GlueApplication(dc)
 
 cube_viewer = app.new_data_viewer(ImageWidget)
-cube_viewer.add_data(sncube)
+cube_viewer.add_data(h2cocube)
 
 # link positional information
-dc.add_link(LinkSame(sncube.id['structure'], catalog.id['_idx']))
+dc.add_link(LinkSame(h2cocube.id['structure'], catalog.id['_idx']))
 #dc.add_link(LinkSame(image.id['World y: DEC--TAN'], catalog.id['DEJ2000']))
 
 dc.add_link(LinkSame(cube.id['Galactic Longitude'], catalog.id['x_cen']))
