@@ -9,6 +9,9 @@ Order of operations (constructed late at night so check yourself)
    + dendro_temperature
  * make_temperature_cube
 
+These codes import `dendrograms.py`, which is where temperatures are computed
+using DESPOTIC.
+
 Order of operations #2:
 
  * Update spectral_apertures.reg and spectral_ncomp.txt

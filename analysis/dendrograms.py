@@ -1,3 +1,13 @@
+"""
+Data loader module for dendrograms: if you want access to the appropriate
+dendrograms, import them from here.  e.g.
+
+    from dendrograms import (catalog, catalog_sm, dend, dendsm)
+
+If the dendrograms have been recomputed, the re-calculation of temperatures
+using inputs to DESPOTIC can take about an hour.
+
+"""
 import numpy as np
 import time
 import warnings
@@ -106,6 +116,20 @@ if 'DespoticTem' not in catalog.colnames:
              for row,gf in ProgressBar(zip(catalog, gcorfactor))]
     catalog.add_column(Column(name='DespoticTem', data=dtems))
     catalog.add_column(Column(name='gausscorrfactor', data=gcorfactor))
+
+    # time estimate: 30m-1h
+    dctems = [tkin_all(density=10**row['density_chi2']*u.cm**-3,
+                       sigma=row['v_rms']*u.km/u.s*gf,
+                       lengthscale=2*((row['reff']*u.pc*gf)**2-(beam_pc)**2)**0.5,
+                       gradient=5*u.km/u.s/u.pc, #min(5,row['v_rms']/row['reff'])*u.km/u.s/u.pc,
+                       tdust=row['higaldusttem']*u.K,
+                       crir=1e-17*u.s**-1,
+                       ISRF=1,
+                       tdust_rad=(row['higaldusttem']*u.K *
+                                  (1-np.exp(-(10**row['logh2column']/1e24)))),
+                       chemistry=True)
+             for row,gf in ProgressBar(zip(catalog, gcorfactor))]
+    catalog.add_column(Column(name='DespoticChemTem', data=dctems))
 
     catalog.write(tpath('PPV_H2CO_Temperature.ipac'), format='ascii.ipac')
 

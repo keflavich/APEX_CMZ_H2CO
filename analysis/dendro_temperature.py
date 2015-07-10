@@ -310,7 +310,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             width = row['v_rms']*u.km/u.s
             lengthscale = reff
 
-            #REMOVED in favor of despotic version
+            #REMOVED in favor of despotic version done in dendrograms.py
             # we use the analytic version here; the despotic version is
             # computed elsewhere (with appropriate gcor factors)
             #columns['tkin_turb'].append(heating.tkin_all(10**row_data['density_chi2']*u.cm**-3,

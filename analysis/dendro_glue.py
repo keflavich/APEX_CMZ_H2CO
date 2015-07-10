@@ -2,12 +2,19 @@
 Load dendrograms into a Glue session
 """
 
-from glue.core.data_factories import load_data,load_dendro
+from glue.core.data_factories import load_data
+try:
+    # v>=0.5
+    from glue.core.data_factories.dendro_loader import load_dendro
+    from glue.core.data_factories.tables import astropy_tabular_data
+except ImportError:
+    # v<=0.4
+    from glue.core.data_factories import load_dendro
+    from glue.core.data_factories import astropy_tabular_data
 from glue.core import DataCollection
 from glue.core.link_helpers import LinkSame
 from glue.qt.glue_application import GlueApplication
 from glue.core import Data, DataCollection, Component
-from glue.core.data_factories import astropy_tabular_data, load_data
 from glue.core.link_helpers import LinkSame, LinkTwoWay
 from glue.qt.glue_application import GlueApplication
 from glue.qt.widgets import ScatterWidget, ImageWidget
@@ -31,7 +38,7 @@ except ImportError:
 #load 2 datasets from files
 dendrogram = load_dendro(hpath('DendroMask_H2CO303202.hdf5'))
 dendro,sncube = dendrogram
-sncube.label='S/N Cube'
+sncube.label='H2CO 303202 Cube'
 cube = load_data(hpath('APEX_H2CO_303_202_bl.fits'))
 table = ascii.read(hpath('PPV_H2CO_Temperature.ipac'), format='ipac')
 table['glon'] = table['lon'] - 360*(table['lon'] > 180)
@@ -88,7 +95,7 @@ dc.add_link(LinkTwoWay(cube.id['Vrad'], catalog.id['v_cen'], ms_to_kms, kms_to_m
 scatter = app.new_data_viewer(ScatterWidget)
 scatter.add_data(catalog)
 scatter.yatt = catalog.id['temperature_chi2']
-scatter.xatt = catalog.id['r303321']
+scatter.xatt = catalog.id['r321303']
 
 dendview = app.new_data_viewer(DendroWidget)
 dendview.add_data(dendro)
