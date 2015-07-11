@@ -56,8 +56,9 @@ h2cocube.add_component(dendcube.get_component('structure'), 'structure')
 h2cocube.join_on_key(dendro, 'structure', dendro.pixel_component_ids[0])
 
 dc = DataCollection([h2cocube, dendrogram, catalog, dendcube])
+
+# not obvious whether any merging is needed
 #dc.merge(h2cocube,dendcube)
-#dendcube.join_on_key(dendro, 'structure', dendro.pixel_component_ids[0])
 #dc.merge(catalog, dendro)
 
 dc.append(catalog)
@@ -81,21 +82,16 @@ dc.add_link(LinkSame(catalog.id['_idx'], dendro.id['index']))
 def ms_to_kms(x): return x/1e3
 def kms_to_ms(x): return x*1e3
 
-# can't link centroid velocity to velocity pixel
-#dc.add_link(LinkTwoWay(dendcube.id['World 2'], catalog.id['v_cen'], ms_to_kms, kms_to_ms))
-
 scatter = app.new_data_viewer(ScatterWidget)
 scatter.add_data(catalog)
 scatter.yatt = catalog.id['temperature_chi2']
 #scatter.xatt = catalog.id['r321303']
 scatter.xatt = catalog.id['_idx']
 
+# selection on the '_idx' parameter works, but absolutely nothing else does.
+
 dendview = app.new_data_viewer(DendroWidget)
 dendview.add_data(dendro)
-
-# DEBUG
-#cube_viewer = app.new_data_viewer(ImageWidget)
-#cube_viewer.add_data(dendcube)
 
 #start Glue
 app.start()
