@@ -24,6 +24,7 @@ from glue import qglue
 
 import matplotlib
 import numpy as np
+from astropy import log
 from astropy import units as u
 from astropy import coordinates
 from astropy import wcs
@@ -35,44 +36,30 @@ except ImportError:
     hpath = lambda x:x
 
 
-#load 2 datasets from files
 dendrogram = load_dendro(hpath('DendroMask_H2CO303202.hdf5'))
-dendro,h2cocube = dendrogram
+dendro,dendcube = dendrogram
+dendcube.label='Dendrogram Cube'
+# cube contains real WCS information; dendcube does not
+h2cocube = load_data(hpath('APEX_H2CO_303_202_bl.fits'))
 h2cocube.label='H2CO 303202 Cube'
-cube = load_data(hpath('APEX_H2CO_303_202_bl.fits'))
-table = ascii.read(hpath('PPV_H2CO_Temperature.ipac'), format='ipac')
-table['glon'] = table['lon'] - 360*(table['lon'] > 180)
-table['xpix'] = table['x_cen'] # Glue "eats" these
-table['ypix'] = table['y_cen'] # Glue "eats" these
-
-catalog=Data(parent=table['parent'], label='Fitted Catalog')
-#catalog=Data()
-for column_name in table.columns:
-    cc = table[column_name]
-    uu = cc.unit if hasattr(cc, 'unit') else cc.units
-    if cc.name == 'parent':
-        cc.name = 'cat_parent'
-        column_name = 'cat_parent'
-    elif cc.name == 'height':
-        cc.name = 'cat_height'
-        column_name = 'cat_height'
-    elif cc.name == 'peak':
-        cc.name = 'cat_peak'
-        column_name = 'cat_peak'
-
-    nc = Component.autotyped(cc, units=uu)
-    catalog.add_component(nc, column_name)
-    #  if column_name != 'parent' else '_flarent_'
+catalog = astropy_tabular_data(hpath('PPV_H2CO_Temperature.ipac'), format='ipac')
+catalog.label='Fitted Catalog'
 
 
-catalog.join_on_key(dendro, '_idx', dendro.pixel_component_ids[0])
-dc = DataCollection(dendrogram)
-#dc = DataCollection([cube, dendrogram, catalog])
-#dc.merge(cube,h2cocube)
-#h2cocube.join_on_key(dendro, 'structure', dendro.pixel_component_ids[0])
+print()
+log.info("cube components: {}".format(h2cocube.components))
+log.info("dendcube components: {}".format(dendcube.components))
+log.info("catalog components: {}".format(catalog.components))
+log.info("dendro components: {}".format(dendro.components))
+
+h2cocube.add_component(dendcube.get_component('structure'), 'structure')
+h2cocube.join_on_key(dendro, 'structure', dendro.pixel_component_ids[0])
+
+dc = DataCollection([h2cocube, dendrogram, catalog, dendcube])
+#dc.merge(h2cocube,dendcube)
+#dendcube.join_on_key(dendro, 'structure', dendro.pixel_component_ids[0])
 #dc.merge(catalog, dendro)
 
-# UNCOMMENT THIS LINE TO BREAK THE VIEWER (note added July 10: I don't really know what this comment means)
 dc.append(catalog)
 
 app = GlueApplication(dc)
@@ -80,25 +67,35 @@ app = GlueApplication(dc)
 cube_viewer = app.new_data_viewer(ImageWidget)
 cube_viewer.add_data(h2cocube)
 
-# link positional information
-dc.add_link(LinkSame(h2cocube.id['structure'], catalog.id['_idx']))
-#dc.add_link(LinkSame(image.id['World y: DEC--TAN'], catalog.id['DEJ2000']))
+# not obvious whether these are necessary:
+dc.add_link(LinkSame(h2cocube.id['Pixel x'], dendcube.id['Pixel x']))
+dc.add_link(LinkSame(h2cocube.id['Pixel y'], dendcube.id['Pixel y']))
+dc.add_link(LinkSame(h2cocube.id['Pixel z'], dendcube.id['Pixel z']))
 
-dc.add_link(LinkSame(cube.id['Galactic Longitude'], catalog.id['x_cen']))
-dc.add_link(LinkSame(cube.id['Galactic Latitude'], catalog.id['y_cen']))
+dc.add_link(LinkSame(h2cocube.id['Galactic Longitude'], dendcube.id['Galactic Longitude']))
+dc.add_link(LinkSame(h2cocube.id['Galactic Latitude'], dendcube.id['Galactic Latitude']))
+dc.add_link(LinkSame(h2cocube.id['Vrad'], dendcube.id['Vrad']))
+
+dc.add_link(LinkSame(catalog.id['_idx'], dendro.id['index']))
 
 def ms_to_kms(x): return x/1e3
 def kms_to_ms(x): return x*1e3
 
-dc.add_link(LinkTwoWay(cube.id['Vrad'], catalog.id['v_cen'], ms_to_kms, kms_to_ms))
+# can't link centroid velocity to velocity pixel
+#dc.add_link(LinkTwoWay(dendcube.id['World 2'], catalog.id['v_cen'], ms_to_kms, kms_to_ms))
 
 scatter = app.new_data_viewer(ScatterWidget)
 scatter.add_data(catalog)
 scatter.yatt = catalog.id['temperature_chi2']
-scatter.xatt = catalog.id['r321303']
+#scatter.xatt = catalog.id['r321303']
+scatter.xatt = catalog.id['_idx']
 
 dendview = app.new_data_viewer(DendroWidget)
 dendview.add_data(dendro)
+
+# DEBUG
+#cube_viewer = app.new_data_viewer(ImageWidget)
+#cube_viewer.add_data(dendcube)
 
 #start Glue
 app.start()
