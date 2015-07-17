@@ -38,7 +38,7 @@ except ImportError:
 
 dendrogram = load_dendro(hpath('DendroMask_H2CO303202.hdf5'))
 dendro,dendcube = dendrogram
-dendcube.label='Dendrogram Cube'
+dendcube.label='Dendrogram Cube' # this label is redundant, it will be deleted upon merge
 # cube contains real WCS information; dendcube does not
 h2cocube = load_data(hpath('APEX_H2CO_303_202_bl.fits'))
 h2cocube.label='H2CO 303202 Cube'
@@ -46,69 +46,39 @@ catalog = astropy_tabular_data(hpath('PPV_H2CO_Temperature.ipac'), format='ipac'
 catalog.label='Fitted Catalog'
 
 
-print()
-log.info("cube components: {}".format(h2cocube.components))
-log.info("dendcube components: {}".format(dendcube.components))
-log.info("catalog components: {}".format(catalog.components))
-log.info("dendro components: {}".format(dendro.components))
-
 h2cocube.add_component(dendcube.get_component('structure'), 'structure')
-#h2cocube.join_on_key(dendro, 'structure', dendro.pixel_component_ids[0])
 
 dc = DataCollection(dendrogram)
 dc.append(h2cocube)
 dc.append(catalog)
 dc.append(dendcube)
 
-# not obvious whether any merging is needed
 dc.merge(h2cocube,dendcube)
-# does not work dc.merge(catalog, dendro)
-dc.merge(dendro, catalog) # does work?
+dc.merge(dendro, catalog)
 
 app = GlueApplication(dc)
 
 cube_viewer = app.new_data_viewer(ImageWidget)
 cube_viewer.add_data(h2cocube)
 
-#dc.add_link(LinkSame(h2cocube.id['structure'], dendro.id['_idx']))
-#dc.add_link(LinkSame(h2cocube.id['structure'], dendro.id['structure']))
-#dc.add_link(LinkSame(h2cocube.id['structure_Dendrogram Cube'], dendro.id['structure']))
-h2cocube.join_on_key(dendro, 'structure_Dendrogram Cube', dendro.pixel_component_ids[0])
-
-
-# not obvious whether these are necessary:
-#dc.add_link(LinkSame(h2cocube.id['Pixel x'], dendcube.id['Pixel x']))
-#dc.add_link(LinkSame(h2cocube.id['Pixel y'], dendcube.id['Pixel y']))
-#dc.add_link(LinkSame(h2cocube.id['Pixel z'], dendcube.id['Pixel z']))
-
-#dc.add_link(LinkSame(h2cocube.id['Galactic Longitude'], dendcube.id['Galactic Longitude']))
-#dc.add_link(LinkSame(h2cocube.id['Galactic Latitude'], dendcube.id['Galactic Latitude']))
-#dc.add_link(LinkSame(h2cocube.id['Vrad'], dendcube.id['Vrad']))
-# ? dc.add_link(LinkTwoWay(h2cocube.id['Vrad'], dendro.id['v_cen'], ms_to_kms, kms_to_ms))
-
-# KeyError: 'ComponentID not found or not unique: index'
-#dc.add_link(LinkSame(catalog.id['_idx'], dendro.id['index']))
-
-def ms_to_kms(x): return x/1e3
-def kms_to_ms(x): return x*1e3
+h2cocube.join_on_key(dendro, 'structure', dendro.pixel_component_ids[0])
 
 scatter = app.new_data_viewer(ScatterWidget)
 scatter.add_data(dendro)
 scatter.yatt = dendro.id['temperature_chi2']
 scatter.xatt = catalog.id['r321303']
-#scatter.xatt = dendro.id['_idx']
-
-# selection on the '_idx' parameter works, but absolutely nothing else does.
 
 dendview = app.new_data_viewer(DendroWidget)
 dendview.add_data(dendro)
 
-subset_tem_lt_60 = (catalog.id['temperature_chi2'] < 60) & (catalog.id['temperature_chi2'] > 10)
+subset_tem_bt_40_60 = ((catalog.id['temperature_chi2'] < 60) &
+                    (catalog.id['temperature_chi2'] > 40))
+subset_tem_lt_40 = ((catalog.id['temperature_chi2'] < 40) &
+                    (catalog.id['temperature_chi2'] > 10))
 subset_tem_gt_60 = (catalog.id['temperature_chi2'] > 60)
-dc.new_subset_group(label='T < 60', subset_state=subset_tem_lt_60)
+dc.new_subset_group(label='T < 40', subset_state=subset_tem_lt_40)
+dc.new_subset_group(label='40 < T < 60', subset_state=subset_tem_bt_40_60)
 dc.new_subset_group(label='T > 60', subset_state=subset_tem_gt_60)
-
-
 
 #start Glue
 app.start()
