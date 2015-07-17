@@ -83,14 +83,18 @@ def make_many_models():
 
     return constraints
 
-def diffplot_t_of_n(densities=np.linspace(3,7), column=13.5, temperatures=[25,50,75,100,125]):
+def diffplot_t_of_n(densities=np.linspace(3,7), column=13.5, temperatures=[25,50,75,100,125,150]):
     grid_exp = np.empty([len(densities), len(temperatures)])
     grid_ML = np.empty([len(densities), len(temperatures)])
-    for idens, density in enumerate(densities):
+    ngrid_exp = np.empty([len(densities), len(temperatures)])
+    ngrid_ML = np.empty([len(densities), len(temperatures)])
+    for idens, density in enumerate(ProgressBar(densities)):
         for item, temperature in enumerate(temperatures):
             constraints,mf,density,column,temperature = make_model(density=density, temperature=temperature, column=column)
             grid_exp[idens,item] = constraints['expected_temperature']
             grid_ML[idens,item] = constraints['temperature_chi2']
+            ngrid_exp[idens,item] = constraints['expected_density']
+            ngrid_ML[idens,item] = constraints['density_chi2']
 
     pl.figure(1).clf()
 
@@ -112,17 +116,43 @@ def diffplot_t_of_n(densities=np.linspace(3,7), column=13.5, temperatures=[25,50
     pl.plot([], 'k', label='Expectation Value')
     pl.plot([], 'k--', label='Maximum Likelihood')
     pl.xlabel("log n(H$_2$CO) [cm$^{-3}$]")
-    pl.ylabel("Fractional Difference")
+    pl.ylabel("Fractional Difference\n(recovered-input)/input")
     pl.legend(loc='best', fontsize=14)
     pl.ylim(-0.5,0.5)
     pl.grid()
 
-    return densities, grid_exp, grid_ML
 
-def diffplot_t_of_c(density=4.5, columns=np.linspace(12,15), temperatures=[25,50,75,100,125]):
+    pl.figure(3).clf()
+
+    for ii,(tem,color) in enumerate(zip(temperatures,('r','g','b','c','m','orange'))):
+        pl.plot(densities, ngrid_exp[:,ii], color=color)
+        pl.plot(densities, ngrid_ML[:,ii], '--', color=color)
+        pl.plot(densities, densities, label='T={0}K'.format(tem), color=color)
+    pl.plot([], 'k', label='Expectation Value')
+    pl.plot([], 'k--', label='Maximum Likelihood')
+    pl.xlabel("Input log $n$(H$_2$) [cm$^{-3}$]")
+    pl.ylabel("Recovered log $n$(H$_2$) [cm$^{-3}$]")
+    pl.legend(loc='best', fontsize=14)
+
+    pl.figure(4).clf()
+
+    for ii,(tem,color) in enumerate(zip(temperatures,('r','g','b','c','m','orange'))):
+        pl.plot(densities, (10**ngrid_exp[:,ii]-10**densities)/10**densities, color=color, label='T={0}K'.format(tem))
+        pl.plot(densities, (10**ngrid_ML[:,ii] -10**densities)/10**densities, '--', color=color)
+    pl.plot([], 'k', label='Expectation Value')
+    pl.plot([], 'k--', label='Maximum Likelihood')
+    pl.xlabel("Input log $n$(H$_2$) [cm$^{-3}$]")
+    pl.ylabel("Fractional Difference\n(recovered-input)/input")
+    pl.legend(loc='best', fontsize=14)
+    pl.ylim(-0.5,0.5)
+    pl.grid()
+
+    return densities, grid_exp, grid_ML, ngrid_exp, ngrid_ML
+
+def diffplot_t_of_c(density=4.5, columns=np.linspace(12,15), temperatures=[25,50,75,100,125,150]):
     grid_exp = np.empty([len(columns), len(temperatures)])
     grid_ML = np.empty([len(columns), len(temperatures)])
-    for icol, column in enumerate(columns):
+    for icol, column in enumerate(ProgressBar(columns)):
         for item, temperature in enumerate(temperatures):
             constraints,mf,density,column,temperature = make_model(density=density, temperature=temperature, column=column)
             grid_exp[icol,item] = constraints['expected_temperature']
@@ -148,19 +178,22 @@ def diffplot_t_of_c(density=4.5, columns=np.linspace(12,15), temperatures=[25,50
     pl.plot([], 'k', label='Expectation Value')
     pl.plot([], 'k--', label='Maximum Likelihood')
     pl.xlabel("log N(H$_2$CO) [cm$^{-2}$]")
-    pl.ylabel("Fractional Difference")
+    pl.ylabel("Fractional Difference\n(recovered-input)/input")
     pl.legend(loc='best', fontsize=14)
     pl.ylim(-0.5,0.5)
     pl.grid()
 
     return columns, grid_exp, grid_ML
 
+
 def main():
     make_model()
     
-    densities, dgrid_exp, dgrid_ML = diffplot_t_of_n()
+    densities, dgrid_exp, dgrid_ML, dngrid_exp, dngrid_ML = diffplot_t_of_n()
     pl.figure(1).savefig(paths.fpath('param_fits/modeled_temperature_vs_density_real_vs_recovered_C=13.5.png'), bbox_inches='tight')
     pl.figure(2).savefig(paths.fpath('param_fits/modeled_temperature_vs_density_real_vs_recovered_fractions_C=13.5.png'), bbox_inches='tight')
+    pl.figure(3).savefig(paths.fpath('param_fits/modeled_density_vs_density_real_vs_recovered_C=13.5.png'), bbox_inches='tight')
+    pl.figure(4).savefig(paths.fpath('param_fits/modeled_density_vs_density_real_vs_recovered_fractions_C=13.5.png'), bbox_inches='tight')
 
     columns, cgrid_exp, cgrid_ML = diffplot_t_of_c()
     pl.figure(1).savefig(paths.fpath('param_fits/modeled_temperature_vs_column_real_vs_recovered_n=4.5.png'), bbox_inches='tight')

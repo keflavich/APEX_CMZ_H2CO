@@ -249,7 +249,37 @@ for cat,dendro,smooth in zipped[:1]:
     ax3.hist(sn[sn==sn], bins=50)
     ax3.set_xlabel("Signal/Noise")
 
-    pl.figure(4).clf()
+    fig3.clf()
+    ax3 = fig3.gca()
+    ax3.hist([cat['temperature_chi2'][mask] for mask,_,_,_ in masks_colors],
+             color=[matplotlib.colors.colorConverter.to_rgb(color)+(alpha,) for _,color,alpha,_ in masks_colors],
+             histtype='barstacked')
+    ax3.set_xlabel("Fitted Temperature")
+    fig3.savefig(fpath("dendrotem/temperature_ML_histogram{0}.pdf".format(smooth)),
+                 bbox_inches='tight')
+
+    fig3.clf()
+    ax3 = fig3.gca()
+    ax3.hist([cat['expected_temperature'][mask] for mask,_,_,_ in masks_colors],
+             color=[matplotlib.colors.colorConverter.to_rgb(color)+(alpha,) for _,color,alpha,_ in masks_colors],
+             histtype='barstacked')
+    ax3.set_xlabel("Fitted Temperature")
+    fig3.savefig(fpath("dendrotem/temperature_expected_histogram{0}.pdf".format(smooth)),
+                 bbox_inches='tight')
+
+
+    fig4 = pl.figure(4)
+    fig4.clf()
+    ax4 = fig4.gca()
+    ax4.hist([cat['density_chi2'][mask] for mask,_,_,_ in masks_colors],
+             color=[matplotlib.colors.colorConverter.to_rgb(color)+(alpha,) for _,color,alpha,_ in masks_colors],
+             histtype='barstacked')
+    ax4.set_xlabel("Fitted Density")
+    fig4.savefig(fpath("dendrotem/density_histogram{0}.pdf".format(smooth)),
+                 bbox_inches='tight')
+
+
+    fig4.clf()
     fig4, (ax4a,ax4b) = pl.subplots(nrows=2,ncols=1,num=4)
     for mask,color,alpha,markersize in masks_colors:
         ax4a.errorbar(cat['density_chi2'][mask], cat['temperature_chi2'][mask],
@@ -265,11 +295,15 @@ for cat,dendro,smooth in zipped[:1]:
                      #xerr=[cat['elo_d'][mask], cat['ehi_d'][mask]],
                      linestyle='none', capsize=0, alpha=alpha, marker='.',
                      color=color, linewidth=0.1)
-        ax4b.set_xlabel("Density from dust")
+        ax4b.set_xlabel("Density Lower Limit from dust")
         ax4b.set_ylabel("Temperature")
         ax4b.set_xlim(*ax4a.get_xlim())
+    ax4a.set_ylim(0,125)
+    ax4b.set_ylim(0,125)
     fig4.savefig(fpath("dendrotem/temperature_vs_density{0}.pdf".format(smooth)),
                  bbox_inches='tight')
+
+    
 
     fig5, ax5 = pl.subplots(num=5)
     lon = cat['x_cen']

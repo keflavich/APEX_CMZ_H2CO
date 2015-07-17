@@ -1,5 +1,6 @@
 """
 ADDED CONSTRAINT: density > 10^4
+(actually, density > dust-derived mean density, or 10^3, whichever is higher)
 
 For each of the fitted spectra from individual_spectra.py, use the fitted ratio
 (and appropriate ancillary data, e.g. h2 column) to derive the best fit
