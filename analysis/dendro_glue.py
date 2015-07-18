@@ -76,9 +76,13 @@ subset_tem_bt_40_60 = ((catalog.id['temperature_chi2'] < 60) &
 subset_tem_lt_40 = ((catalog.id['temperature_chi2'] < 40) &
                     (catalog.id['temperature_chi2'] > 10))
 subset_tem_gt_60 = (catalog.id['temperature_chi2'] > 60)
-dc.new_subset_group(label='T < 40', subset_state=subset_tem_lt_40)
-dc.new_subset_group(label='40 < T < 60', subset_state=subset_tem_bt_40_60)
-dc.new_subset_group(label='T > 60', subset_state=subset_tem_gt_60)
+sg0 = dc.new_subset_group(label='T < 40', subset_state=subset_tem_lt_40)
+sg1 = dc.new_subset_group(label='40 < T < 60', subset_state=subset_tem_bt_40_60)
+sg2 = dc.new_subset_group(label='T > 60', subset_state=subset_tem_gt_60)
+sg0.style.color = 'blue'
+sg1.style.color = 'green'
+sg2.style.color = 'red'
+
 
 #start Glue
 app.start()
