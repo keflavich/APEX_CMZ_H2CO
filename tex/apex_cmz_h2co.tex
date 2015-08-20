@@ -3,7 +3,7 @@
 \begin{document}
 
 %\title{APEX CMZ \para 218 GHz Survey: Temperature Map of the CMZ}
-\title{Dense gas in the Galactic Central Molecular Zone is warm and heated by turbulence}
+\title{Dense gas in the Galactic central molecular zone is warm and heated by turbulence}
 \titlerunning{APEX CMZ \formaldehyde}
 \authorrunning{Ginsburg et al}
 \input{authors}
@@ -14,18 +14,20 @@
 {The Galactic center is the closest region in which we can study star formation
 under extreme physical conditions like those in high-redshift galaxies.
 }
-{We measure the temperature of the dense gas in the Central Molecular Zone
+{We measure the temperature of the dense gas in the central molecular zone
 (CMZ) and examine what drives it.}
-{We have mapped the inner 300 pc of the CMZ in the temperature-sensitive
-$J=3-2$ para-formaldehyde (\para) transitions.  We use the 
+{We mapped the inner 300 pc of the CMZ in the temperature-sensitive
+$J=3-2$ para-formaldehyde (\para) transitions.  We used the 
 \threetwoone / \threeohthree line ratio to determine the gas temperature in
-$n\sim10^4-10^5$ \percc gas.  We produce temperature maps and cubes with
-30\arcsec and 1 \kms resolution and publish all data in FITS form; they can be
-recovered from digital object identifier \texttt{doi:10.7910/DVN/27601}.}
+$n\sim10^4-10^5$ \percc gas.  We have produced temperature maps and cubes with
+30\arcsec and 1 \kms resolution and published all data in FITS
+form\footnote{\texttt{doi:10.7910/DVN/27601}, also available from CDS via
+anonymous ftp to cdsarc.u-strasbg.fr (130.79.128.5) or via
+\url{http://cdsweb.u-strasbg.fr/cgi-bin/qcat?J/A+A/}}.}
 {Dense gas temperatures in the Galactic center range from $\sim60$ K to $>100$
 K in selected regions.  The highest gas temperatures $T_G>100$ K are
 observed around the Sgr B2 cores, in the extended Sgr B2 cloud, the 20 \kms and
-50 \kms clouds, and in `The Brick' (G0.253+0.016).  We infer an upper limit on
+50 \kms clouds, and in ``The Brick'' (G0.253+0.016).  We infer an upper limit on
 the cosmic ray ionization rate $\zeta_{CR}<10^{-14}$ \pers.  
 }
 {
@@ -55,9 +57,9 @@ in the inner $\sim75$ pc are confirmed to be high in the entire CMZ.}
 \section{Introduction}
 \label{sec:intro}
 The central region of our Galaxy, the Central Molecular Zone (CMZ), is the
-nearest location in which we can study star formation in an `extreme'
+nearest location in which we can study star formation in an extreme
 environment with pressure, turbulent Mach number, and gas temperature much
-higher than in local star forming regions \citep{Morris1996a}.  While there
+higher than in local star-forming regions \citep{Morris1996a}.  While there
 have been great leaps in our understanding of star formation in local
 molecular clouds in the past decade, there remain many unanswered questions
 about how star formation changes as gas becomes denser, more opaque, and more
@@ -65,22 +67,22 @@ turbulent, as it most likely was in galaxies at the peak of cosmic star
 formation \citep{Kruijssen2013a}.
 
 
-The Galactic CMZ has attracted a great deal of attention recently, as it has a
-much higher ratio of dense gas mass to star formation tracers than the rest of
-the galaxy
+The Galactic CMZ has attracted a great deal of attention recently because it
+has a much higher ratio of dense gas mass to star formation tracers than the
+rest of the galaxy
 \citep{Longmore2013a,Longmore2012b,Longmore2013b,Kruijssen2014c,Yusef-Zadeh2009a,Immer2012a}.
 The star formation rate in this region therefore appears to be suppressed
 relative to the expectations from nearby star-forming regions and nearby galaxy
-disks, where the star formation time-scale decreases with increasing gas
+disks, where the star formation timescale decreases with increasing gas
 surface density
 \citep{Kennicutt1998a, Kennicutt2012a, Leroy2013a, Heiderman2010a}.  Within the
 CMZ, the central $\sim100$ pc\footnote{Assuming the IAU-recommended $d=8.5$ kpc
-\citep{Ghez2008a, Gillessen2009b, Reid2009a, Gillessen2013b}.} `ring' including
-the  `dust ridge' \citep{Lis1991a, Sofue1995a, Molinari2011a} contains most of
+\citep{Ghez2008a, Gillessen2009b, Reid2009a, Gillessen2013b}.} ``ring'' including
+the  dust ridge \citep{Lis1991a, Sofue1995a, Molinari2011a} contains most of
 the dense gas.  \citet{Longmore2013a} recently proposed that the clouds along
-the `ring' \citep[which is more accurately described as a
-`stream';][]{Kruijssen2015a} represent a time-ordered path from starless to
-star-forming clouds, from `The Brick' (G0.253+0.016, cloud a) through the
+the ``ring'' \citep[which is more accurately described as a
+stream;][]{Kruijssen2015a} represent a time-ordered path from starless to
+star-forming clouds, from ``The Brick'' (G0.253+0.016, cloud a) through the
 lettered dust ridge clouds \citep[clouds b,c,d,e,f][]{Lis1999a}, ending at Sgr
 B2.  In principle, this would allow us to study the time evolution of
 protocluster clumps given an orbital model to describe their motion
@@ -89,9 +91,9 @@ protocluster clumps given an orbital model to describe their motion
 The thermal properties of this gas are a crucial component for understanding
 the conditions governing both star formation and interstellar chemistry.  The
 gas temperature sets the sound speed in the gas and therefore the Mach number
-within a turbulent medium.  It also governs the thermal Jeans mass.  Whether
-turbulence or gravity controls the fragmentation scale, the gas temperature is
-clearly important.  
+within a turbulent medium.  It also governs the thermal Jeans mass.  Regardless
+of whether turbulence or gravity controls the fragmentation scale, the gas
+temperature is clearly important.  
 
 Prior gas temperature measurements in the CMZ primarily used the popular
 ammonia metastable inversion transition thermometer \citep[\ammonia (1,1) -
@@ -100,13 +102,13 @@ which is
 sensitive to moderate density gas \citep[$n(\hh) \sim 10^3-10^4$
 \percc;][]{Shirley2015a}.  While this thermometer is generally reliable in cold
 regions (e.g., the (1-1)/(2-2) ratio is accurate to $T_G\lesssim40$ K), the
-population of the higher energy states \emph{may} be affected by `formation
-heating', a mechanism recently discovered to affect H$_3$O+ in the CMZ and
+population of the higher energy states \emph{may} be affected by formation
+heating, a mechanism recently discovered to affect H$_3$O+ in the CMZ and
 suggested to affect \ammonia, in which the excess energy from molecule
 formation leaves a significant fraction of the molecules in a rotationally
-excited state \citep[][]{Lis2014a}, so confirmation of high temperatures seen
-in \ammonia \citep{Mills2013a} can be used to assess the significance of that
-mechanism.  \citet{Ao2013a} used the para-formaldehyde (\para) 218 GHz
+excited state \citep[][]{Lis2014a}, so confirmation of the high temperatures
+seen in \ammonia \citep{Mills2013a} can be used to assess the significance of
+that mechanism.  \citet{Ao2013a} used the para-formaldehyde (\para) 218 GHz
 thermometer \citep{Mangum1993a}, which is sensitive to denser ($n\sim10^4-10^5$
 \percc) and hotter ($T_G>20$ K, usually $T_G\sim60$ K) gas, to map out the
 inner $\sim75$ pc of the CMZ and found high temperatures comparable to those
@@ -120,7 +122,7 @@ densities
 \citep{Hollenbach1999a}.  The observed discrepancy represents a significant
 problem for understanding the importance of gas temperature and pressure in the
 evolution of molecular clouds.  The dust temperature is readily estimated via
-multi-band continuum mapping and therefore is often used as a proxy for the
+multiband continuum mapping and therefore is often used as a proxy for the
 dense gas temperature.  While the discrepancy is not theoretically a problem,
 as the gas and dust may remain collisionally uncoupled up to moderately high
 densities given a high enough heating rate, it is an important empirical
@@ -163,7 +165,7 @@ for the paper.
 \label{sec:observations}
 
 \subsection{Observations}
-We observed the Central Molecular Zone from $-0.4\arcdeg < \ell < 1.6\arcdeg$
+We observed the CMZ from $-0.4\arcdeg < \ell < 1.6\arcdeg$
 with the APEX-1 (SHFI) instrument \citep{Vassilev2008a} on the Atacama Pathfinder
 Experiment (APEX) telescope \citep{Gusten2006b} using the eXtended bandwidth
 Fast Fourier Transform
@@ -202,7 +204,7 @@ The detected lines were \para \threeohthree 218.22219 GHz, \para \threetwotwo
 \methanol \fourtwotwo 218.44005 GHz, OCS 18-17 218.90336 GHz, HC$_3$N 24-23
 218.32471 GHz, SO $6_5-5_4$ 219.94944 GHz, HNCO $10_{0,10}-9_{0,9}$ 219.79828
 GHz, \ceighteeno 2-1 219.56036 GHz, and \thirteenco 2-1 220.39868 GHz.  All
-listed frequencies are rest frequencies, but we do not include many, e.g.
+listed frequencies are rest frequencies, but we do not include many, e.g.,
 \methylcyanide 12-11, that are in the observed band but were detected only in
 Sgr B2, since complete surveys of the rich molecular heimat in this band have
 been compiled elsewhere \citep{Nummelin1998a, Belloche2013a}.  Of the detected
@@ -237,7 +239,7 @@ identified.  The feature overlapping the \ceighteeno
 2-1
 line at about 219.5 GHz is the \twelveco line from the upper sideband,
 suppressed by $\sim20$ dB.
-There are artifacts at the band edges, e.g. below 217.0 GHz, because these
+There are artifacts at the band edges, e.g., below 217.0 GHz, because these
 spectra average a few different tunings without accounting for missing data at
 the band edges.}
 {fig:fullspectra}{1}{6.5in}
@@ -327,7 +329,7 @@ projected on the sky with axes in Galactic coordinates.  The term `voxel' is
 used to indicate a cubic data element, with two axes in galactic coordinates
 and a third in frequency or velocity} location.  In order
 to avoid empty pixels and maximize the signal-to-noise, the spectra were added
-to the grid with a weight set from a gaussian with $FWHM=10\arcsec$, which
+to the grid with a weight set from a Gaussian with $FWHM=10\arcsec$, which
 effectively smooths the output images from $FWHM\approx28\arcsec$ to
 $\approx30\arcsec$.  See \citet{Mangum2007a} for more detail on the on-the-fly
 mapping technique used here.  The spectra were averaged with inverse-variance
@@ -402,11 +404,11 @@ We use the \para \threeohthree line, which is the brightest of the
 the following procedure:
 
 \begin{enumerate}
-    \item Smooth the data with a gaussian of width 2 pixels in each direction
+    \item Smooth the data with a Gaussian of width two pixels in each direction
         (spatial, $\sigma=14.4\arcsec$, and spectral, $\sigma=2$ \kms)
     \item Create an inclusive mask of all pixels with brightness $T_A >
         2\sigma$ in the smoothed map
-    \item Grow the mask from the previous step by 1 pixel in each direction
+    \item Grow the mask from the previous step by one pixel in each direction
         (this is known in image processing as binary dilation)
 \end{enumerate}
 
@@ -564,7 +566,7 @@ included a series of large square $8\arcmin \times 8\arcmin$ apertures
 corresponding to each observed field.  For each region extracted in this
 fashion, we fit a 1-3 component model as described in Section
 \ref{sec:spectralmodeling}, where each component consists of a 6-parameter
-multi-gaussian model.  An example spectrum extracted from a small region around
+multi-Gaussian model.  An example spectrum extracted from a small region around
 ``cloud c'' is shown in Figure \ref{fig:cloudcspec}.  The extracted regions are
 shown in Figure \ref{fig:regions}.
 
@@ -572,7 +574,7 @@ shown in Figure \ref{fig:regions}.
 \label{sec:analysis}
 In this Section, we describe the techniques used to derive gas temperatures.
 In Section \ref{sec:linemodeling} we model the line ratios with a radiative
-transfer code.  We fit gaussians to spectra extracted from the cubes and use
+transfer code.  We fit Gaussians to spectra extracted from the cubes and use
 these fits to measure line ratios in Section \ref{sec:spectralmodeling}.  In
 Section \ref{sec:dendromod}, we apply the same modeling approach to the
 dendrogram-extracted clumps from Section \ref{sec:region}.  We use the modeling
@@ -898,7 +900,7 @@ and typically lower densities than cloud centers.  At densities $n<10^4$
 observed line emission.  Volumes within the actively star-forming regions
 Sgr B2, Sgr C, and near the circumnuclear disk may be locally affected
 by strong UV heating from young and forming stars, but the bulk of the dense
-gas is not.  Finally, PDR models \citep[e.g.][]{Hollenbach1999a} predict that
+gas is not.  Finally, PDR models \citep[e.g.,][]{Hollenbach1999a} predict that
 $T_{D} \approx T_{G}$ at high densities, while we show that $T_{G} >
 T_{D}$; see Section\ref{sec:td_ne_tg}.}.
 Other processes, e.g.,  direct (proto)stellar heating
@@ -1008,11 +1010,11 @@ predict the gas temperature.  We use the effective radius,
 which is the geometric mean between the moment-derived major and minor
 axes\footnote{The effective radius is often computed as the square root of the
 total area (in pixels), but \citet{Rosolowsky2006a} show that this is usually a
-very bad approximation, so we use the gaussian-corrected (see next footnote)
+very bad approximation, so we use the Gaussian-corrected (see next footnote)
 moment-derived radius.}, of the selected sources as the length scale, the
 measured linewidth\footnote{We correct the linewidth and the radius of
 dendrogram-extracted clumps for clipping assuming the underlying source is
-gaussian following \citet[][Appendix B]{Rosolowsky2005b}.}
+Gaussian following \citet[][Appendix B]{Rosolowsky2005b}.}
 $\sigma_v$, the
 measured dust temperature $T_{D}$ scaled down by an optical depth correction
 $1-\exp\left[-N(\hh)/10^{24}~\persc\right]$, and we assume the velocity gradient
@@ -1088,7 +1090,7 @@ either supernova or \hii-region driven.  Alternatively, they may contain denser
 gas and therefore be able to cool more efficiently; these regions would then be
 good regions to search for star formation.
 
-The dendrogram-extracted points plotted include only those with a gaussian
+The dendrogram-extracted points plotted include only those with a Gaussian
 correction factor $<3$, as larger corrections are regarded as unreliable
 extrapolations.  Since dendrogram-extracted sources are necessarily coherent in
 position-velocity space, they are less likely than the hand-selected features
@@ -1150,7 +1152,7 @@ a measured $1-\sigma$ lower limit on the temperature $T_G>150$ K.  The gray
 dashed line shows the $T_{G,turb} = T_{G,measured}$ relation.  Regions that are inconsistent
 with the relation at the $1-\sigma$ level are outlined.
 (b) The same as (a) for the dendrogram-extracted regions.  Regions with a large
-gaussian correction factor $f_g>3$ are excluded.  Regions with $T_{G,turb}>180$ K
+Gaussian correction factor $f_g>3$ are excluded.  Regions with $T_{G,turb}>180$ K
 are indicated with triangles.
 The points are color coded by signal-to-noise in the ratio $R_1$, with gray
 $S/N < 5$, blue $5 < S/N < 25$, green $25 < S/N < 50$, and red $S/N > 50$. 
@@ -1336,7 +1338,7 @@ the top of the plot.}
 {fig:temvslonplot}{0.4}{3.5in}
 
 In order to search for explanations for the temperature variations we observe,
-we compare our data to predicted cloud orbits.  Figure \ref{fig:kdlorbit} shows
+we compared our data to predicted cloud orbits.  Figure \ref{fig:kdlorbit} shows
 the orbital fit from \citet{Kruijssen2015a} and a position-velocity slice
 through the fitted temperature cube following that orbit.  The orbit does not
 align with all cloud components, especially along the green segment, but is still
@@ -1344,8 +1346,8 @@ very useful for
 tracking the properties of clouds in common environments.  Assuming we can use
 the orbit PPV predictions to locate the clouds in 3D, we can begin to
 understand the geometry of the CMZ.  It appears that the
-`far-side' clouds (green segment, 1 Myr < $t$ < 2 Myr), are slightly cooler
-than many of those on the near side, such as The Brick (red segment).  
+far-side clouds (green segment, 1 Myr < $t$ < 2 Myr), are slightly cooler
+than many of those on the near side, such as ``The Brick'' (red segment).  
 
 %Perhaps the most interesting feature of the orbital extraction is the qualitative
 %difference between the `big clouds', Sgr B2, Sgr A, and The Brick, and the rest
@@ -1353,25 +1355,24 @@ than many of those on the near side, such as The Brick (red segment).
 %as the massive star-forming Sgr B2 complex and the clouds closest to the central
 %black hole.
 
-We assign a time to each dendrogram-extracted clump within 35 \kms and 6 pc of
-the \citet{Kruijssen2015a} orbit and plot their temperatures against that time
-in Figure \ref{fig:kdltemvstime}.  We see a suggestion of a linear increase in temperature
-with time at the first crossing.  The possible linear increase in temperature
-over the first $\sim0.5$ Myr would support the \citet{Kruijssen2015a} hypothesis
-that the `ring' represents a single gas stream following an eccentric orbit
-with regular pericenter passages by Sgr A*.
+We assigned a time to each dendrogram-extracted clump within 35 \kms and 6 pc
+of the \citet{Kruijssen2015a} orbit and plotted their temperatures against that
+time in Figure \ref{fig:kdltemvstime}.  We observed a hint of a linear increase
+in temperature with time at the first crossing.  The possible linear increase
+in temperature over the first $\sim0.5$ Myr would support the
+\citet{Kruijssen2015a} hypothesis that the ``ring'' represents a single gas
+stream following an eccentric orbit with regular pericenter passages by Sgr A*.
 In this model, the pericenter passage drives additional turbulence and induces
 collapse, which implies increased turbulent energy dissipation (hence heating)
-after the pericenter passage.  However, the `trend' is also reasonably
+after the pericenter passage.  However, the possible trend is also reasonably
 consistent with a constant temperature over the same range, so we caution
 against overinterpretation. 
-%Nonetheless, if
-%the trend is real, it may indicate that additional turbulence is driven on
-%closest passage, decaying over a timescale of $\sim1$ Myr to heat the gas.
-%The cooler gas on the far side does not obviously fit into this picture, 
-%and we suggest in Section \ref{sec:coolstream} that it is not affiliated with
-%the orbit (but the existence of such a cool stream does \emph{not} challenge
-%the model directly).
+%Nonetheless, if the trend is real, it may indicate that additional turbulence
+%is driven on closest passage, decaying over a timescale of $\sim1$ Myr to heat
+%the gas.  The cooler gas on the far side does not obviously fit into this
+%picture, and we suggest in Section \ref{sec:coolstream} that it is not
+%affiliated with the orbit (but the existence of such a cool stream does
+%\emph{not} challenge the model directly).
 
 % orbit_pv
 \RotFigureTwoAA
@@ -1472,9 +1473,9 @@ unlikely.
 Figure \ref{fig:nh3tmap} shows the \citet{Ott2014a} temperature map in the same
 color scheme that we have used in Figure \ref{fig:temmapnosmooth}.  There are some
 trends that are common between the two maps: the Sgr A complex and Sgr B2
-complex are the warmest regions, the `diffuse' gas surrounding these is
+complex are the warmest regions, the diffuse gas surrounding these is
 somewhat cooler, and the positive latitude component of the
-\citet{Molinari2011a} `ring' is slightly warmer than the negative latitude
+\citet{Molinari2011a} ``ring'' is slightly warmer than the negative latitude
 component.
 
 The most significant difference occurs in the southwest portion of the Sgr B2
@@ -1617,7 +1618,7 @@ brightness peaks.
 % is at a lower average density.
 % % yet it contributes to the total cold gas mass
 % % inferred in the inner galaxy.  However, the total mass within the inner
-% % projected 200 pc is still dominated by the `ring' clouds and Sgr B2, so at
+% % projected 200 pc is still dominated by the ``ring'' clouds and Sgr B2, so at
 % % least some deficit remains.
 % 
 % 
@@ -1656,7 +1657,7 @@ extreme abundances $X\sim10^{-8}$, the implied local column density is
 $N(\hh)\gtrsim10^{25(24)}$ \persc in a single velocity bin.  Column densities
 up to $N(\hh)\sim10^{24}$ \persc are observed, but with much lower filling
 fractions $ff\sim10^{-4}$, in The Brick \citep[][their Figure
-4]{Rathborne2014b}.  Even in The Brick, one of the the densest clouds in the
+4]{Rathborne2014b}.  Even in The Brick, one of the densest clouds in the
 dust ridge besides Sgr B2, higher column densities are not observed.  So, while
 it remains possible that optically thick
 \para is responsible for the observed line ratios, it is very unlikely,
@@ -1666,7 +1667,7 @@ One remaining possibility is that the \para lines become optically thick
 because of dramatically reduced turbulent line spreading and therefore
 increased line trapping.  Such an effect would require a transition from
 supersonically turbulent to coherent (subsonically turbulent) gas motion
-\citep[e.g.][]{Pineda2010a} and could reduce the required column densities by
+\citep[e.g.,][]{Pineda2010a} and could reduce the required column densities by
 $\sim100\times$.   \citet{Kauffmann2013a} observed a few clumps within The
 Brick with narrow velocity dispersions that could represent subsonic regions,
 and such clumps could in principle mimic the observed signal since their
@@ -1676,7 +1677,7 @@ many high-velocity-dispersion clumps detected.
 
 A related argument is that the high temperatures come from a very small
 fraction of the gas heated in high velocity shocks, i.e. that we are seeing
-intermittent high temperatures \citep[e.g.][]{Falgarone1995a}.  Given the high
+intermittent high temperatures \citep[e.g.,][]{Falgarone1995a}.  Given the high
 observed velocity dispersions, high velocity shocks capable of heating the gas
 far above the observed temperatures are possible.  Very high velocity shocks,
 with $v_s \gtrsim 50 \kms$ will dissociate molecules, so in this scenario the
@@ -1851,7 +1852,7 @@ the orbital model.
 % The 80 \kms cloud stream extending from $\ell=1.2\arcdeg$ to $\ell=0.3\arcdeg$
 % is relatively cool compared to the rest of the CMZ despite its broad line
 % width.  The lower temperature hints that it is more distant from pericenter
-% than the `ring' clouds, and it may therefore represent a fresh stream of gas
+% than the ``ring'' clouds, and it may therefore represent a fresh stream of gas
 % infalling into the center.
 
 \textbf{Acknowledgements}:
@@ -2131,7 +2132,7 @@ features that were weakly detected.  The smoothed maps may also give a sense
 of how the temperature varies with spatial scale.
 
 The cubes were smoothed in the spatial dimensions with a
-$\sigma_{FWHM}=33.84\arcsec$ gaussian to achieve a resolution 45\arcsec and
+$\sigma_{FWHM}=33.84\arcsec$ Gaussian to achieve a resolution 45\arcsec and
 $\sigma_{v, FWHM} = 3$ \kms in the spectral direction.  The smoothed cubes were
 also downsampled by a factor of 2 in the spectral direction (the smoothing and
 downsampling are independent).  
@@ -2151,7 +2152,7 @@ white fully opaque.
 {figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ.png}
 {figures/big_maps/big_H2CO_321220_to_303202_smooth_bl_integ_masked_weighted.png}
 %{figures/big_maps/big_lores_smooth_tmap_withcontours.png} % tmap_figure
-{Same as Figure \ref{fig:ratiomaps}, but smoothed with a 34\arcsec gaussian.
+{Same as Figure \ref{fig:ratiomaps}, but smoothed with a 34\arcsec Gaussian.
 }
 %{fig:ratiomaps}{1}{7in}
 %{fig:ratiomaps}{0.6}{0}
@@ -2224,7 +2225,7 @@ these figures, it is easier to identify interesting features in them by eye.
 {figures/big_maps/big_loresdendro_weighted_tmap_withcontours.png}
 {Maps generated by building a data cube in which each voxel has been replaced
 with the average temperature from the smallest associated dendrogram-extracted
-clump.  These maps can be thought of as `adaptively-smoothed' maps, where the
+clump.  These maps can be thought of as adaptively-smoothed maps, where the
 smoothing kernel is matched to the source size.
 (a) The mean temperature along each line of sight through the dendrogram-extracted
 cube, where only the leaf nodes have been included
