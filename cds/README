@@ -1,1 +1,167 @@
 Integrated Files:
+    APEX_H2CO_*
+    Integrated moment 0 maps of the smooth and original resolution H2CO lines
+    used for line ratio mapping
+
+    H2CO_321220_to_303202_bl_integ*
+    Integrated line ratio maps.  
+
+    H2CO_321220_to_303202_bl_integ_temperature*
+    Integrated temperature maps.  The temperatures are computed using fixed
+    abundance and fixed density, and the titles describe which number density
+    and relative abundance have been used.
+
+    pv_H2CO_321220_to_303202_bl_integ*
+    Position-velocity diagrams of the ratio cube converted to temperatures,
+    then integrated along Galactic latitude weighted by 303-202 brightness.
+    
+    "masked" have been masked by signal-to-noise ratio as described in Section
+    3 of the paper.
+    
+    "weighted" are the values (temperature or ratio) weighted by the brightness
+    of the 303-202 line
+
+Cubes:
+
+    H2CO_321220_to_303202_cube*
+    Ratio cubes.
+
+    APEX_H2CO_3*, APEX_SiO_54_bl.fits, APEX_13CO_2014_merge.fits
+    Line cubes.  "_bl" indicates baseline subtraction has been performed.
+
+    APEX_H2CO_merge_high_plait_all.fits
+    Full merged datacube covering 218-219 GHz and including data from all
+    epochs.
+    
+
+
+Catalog Files:
+
+
+fitted_line_parameters_Chi2Constraints.ipac::
+
+    Source_Name                 str     -          Source name in the accompanying .reg files
+    ComponentID                 int     -          Component # for the source (there may be multiple velocity components per source)
+    GLON                        float   deg        Galactic longitude
+    GLAT                        float   deg        Galactic latitude
+    ampH2CO                     float   K          Fitted H2CO 303 amplitude (T_A*, K)
+    eampH2CO                    float   K          Error on ampH2CO
+    h2coratio321303             float   -          Fitted 303/321 ratio
+    eh2coratio321303            float   -          Error on h2coratio321303
+    center                      float   km/s       Velocity centroid (LSR, km/s)
+    ecenter                     float   km/s       Error on center
+    width                       float   km/s       Velocity width (sigma, km/s)
+    ewidth                      float   km/s       Error on width
+    h2coratio322321             float   -          Fitted 321/322 ratio
+    eh2coratio322321            float   -          Error on h2coratio322321
+    ampCH3OH                    float   K          Fitted CH3OH amplitude (T_A*, K)
+    eampCH3OH                   float   K          Error on ampCH3OH
+    spline_ampCH3OH             float   K          Spline-baselined spectra: Fitted H2CO 303 amplitude (T_A*, K)
+    espline_ampCH3OH            float   K          Spline-baselined spectra: Error on ampH2CO
+    spline_center               float   km/s       Spline-baselined spectra: Fitted 303/321 ratio
+    espline_center              float   km/s       Spline-baselined spectra: Error on h2coratio321303
+    spline_h2coratio321303      float   -          Spline-baselined spectra: Velocity centroid (LSR, km/s)
+    espline_h2coratio321303     float   -          Spline-baselined spectra: Error on center
+    spline_width                float   km/s       Spline-baselined spectra: Velocity width (sigma, km/s)
+    espline_width               float   km/s       Spline-baselined spectra: Error on width
+    spline_h2coratio322321      float   -          Spline-baselined spectra: Fitted 321/322 ratio
+    espline_h2coratio322321     float   -          Spline-baselined spectra: Error on h2coratio322321
+    spline_ampH2CO              float   K          Spline-baselined spectra: Fitted CH3OH amplitude (T_A*, K)
+    espline_ampH2CO             float   K          Spline-baselined spectra: Error on ampCH3OH
+    boxwidth                    float   deg        Width of the box region (deg)
+    boxheight                   float   deg        Height of the box region (deg)
+    radius                      float   deg        Radius of the circular region (deg)
+    area                        float   deg^2      Region area (deg^2)
+    posang                      float   deg        Position angle of the box region
+    is_good                     bool    -          Flag: Are the line fits good enough to use in plotting?
+    higalcolumndens             float   cm^-2      Herschel Hi-Gal derived mean column density (cm^-2)
+    higaldusttem                float   K          Herschel Hi-Gal derived mean temperature (K)
+    temperature_chi2            float   K          Chi^2 fitting derived gas temperature (K)
+    tmin1sig_chi2               float   K          Chi^2 1-sigma lower limit on temperature 
+    tmax1sig_chi2               float   K          Chi^2 1-sigma upper limit on temperature 
+    column_chi2                 float   cm^-2      Chi^2 fitting derived H2CO column (cm^-2 / (km/s/pc))
+    cmin1sig_chi2               float   cm^-2      Chi^2 1-sigma lower limit on column
+    cmax1sig_chi2               float   cm^-2      Chi^2 1-sigma upper limit on column
+    density_chi2                float   cm^-3      Chi^2 fitting derived gas density (cm^-3)
+    dmin1sig_chi2               float   cm^-3      Chi^2 1-sigma lower limit on density
+    dmax1sig_chi2               float   cm^-3      Chi^2 1-sigma upper limit on density
+    logh2column                 float   cm^-2      Log of the Herschel hi-gal column density (log[cm^-2])
+    elogh2column                float   cm^-2      
+    logabundance                float   -          Log abundance of H2CO relative to H2
+    elogabundance               float   -           
+    tkin_turb                   float   K          Predicted kinetic temperature of the gas from turbulent heating (K)
+    reff_pc                     float   pc         Effective radius of the region (pc)
+    expected_temperature        float   K          Expectation value of the derived gas temperature
+    expected_column             float   cm^-2      Expectation value of the derived H2CO column
+    expected_density            float   cm^-3      Expectation value of the derived H2 volume density
+
+PPV_H2CO_Temperature.ipac::
+
+    _idx                        int     -        ID number of the dendrogram source
+    index                       int     -        ID number of the dendrogram source
+    npix                        int     -        Number of voxels included in the source
+    area_ellipse                float   deg^2    Area of the fitted ellipse
+    area_exact                  float   deg^2    Summed area of the pixels included in the source (projected)
+    flux                        float   K        Sum of the brightness in the source voxels
+    major_sigma                 float   arcsec   Major axis of the fitted ellipse
+    minor_sigma                 float   arcsec   Minor axis of the fitted ellipse
+    position_angle              float   deg      Position angle of the fitted ellipse
+    radius                      float   arcsec   Effective radius (arcsec)
+    reff                        float   pc       Effective radius (pc)
+    v_cen                       float   m/s      Velocity centroid
+    vcen                        float   km/s     Velocity centroid
+    v_rms                       float   km/s     Velocity RMS
+    x_cen                       float   deg      Galactic Longitude centroid
+    y_cen                       float   deg      Galactic Latitude centroid
+    lon                         float   deg      Galactic Longitude centroid
+    lat                         float   deg      Galactic Latitude centroid
+    is_leaf                     bool    -        Is the source a "Leaf" in the dendrogram?
+    parent                      int     -        Index of the parent structure (-1 indicates it is a root)
+    root                        int     -        Index of the root structure (root==index if it is a root)
+    Stot321                     float   K        Total brightness in the 321 line
+    Smean321                    float   K        Mean brightness in the 321 line
+    e321                        float   K        Noise estimate for the 321 line
+    Stot303                     float   K        Total brightness in the 303 line 
+    Smean303                    float   K        Mean brightness in the 303 line  
+    e303                        float   K        Noise estimate for the 303 line  
+    s_ntotal                    float   -        Sum of the signal-to-noise cube over the extracted source
+    r303321                     float   -        Ratio of the 303/321 lines
+    er303321                    float   -        Error on the ratio of the 303/321 lines
+    ratio303321                 float   -        Ratio of the 303/321 lines              
+    eratio303321                float   -        Error on the ratio of the 303/321 lines 
+    13cosum                     float   K        Sum of the 13CO brightness
+    13comean                    float   K        Mean of the 13CO brightness
+    c18omean                    float   K        Sum of the C18O brightness  
+    c18osum                     float   K        Mean of the C18O brightness 
+    logabundance                float   -        Assumed log abundance
+    elogabundance               float   -        Error on the assumed log abundance
+    logh2column                 float   cm^-2    HiGal column density (log[cm^-2])
+    elogh2column                float   cm^-2    error on the HiGal column density (log[cm^-2])
+    higaldusttem                float   K        HiGal mean dust temperature
+    dustmass                    float   Msun     HiGal dust-derived gas mass
+    dustmindens                 float   cm^-3    HiGal dust-derived gas density
+    density_chi2                float   cm^-3    Chi^2 fitted dust density
+    dmin1sig_chi2               float   cm^-3    1-sigma minimum Chi^2 fitted dust density
+    dmax1sig_chi2               float   cm^-3    1-sigma maximum Chi^2 fitted dust density 
+    elo_d                       float   cm^-3    lower 1-sigma error bar on Chi^2 fitted dust density 
+    ehi_d                       float   cm^-3    upper 1-sigma error bar on Chi^2 fitted dust density
+    temperature_chi2            float   K        Chi^2 fitted temperature
+    tmin1sig_chi2               float   K        1-sigma minimum Chi^2 fitted temperature
+    tmax1sig_chi2               float   K        1-sigma maximum Chi^2 fitted temperature 
+    elo_t                       float   K        lower 1-sigma error bar on Chi^2 fitted temperature 
+    ehi_t                       float   K        upper 1-sigma error bar on Chi^2 fitted temperature
+    column_chi2                 float   cm^-2    Chi^2 fitted H2CO column per km/s per pc
+    cmin1sig_chi2               float   cm^-2    1-sigma minimum Chi^2 fitted H2CO column per km/s per pc
+    cmax1sig_chi2               float   cm^-2    1-sigma maximum Chi^2 fitted H2CO column per km/s per pc 
+    elo_c                       float   cm^-2    lower 1-sigma error bar on Chi^2 fitted H2CO column per km/s per pc 
+    ehi_c                       float   cm^-2    upper 1-sigma error bar on Chi^2 fitted H2CO column per km/s per pc
+    tkin_turb                   float   K        Predicted temperature from turbulent decay heating
+    bad                         flag    -        Flag indicating the source is probably bad (usually HC3N)
+    IsNotH2CO                   flag    -        Flag indicating the source is HC3N 
+    IsAbsorption                flag    -        Flag indicating the source is associated with absorption in Sgr B2
+    OrbitTime                   float   Myr      Time along the Kruijssen et al 2015 orbit since the Brick's pericenter approach
+    ModelVelo                   float   km/s     Velocity predicted by the Kruijssen model
+    DistanceFromOrbit           float   pc       Projected distance from the nearest point along the Kruijssen model
+    expected_temperature        float   K          Expectation value of the derived gas temperature
+    expected_column             float   cm^-2      Expectation value of the derived H2CO column
+    expected_density            float   cm^-3      Expectation value of the derived H2 volume density
