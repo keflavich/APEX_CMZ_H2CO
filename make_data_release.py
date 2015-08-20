@@ -3,6 +3,7 @@ Copy data from the appropriate directories to the CDS directory for upload to A&
 """
 import os
 from paths import h2copath,figurepath,hpath,rpath,fpath,mpath,molpath,tpath
+import tarfile
 
 integrated_files = [hpath(x) for x in ('APEX_H2CO_303_202_masked_moment0.fits',
                                        'APEX_H2CO_303_202_masked_smooth_moment0.fits',
@@ -91,3 +92,6 @@ for fn in dendrograms:
     if not os.path.isfile(outpath):
         print(fn,outpath)
         os.link(fn, outpath)
+
+with tarfile.open('cds.tgz','w:gz') as tar:
+    tar.add('cds')
