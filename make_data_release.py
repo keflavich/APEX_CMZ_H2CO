@@ -2,7 +2,7 @@
 Copy data from the appropriate directories to the CDS directory for upload to A&A
 """
 import os
-from paths import h2copath,figurepath,hpath,rpath,fpath,mpath,molpath
+from paths import h2copath,figurepath,hpath,rpath,fpath,mpath,molpath,tpath
 
 integrated_files = [hpath(x) for x in ('APEX_H2CO_303_202_masked_moment0.fits',
                                        'APEX_H2CO_303_202_masked_smooth_moment0.fits',
@@ -51,8 +51,11 @@ cubes = [hpath(x)
 
 
 dendrograms = [hpath(x) for x in
-               ("PPV_H2CO_Temperature.ipac",
-                "DendroMask_H2CO303202.hdf5",)
+               ("DendroMask_H2CO303202.hdf5",)
+              ] + [tpath(x) for x in
+                   ("fitted_line_parameters_Chi2Constraints.ipac",
+                    "PPV_H2CO_Temperature.ipac",
+                   )
               ]
 
 if not os.path.isdir('cds'):
@@ -67,14 +70,23 @@ if not os.path.isdir('cds/catalogs'):
 for fn in integrated_files:
     fullfn = os.path.realpath(fn)
     shortfn = os.path.basename(fn)
-    os.link(fn, os.path.join('cds/integrated', shortfn))
+    outpath = os.path.join('cds/integrated', shortfn)
+    if not os.path.isfile(outpath):
+        print(fn,outpath)
+        os.link(fn, outpath)
 
-for fn in cubes_files:
+for fn in cubes:
     fullfn = os.path.realpath(fn)
     shortfn = os.path.basename(fn)
-    os.link(fn, os.path.join('cds/cubes', shortfn))
+    outpath = os.path.join('cds/cubes', shortfn)
+    if not os.path.isfile(outpath):
+        print(fn,outpath)
+        os.link(fn, outpath)
 
 for fn in dendrograms:
     fullfn = os.path.realpath(fn)
     shortfn = os.path.basename(fn)
-    os.link(fn, os.path.join('cds/catalogs', shortfn))
+    outpath = os.path.join('cds/catalogs', shortfn)
+    if not os.path.isfile(outpath):
+        print(fn,outpath)
+        os.link(fn, outpath)
