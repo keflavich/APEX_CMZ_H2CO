@@ -11,7 +11,6 @@ from astropy import coordinates
 from astropy.io import ascii
 from astropy import log
 from astropy.wcs import WCS
-from astropy import table
 import paths
 import matplotlib
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
@@ -22,7 +21,7 @@ reload(dendrograms)
 from dendrograms import dend, dendsm, catalog, catalogsm
 
 # obsolete x,y = np.loadtxt(apath('orbit_K14.dat')).T
-table = ascii.read(apath('orbit_K14_2.dat'), format='basic', comment="#", guess=False) 
+table = ascii.read(apath('orbit_K14_2.dat'), format='basic', comment="#", guess=False)
 coords = coordinates.SkyCoord(table['l']*u.deg, table['b']*u.deg, frame='galactic')
 P = pvextractor.Path(coords, width=300*u.arcsec)
 
@@ -86,13 +85,13 @@ for cat,smooth in ((catalog,"",),):
 
     reftime = -2
     bricktime = 0.3
-    cat.add_column(table.Column(time-reftime, name='OrbitTime'))
-    cat.add_column(table.Column(modelvelo, name='ModelVelo'))
-    cat.add_column(table.Column(distance, name='DistanceFromOrbit'))
+    cat.add_column(table.Column(time-reftime, name='OrbitTime', unit=u.Myr))
+    cat.add_column(table.Column(modelvelo, name='ModelVelo', unit=u.km/u.s))
+    cat.add_column(table.Column(distance, name='DistanceFromOrbit', unit=u.deg))
 
-    is_leaf = (cat['is_leaf'] == 'True')
+    is_leaf = cat['is_leaf']
     ok = (~cat['IsAbsorption']) & (~cat['IsNotH2CO'])
-    sn = (cat['ratio303321']/cat['eratio303321'])
+    sn = (cat['ratio321303']/cat['eratio321303'])
     selection = ((np.abs((modelvelo-vcen))<35) &
                  (distance < 0.15) &
                  #(vcen > -80) &
@@ -118,16 +117,18 @@ for cat,smooth in ((catalog,"",),):
     color = cmap((vcen-cbvmin)/(cbvmax-cbvmin))
     cblabel = r"$v_{LSR}$ (km s$^{-1}$)"
 
-    sc = ax3.scatter(time[selection&is_leaf]-reftime,
-                     temperature[selection&is_leaf], marker='.',
-                     c=color[selection&is_leaf], #alpha=0.5,
-                     s=5000*cat['Smean321'][selection&is_leaf], edgecolor='none')
-    ax3.errorbar(time[selection&is_leaf]-reftime,
-                 temperature[selection&is_leaf],
-                 yerr=[cat['temperature_chi2'][selection&is_leaf]-cat['tmin1sig_chi2'][selection&is_leaf],
-                       -(cat['temperature_chi2'][selection&is_leaf]-cat['tmax1sig_chi2'][selection&is_leaf]),],
-                 marker=None, linestyle='none', color='k', alpha=0.1,
-                 capsize=0)
+    if np.any(selection & is_leaf):
+
+        sc = ax3.scatter(time[selection&is_leaf]-reftime,
+                         temperature[selection&is_leaf], marker='.',
+                         c=color[selection&is_leaf], #alpha=0.5,
+                         s=5000*cat['Smean321'][selection&is_leaf], edgecolor='none')
+        ax3.errorbar(time[selection&is_leaf]-reftime,
+                     temperature[selection&is_leaf],
+                     yerr=[cat['temperature_chi2'][selection&is_leaf]-cat['tmin1sig_chi2'][selection&is_leaf],
+                           -(cat['temperature_chi2'][selection&is_leaf]-cat['tmax1sig_chi2'][selection&is_leaf]),],
+                     marker=None, linestyle='none', color='k', alpha=0.1,
+                     capsize=0)
 
     sc3 = ax3.scatter(timeline-reftime, 0*timeline+5,
                       c=cmap((veloline-cbvmin)/(cbvmax-cbvmin)),
@@ -136,11 +137,12 @@ for cat,smooth in ((catalog,"",),):
                      )
 
     # plot the non-leaf objects too
-    sc2 = ax3.scatter(time[selection&~is_leaf]-reftime,
-                     temperature[selection&~is_leaf], marker='.',
-                     c=color[selection&~is_leaf], alpha=0.2,
-                     s=5000*cat['Smean321'][selection&~is_leaf],
-                     edgecolor='none')
+    if np.any(selection&~is_leaf):
+        sc2 = ax3.scatter(time[selection&~is_leaf]-reftime,
+                         temperature[selection&~is_leaf], marker='.',
+                         c=color[selection&~is_leaf], alpha=0.2,
+                         s=5000*cat['Smean321'][selection&~is_leaf],
+                         edgecolor='none')
     ax3.set_xlabel("Time since 1$^\\mathrm{st}$ pericenter passage [Myr]", size=24, labelpad=10)
 
     ytext=180
@@ -192,5 +194,9 @@ for cat,smooth in ((catalog,"",),):
     fig4 = pl.figure(4, figsize=(14,8))
     fig4.clf()
     ax4 = fig4.gca()
-    ax4.hist(cat['temperature_chi2'][selection&is_leaf], histtype='stepfilled', edgecolor='none', alpha=0.5)
-    ax4.hist(cat['temperature_chi2'][(~selection)&is_leaf], histtype='stepfilled', edgecolor='none', alpha=0.5)
+    if np.any(selection&is_leaf):
+        ax4.hist(cat['temperature_chi2'][selection&is_leaf], histtype='stepfilled', edgecolor='none', alpha=0.5)
+    if np.any((~selection)&is_leaf):
+        ax4.hist(cat['temperature_chi2'][(~selection)&is_leaf], histtype='stepfilled', edgecolor='none', alpha=0.5)
+
+catalog.write(paths.tpath('fitted_line_parameters_Chi2Constraints_orbit.ipac'), format='ascii.ipac')

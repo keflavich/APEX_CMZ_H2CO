@@ -60,6 +60,11 @@ fitted_line_parameters_Chi2Constraints.ipac::
     expected_temperature        float   K          Expectation value of the derived gas temperature
     expected_column             float   cm^-2      Expectation value of the derived H2CO column
     expected_density            float   cm^-3      Expectation value of the derived H2 volume density
+    OrbitTime                   float   Myr        Time along the Kruijssen et al 2015 orbit since the Brick's pericenter approach
+    ModelVelo                   float   km/s       Velocity predicted by the Kruijssen model
+    DistanceFromOrbit           float   pc         Projected distance from the nearest point along the Kruijssen model
+    Smin303                     float   K          Minimum brightness temperature within the source
+    Smax303                     float   K          Maximum brightness temperature within the source
 
 PPV_H2CO_Temperature.ipac::
 
@@ -125,9 +130,10 @@ PPV_H2CO_Temperature.ipac::
     bad                         flag    -        Flag indicating the source is probably bad (usually HC3N)
     IsNotH2CO                   flag    -        Flag indicating the source is HC3N 
     IsAbsorption                flag    -        Flag indicating the source is associated with absorption in Sgr B2
-    OrbitTime                   float   Myr      Time along the Kruijssen et al 2015 orbit since the Brick's pericenter approach
-    ModelVelo                   float   km/s     Velocity predicted by the Kruijssen model
-    DistanceFromOrbit           float   pc       Projected distance from the nearest point along the Kruijssen model
-    expected_temperature        float   K          Expectation value of the derived gas temperature
-    expected_column             float   cm^-2      Expectation value of the derived H2CO column
-    expected_density            float   cm^-3      Expectation value of the derived H2 volume density
+    expected_temperature        float   K        Expectation value of the derived gas temperature
+    expected_column             float   cm^-2    Expectation value of the derived H2CO column
+    expected_density            float   cm^-3    Expectation value of the derived H2 volume density
+    DespoticTem                 float   K        The DESPOTIC-computed equilibrium temperature
+    gausscorrfactor             float   -        The Gaussian correction factor for extracted sources
+    Smin303                     float   K        Minimum brightness temperature within the source
+    Smax303                     float   K        Maximum brightness temperature within the source
