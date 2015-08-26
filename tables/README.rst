@@ -37,7 +37,7 @@ fitted_line_parameters_Chi2Constraints_toCDS.ipac::
     boxwidth                    float   deg        Width of the box region (deg)
     boxheight                   float   deg        Height of the box region (deg)
     radius                      float   deg        Radius of the circular region (deg)
-    area                        float   deg^2      Region area (deg^2)
+    area                        float   arcsec^2   Region angular area
     posang                      float   deg        Position angle of the box region
     is_good                     bool    -          Flag: Are the line fits good enough to use in plotting?
     higalcolumndens             float   cm^-2      Herschel Hi-Gal derived mean column density (cm^-2)
@@ -66,8 +66,8 @@ PPV_H2CO_Temperature_orbit_toCDS.ipac::
     _idx                        int     -        ID number of the dendrogram source
     index                       int     -        ID number of the dendrogram source
     npix                        int     -        Number of voxels included in the source
-    area_ellipse                float   deg^2    Area of the fitted ellipse
-    area_exact                  float   deg^2    Summed area of the pixels included in the source (projected)
+    area_ellipse                float   arcsec^2 Angular area of the fitted ellipse
+    area_exact                  float   arcsec^2 Summed angular area of the pixels included in the source (projected)
     flux                        float   K        Sum of the brightness in the source voxels
     major_sigma                 float   arcsec   Major axis of the fitted ellipse
     minor_sigma                 float   arcsec   Minor axis of the fitted ellipse
