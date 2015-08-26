@@ -118,14 +118,13 @@ PPV_H2CO_Temperature_orbit_toCDS.ipac::
     cmax1sig_chi2               float   cm^-2    1-sigma maximum Chi^2 fitted H2CO column per km/s per pc 
     elo_c                       float   cm^-2    lower 1-sigma error bar on Chi^2 fitted H2CO column per km/s per pc 
     ehi_c                       float   cm^-2    upper 1-sigma error bar on Chi^2 fitted H2CO column per km/s per pc
-    tkin_turb                   float   K        Predicted temperature from turbulent decay heating
     bad                         flag    -        Flag indicating the source is probably bad (usually HC3N)
     IsNotH2CO                   flag    -        Flag indicating the source is HC3N 
     IsAbsorption                flag    -        Flag indicating the source is associated with absorption in Sgr B2
     expected_temperature        float   K        Expectation value of the derived gas temperature
     expected_column             float   cm^-2    Expectation value of the derived H2CO column
     expected_density            float   cm^-3    Expectation value of the derived H2 volume density
-    DespoticTem                 float   K        The DESPOTIC-computed equilibrium temperature
+    DespoticTem                 float   K        The DESPOTIC-predicted temperature from turbulent decay heating (tkin_turb in other table)
     gausscorrfactor             float   -        The Gaussian correction factor for extracted sources
     Smin303                     float   K        Minimum brightness temperature within the source
     Smax303                     float   K        Maximum brightness temperature within the source
