@@ -4,7 +4,7 @@ Data Table README
 Column Descriptions
 -------------------
 
-fitted_line_parameters_Chi2Constraints.ipac::
+fitted_line_parameters_Chi2Constraints_toCDS.ipac::
 
     Source_Name                 str     -          Source name in the accompanying .reg files
     ComponentID                 int     -          Component # for the source (there may be multiple velocity components per source)
@@ -60,13 +60,8 @@ fitted_line_parameters_Chi2Constraints.ipac::
     expected_temperature        float   K          Expectation value of the derived gas temperature
     expected_column             float   cm^-2      Expectation value of the derived H2CO column
     expected_density            float   cm^-3      Expectation value of the derived H2 volume density
-    OrbitTime                   float   Myr        Time along the Kruijssen et al 2015 orbit since the Brick's pericenter approach
-    ModelVelo                   float   km/s       Velocity predicted by the Kruijssen model
-    DistanceFromOrbit           float   pc         Projected distance from the nearest point along the Kruijssen model
-    Smin303                     float   K          Minimum brightness temperature within the source
-    Smax303                     float   K          Maximum brightness temperature within the source
 
-PPV_H2CO_Temperature.ipac::
+PPV_H2CO_Temperature_orbit_toCDS.ipac::
 
     _idx                        int     -        ID number of the dendrogram source
     index                       int     -        ID number of the dendrogram source
@@ -79,7 +74,6 @@ PPV_H2CO_Temperature.ipac::
     position_angle              float   deg      Position angle of the fitted ellipse
     radius                      float   arcsec   Effective radius (arcsec)
     reff                        float   pc       Effective radius (pc)
-    v_cen                       float   m/s      Velocity centroid
     vcen                        float   km/s     Velocity centroid
     v_rms                       float   km/s     Velocity RMS
     x_cen                       float   deg      Galactic Longitude centroid
@@ -96,8 +90,6 @@ PPV_H2CO_Temperature.ipac::
     Smean303                    float   K        Mean brightness in the 303 line  
     e303                        float   K        Noise estimate for the 303 line  
     s_ntotal                    float   -        Sum of the signal-to-noise cube over the extracted source
-    r303321                     float   -        Ratio of the 303/321 lines
-    er303321                    float   -        Error on the ratio of the 303/321 lines
     ratio303321                 float   -        Ratio of the 303/321 lines              
     eratio303321                float   -        Error on the ratio of the 303/321 lines 
     13cosum                     float   K        Sum of the 13CO brightness
@@ -137,3 +129,6 @@ PPV_H2CO_Temperature.ipac::
     gausscorrfactor             float   -        The Gaussian correction factor for extracted sources
     Smin303                     float   K        Minimum brightness temperature within the source
     Smax303                     float   K        Maximum brightness temperature within the source
+    OrbitTime                   float   Myr      Time along the Kruijssen et al 2015 orbit since the Brick's pericenter approach
+    ModelVelo                   float   km/s     Velocity predicted by the Kruijssen model
+    DistanceFromOrbit           float   pc       Projected distance from the nearest point along the Kruijssen model

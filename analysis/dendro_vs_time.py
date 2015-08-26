@@ -199,4 +199,4 @@ for cat,smooth in ((catalog,"",),):
     if np.any((~selection)&is_leaf):
         ax4.hist(cat['temperature_chi2'][(~selection)&is_leaf], histtype='stepfilled', edgecolor='none', alpha=0.5)
 
-catalog.write(paths.tpath('fitted_line_parameters_Chi2Constraints_orbit.ipac'), format='ascii.ipac')
+catalog.write(paths.tpath('PPV_H2CO_Temperature_orbit.ipac'), format='ascii.ipac')
