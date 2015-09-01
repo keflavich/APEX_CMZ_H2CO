@@ -1,6 +1,7 @@
 import re,os,time
 import argparse
 import shutil
+import ipdb
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--reconvert",default=False,action='store_true')
@@ -27,7 +28,7 @@ outf = open(outfn,'w')
 
 inputre = re.compile('input{(.*)}')
 includere = re.compile('include{(.*)}')
-bibre   = re.compile('bibliography{(.*)}')
+bibre = re.compile('bibliography{(.*)}')
 aandare = re.compile("documentclass{aa}")
 #                           \documentclass{aa}
 beginre = re.compile('\\begin{document}')
@@ -39,12 +40,14 @@ def strip_input(list_of_lines):
     # strip out preface, solobib, end{doc}
     #return "".join(list_of_lines[1:-2])
     return "".join(
-            [line for line in list_of_lines 
-            if not prefacere.search(line)
-            #and not solobibre.search(line)
-            and not endre.search(line)
-            and not beginre.search(line)]
-            )
+                   [line
+                    for line in list_of_lines
+                    if not prefacere.search(line)
+                    #and not solobibre.search(line)
+                    and not endre.search(line)
+                    and not beginre.search(line)
+                   ]
+    )
 
 def dobib(bib, outf):
     #bn = bib.groups()[0] + '.bbl'
@@ -72,7 +75,7 @@ for line in file.readlines():
     elif input is not None:
         fn = os.path.splitext(input.groups()[0])[0] + ".tex"
         if fn.count('.') > 1:
-            import ipdb; ipdb.set_trace()
+            ipdb.set_trace()
         print "Doing input " + fn
         with open(os.path.join(ppath,fn),'r') as f:
             if 'preface' in line:
@@ -104,8 +107,10 @@ default_suffix='.png'
 figre = re.compile('Figure{{?(.*?)}?}')
 #figre = re.compile('Figure\n?{{?(.*?)}?}?',flags=re.MULTILINE)
 figre1line = re.compile('^\\\Figure',)
-fig2re = re.compile('FigureTwoA?A?\n?{{?(.*?)}?}\n?\s*{(.*?)}?}',flags=re.MULTILINE)
-fig2re1line = re.compile('^\\\FigureTwoA?A?\n?({{?(.*?)}?})?', flags=re.MULTILINE)
+fig2re = re.compile('R?o?t?FigureTwoA?A?\n?{{?(.*?)}?}\n?\s*{(.*?)}?}',flags=re.MULTILINE)
+fig2re1line = re.compile('^\\\R?o?t?FigureTwoA?A?\n?({{?(.*?)}?})?', flags=re.MULTILINE)
+fig3re = re.compile('R?o?t?FigureThreeA?A?\n?{{?(.*?)}?}\n?\s*{(.*?)}?}',flags=re.MULTILINE)
+fig3re1line = re.compile('^\\\R?o?t?FigureThreeA?A?\n?({{?(.*?)}?})?', flags=re.MULTILINE)
 fig4re = re.compile('FigureFourP?D?F?\n?\s*{{?(.*?)}?}\n\s*?{{?(.*?)}}?\n\s*?{{?(.*?)}}?\n\s*?{{?(.*?)}}?',flags=re.MULTILINE)
 fig4re1line = re.compile('FigureFourP?D?F?({{?(.*?)}?})?',flags=re.MULTILINE)
 plotonere = re.compile('plotone{{?(.*?)}')
@@ -131,11 +136,13 @@ for ii,line in enumerate(file.readlines()):
     fig1 = figre.search(line)
     fig2 = fig2re.search(line)
     fig2b = fig2re1line.search(line)
+    fig3 = fig3re.search(line)
+    fig3b = fig3re1line.search(line)
     fig4 = fig4re.search(line)
     fig4b = fig4re1line.search(line)
     pone = plotonere.search(line)
     lonely = lonelygraphics.search(line)
-    igr  = includegre.search(line)
+    igr = includegre.search(line)
 
     if igr is not None:
         fign = igr.groups()[0]
@@ -143,10 +150,13 @@ for ii,line in enumerate(file.readlines()):
     elif fig1 is not None:
         fign = fig1.groups()[0]
         prevline = ''
-    elif fig2 is not None: 
+    elif fig2 is not None:
         fign = fig2.groups()[0:2]
         prevline = ''
-    elif fig4 is not None: 
+    elif fig3 is not None:
+        fign = fig3.groups()[0:3]
+        prevline = ''
+    elif fig4 is not None:
         fign = fig4.groups()[0:4]
         prevline = ''
     elif fig4b is not None:
@@ -161,18 +171,26 @@ for ii,line in enumerate(file.readlines()):
         else:
             nfigs = 1
         prevline = 'fig2'
-    elif pone is not None: 
+    elif fig3b is not None:
+        fign = fig3b.groups()[1]
+        if fign in (None,''):
+            fign = None
+            nfigs = 0
+        else:
+            nfigs = 1
+        prevline = 'fig3'
+    elif pone is not None:
         fign = pone.groups()[0]
         prevline = ''
     elif fig1b is not None:
         if 'Two' in line:
             print "Two in line: ",line
-            import ipdb; ipdb.set_trace()
+            ipdb.set_trace()
         #print "Found solo figure"
         fign = None#fig1b.groups()[0]
         nfigs = 0
         prevline = 'fig1'
-    elif lonely is not None and prevline in ('fig4','fig2','fig1'):
+    elif lonely is not None and prevline in ('fig4','fig2','fig3','fig1'):
         # DEBUG print "in lonely: ",lonely.groups()," nfigs=",nfigs," prevline=",prevline
         fign = lonely.groups()[0]
         nfigs += 1
@@ -190,7 +208,7 @@ for ii,line in enumerate(file.readlines()):
     input = inputre.search(line)
 
     if 'H2CO_ParameterFitPlot_weighted_mean_likewtdfit' in line and fign is None:
-        import ipdb; ipdb.set_trace()
+        ipdb.set_trace()
 
     if fign is not None:
         #DEBUG print "Found fign: %s" % fign
@@ -207,15 +225,15 @@ for ii,line in enumerate(file.readlines()):
             fignroot = fign
             if fign[-4] != '.': # if no suffix, add one
                 fign += default_suffix
-            if fign[-3:] == "png": 
+            if fign[-3:] == "png":
                 #if args.reconvert:
                 #    os.system("pngtoeps %s" % fign)
                 fn = ppath+fign.replace("png",out_suffix)
-            elif fign[-3:] == "svg": 
+            elif fign[-3:] == "svg":
                 #if args.reconvert:
                 #    os.system("svg2eps %s" % fign)
                 fn = ppath+fign.replace("svg",out_suffix)
-            elif fign[-3:] == "pdf": 
+            elif fign[-3:] == "pdf":
                 #if args.reconvert:
                 #    os.system("pdf2ps %s %s" % (fign,fign.replace("pdf","ps")))
                 #    os.system("mv %s %s" % (fign.replace('pdf','ps'),fign.replace('pdf','eps')))
@@ -228,17 +246,17 @@ for ii,line in enumerate(file.readlines()):
             else:
                 fn = ppath+fign
             if os.system('ls %s' % fn) != 0:
-                import ipdb; ipdb.set_trace()
+                ipdb.set_trace()
             print "Converting figure " + fn + " to f%i.%s" % (count,out_suffix)
             outfig = 'f%i.%s' % (count,out_suffix)
             outpath = os.path.join(ppath, outdir, outfig)
             if args.arxiv:
                 rslt = os.system('gs -dSAFER -dBATCH -dNOPAUSE  -sDEVICE=pdfwrite -sOutputFile={1} {0}'.format(fn, outpath))
                 if rslt != 0:
-                    import ipdb; ipdb.set_trace()
+                    ipdb.set_trace()
             else:
                 if os.system('cp %s %s' % (fn, outpath)) != 0:
-                    import ipdb; ipdb.set_trace()
+                    ipdb.set_trace()
             if args.arxiv:
                 outline = outline.replace(fignroot,os.path.splitext(outfig)[0])
             else:
