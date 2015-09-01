@@ -1,13 +1,17 @@
+"""
+Download the raw data files for processing using the pipeline
+"""
 from __future__ import print_function
 import os
 import retrieve_esoarchive
 import cgi
 import requests
-from astropy.utils.data import download_files_in_parallel
 from astropy.utils.console import ProgressBar
 
-rawpath='/scratch/aginsbur/apex/raw/'
-eso_username='aginsburg'
+# This path ("rawpath") should be replaced with an appropriate local path
+rawpath = '/scratch/aginsbur/apex/raw/'
+# Your username needs to be put here instead of mine
+eso_username = 'aginsburg'
 
 mpi_raw_files = ['https://dataverse.harvard.edu/api/v1/access/datafile/2509801',
                  'https://dataverse.harvard.edu/api/v1/access/datafile/2504422',
@@ -49,8 +53,10 @@ def download_file(url, outdir=rawpath):
 
 def download_all():
 
+    print("Downloading files from the ESO Archive")
     retrieve_esoarchive.retrieve_ESO_files(rawpath=rawpath, username=eso_username)
 
+    print("Downloading MPI files from the CfA Dataverse")
     for ii,fn in enumerate(mpi_raw_files):
         name = download_file(fn)
         print("Completed {2}: {0} of {1} files".format(ii, len(mpi_raw_files), name))

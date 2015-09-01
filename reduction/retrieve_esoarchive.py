@@ -1,3 +1,6 @@
+"""
+Download files for our project from the ESO archive using astroquery
+"""
 from astroquery.eso import Eso
 import paths
 
