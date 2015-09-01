@@ -247,8 +247,8 @@ for ii,line in enumerate(file.readlines()):
             print "Converting figure " + fn + " to f%i.%s" % (count,out_suffix)
             outfig = 'f%i.%s' % (count,out_suffix)
             outpath = os.path.join(ppath, outdir, outfig)
-            if args.arxiv: 
-                rslt = os.system('gs -dSAFER -dBATCH -dNOPAUSE -dAutoRotatePages=/None -sDEVICE=pdfwrite -sOutputFile={1} {0}'.format(fn, outpath))
+            if args.arxiv:
+                rslt = os.system('gs -dSAFER -dBATCH -dNOPAUSE -dAutoRotatePages=/None -dPDFSETTINGS=/screen -sDEVICE=pdfwrite -sOutputFile={1} {0}'.format(fn, outpath))
                 if rslt != 0:
                     ipdb.set_trace()
             else:
