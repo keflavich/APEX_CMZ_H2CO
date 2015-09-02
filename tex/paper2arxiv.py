@@ -56,7 +56,7 @@ def dobib(bib, outf):
     with open(ppath+bn,'r') as f:
         print >>outf,strip_input(f.readlines()),
 
-for line in file.readlines():
+for ii,line in enumerate(file.readlines()):
     if line[0] == "%":
         continue
     input = inputre.search(line)
@@ -65,18 +65,21 @@ for line in file.readlines():
     solobib = solobibre.search(line)
     if solobib is not None:
         fn = solobib.groups()[0] + ".tex"
-        print "Doing solobib " + fn
+        print ii, "Doing solobib " + fn
         with open(os.path.join(ppath,fn),'r') as f:
             solobib = f.readlines()
             for ln in solobib:
+                if ln[0].strip() == "%":
+                    continue
                 bib = bibre.search(ln)
                 if bib is not None:
+                    print ii,"Bib matched: ",bib.groups()
                     dobib(bib,outf)
     elif input is not None:
         fn = os.path.splitext(input.groups()[0])[0] + ".tex"
         if fn.count('.') > 1:
             ipdb.set_trace()
-        print "Doing input " + fn
+        print ii, "Doing input " + fn
         with open(os.path.join(ppath,fn),'r') as f:
             if 'preface' in line:
                 print >>outf,f.read(),
@@ -84,7 +87,7 @@ for line in file.readlines():
                 print >>outf,strip_input(f.readlines()),
     elif include is not None:
         fn = os.path.splitext(include.groups()[0])[0] + ".tex"
-        print "Doing include " + fn
+        print ii, "Doing include " + fn
         f = open(os.path.join(ppath,fn),'r')
         if 'preface' in line:
             print >>outf,f.read(),
@@ -92,6 +95,7 @@ for line in file.readlines():
             print >>outf,strip_input(f.readlines()),
         f.close()
     elif bib is not None:
+        print ii, "Doing bib (no solo) " + fn
         dobib(bib,outf)
     else:
         print >>outf,line,
