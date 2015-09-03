@@ -1,7 +1,7 @@
 from astropy.table import Table
 import paths
 
-to_remove = ['v_cen', 'r303321', 'er303321']
+to_remove = ['v_cen', 'r303321', 'er303321', '_idx']
 to_rename = {'ratio321303': 'ratio303321',
              'eratio321303': 'eratio303321',
             }
@@ -18,7 +18,6 @@ for col in to_rename:
         print("Renaming {0} to {1} in flp".format(col, to_rename[col]))
         flp.rename_column(col, to_rename[col])
 
-flp.write(paths.tpath('fitted_line_parameters_Chi2Constraints_toCDS.ipac'), format='ascii.ipac')
 
 p2t = Table.read(paths.tpath('PPV_H2CO_Temperature_orbit.ipac'), format='ascii.ipac')
 
@@ -31,7 +30,6 @@ for col in to_rename:
         print("Renaming {0} to {1} in p2t".format(col, to_rename[col]))
         p2t.rename_column(col, to_rename[col])
 
-p2t.write(paths.tpath('PPV_H2CO_Temperature_orbit_toCDS.ipac'), format='ascii.ipac')
 
 
 tbl1 = tbl2 = False
@@ -60,3 +58,9 @@ with open(paths.tpath('README.rst'),'r') as f:
             cols2.append(colname)
             if colname not in p2t.colnames:
                 print("{0} not in PPV_H2CO_Temperature_orbit_toCDS.ipac".format(colname))
+
+flpb = Table([flp[cn] for cn in cols1])
+p2tb = Table([p2t[cn] for cn in cols2])
+
+flpb.write(paths.tpath('fitted_line_parameters_Chi2Constraints_toCDS.ipac'), format='ascii.ipac')
+p2tb.write(paths.tpath('PPV_H2CO_Temperature_orbit_toCDS.ipac'), format='ascii.ipac')

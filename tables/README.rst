@@ -63,7 +63,6 @@ fitted_line_parameters_Chi2Constraints_toCDS.ipac::
 
 PPV_H2CO_Temperature_orbit_toCDS.ipac::
 
-    _idx                        int     -        ID number of the dendrogram source
     index                       int     -        ID number of the dendrogram source
     npix                        int     -        Number of voxels included in the source
     area_ellipse                float   arcsec^2 Angular area of the fitted ellipse
