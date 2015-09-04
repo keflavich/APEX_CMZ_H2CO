@@ -514,7 +514,6 @@ for cat,dendro,smooth in zipped[:1]:
                       cat['temperature_chi2'][mask&~hot_lolim],
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
-        ax24.plot([14,38], [14,38], 'k--')
     ax24.set_xlim([0,2e23])
     ax24.set_ylim([13,150])
     ax24.set_xlabel("HiGal Dust Column Density")
