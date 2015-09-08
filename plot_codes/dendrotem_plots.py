@@ -501,6 +501,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax22.set_title("Dendrogram-selected regions")
     fig22.savefig(fpath('dendrotem/temperature_vs_dusttem{0}.pdf'.format(smooth)),
                   bbox_inches='tight')
+    fig22.savefig(fpath('dendrotem/temperature_vs_dusttem{0}.png'.format(smooth)),
+                  bbox_inches='tight')
 
     fig24 = pl.figure(24)
     fig24.clf()
@@ -512,6 +514,7 @@ for cat,dendro,smooth in zipped[:1]:
     for mask,color,alpha,markersize in masks_colors:
         ax24.errorbar(10**cat['logh2column'][mask&~hot_lolim],
                       cat['temperature_chi2'][mask&~hot_lolim],
+                      markersize=markersize*(2 if any(mask & is_leaf) else 1),
                     #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                     linestyle='none', capsize=0, alpha=alpha, marker='.', color=color)
     ax24.set_xlim([0,2e23])
@@ -520,6 +523,8 @@ for cat,dendro,smooth in zipped[:1]:
     ax24.set_ylabel("Temperature (K)")
     fig24.savefig(fpath('dendrotem/temperature_vs_dustcol{0}.pdf'.format(smooth)),
                   bbox_inches='tight')
+    fig24.savefig(fpath('dendrotem/temperature_vs_dustcol{0}.png'.format(smooth)),
+                  bbox_inches='tight', dpi=150)
 
     fig27 = pl.figure(27)
     fig27.clf()
