@@ -113,6 +113,8 @@ ax6.plot(pcfittable['higaldusttem'][mask],
 
 ax6.set_ylim(10,150)
 ax6.set_xlim(15,30)
+fig6.savefig(paths.fpath('chi2_temperature_vs_higaltemperature_fieldsandsources_notitle.pdf'),
+                         bbox_inches='tight')
 ax6.set_title("Hand-selected regions")
 fig6.savefig(paths.fpath('chi2_temperature_vs_higaltemperature_fieldsandsources.pdf'),
                          bbox_inches='tight')
@@ -450,6 +452,8 @@ ax15.plot(pcfittable['tkin_turb'][mask],
          linestyle='none')
 
 ax15.set_ylim(10,150)
+fig15.savefig(paths.fpath('chi2_temperature_vs_turbulenttemperature_fieldsandsources_notitle.pdf'),
+                         bbox_inches='tight')
 ax15.set_title("Hand-selected regions")
 fig15.savefig(paths.fpath('chi2_temperature_vs_turbulenttemperature_fieldsandsources.pdf'),
                          bbox_inches='tight')
