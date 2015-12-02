@@ -14,6 +14,8 @@ from dendrograms import (catalog, catalog_sm, dend, dendsm)
 import heating
 import gaussian_correction
 
+import lte_model
+
 
 if 'tm' not in locals():
     tm = TemperatureMapper(logdensities=[3,4,5], abundances=(1.2e-9,))
@@ -105,12 +107,14 @@ for cat,dendro,smooth in zipped[:1]:
         fig2.clf()
         ax2 = fig2.gca()
         for mask,color,alpha,markersize in masks_colors:
-            ax2.errorbar(cat['ratio321303'][mask], cat[temperature_type][mask],
+            L,_,_ = ax2.errorbar(cat['ratio321303'][mask], cat[temperature_type][mask],
                          #yerr=[cat['elo_t'][mask], cat['ehi_t'][mask]],
                          #xerr=[cat['eratio321303'][mask], cat['eratio321303'][mask]],
                          linestyle='none', capsize=0, alpha=alpha, marker='.',
                          markersize=10 if any(mask & is_leaf) else 5,
-                         color=color, linewidth=0.3)
+                         color=color, linewidth=0.3, label='')
+            if L.get_label():
+                L.set_label(None)
             ax2.set_xlabel("Ratio $S(3_{2,1}-2_{2,0})/S(3_{0,3}-2_{0,2})$")
             ax2.set_ylabel("H$_2$CO Temperature (K)")
         fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}.pdf'.format(smooth)),
@@ -127,6 +131,7 @@ for cat,dendro,smooth in zipped[:1]:
         L1, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e3], tm.temperatures, 'k-.', label=r'$n(H_2)=10^3$ cm$^{-3}$', zorder=-5)
         L2, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e4], tm.temperatures, 'k--', label=r'$n(H_2)=10^4$ cm$^{-3}$', zorder=-5)
         L3, = ax2.plot(tm.Xarr[1.2e-9]['ratio1'][1e5], tm.temperatures, 'k:',  label=r'$n(H_2)=10^5$ cm$^{-3}$', zorder=-5)
+
         leg = pl.legend(loc='best')
         ax2.axis([0,0.55,10,200])
         fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay{1}.pdf'.format(smooth, tsuffix)),
@@ -149,10 +154,18 @@ for cat,dendro,smooth in zipped[:1]:
         leg = pl.legend(loc='best', fontsize=14)
         fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay{1}_dv.pdf'.format(smooth, tsuffix)),
                      bbox_inches='tight')
+        L8, = ax2.plot(lte_model.T_321/lte_model.T_303, lte_model.tem,
+                       color='orange', linewidth=2,
+                       label=r'LTE', zorder=-10)
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay{1}_dv_lte.pdf'.format(smooth, tsuffix)),
+                     bbox_inches='tight')
         L4.set_visible(False)
         L5.set_visible(False)
         L6.set_visible(False)
         L7.set_visible(False)
+        fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay{1}_lte.pdf'.format(smooth, tsuffix)),
+                     bbox_inches='tight')
+        L8.set_visible(False)
 
         ax2.set_yscale('log')
         fig2.savefig(fpath('dendrotem/ratio_vs_temperature{0}_modeloverlay{1}_log.pdf'.format(smooth, tsuffix)),
