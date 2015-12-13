@@ -7,7 +7,7 @@ import numpy as np
 from astropy.io import fits
 from astropy import log
 
-from temperature_mapper import ph2cogrid, TemperatureMapper, tm
+from h2co_modeling.temperature_mapper import ph2cogrid, TemperatureMapper, tm
 from paths import h2copath
 
 def doratio(h2copath=h2copath, maxratio=1):

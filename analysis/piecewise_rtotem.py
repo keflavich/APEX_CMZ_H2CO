@@ -6,7 +6,7 @@ from astropy.table import Table, Column
 import numpy as np
 from numpy.polynomial.polynomial import Polynomial
 from paths import apath
-from temperature_mapper import tm
+from h2co_modeling.temperature_mapper import tm
 
 fit_table = Table.read(apath('piecewise_tvsratio_fit.ipac'), format='ascii.ipac')
 

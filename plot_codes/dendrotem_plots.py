@@ -9,7 +9,7 @@ from astropy import log
 from astropy import units as u
 from scipy.interpolate import PiecewisePolynomial
 
-from temperature_mapper import ph2cogrid, TemperatureMapper
+from h2co_modeling.temperature_mapper import ph2cogrid, TemperatureMapper
 from dendrograms import (catalog, catalog_sm, dend, dendsm)
 import heating
 import gaussian_correction
