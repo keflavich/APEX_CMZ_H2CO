@@ -70,7 +70,7 @@ def fiducial_case(sigma=5.0*u.km/u.s, tdust=25*u.K, tdust_rad=10*u.K,
 
 def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
              ISRF=1, tdust_rad=None, turbulence=True, gmc=gmc, reload_gmc=True,
-             chemistry=False):
+             chemistry=False, dampfactor=0.5):
 
     assert density.unit.is_equivalent(u.cm**-3)
     assert sigma.unit.is_equivalent(u.km/u.s)
@@ -94,7 +94,13 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
 
     turb_heating = turb_heating_generator(lengthscale, turbulence=turbulence)
 
-    gmc.setTempEq(escapeProbGeom='LVG', PsiUser=turb_heating)
+    # dampfactor is only in my fork of despotic
+    try:
+        gmc.setTempEq(escapeProbGeom='LVG', PsiUser=turb_heating)
+    except despotic.despoticError as ex:
+        print(ex)
+        return np.nan
+    #             dampFactor=dampfactor)
     #energy_balance = gmc.dEdt()
 
     if chemistry:
@@ -209,6 +215,16 @@ if __name__ == "__main__":
     matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
     densities = np.logspace(3,7,20)
+
+    linewidths = np.arange(0.5,30,2)
+    linewidths = np.logspace(np.log10(0.5), np.log10(30), 15)
+    # do tem4 first because it crashes sometimes
+    tem4 = [tkin_all(1e5*u.cm**-3, sigma*u.km/u.s, lengthscale=5*u.pc,
+                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
+                     tdust_rad=10*u.K,
+                     crir=1e-14*u.s**-1,
+                     dampfactor=0.02) for sigma in ProgressBar(linewidths)]
+
     tem = [tkin_all(n*u.cm**-3, 10*u.km/u.s, lengthscale=5*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                     crir=1e-17*u.s**-1) for n in ProgressBar(densities)]
@@ -222,8 +238,6 @@ if __name__ == "__main__":
     pl.savefig(paths.fpath("despotic/TvsN.png"))
 
 
-    linewidths = np.arange(0.5,30,2)
-    linewidths = np.logspace(np.log10(0.5), np.log10(30), 15)
     fiducial = tem2 = [tkin_all(1e4*u.cm**-3, sigma*u.km/u.s, lengthscale=5*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                      tdust_rad=10*u.K,
@@ -232,10 +246,6 @@ if __name__ == "__main__":
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                      tdust_rad=10*u.K,
                     crir=1e-17*u.s**-1) for sigma in ProgressBar(linewidths)]
-    tem4 = [tkin_all(1e5*u.cm**-3, sigma*u.km/u.s, lengthscale=5*u.pc,
-                    gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
-                     tdust_rad=10*u.K,
-                    crir=1e-14*u.s**-1) for sigma in ProgressBar(linewidths)]
     tem5 = [tkin_all(1e6*u.cm**-3, sigma*u.km/u.s, lengthscale=5*u.pc,
                     gradient=5*u.km/u.s/u.pc, tdust=25*u.K,
                      tdust_rad=10*u.K,
