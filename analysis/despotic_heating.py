@@ -7,6 +7,7 @@ import pylab as pl
 pl.switch_backend('Qt4Agg')
 from astropy import units as u
 from astropy import constants
+from astropy.table import Table
 import paths
 from paths import fpath
 from astropy.utils.console import ProgressBar
@@ -70,7 +71,7 @@ def fiducial_case(sigma=5.0*u.km/u.s, tdust=25*u.K, tdust_rad=10*u.K,
 
 def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
              ISRF=1, tdust_rad=None, turbulence=True, gmc=gmc, reload_gmc=True,
-             chemistry=False, dampfactor=0.5):
+             chemistry=False):
 
     assert density.unit.is_equivalent(u.cm**-3)
     assert sigma.unit.is_equivalent(u.km/u.s)
@@ -94,14 +95,11 @@ def tkin_all(density, sigma, lengthscale, gradient, tdust, crir=1e-17*u.s**-1,
 
     turb_heating = turb_heating_generator(lengthscale, turbulence=turbulence)
 
-    # dampfactor is only in my fork of despotic
     try:
         gmc.setTempEq(escapeProbGeom='LVG', PsiUser=turb_heating)
     except despotic.despoticError as ex:
         print(ex)
         return np.nan
-    #             dampFactor=dampfactor)
-    #energy_balance = gmc.dEdt()
 
     if chemistry:
 
@@ -401,7 +399,6 @@ if __name__ == "__main__":
                        figname=paths.fpath("despotic/TvsSigma_isobar_L0.7_only.pdf"))
 
 
-    from astropy.table import Table
     pcfittable = Table.read(paths.apath('fitted_line_parameters_Chi2Constraints.ipac'),
                             format='ascii.ipac')
 
