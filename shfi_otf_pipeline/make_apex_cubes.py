@@ -699,7 +699,7 @@ def make_blanks(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
                                flatheader=flatheader, clobber=clobber,
                                dtype='float32')
 
-den make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
+def make_blanks_freq(gal, header, cubefilename, clobber=True, pixsize=7.2*u.arcsec):
     """ complete freq covg """
 
     lrange = gal.l.wrap_at(180*u.deg).deg.min()+15/3600.,gal.l.wrap_at(180*u.deg).deg.max()+15/3600.
