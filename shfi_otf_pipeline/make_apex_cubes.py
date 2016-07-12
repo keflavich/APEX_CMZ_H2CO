@@ -13,6 +13,7 @@ except:
 from astropy.convolution import convolve, Gaussian1DKernel, Gaussian2DKernel
 from sdpy import makecube
 from astropy.io import fits
+from astropy.stats.funcs import mad_std
 from FITS_tools import cube_regrid
 from FITS_tools.load_header import get_cd
 from astropy.wcs import WCS
@@ -33,10 +34,9 @@ import warnings
 import image_tools
 import spectral_cube
 from spectral_cube import SpectralCube,BooleanArrayMask
-from agpy import mad
 import matplotlib
 from lines import all_lines
-import paths
+from . import paths
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 # http://www.apex-telescope.org/heterodyne/shfi/calibration/calfactor/
@@ -175,32 +175,6 @@ def checkdir_makedir(path):
     if not os.path.exists(dpath) and dpath:
         mkdir_p(dpath)
 
-
-def MAD(a, c=0.6745, axis=None):
-    """
-    Median Absolute Deviation along given axis of an array:
-
-    median(abs(a - median(a))) / c
-
-    c = 0.6745 is the constant to convert from MAD to std; it is used by
-    default
-
-    """
-
-    a = ma.masked_where(a!=a, a)
-    if a.ndim == 1:
-        d = ma.median(a)
-        m = ma.median(ma.fabs(a - d) / c)
-    else:
-        d = ma.median(a, axis=axis)
-        # I don't want the array to change so I have to copy it?
-        if axis > 0:
-            aswp = ma.swapaxes(a,0,axis)
-        else:
-            aswp = a
-        m = ma.median(ma.fabs(aswp - d) / c, axis=0)
-
-    return m
 
 def debug_and_load(test='test'):
 
@@ -643,7 +617,7 @@ def add_pipeline_header_data(header):
     try:
         import pyspeckit
         header['PYSPECKV'] = pyspeckit.__version__
-    except ImportError,AttributeError:
+    except (ImportError,AttributeError):
         pass
     import FITS_tools.version
     header['FITSTOOV'] = (FITS_tools.version.version,'FITS_tools version')
@@ -1811,10 +1785,10 @@ def compute_noise_high(prefix=mergepath+'APEX_H2CO_merge_high_sub',
     ffile = fits.open(prefix+'.fits')
 
     try:
-        mad.bottleneck_MAD([0,1,2,3,4])
-        integ1,hdr = cubes.integ(ffile, pixrange, average=mad.bottleneck_MAD)
+        mad_std([0,1,2,3,4])
+        integ1,hdr = cubes.integ(ffile, pixrange, average=mad_std)
     except:
-        integ1,hdr = cubes.integ(ffile, pixrange, average=mad.MAD)
+        integ1,hdr = cubes.integ(ffile, pixrange, average=mad_std)
     integ1.fill_value = np.nan
     hdu1 = fits.PrimaryHDU(data=integ1.filled(), header=hdr)
     hdu1.writeto(prefix+"_noise.fits", clobber=True)
@@ -3091,7 +3065,7 @@ def plot_mean_abs_spectrum(apex_filename, ncomponents=3):
         mspec, sspec, ftabs = fits.getdata(fn)
         ax1 = fig.add_subplot(2,1,1)
         ax1.plot(mspec-np.median(mspec), ',', label=str(jj))
-        mmad = mad.MAD(mspec)
+        mmad = mad_std(mspec)
         ax1.set_ylim(mmad*-10, mmad*10)
         ax1.set_title(basename)
 
