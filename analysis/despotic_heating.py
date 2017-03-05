@@ -31,6 +31,13 @@ def turb_heating_generator(lengthscale=1*u.pc, turbulence=True):
         (sigma_nonthermal) and driving scale of the turbulence
         DESPOTIC wants units of erg/s/H (per hydrogen), so the turbulent
         heating rate n sigma^3 / L is divided by n to get just sigma^3/L
+
+        MacLow 1999, 2002, 2004 gives exactly:
+            3e-27 erg cm^-3 s^-1 (n/1 cm^3) (v/10 km/s)**3 (L/100 pc)**-1
+        Ours is higher by the factor 3^1.5 = 5, which is the conversion from 1D
+        to 3D velocity dispersion (should that be 3**0.5?):
+            2e-26 ...
+
         """
         if turbulence:
             gamturb = (1.4 * constants.m_p *
