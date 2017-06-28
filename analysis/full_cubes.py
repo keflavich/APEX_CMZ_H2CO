@@ -46,7 +46,7 @@ pcube_merge_high = pyspeckit.Cube(cube=h2co_cube_merge_high._data,
                                   xarr=h2co_cube_merge_high.spectral_axis,
                                  )
 pcube_merge_high.xarr.refX = 218.22219
-pcube_merge_high.xarr.refX_units = 'GHz'
+pcube_merge_high.xarr.refX_unit = 'GHz'
 
 pcube_merge_high_sm = pyspeckit.Cube(cube=h2co_cube_merge_high_sm._data,
                                   errorcube=h2co_noise_cube_sm._data,
@@ -54,4 +54,4 @@ pcube_merge_high_sm = pyspeckit.Cube(cube=h2co_cube_merge_high_sm._data,
                                   xarr=h2co_cube_merge_high_sm.spectral_axis,
                                  )
 pcube_merge_high_sm.xarr.refX = 218.22219
-pcube_merge_high_sm.xarr.refX_units = 'GHz'
+pcube_merge_high_sm.xarr.refX_unit = 'GHz'

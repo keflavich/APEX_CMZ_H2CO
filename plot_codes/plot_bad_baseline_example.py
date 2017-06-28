@@ -22,7 +22,7 @@ diff.plotter(ymax=-0.17, ymin=-0.3, alpha=1, xmin=217.500, xmax=218.500, linesty
 diff.plotter.savefig(paths.fpath('worst_baselines_map001.pdf'))
 
 sp.xarr.refX = make_apex_cubes.bright_lines['H2CO_303_202']
-sp.xarr.refX_units = 'GHz'
+sp.xarr.refX_unit = 'GHz'
 sp.xarr.convert_to_unit('km/s')
 sp.data = np.exp(-(sp.xarr-0)**2/(2*5.**2)) * 0.07
 sp.xarr.convert_to_unit('GHz')

@@ -119,6 +119,6 @@ def dend_guess_npeaks(cube, noise_2d, min_nsig=3, min_delta=1, min_npix=3):
 def guesses_to_cube(guesses, shape):
     maxlen = max((len(x) for x in guesses.values()))
     gcube = np.empty((maxlen,)+shape) + np.nan
-    for (yy,xx),gg in guesses.iteritems():
+    for (yy,xx),gg in guesses.items():
         gcube[:len(gg),yy,xx] = gg
     return gcube

@@ -405,7 +405,7 @@ sys.exit(0)
 #     mf.chi2 -= mf.chi2_r321322
 # 
 #     row_data = mf.get_parconstraints()
-#     for key,value in row_data.iteritems():
+#     for key,value in row_data.items():
 #         row[key] = value
 # 
 #     #if row_data['temperature_chi2'] == 10:

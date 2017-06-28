@@ -36,7 +36,7 @@ import spectral_cube
 from spectral_cube import SpectralCube,BooleanArrayMask
 import matplotlib
 from lines import all_lines
-from . import paths
+import paths
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 # http://www.apex-telescope.org/heterodyne/shfi/calibration/calfactor/
@@ -150,7 +150,7 @@ bandwidths = {'H2CO_303_202':25,
               #'H2S 2(2,0)-2(1,1)': 216.71044, ??
               }
 
-lines218 = {x:v for x,v in all_lines.iteritems()
+lines218 = {x:v for x,v in all_lines.items()
             if 'H2CO' in x or 'CH3OH_422_312' in x}
 
 all_apexfiles = ([os.path.join(june2013datapath, k)+".apex"
@@ -590,7 +590,7 @@ def add_pipeline_parameters_to_file(fileprefix, pipeline_type, **kwargs):
 
     f = fits.open(fileprefix+".fits")
     f[0].header['PIPECALL'] = (pipeline_type,'build_cube function called')
-    for ii,(k,v) in enumerate(kwargs.iteritems()):
+    for ii,(k,v) in enumerate(kwargs.items()):
         try:
             kw = ('P{pipetype:_<4s}K{n:02d}'.format(n=ii,
                                                    pipetype=pipeline_type[:4])
@@ -815,7 +815,7 @@ def data_diagplot(data, dataset, ext='png', newfig=False,
         pl.savefig(figfilename,bbox_inches='tight')
     except Exception as ex:
         log.exception(ex)
-        print ex
+        print(ex)
     return axis
 
 def diagplot(data, tsys, noise, dataset, freq=None, mask=None, ext='png',
@@ -1692,8 +1692,8 @@ def make_low_mergecube(pca_clean={'2014':False,
                     pca_clean=pca_clean['2013'],
                     scanblsub=scanblsub['2013'])
 
-    print "TODO: plait the low-frequency merge."
-    print "TODO: possible merge the ao low/high into the low-merge?"
+    print("TODO: plait the low-frequency merge.")
+    print("TODO: possible merge the ao low/high into the low-merge?")
 
 
 
@@ -1947,7 +1947,7 @@ def make_smooth_noise(noisefilename, outfilename, kernelwidth=2, clobber=True):
 
 def make_line_mask(freqarr, lines=bright_lines):
     mask = np.ones(freqarr.size, dtype='bool')
-    for ln,lf in lines.iteritems():
+    for ln,lf in lines.items():
         bw = bandwidths[ln]
         wh = (lf*1e3-bw < freqarr) & (lf*1e3+bw > freqarr)
         mask[wh] = False
@@ -1990,7 +1990,7 @@ def do_extract_subcubes(outdir=molpath, merge_prefix='APEX_H2CO_merge',
             log.info("File {0} does not exist.  Skipping.".format(cubefilename))
             continue
 
-        for line,freq in lines.iteritems():
+        for line,freq in lines.items():
             if frange is not None:
                 if freq<frange[0] or freq>frange[1]:
                     log.info("Skipping line {0}".format(line))

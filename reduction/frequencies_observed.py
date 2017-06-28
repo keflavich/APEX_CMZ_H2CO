@@ -8,7 +8,7 @@ datasets = {2013:make_apex_cubes.june2013datapath+'M-091.F-0019-2013-2013-06-11'
 
 frs = {}
 all_headers = {}
-for year,dataset in datasets.iteritems():
+for year,dataset in datasets.items():
     frs[year] = {}
     all_headers[year] = {}
     for lowhigh in ('low','high'):

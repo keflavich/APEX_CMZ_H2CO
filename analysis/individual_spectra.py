@@ -208,7 +208,7 @@ def fit_a_spectrum(sp, radexfit=False, write=True, vlimits=(-105,125),
 #h2co321 = pyspeckit.Cube(hpath('APEX_H2CO_321_220_bl.fits'))
 #cube = pyspeckit.CubeStack([h2co303,h2co321,h2co322])
 #cube.xarr.refX = 218222190000.0
-#cube.xarr.refX_units = 'Hz'
+#cube.xarr.refX_unit = 'Hz'
 #cube = pyspeckit.Cube(os.path.join(mergepath, 'APEX_H2CO_merge_high_sub.fits'))
 #cube.cube /= etamb
 #errorcube = noise[None,:,:] * np.ones(cube.cube.shape)
@@ -220,7 +220,7 @@ def load_spectra(regs, cube):
     xarr = pyspeckit.units.SpectroscopicAxis(cube.spectral_axis.value,
                                              unit=str(cube.spectral_axis.unit),
                                              refX=cube.wcs.wcs.restfrq,
-                                             refX_units='Hz')
+                                             refX_unit='Hz')
 
 
     for region_number,reg in enumerate(regs):

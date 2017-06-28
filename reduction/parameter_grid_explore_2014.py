@@ -57,7 +57,7 @@ if not os.path.exists(outpath):
 results = {}
 
 for pars in par_sets_pruned:
-    suffix = "_".join(short_names[k]+str(int(v)) for k,v in pars.iteritems()) 
+    suffix = "_".join(short_names[k]+str(int(v)) for k,v in pars.items()) 
     log.info(suffix)
     t0 = time.time()
     make_apex_cubes.build_cube_2014(source_name,

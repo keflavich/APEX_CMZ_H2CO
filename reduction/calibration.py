@@ -74,7 +74,7 @@ for ds in all_apexfiles:
                             sp.xarr.refX = 218.44005 #218.39258144781465 # CH3OH + 65.147 km/s
                         else:
                             sp.xarr.refX = 218.90336
-                        sp.xarr.refX_units = 'GHz'
+                        sp.xarr.refX_unit = 'GHz'
                     sp.xarr.convert_to_unit('km/s')
                     if sp.xarr.min() > 50 or sp.xarr.max() < -50:
                         log.info("Skipped {3} {1} {0} {2} - out of range"

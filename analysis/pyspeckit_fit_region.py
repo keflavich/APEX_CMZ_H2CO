@@ -26,15 +26,15 @@ def get_subregion_pcube(cube303m, cube303, cube321, region):
     #pcube = pyspeckit.Cube(cube=scube)
     pcube303 = pyspeckit.Cube(cube=scube303)
     pcube303.xarr.refX = cube303.wcs.wcs.restfrq
-    pcube303.xarr.refX_units = 'Hz'
+    pcube303.xarr.refX_unit = 'Hz'
     pcube321 = pyspeckit.Cube(cube=scube321)
     pcube321.xarr.refX = cube321.wcs.wcs.restfrq
-    pcube321.xarr.refX_units = 'Hz'
+    pcube321.xarr.refX_unit = 'Hz'
     pcube = pyspeckit.CubeStack([pcube303,pcube321,])
     pcube.specfit.Registry.add_fitter('h2co_simple', simple_fitter3, 4,
                                       multisingle='multi')
     pcube.xarr.refX = cube303m.wcs.wcs.restfrq
-    pcube.xarr.refX_units = 'Hz'
+    pcube.xarr.refX_unit = 'Hz'
     return pcube, scube303m
 
 

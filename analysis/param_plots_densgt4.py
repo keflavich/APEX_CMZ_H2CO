@@ -442,7 +442,7 @@ for row in fittable:
     pl.savefig(outf, bbox_inches='tight')
 
     row_data = mf.get_parconstraints()
-    for key,value in row_data.iteritems():
+    for key,value in row_data.items():
         row[key] = value
 
 

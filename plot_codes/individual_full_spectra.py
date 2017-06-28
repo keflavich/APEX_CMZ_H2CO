@@ -69,9 +69,9 @@ def velo_overlays(fullcube, lines):
                                         xarr=pyspeckit.units.SpectroscopicAxis(cube.spectral_axis.value,
                                              unit=str(cube.spectral_axis.unit),
                                              refX=cube.wcs.wcs.restfrq,
-                                             refX_units='Hz'),
+                                             refX_unit='Hz'),
                                         header=cube.wcs.to_header())
-               for line,cube in cubes.iteritems()}
+               for line,cube in cubes.items()}
 
     return cubes,spectra
 
@@ -86,7 +86,7 @@ for lh in ('low','high'):
     xarr = pyspeckit.units.SpectroscopicAxis(cube.spectral_axis.value,
                                              unit=str(cube.spectral_axis.unit),
                                              refX=cube.wcs.wcs.restfrq,
-                                             refX_units='Hz')
+                                             refX_unit='Hz')
 
     spectra = {}
     for region_number,reg in enumerate(regs):

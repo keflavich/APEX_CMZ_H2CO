@@ -320,7 +320,7 @@ def measure_dendrogram_properties(dend=None, cube303=cube303,
             #                                             columns['higaldusttem'][-1]*u.K,
             #                                             crir=0./u.s))
 
-        if len(set(len(c) for k,c in columns.iteritems())) != 1:
+        if len(set(len(c) for k,c in columns.items())) != 1:
             print("Columns are different lengths.  This is not allowed.")
             import ipdb; ipdb.set_trace()
 

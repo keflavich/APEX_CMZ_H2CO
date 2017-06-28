@@ -157,7 +157,7 @@ def parameter_grid_explore(build_cube_function,
 
     times = {r:results[r]['time'] for r in results}
     # http://stackoverflow.com/questions/613183/sort-a-python-dictionary-by-value
-    print sorted(times.iteritems(), key=operator.itemgetter(1))
+    print sorted(times.items(), key=operator.itemgetter(1))
 
     plot_pargrid_results(results, outpath=outpath)
 
