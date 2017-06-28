@@ -34,6 +34,7 @@ sp.plotter.savefig(paths.fpath('simple/WholeCMZ_6parameter.pdf'),
 lat,lon = full_cubes.cube_merge_high.world[0,:,:][1:]
 sgrb2_cloud_mask = ((lon-0.674*u.deg)**2 + (lat+0.027*u.deg)**2)**0.5 < 5*u.arcmin
 spd_nob2 = full_cubes.cube_merge_high.with_mask(~sgrb2_cloud_mask).mean(axis=(1,2)).value
+spd_b2 = full_cubes.cube_merge_high.with_mask(sgrb2_cloud_mask).mean(axis=(1,2)).value
 sp2 = pyspeckit.Spectrum(xarr=full_cubes.cube_merge_high.spectral_axis,
                          data=spd_nob2,
                          xarrkwargs={'velocity_convention': 'radio'},

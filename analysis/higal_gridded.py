@@ -10,14 +10,14 @@ dusttem_image = fits.open('/Users/adam/work/gc/gcmosaic_temp_conv36.fits')[0]
 # fix NaNs by convolving
 col_conv = convolution.convolve_fft(column_image.data,
                                     convolution.Gaussian2DKernel(2),
-                                    interpolate_nan=True,
+                                    nan_treatment='interpolate',
                                     normalize_kernel=True)
 whnan = np.isnan(column_image.data)
 column_image.data[whnan] = col_conv[whnan]
 
 dusttem_conv = convolution.convolve_fft(dusttem_image.data,
                                     convolution.Gaussian2DKernel(2),
-                                    interpolate_nan=True,
+                                    nan_treatment='interpolate',
                                     normalize_kernel=True)
 whnan = np.isnan(dusttem_image.data)
 dusttem_image.data[whnan] = dusttem_conv[whnan]
