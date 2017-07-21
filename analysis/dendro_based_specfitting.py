@@ -23,7 +23,8 @@ import numpy as np
 from astropy.io import fits
 from astropy.utils.console import ProgressBar
 from astropy import log
-from agpy.mad import MAD
+#from agpy.mad import MAD
+from astropy.stats import mad_std as MAD
 import multiprocessing
 import pyspeckit
 
