@@ -21,9 +21,14 @@ import matplotlib
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
 
 # obsolete x,y = np.loadtxt(apath('orbit_K14.dat')).T
-table = ascii.read(apath('orbit_K14_2.dat'), format='basic', comment="#", guess=False) 
+table = ascii.read(apath('orbit_K14_2.dat'), format='basic', comment="#", guess=False)
 coords = coordinates.SkyCoord(table['l']*u.deg, table['b']*u.deg, frame='galactic')
 P = pvextractor.Path(coords, width=300*u.arcsec)
+width = ""
+P = pvextractor.Path(coords, width=500*u.arcsec)
+width = "500arcsec"
+P = pvextractor.Path(coords, width=200*u.arcsec)
+width = "200arcsec"
 
 dl = (table['l'][1:]-table['l'][:-1])
 db = (table['b'][1:]-table['b'][:-1])
@@ -85,7 +90,8 @@ cmap = copy.copy(pl.cm.RdYlBu_r)
 cmap.set_under((0.9,0.9,0.9,0.5))
 
 for weight in ("","_weighted"):
-    for molecule,fn in zip(molecules[-2:],filenames[-2:]):
+    #for molecule,fn in zip(molecules[-2:],filenames[-2:]):
+    for molecule,fn in zip(molecules,filenames):
         log.info(molecule)
         cube = spectral_cube.SpectralCube.read(fn)
 
@@ -115,9 +121,10 @@ for weight in ("","_weighted"):
             weighted = weighted.with_mask(mask)
             wcube = wcube.with_mask(mask)
 
-        pvfilename = paths.dpath('orbits/KDL2014_orbit_on_{0}{1}.fits'.format(molecule, weight))
+        pvfilename = paths.dpath('orbits/KDL2014_orbit_on_{0}{1}{2}.fits'.format(molecule, weight, width))
         if os.path.exists(pvfilename):
             pv = fits.open(pvfilename)[0]
+            print("opened {0}".format(pvfilename))
         else:
             if weight:
 
@@ -156,6 +163,7 @@ for weight in ("","_weighted"):
                 pv = pvextractor.extract_pv_slice(cube, P, respect_nan=True)
             if not os.path.isdir(os.path.dirname(pvfilename)):
                 os.mkdir(os.path.dirname(pvfilename))
+            print("writing {0}".format(pvfilename))
             pv.writeto(pvfilename)
 
 
@@ -172,7 +180,7 @@ for weight in ("","_weighted"):
         ax = fig1.gca()
         mywcs = WCS(pv.header)
         xext, = mywcs.sub([1]).wcs_pix2world((0,pv.shape[1]), 0)
-        print "xext: ",xext
+        print("xext: ",xext)
         yext, = mywcs.sub([2]).wcs_pix2world((0,pv.shape[0]), 0)
         yext /= 1e3
         dy = yext[1]-yext[0]
