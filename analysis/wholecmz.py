@@ -5,7 +5,9 @@ from astropy import units as u
 from pyspeckit_fitting import simple_fitter2
 import full_cubes
 import paths
+import pylab as pl
 
+full_cubes.cube_merge_high.allow_huge_operations = True
 spd = full_cubes.cube_merge_high.mean(axis=(1,2)).value
 sp = pyspeckit.Spectrum(xarr=full_cubes.cube_merge_high.spectral_axis,
                         data=spd,
@@ -110,6 +112,52 @@ sp.plotter.axis.set_ylim(*ylim)
 sp.plotter.axis.set_title("Whole CMZ and Sgr B2")
 sp.plotter.savefig(paths.fpath('simple/WholeCMZ_withSgrB2_6parameter.pdf'),
                    bbox_inches='tight')
+
+sgrb2_N_mask = ((lon-0.6771*u.deg)**2 + (lat+0.0274*u.deg)**2)**0.5 < 0.5*u.arcmin
+spd_b2_N = full_cubes.cube_merge_high.with_mask(sgrb2_N_mask).mean(axis=(1,2)).value
+sp_b2_N = pyspeckit.Spectrum(xarr=full_cubes.cube_merge_high.spectral_axis,
+                             data=spd_b2_N,
+                             xarrkwargs={'velocity_convention': 'radio'},
+                            )
+sp_b2_N.xarr.refX = full_cubes.pcube_merge_high.xarr.refX
+sp_b2_N.xarr.refX_unit = full_cubes.pcube_merge_high.xarr.refX_unit
+sp_b2_N.xarr.convert_to_unit(u.GHz)
+sp_b2_N.specname = 'Sgr B2 N'
+sp_b2_N.unit = 'K'
+
+sgrb2_M_mask = ((lon-0.6668*u.deg)**2 + (lat+0.03508*u.deg)**2)**0.5 < 0.5*u.arcmin
+spd_b2_M = full_cubes.cube_merge_high.with_mask(sgrb2_M_mask).mean(axis=(1,2)).value
+sp_b2_M = pyspeckit.Spectrum(xarr=full_cubes.cube_merge_high.spectral_axis,
+                             data=spd_b2_M,
+                             xarrkwargs={'velocity_convention': 'radio'},
+                            )
+sp_b2_M.xarr.refX = full_cubes.pcube_merge_high.xarr.refX
+sp_b2_M.xarr.refX_unit = full_cubes.pcube_merge_high.xarr.refX_unit
+sp_b2_M.xarr.convert_to_unit(u.GHz)
+sp_b2_M.specname = 'Sgr B2 M'
+sp_b2_M.unit = 'K'
+
+N_to_B2 = sgrb2_N_mask.sum() / sgrb2_cloud_mask.sum()
+sp_b2_N_scaled = sp_b2_N * N_to_B2
+
+fig4 = pl.figure(4)
+fig4.clf()
+sp_b2.plotter(axis=fig4.gca(), color='red')
+ylim = sp_b2.plotter.axis.get_ylim()
+sp_b2_N_scaled.plotter(axis=fig4.gca(), clear=False, color='b')
+sp_b2.plotter.axis.set_ylim(*ylim)
+
+sp_b2.plotter.axis.set_title("Sgr B2 and Sgr B2 N")
+sp_b2.plotter.savefig(paths.fpath('simple/SgrB2_with_SgrB2N.pdf'),
+                      bbox_inches='tight')
+
+fig5 = pl.figure(5)
+fig5.clf()
+sp_b2_N.plotter(axis=fig5.gca(), color='b')
+sp_b2_M.plotter(axis=sp_b2_N.plotter.axis, clear=False, color='g')
+sp_b2_N.plotter.axis.set_title("Sgr B2 M and N")
+sp_b2_N.plotter.savefig(paths.fpath('simple/SgrB2MandN.pdf'),
+                        bbox_inches='tight')
 
 
 sp_b2.plotter()
