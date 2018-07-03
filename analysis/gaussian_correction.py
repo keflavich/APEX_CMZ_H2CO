@@ -1,5 +1,7 @@
 """
-Python implementation of Rosolowsky & Blitz 2006 Appendix B
+Python implementation of Rosolowsky & Blitz 2005 Appendix B (http://esoads.eso.org/abs/2005ApJ...623..826R)
+Probably also implements corrections from
+http://esoads.eso.org/abs/2006PASP..118..590R, but I'm less sure of that.
 """
 import numpy as np
 from numpy import exp,pi,sqrt
