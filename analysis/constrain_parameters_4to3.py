@@ -14,7 +14,7 @@ import pylab as pl
 from astropy.io import fits
 
 from h2co_modeling import grid_fitter
-from paraH2COmodel import generic_paraH2COmodel
+from h2co_modeling.paraH2COmodel import generic_paraH2COmodel
 
 def gpath(fn, gridpath='/Users/adam/work/h2co/radex/thermom/'):
     return os.path.join(gridpath, fn)
@@ -82,7 +82,7 @@ class paraH2COmodel(generic_paraH2COmodel):
                                    upsinds/upsample_factor[:,None,None,None],
                                    mode='nearest')
 
-    
+
         self.tline = {303: self.tline303,
                       321: self.tline321,
                       322: self.tline322,
@@ -209,7 +209,7 @@ class paraH2COmodel(generic_paraH2COmodel):
 
         All errors are 1-sigma Gaussian errors.
 
-        The ``taline`` parameters are only used as lower limits.  
+        The ``taline`` parameters are only used as lower limits.
 
         Logabundance and logh2column are both log_10 values, so the errorbars
         are effectively lognormal 1-sigma errors.
@@ -227,13 +227,13 @@ class paraH2COmodel(generic_paraH2COmodel):
             if argspec.locals[arg] is not None:
                 setattr(self, arg, argspec.locals[arg])
 
-        self.chi2_X = (self.chi2_abundance(logabundance, elogabundance) 
+        self.chi2_X = (self.chi2_abundance(logabundance, elogabundance)
                        if not any(arg is None for arg in (logabundance,
                                                           elogabundance))
                        else 0)
 
         self.chi2_h2 = (self.chi2_column(logh2column, elogh2column,
-                                         logabundance, linewidth) 
+                                         logabundance, linewidth)
                         if not
                         any(arg is None for arg in (logabundance, logh2column,
                                                       elogh2column, linewidth))
@@ -418,4 +418,3 @@ class paraH2COmodel(generic_paraH2COmodel):
 
     def coltemplot(self):
         self.parplot('col','tem')
-

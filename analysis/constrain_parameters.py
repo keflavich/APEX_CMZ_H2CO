@@ -15,8 +15,7 @@ from astropy import log
 import pylab as pl
 import matplotlib
 
-from h2co_modeling import grid_fitter
-from paraH2COmodel import generic_paraH2COmodel
+from h2co_modeling.paraH2COmodel import generic_paraH2COmodel
 
 short_mapping = {'dens': 'density',
                  'col': 'column',
@@ -76,7 +75,7 @@ class paraH2COmodel(generic_paraH2COmodel):
         self.tline322 = map_coordinates(self.tline322a,
                                    upsinds/upsample_factor[:,None,None,None],
                                    mode='nearest')
-    
+
         self.tline = {303: self.tline303,
                       321: self.tline321,
                       322: self.tline322}
@@ -162,13 +161,13 @@ class paraH2COmodel(generic_paraH2COmodel):
             if argspec.locals[arg] is not None:
                 setattr(self, arg, argspec.locals[arg])
 
-        self.chi2_X = (self.chi2_abundance(logabundance, elogabundance) 
+        self.chi2_X = (self.chi2_abundance(logabundance, elogabundance)
                        if not any(arg is None for arg in (logabundance,
                                                           elogabundance))
                        else 0)
 
         self.chi2_h2 = (self.chi2_column(logh2column, elogh2column,
-                                         logabundance, linewidth) 
+                                         logabundance, linewidth)
                         if not
                         any(arg is None for arg in (logabundance, logh2column,
                                                       elogh2column, linewidth))
@@ -439,7 +438,7 @@ class paraH2COmodel(generic_paraH2COmodel):
                           fontsize=legendfontsize)
 
         pl.subplots_adjust(hspace=0.45)
-                
+
 
     @property
     def individual_likelihoods(self):
