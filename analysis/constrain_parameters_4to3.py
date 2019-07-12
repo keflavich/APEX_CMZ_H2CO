@@ -59,28 +59,28 @@ class paraH2COmodel(generic_paraH2COmodel):
                                     gridsize[1]/self.tline303a.shape[1], # density
                                     gridsize[2]/self.tline303a.shape[2]], # column
                                    dtype='float')
-        uzinds,uyinds,uxinds = upsinds = np.indices([x*us
+        uzinds,uyinds,uxinds = upsinds = np.indices([int(x*us)
                                                      for x,us in zip(self.tline303a.shape,
                                                                      upsample_factor)],
-                                                   dtype='float')
+                                                    dtype='float')
         self.tline303 = map_coordinates(self.tline303a,
-                                   upsinds/upsample_factor[:,None,None,None],
-                                   mode='nearest')
+                                        upsinds/upsample_factor[:,None,None,None],
+                                        mode='nearest')
         self.tline321 = map_coordinates(self.tline321a,
-                                   upsinds/upsample_factor[:,None,None,None],
-                                   mode='nearest')
+                                        upsinds/upsample_factor[:,None,None,None],
+                                        mode='nearest')
         self.tline322 = map_coordinates(self.tline322a,
-                                   upsinds/upsample_factor[:,None,None,None],
-                                   mode='nearest')
+                                        upsinds/upsample_factor[:,None,None,None],
+                                        mode='nearest')
         self.tline404 = map_coordinates(self.tline404a,
-                                   upsinds/upsample_factor[:,None,None,None],
-                                   mode='nearest')
+                                        upsinds/upsample_factor[:,None,None,None],
+                                        mode='nearest')
         self.tline422 = map_coordinates(self.tline422a,
-                                   upsinds/upsample_factor[:,None,None,None],
-                                   mode='nearest')
+                                        upsinds/upsample_factor[:,None,None,None],
+                                        mode='nearest')
         self.tline423 = map_coordinates(self.tline423a,
-                                   upsinds/upsample_factor[:,None,None,None],
-                                   mode='nearest')
+                                        upsinds/upsample_factor[:,None,None,None],
+                                        mode='nearest')
 
 
         self.tline = {303: self.tline303,
