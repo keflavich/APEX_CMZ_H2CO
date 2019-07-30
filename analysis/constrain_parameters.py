@@ -6,6 +6,7 @@ import inspect
 import time
 import collections
 import warnings
+import os
 
 import numpy as np
 from scipy.ndimage.interpolation import map_coordinates
@@ -14,6 +15,8 @@ from astropy import units as u
 from astropy import log
 import pylab as pl
 import matplotlib
+from astropy.io import fits
+from astropy.utils.console import ProgressBar
 
 from h2co_modeling.paraH2COmodel import generic_paraH2COmodel
 
