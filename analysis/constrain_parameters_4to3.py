@@ -320,9 +320,9 @@ class paraH2COmodel(generic_paraH2COmodel):
         yax = self.axes[par2]
         xlabel = self.labels[par1]
         ylabel = self.labels[par2]
-        axis = {set(('col','dens')): 0,
-                set(('dens','tem')): 2,
-                set(('col','tem')): 1}[set((par1,par2))]
+        axis = {frozenset(('col','dens')): 0,
+                frozenset(('dens','tem')): 2,
+                frozenset(('col','tem')): 1}[frozenset((par1,par2))]
 
         if levels is None:
             levels = np.arange(nlevs)
