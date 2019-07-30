@@ -1,3 +1,4 @@
+raise "Use https://github.com/keflavich/h2co_modeling/blob/master/h2co_modeling/constrain_parameters.py instead"
 """
 Functions for fitting temperature (and density and column) from the line ratio
 plus whatever other constraints are available
