@@ -19,6 +19,8 @@ from piecewise_rtotem import pwtem
 import paths
 import matplotlib
 matplotlib.rc_file(paths.pcpath('pubfiguresrc'))
+from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
+from mpl_toolkits.axes_grid1.colorbar import colorbar
 
 # obsolete x,y = np.loadtxt(apath('orbit_K14.dat')).T
 table = ascii.read(apath('orbit_K14_2.dat'), format='basic', comment="#", guess=False)
